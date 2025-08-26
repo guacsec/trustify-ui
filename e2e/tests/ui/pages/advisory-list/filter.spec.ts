@@ -21,7 +21,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await table.verifyColumnContainsText("ID", "CVE-2024-26308");
 
     // Date filter
-    await toolbar.applyDateRangeFilter("Revision", "08/01/2024", "08/03/2024");
+    await toolbar.applyDateRangeFilter("Revision", "03/26/2025", "03/28/2025");
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("ID", "CVE-2024-26308");
 
