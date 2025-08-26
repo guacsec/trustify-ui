@@ -10,6 +10,7 @@ const Home = lazy(() => import("./pages/home"));
 
 // Advisory
 const AdvisoryList = lazy(() => import("./pages/advisory-list"));
+const AdvisoryUpload = lazy(() => import("./pages/advisory-upload"));
 const AdvisoryDetails = lazy(() => import("./pages/advisory-details"));
 
 // Vulnerability
@@ -24,12 +25,12 @@ const PackageDetails = lazy(() => import("./pages/package-details"));
 
 // SBOM
 const SBOMList = lazy(() => import("./pages/sbom-list"));
+const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 
 // Others
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
-const Upload = lazy(() => import("./pages/upload"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
@@ -40,16 +41,17 @@ export enum PathParam {
 
 export const Paths = {
   advisories: "/advisories",
+  advisoryUpload: "/advisories/upload",
   advisoryDetails: `/advisories/:${PathParam.ADVISORY_ID}`,
   vulnerabilities: "/vulnerabilities",
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
   sboms: "/sboms",
+  sbomUpload: "/sboms/upload",
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
   packages: "/packages",
   packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
   search: "/search",
   importers: "/importers",
-  upload: "/upload",
 } as const;
 
 const Lazy = ({ component }: { component: React.ReactNode }) => {
@@ -68,8 +70,9 @@ const Lazy = ({ component }: { component: React.ReactNode }) => {
 
 export const AppRoutes = () => {
   const allRoutes = useRoutes([
-    { path: "/", element: <Lazy component={<Home />} /> },
-    { path: Paths.advisories, element: <Lazy component={<AdvisoryList />} /> },
+    { path: "/", element: <Home /> },
+    { path: Paths.advisories, element: <Lazy component={<Home />} /> },
+    { path: Paths.advisoryUpload, element: <Lazy component={<AdvisoryUpload />} /> },
     {
       path: Paths.advisoryDetails,
       element: <Lazy component={<AdvisoryDetails />} />,
@@ -88,6 +91,7 @@ export const AppRoutes = () => {
       element: <Lazy component={<PackageDetails />} />,
     },
     { path: Paths.sboms, element: <Lazy component={<SBOMList />} /> },
+    { path: Paths.sbomUpload, element: <Lazy component={<SBOMUpload />} /> },
     {
       path: Paths.sbomDetails,
       element: <Lazy component={<SBOMDetails />} />,
@@ -97,7 +101,6 @@ export const AppRoutes = () => {
       element: <Lazy component={<ImporterList />} />,
     },
     { path: Paths.search, element: <Lazy component={<Search />} /> },
-    { path: Paths.upload, element: <Lazy component={<Upload />} /> },
   ]);
 
   return (
