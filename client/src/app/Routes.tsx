@@ -71,8 +71,11 @@ const Lazy = ({ component }: { component: React.ReactNode }) => {
 export const AppRoutes = () => {
   const allRoutes = useRoutes([
     { path: "/", element: <Home /> },
-    { path: Paths.advisories, element: <Lazy component={<Home />} /> },
-    { path: Paths.advisoryUpload, element: <Lazy component={<AdvisoryUpload />} /> },
+    { path: Paths.advisories, element: <Lazy component={<AdvisoryList />} /> },
+    {
+      path: Paths.advisoryUpload,
+      element: <Lazy component={<AdvisoryUpload />} />,
+    },
     {
       path: Paths.advisoryDetails,
       element: <Lazy component={<AdvisoryDetails />} />,
