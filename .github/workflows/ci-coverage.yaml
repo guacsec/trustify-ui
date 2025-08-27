@@ -24,7 +24,7 @@ jobs:
           node-version: 22
           cache: npm
       - name: install dependencies
-        run: npm ci
+        run: npm ci --verbose --ignore-scripts --no-audit
 
       - name: install trustify
         id: install-trustify
