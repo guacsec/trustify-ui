@@ -1,9 +1,11 @@
 import path from "node:path";
-import { expect, type Page, test as setup } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
+import { test as setup } from "../fixtures";
 
 import { login } from "../helpers/Auth";
 import {
   ADVISORY_FILES,
+  logger,
   SBOM_FILES,
   SETUP_TIMEOUT,
 } from "../../common/constants";
@@ -11,7 +13,7 @@ import {
 setup.describe("Ingest initial data", () => {
   setup.skip(
     process.env.SKIP_INGESTION === "true",
-    "Skipping global.setup data ingestion"
+    "Skipping global.setup data ingestion",
   );
 
   setup("Upload files", async ({ page, baseURL }) => {
@@ -21,8 +23,11 @@ setup.describe("Ingest initial data", () => {
     await page.goto(baseURL!);
 
     setup.setTimeout(SETUP_TIMEOUT);
+
+    logger.info("Setup UI: start uploading assets");
     await uploadSboms(page, SBOM_FILES);
     await uploadAdvisories(page, ADVISORY_FILES);
+    logger.info("Setup UI: upload finished successfully");
   });
 });
 
@@ -34,11 +39,11 @@ const uploadSboms = async (page: Page, files: string[]) => {
   await page.getByRole("button", { name: "Upload", exact: true }).click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles(
-    files.map((e) => path.join(__dirname, `../../common/assets/sbom/${e}`))
+    files.map((e) => path.join(__dirname, `../../common/assets/sbom/${e}`)),
   );
 
   await expect(
-    page.locator(".pf-v6-c-expandable-section__toggle")
+    page.locator(".pf-v6-c-expandable-section__toggle"),
   ).toContainText(`${files.length} of ${files.length} files uploaded`, {
     timeout: SETUP_TIMEOUT / 2,
   });
@@ -52,11 +57,11 @@ const uploadAdvisories = async (page: Page, files: string[]) => {
   await page.getByRole("button", { name: "Upload", exact: true }).click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles(
-    files.map((e) => path.join(__dirname, `../../common/assets/csaf/${e}`))
+    files.map((e) => path.join(__dirname, `../../common/assets/csaf/${e}`)),
   );
 
   await expect(
-    page.locator(".pf-v6-c-expandable-section__toggle")
+    page.locator(".pf-v6-c-expandable-section__toggle"),
   ).toContainText(`${files.length} of ${files.length} files uploaded`, {
     timeout: SETUP_TIMEOUT / 2,
   });

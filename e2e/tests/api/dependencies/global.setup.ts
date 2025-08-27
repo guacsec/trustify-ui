@@ -20,10 +20,10 @@ setup.describe("Ingest initial data", () => {
   setup("Upload files", async ({ axios }) => {
     setup.setTimeout(SETUP_TIMEOUT);
 
-    logger.info("Setup: start uploading assets");
+    logger.info("Setup API: start uploading assets");
     await uploadSboms(axios, SBOM_FILES);
     await uploadAdvisories(axios, ADVISORY_FILES);
-    logger.info("Setup: upload finished successfully");
+    logger.info("Setup API: upload finished successfully");
   });
 });
 

@@ -16,6 +16,8 @@ export const login = async (page: Page) => {
     await page.fill('input[name="password"]:visible', userPassword);
     await page.keyboard.press("Enter");
 
-    await expect(page.getByRole("heading", { name: "Importers" })).toHaveCount(1); // Ensure login was successful
+    await expect(page.getByRole("heading", { name: "Importers" })).toHaveCount(
+      1,
+    ); // Ensure login was successful
   }
 };
