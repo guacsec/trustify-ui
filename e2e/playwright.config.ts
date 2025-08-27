@@ -66,7 +66,7 @@ export default defineConfig({
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"], ...DESKTOP_CONFIG },
-      dependencies: ["setup-api-data"],
+      dependencies: ["setup-ui-data"],
     },
 
     {
@@ -76,7 +76,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         ...DESKTOP_CONFIG,
       },
-      dependencies: ["setup-api-data"],
+      dependencies: ["setup-ui-data"],
     },
 
     {
@@ -84,6 +84,12 @@ export default defineConfig({
       testDir: "./tests/api/features",
       testMatch: /.*\.ts/,
       dependencies: ["setup-api-data"],
+    },
+
+    {
+      name: "setup-ui-data",
+      testDir: "./tests/ui/dependencies",
+      testMatch: "*.setup.ts",
     },
     {
       name: "setup-api-data",
