@@ -7,7 +7,7 @@ COPY --chown=1001 . .
 RUN \
   npm version && \
   npm config ls && \
-  npm clean-install --verbose --ignore-scripts --no-audit && \
+  npm ci --verbose --ignore-scripts --no-audit && \
   npm run build && \
   npm run dist
 
