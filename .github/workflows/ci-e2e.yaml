@@ -39,28 +39,33 @@ jobs:
     outputs:
       image_tag: ${{ steps.set-outputs.outputs.image_tag }}
     steps:
-      - name: Extract env vars for main
+      - name: Extract vars for Pull Request
         shell: bash
-        if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') || (github.event_name != 'pull_request' && github.ref == 'refs/heads/main') }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+        env:
+          base_ref: ${{ github.event.pull_request.base.ref || github.event.merge_group.base_ref }}
         run: |
-          echo "image_tag=latest" >> $GITHUB_ENV
-      - name: Extract env vars for other branches on PR
+          branch=$base_ref
+          branch=$(echo ${branch#refs/heads/})
+          image_tag="latest"
+          if [[ "$branch" != "main" ]]; then
+            image_tag="${branch#release/}"
+          fi
+          echo "image_tag=$image_tag" >> $GITHUB_ENV
+      - name: Extract vars for Push
         shell: bash
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref != 'main' }}
-        run: |
-          branch=${{ github.event.pull_request.base.ref }}
-          branch_version="${branch#release/}"
-          echo "image_tag=$branch_version" >> $GITHUB_ENV
-      - name: Extract env vars for other branches on Push
-        shell: bash
-        if: ${{ github.event_name != 'pull_request' && contains(github.ref, 'refs/heads/main') == false }}
+        if: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
         run: |
           branch=$(echo ${GITHUB_REF#refs/heads/})
-          branch_version="${branch#release/}"
-          echo "image_tag=$branch_version" >> $GITHUB_ENV
+          image_tag="latest"
+          if [[ "$branch" != "main" ]]; then
+            image_tag="${branch#release/}"
+          fi
+          echo "image_tag=$image_tag" >> $GITHUB_ENV
       - name: Set outputs
         id: set-outputs
         run: |
+          echo ${{ env.image_tag }}
           echo "image_tag=${{ env.image_tag }}" >> "$GITHUB_OUTPUT"
 
   run-e2e-ci:
