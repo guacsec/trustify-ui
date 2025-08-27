@@ -42,8 +42,10 @@ jobs:
       - name: Extract vars for Pull Request
         shell: bash
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+        env:
+          base_ref: ${{ github.event.pull_request.base.ref || github.event.merge_group.base_ref }}
         run: |
-          branch=${{ github.event.pull_request.base.ref || github.event.merge_group.base_ref }}
+          branch=$base_ref
           branch=$(echo ${branch#refs/heads/})
           image_tag="latest"
           if [[ "$branch" != "main" ]]; then
