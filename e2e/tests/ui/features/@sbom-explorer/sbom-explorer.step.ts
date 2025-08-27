@@ -188,7 +188,7 @@ Then(
   async ({ page }, columnHeaders: string) => {
     const headers = columnHeaders
       .split(`,`)
-      .map((column: String) => column.trim());
+      .map((column: string) => column.trim());
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
     await toolbarTable.verifySorting(vulnTableTopPagination, headers);
@@ -208,7 +208,9 @@ When(
     await detailsPage.addLabels(labelsToAdd);
 
     // Store generated labels for verification
+    // biome-ignore lint/suspicious/noExplicitAny: allowed
     (page as any).testContext = {
+      // biome-ignore lint/suspicious/noExplicitAny: allowed
       ...(page as any).testContext,
       generatedLabels: labelsToAdd,
     };
@@ -223,7 +225,8 @@ Then(
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
-        ? (page as any).testContext?.generatedLabels || labelList
+        ? // biome-ignore lint/suspicious/noExplicitAny: allowed
+          (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName);
   },
@@ -231,13 +234,15 @@ Then(
 
 When(
   "User Adds Labels {string} to {string} SBOM from Explorer Page",
-  async ({ page }, labelList, sbomName) => {
+  async ({ page }, labelList, _sbomName) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.editLabelsDetailsPage();
     const labelsToAdd =
       labelList === "RANDOM_LABELS" ? detailsPage.generateLabels() : labelList;
     await detailsPage.addLabels(labelsToAdd);
+    // biome-ignore lint/suspicious/noExplicitAny: allowed
     (page as any).testContext = {
+      // biome-ignore lint/suspicious/noExplicitAny: allowed
       ...(page as any).testContext,
       generatedLabels: labelsToAdd,
     };
@@ -249,12 +254,13 @@ Then(
   async ({ page }, labelList, sbomName) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab(`Info`);
-    let infoSection = page.locator("#refTabInfoSection");
+    const infoSection = page.locator("#refTabInfoSection");
 
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
-        ? (page as any).testContext?.generatedLabels || labelList
+        ? // biome-ignore lint/suspicious/noExplicitAny: allowed
+          (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName, infoSection);
   },
