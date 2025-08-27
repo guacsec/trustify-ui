@@ -17,6 +17,7 @@ export const TablePersistenceKeyPrefixes = {
   sboms: "sb",
   sboms_by_package: "sbk",
   packages: "pk",
+  importers: "im",
 };
 
 // URL param prefixes: should be short, must be unique for each table that uses one
