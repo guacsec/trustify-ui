@@ -14,7 +14,7 @@ Given(
     const searchPage = new SearchPage(page, "Advisories");
     await searchPage.dedicatedSearch(advisoryID);
     await page.getByRole("link", { name: advisoryID }).click();
-  }
+  },
 );
 
 Given(
@@ -33,7 +33,7 @@ When(
   async ({ page }, item) => {
     const searchPage = new SearchPage(page, "Dashboard");
     await searchPage.generalSearch("Advisories", item);
-  }
+  },
 );
 
 When(
@@ -41,16 +41,16 @@ When(
   async ({ page }, advisoryID) => {
     const searchPage = new SearchPage(page, "Advisories");
     await searchPage.dedicatedSearch(advisoryID);
-  }
+  },
 );
 
 Then(
   "The advisory {string} shows in the results",
   async ({ page }, advisoryID) => {
     await expect(
-      page.getByRole("gridcell").filter({ hasText: advisoryID })
+      page.getByRole("gridcell").filter({ hasText: advisoryID }),
     ).toBeVisible();
-  }
+  },
 );
 
 // Advisory Explorer
@@ -59,7 +59,7 @@ Then(
   async ({ page }, columnName) => {
     const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
     await toolbarTable.verifyTableIsSortedBy(columnName);
-  }
+  },
 );
 
 Then(
@@ -67,7 +67,7 @@ Then(
   async ({ page }, totalResults) => {
     const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
     await toolbarTable.verifyPaginationHasTotalResults(totalResults);
-  }
+  },
 );
 
 Then(
@@ -75,7 +75,7 @@ Then(
   async ({ page }, columnName, expectedValue) => {
     const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
     await toolbarTable.verifyColumnContainsText(columnName, expectedValue);
-  }
+  },
 );
 
 // Advisory Explorer / Vulenrabilities

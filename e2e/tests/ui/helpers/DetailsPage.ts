@@ -39,7 +39,7 @@ export class DetailsPage {
       this.page
         .locator(".pf-v6-c-card__title-text")
         .filter({ hasText: panel })
-        .first()
+        .first(),
     ).toBeVisible();
   }
 

@@ -40,7 +40,7 @@ Then(
     const download = await downloadPromise;
     const actualFilename = download.suggestedFilename();
     expect(actualFilename).toEqual(expectedFilename);
-  }
+  },
 );
 
 When("User selects the Tab {string}", async ({ page }, tabName) => {
