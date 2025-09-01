@@ -3,8 +3,12 @@ FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS builder
 
 USER 1001
 COPY --chown=1001 . .
-RUN npm install -g npm@9
-RUN npm clean-install --ignore-scripts && npm run build && npm run dist
+RUN \
+  npm version && \
+  npm config ls && \
+  npm ci --verbose --ignore-scripts --no-audit && \
+  npm run build && \
+  npm run dist
 
 # Runner image
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
@@ -22,8 +26,8 @@ LABEL name="trustify/trustify-ui" \
       license="Apache License 2.0" \
       maintainer="carlosthe19916@gmail.com" \
       summary="Trustify - User Interface" \
-      url="https://ghcr.io/trustification/trustify-ui" \
-      usage="podman run -p 80 -v trustification/trustify-ui:latest" \
+      url="https://ghcr.io/guacsec/trustify-ui" \
+      usage="podman run -p 80 -v guacsec/trustify-ui:latest" \
       io.k8s.display-name="trustify-ui" \
       io.k8s.description="Trustify - User Interface" \
       io.openshift.expose-services="80:http" \
