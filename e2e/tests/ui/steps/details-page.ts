@@ -8,6 +8,11 @@ Then("The page title is {string}", async ({ page }, title) => {
   await pageWithTabs.verifyPageHeader(title);
 });
 
+Then("The {string} action is available", async ({ page }, actionName) => {
+  const detailsPage = new DetailsPage(page);
+  await detailsPage.verifyActionIsAvailable(actionName);
+});
+
 Then("The {string} button is visible", async ({ page }, buttonName) => {
   const detailsPage = new DetailsPage(page);
   await detailsPage.verifyButtonIsVisible(buttonName);

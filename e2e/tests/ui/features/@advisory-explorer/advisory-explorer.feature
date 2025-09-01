@@ -29,7 +29,7 @@ Feature: Advisory Explorer
         When User visits Advisory details Page of "<advisoryID>"
 
         Then The page title is "<advisoryID>"
-        Then The "Download" button is visible
+        Then The "Download" action is available
 
         Examples:
             | advisoryID      |

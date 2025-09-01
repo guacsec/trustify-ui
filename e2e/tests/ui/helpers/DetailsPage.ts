@@ -30,6 +30,11 @@ export class DetailsPage {
     await expect(this.page.getByRole("heading")).toContainText(header);
   }
 
+  async verifyActionIsAvailable(actionName: string) {
+    await this.page.getByRole("button", { name: "Actions" }).click();
+    await expect(this.page.getByRole("menuitem", { name: actionName })).toBeVisible();
+  }
+
   async verifyButtonIsVisible(button: string) {
     await expect(this.page.getByRole("button", { name: button })).toBeVisible();
   }
