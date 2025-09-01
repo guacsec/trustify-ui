@@ -32,7 +32,9 @@ export class DetailsPage {
 
   async verifyActionIsAvailable(actionName: string) {
     await this.page.getByRole("button", { name: "Actions" }).click();
-    await expect(this.page.getByRole("menuitem", { name: actionName })).toBeVisible();
+    await expect(
+      this.page.getByRole("menuitem", { name: actionName }),
+    ).toBeVisible();
   }
 
   async verifyButtonIsVisible(button: string) {
