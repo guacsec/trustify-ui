@@ -12,7 +12,7 @@
     "test:ui": "npx bddgen && npx playwright test --project='chromium' --project='bdd'",
     "test:ui:trace": "npx bddgen && npx playwright test --project='chromium' --project='bdd' --trace on",
     "test:ui:host": "npx bddgen && npx playwright test --ui-host 127.0.0.1",
-    "check": "biome check .",
+    "check": "biome check --error-on-warnings .",
     "check:write": "biome check --write .",
     "format": "biome format .",
     "format:fix": "biome format --write ."

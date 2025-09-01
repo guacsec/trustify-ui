@@ -468,8 +468,8 @@ export class ToolbarTable {
    */
   async editLabelsListPage(entity: string) {
     await this.waitForTableContent();
-    let sbomAction = `xpath=//td[.='${entity}']/parent::tr/td/button`;
-    let table = this.getTable();
+    const sbomAction = `xpath=//td[.='${entity}']/parent::tr/td/button`;
+    const table = this.getTable();
     await table.locator(sbomAction).click();
     await this._page.getByRole("menuitem", { name: "Edit labels" }).click();
   }

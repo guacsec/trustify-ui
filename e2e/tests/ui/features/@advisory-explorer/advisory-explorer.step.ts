@@ -57,7 +57,7 @@ Then(
   async ({ page }, headers: string) => {
     const headersArr = headers
       .split(`,`)
-      .map((column: String) => column.trim());
+      .map((column: string) => column.trim());
     for (const label of headersArr) {
       const header = page.getByRole("columnheader", { name: label });
       if (await header.count()) {

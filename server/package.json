@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "clean:all": "rimraf ./dist ./node_modules",
-    "check": "biome check .",
+    "check": "biome check --error-on-warnings .",
     "check:write": "biome check --write .",
     "format": "biome format .",
     "format:fix": "biome format --write .",

@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 /**
  * Describes the Details of an Entity. E.g. SBOM Details Page.
@@ -101,7 +101,7 @@ export class DetailsPage {
     delimiter: string,
   ): Promise<{ [key: string]: number }> {
     const elements = await this.page.locator(labelLocator).all();
-    let vulnLabelCount: { [key: string]: number } = {};
+    const vulnLabelCount: { [key: string]: number } = {};
     for (const element of elements) {
       const innerText = await element.textContent();
       const labelArr = await innerText?.split(delimiter);
@@ -141,7 +141,9 @@ export class DetailsPage {
     }
 
     while (nextPage) {
-      for (let cvssType of Object.keys(counts) as Array<keyof typeof counts>) {
+      for (const cvssType of Object.keys(counts) as Array<
+        keyof typeof counts
+      >) {
         const cvssLocator = await this.page
           .locator(`xpath=//td[@data-label='CVSS']//div[.='${cvssType}']`)
           .all();
@@ -185,9 +187,9 @@ export class DetailsPage {
    * @param labels List of labels to add to the entity
    */
   async addLabels(labelList: string) {
-    let labels = labelList.split(",").map((label) => label.trim());
+    const labels = labelList.split(",").map((label) => label.trim());
     await this.page.getByText("Edit labels").isVisible();
-    for (let label of labels) {
+    for (const label of labels) {
       await this.page.getByPlaceholder("Add label").fill(label);
       await this.page.getByPlaceholder("Add label").press("Enter");
     }
@@ -205,7 +207,7 @@ export class DetailsPage {
     entity: string = "",
     parentElem: Locator | undefined = undefined,
   ) {
-    let labels = labelList.split(",").map((label) => label.trim());
+    const labels = labelList.split(",").map((label) => label.trim());
 
     if (!parentElem) {
       parentElem = this.page.locator(`xpath=//td[.='${entity}']/parent::tr/td`);
