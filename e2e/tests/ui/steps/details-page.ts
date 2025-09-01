@@ -48,7 +48,13 @@ When("User selects the Tab {string}", async ({ page }, tabName) => {
   await detailsPage.selectTab(tabName);
 });
 
+When("User selects the {string} action", async ({ page }, menuItemName) => {
+  const detailsPage = new DetailsPage(page);
+  await detailsPage.clickOnPageAction(menuItemName);
+});
+
 When("User clicks the {string} button", async ({ page }, buttonName) => {
   const detailsPage = new DetailsPage(page);
   await detailsPage.clickOnPageButton(buttonName);
 });
+

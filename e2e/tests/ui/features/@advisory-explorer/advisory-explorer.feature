@@ -38,7 +38,7 @@ Feature: Advisory Explorer
     Scenario: Download an advisory
 
         When User visits Advisory details Page of "<advisoryID>"
-        And User clicks the "Download" button
+        And User selects the "Download Advisory" action
 
         Then File with the name "<fileName>" is downloaded
 
