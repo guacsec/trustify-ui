@@ -57,4 +57,3 @@ When("User clicks the {string} button", async ({ page }, buttonName) => {
   const detailsPage = new DetailsPage(page);
   await detailsPage.clickOnPageButton(buttonName);
 });
-
