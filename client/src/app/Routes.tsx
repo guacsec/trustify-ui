@@ -1,3 +1,4 @@
+import type React from "react";
 import { Suspense, lazy } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useParams, useRoutes } from "react-router-dom";
@@ -53,38 +54,7 @@ export const Paths = {
   importers: "/importers",
 } as const;
 
-export const AppRoutes = () => {
-  const allRoutes = useRoutes([
-    { path: "/", element: <Home /> },
-    { path: Paths.advisories, element: <AdvisoryList /> },
-    { path: Paths.advisoryUpload, element: <AdvisoryUpload /> },
-    {
-      path: Paths.advisoryDetails,
-      element: <AdvisoryDetails />,
-    },
-    { path: Paths.vulnerabilities, element: <VulnerabilityList /> },
-    {
-      path: Paths.vulnerabilityDetails,
-      element: <VulnerabilityDetails />,
-    },
-    { path: Paths.packages, element: <PackageList /> },
-    {
-      path: Paths.packageDetails,
-      element: <PackageDetails />,
-    },
-    { path: Paths.sboms, element: <SBOMList /> },
-    { path: Paths.sbomUpload, element: <SBOMUpload /> },
-    {
-      path: Paths.sbomDetails,
-      element: <SBOMDetails />,
-    },
-    {
-      path: Paths.importers,
-      element: <ImporterList />,
-    },
-    { path: Paths.search, element: <Search /> },
-  ]);
-
+const Lazy = ({ component }: { component: React.ReactNode }) => {
   return (
     <Suspense
       fallback={
@@ -93,10 +63,53 @@ export const AppRoutes = () => {
         </Bullseye>
       }
     >
-      <ErrorBoundary FallbackComponent={ErrorFallback} key={location.pathname}>
-        {allRoutes}
-      </ErrorBoundary>
+      {component}
     </Suspense>
+  );
+};
+
+export const AppRoutes = () => {
+  const allRoutes = useRoutes([
+    { path: "/", element: <Home /> },
+    { path: Paths.advisories, element: <Lazy component={<AdvisoryList />} /> },
+    {
+      path: Paths.advisoryUpload,
+      element: <Lazy component={<AdvisoryUpload />} />,
+    },
+    {
+      path: Paths.advisoryDetails,
+      element: <Lazy component={<AdvisoryDetails />} />,
+    },
+    {
+      path: Paths.vulnerabilities,
+      element: <Lazy component={<VulnerabilityList />} />,
+    },
+    {
+      path: Paths.vulnerabilityDetails,
+      element: <Lazy component={<VulnerabilityDetails />} />,
+    },
+    { path: Paths.packages, element: <Lazy component={<PackageList />} /> },
+    {
+      path: Paths.packageDetails,
+      element: <Lazy component={<PackageDetails />} />,
+    },
+    { path: Paths.sboms, element: <Lazy component={<SBOMList />} /> },
+    { path: Paths.sbomUpload, element: <Lazy component={<SBOMUpload />} /> },
+    {
+      path: Paths.sbomDetails,
+      element: <Lazy component={<SBOMDetails />} />,
+    },
+    {
+      path: Paths.importers,
+      element: <Lazy component={<ImporterList />} />,
+    },
+    { path: Paths.search, element: <Lazy component={<Search />} /> },
+  ]);
+
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback} key={location.pathname}>
+      {allRoutes}
+    </ErrorBoundary>
   );
 };
 
