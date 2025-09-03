@@ -10,12 +10,14 @@ export const login = async (page: Page) => {
     const userName = AUTH_USER;
     const userPassword = AUTH_PASSWORD;
 
-    await page.goto("/upload");
+    await page.goto("/importers");
 
     await page.fill('input[name="username"]:visible', userName);
     await page.fill('input[name="password"]:visible', userPassword);
     await page.keyboard.press("Enter");
 
-    await expect(page.getByRole("heading", { name: "Upload" })).toHaveCount(1); // Ensure login was successful
+    await expect(page.getByRole("heading", { name: "Importers" })).toHaveCount(
+      1,
+    ); // Ensure login was successful
   }
 };
