@@ -1,7 +1,7 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
 import { FORM_DATA_FILE_KEY } from "@app/Constants";
-import type { AdvisoryDetails, IngestResult } from "@app/client";
+import type { AdvisoryDetails, ExtractResult, IngestResult } from "@app/client";
 import { serializeRequestParamsForHub } from "@app/hooks/table-controls/getHubRequestParams";
 
 import type { HubPaginatedResult, HubRequestParams } from "./models";
@@ -65,11 +65,33 @@ export const uploadSbom = (formData: FormData, config?: AxiosRequestConfig) => {
   });
 };
 
+export const uploadSbomForAnalysis = (
+  formData: FormData,
+  config?: AxiosRequestConfig,
+) => {
+  const file = formData.get(FORM_DATA_FILE_KEY) as File;
+  return axios.post<ExtractResult>("/api/v2/ui/extract-sbom-purls", file, {
+    ...config,
+    headers: { "Content-Type": getContentTypeFromFile(file) },
+  });
+};
+
 // Using our own definition of the endpoint rather than the `hey-api` auto generated
 // We could replace this one once https://github.com/hey-api/openapi-ts/issues/1803 is fixed
 export const downloadSbomLicense = (sbomId: string) => {
   return axios.get<Blob>(`${SBOMS}/${sbomId}/license-export`, {
     responseType: "arraybuffer",
     headers: { Accept: "text/plain", responseType: "blob" },
+  });
+};
+
+export const generateStaticReport = (formData: FormData) => {
+  return axios.post<Blob>("/api/v2/ui/generate-sbom-static-report", formData, {
+    responseType: "arraybuffer",
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Accept: "text/plain",
+      responseType: "blob",
+    },
   });
 };

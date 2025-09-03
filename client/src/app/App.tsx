@@ -1,23 +1,20 @@
-import "./App.css";
 import type React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import "./App.css";
 
-import { AppRoutes } from "./Routes";
 import { NotificationsProvider } from "./components/NotificationsContext";
 import { DefaultLayout } from "./layout";
 
-import "@patternfly/patternfly/patternfly.css";
 import "@patternfly/patternfly/patternfly-addons.css";
+import "@patternfly/patternfly/patternfly.css";
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <NotificationsProvider>
-        <DefaultLayout>
-          <AppRoutes />
-        </DefaultLayout>
-      </NotificationsProvider>
-    </Router>
+    <NotificationsProvider>
+      <DefaultLayout>
+        <Outlet />
+      </DefaultLayout>
+    </NotificationsProvider>
   );
 };
 

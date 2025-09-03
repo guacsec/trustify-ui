@@ -1,3 +1,4 @@
+import { isMockDisabled } from "@app/Constants";
 import type { DisallowCharacters } from "@app/utils/type-utils";
 import { objectKeys } from "@app/utils/utils";
 import React from "react";
@@ -78,11 +79,42 @@ export const useUrlParams = <
         )
       : (serializedParams as TSerializedParams<TPrefixedURLParamKey>);
 
+  /**
+   * Generates hash, pathname, and search valid for BrowserRoute as well as HashRoute
+   */
+  const getLocation = ({
+    hash,
+    pathname,
+    search,
+  }: {
+    hash: string;
+    pathname: string;
+    search: string;
+  }) => {
+    if (isMockDisabled) {
+      return {
+        pathname,
+        search,
+      };
+    }
+
+    const array = hash.replace(/^#/, "").split("?");
+    return {
+      pathname: array[0],
+      search: array[1] ?? "",
+    };
+  };
+
   const setParams = (newParams: Partial<TDeserializedParams>) => {
     // In case setParams is called multiple times synchronously from the same rendered instance,
     // we use document.location here as the current params so these calls never overwrite each other.
     // This also retains any unrelated params that might be present and allows newParams to be a partial update.
-    const { pathname, search } = document.location;
+    const { search, pathname } = getLocation({
+      hash: document.location.hash,
+      pathname: document.location.pathname,
+      search: document.location.search,
+    });
+
     const existingSearchParams = new URLSearchParams(search);
     // We prefix the params object here so the serialize function doesn't have to care about the keyPrefix.
     const newPrefixedSerializedParams = withPrefixes(serialize(newParams));
@@ -99,7 +131,13 @@ export const useUrlParams = <
   };
 
   // We use useLocation here so we are re-rendering when the params change.
-  const urlParams = new URLSearchParams(useLocation().search);
+  const location = useLocation();
+  const { search } = getLocation({
+    hash: location.hash,
+    pathname: location.pathname,
+    search: location.search,
+  });
+  const urlParams = new URLSearchParams(search);
   // We un-prefix the params object here so the deserialize function doesn't have to care about the keyPrefix.
 
   let allParamsEmpty = true;

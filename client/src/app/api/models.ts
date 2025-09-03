@@ -42,6 +42,7 @@ export type VulnerabilityStatus =
   | "fixed"
   | "not_affected"
   | "known_not_affected"
+  | "under_investigation"
   | "affected";
 
 export interface DecomposedPurl {
