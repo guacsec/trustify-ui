@@ -5,7 +5,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/trustification/trustify-ui.git"
+    "url": "https://github.com/guacsec/trustify-ui.git"
   },
   "scripts": {
     "generate": "npm run generate -ws --if-present",
