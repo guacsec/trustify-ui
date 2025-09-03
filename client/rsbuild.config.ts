@@ -22,9 +22,9 @@ const brandingAssetPath = () =>
     .resolve("@trustify-ui/common/package.json")
     .replace(/(.)\/package.json$/, "$1")}/dist/branding`;
 
-const brandingPath: string = brandingAssetPath();
-const manifestPath = path.resolve(brandingPath, "manifest.json");
-const faviconPath = path.resolve(brandingPath, "favicon.ico");
+export const brandingPath: string = brandingAssetPath();
+export const manifestPath = path.resolve(brandingPath, "manifest.json");
+export const faviconPath = path.resolve(brandingPath, "favicon.ico");
 
 export const renameIndex = (): RsbuildPlugin => ({
   name: "CopyIndex",

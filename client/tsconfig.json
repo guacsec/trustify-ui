@@ -20,6 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@app/*": ["src/app/*"],
+      "@static-report/*": ["src/static-report/*"],
       "@mocks/*": ["src/mocks/*"]
     },
     "esModuleInterop": true
