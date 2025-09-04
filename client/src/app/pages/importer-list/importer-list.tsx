@@ -12,6 +12,7 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
+  ModalVariant,
   PageSection,
   Toolbar,
   ToolbarContent,
@@ -64,6 +65,7 @@ import { useLocalTableControls } from "@app/hooks/table-controls";
 import { ANSICOLOR } from "@app/Constants";
 import { ImporterProgress } from "./components/importer-progress";
 import { ImporterStatusIcon } from "./components/importer-status-icon";
+import { ImporterForm } from "./components/importer-form";
 
 type ImporterStatus = "disabled" | "scheduled" | "running";
 
@@ -83,6 +85,8 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
+  const { importers, isFetching, fetchError, refetch } = useFetchImporters();
+
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
   const [selectedRow, setSelectedRow] = React.useState<Importer | null>(null);
@@ -94,7 +98,18 @@ export const ImporterList: React.FC = () => {
     setSelectedRow(row);
   };
 
-  const { importers, isFetching, fetchError } = useFetchImporters();
+  // Create | Edit Actions
+  const [createUpdateModalState, setCreateUpdateModalState] = React.useState<
+    "create" | Importer | null
+  >(null);
+  const isCreateUpdateModalOpen = createUpdateModalState !== null;
+  const entityToUpdate =
+    createUpdateModalState !== "create" ? createUpdateModalState : null;
+
+  const closeCreateUpdateModal = () => {
+    setCreateUpdateModalState(null);
+    refetch();
+  };
 
   // Enable/Disable Importer
 
@@ -286,6 +301,14 @@ export const ImporterList: React.FC = () => {
           <Toolbar {...toolbarProps}>
             <ToolbarContent>
               <FilterToolbar showFiltersSideBySide {...filterToolbarProps} />
+              <ToolbarItem>
+                <Button
+                  variant="primary"
+                  onClick={() => setCreateUpdateModalState("create")}
+                >
+                  Create
+                </Button>
+              </ToolbarItem>
               <ToolbarItem {...paginationToolbarItemProps}>
                 <SimplePagination
                   idPrefix="importer-table"
@@ -383,6 +406,15 @@ export const ImporterList: React.FC = () => {
                         <Td isActionCell>
                           <ActionsColumn
                             items={[
+                              {
+                                title: "Edit",
+                                onClick: () => {
+                                  setCreateUpdateModalState(item);
+                                },
+                              },
+                              {
+                                isSeparator: true,
+                              },
                               ...(isImporterDisabled
                                 ? [
                                     {
@@ -435,6 +467,22 @@ export const ImporterList: React.FC = () => {
           />
         </div>
       </PageSection>
+
+      <Modal
+        variant={ModalVariant.medium}
+        isOpen={isCreateUpdateModalOpen}
+        onClose={closeCreateUpdateModal}
+      >
+        <ModalHeader
+          title={entityToUpdate ? "Update Importer" : "Create Importer"}
+        />
+        <ModalBody>
+          <ImporterForm
+            importer={entityToUpdate}
+            onClose={closeCreateUpdateModal}
+          />
+        </ModalBody>
+      </Modal>
 
       {selectedRowAction && confirmDialogProps && (
         <ConfirmDialog

@@ -89,18 +89,27 @@ const PERIOD_UNIT_LIST: PeriodUnitProps = {
 type FormValues = {
   name: string;
   description: string;
-  type: ImporterType;
-  source: string;
+  enabled: boolean;
   periodValue: number;
   periodUnit: PeriodUnitType;
-  v3Signatures: boolean;
-  enabled: boolean;
-  keys: { value: string }[];
-  onlyPatterns: { value: string }[];
+  labels: { [key: string]: string };
+  type: ImporterType;
+  sbom?: {
+    source: string;
+    keys: { value: string }[];
+    v3Signatures: boolean;
+    onlyPatterns: { value: string }[];
+    size_limit: string;
+    fetch_retries: number;
+    ignore_missing: boolean;
+  };
 };
 
+export const ALL_TYPES = ["sbom", "advisory", "license"] as const;
+type ImporterType = (typeof ALL_TYPES)[number];
+
 export const ALL_IMPORTERS = ["sbom", "csaf", "osv", "cve"] as const;
-type ImporterType = (typeof ALL_IMPORTERS)[number];
+type ImporterSubType = (typeof ALL_IMPORTERS)[number];
 
 export interface IImporterFormProps {
   importer: Importer | null;
@@ -117,18 +126,18 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
     name: string().trim().required().min(3).max(120),
     description: string().trim().max(250),
     type: string().trim().required().min(3).max(250),
-    source: string().trim().required().min(3).max(250),
-    periodValue: number().required().min(1),
-    periodUnit: string().trim().required().max(250),
-    v3Signatures: boolean().required(),
-    enabled: boolean().required(),
-    keys: array(object().shape({ value: string() })),
-    onlyPatterns: array(object().shape({ value: string() })),
+    // source: string().trim().required().min(3).max(250),
+    // periodValue: number().required().min(1),
+    // periodUnit: string().trim().required().max(250),
+    // v3Signatures: boolean().required(),
+    // enabled: boolean().required(),
+    // keys: array(object().shape({ value: string() })),
+    // onlyPatterns: array(object().shape({ value: string() })),
   });
 
   const importerType = Object.keys(
     importer?.configuration ?? {},
-  )[0] as ImporterType;
+  )[0] as ImporterSubType;
 
   const importerConfiguration = importer?.configuration
     ? // biome-ignore lint/suspicious/noExplicitAny: allowed
@@ -149,28 +158,29 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
     defaultValues: {
       name: importer?.name || "",
       description: importerConfiguration?.description || "",
-      type: importer ? importerType : "sbom",
-      source: importerConfiguration?.source || "",
       periodValue: periodValue || 60,
       periodUnit: periodUnit || "s",
-      v3Signatures: importerConfiguration?.v3Signatures ?? false,
       enabled: importerConfiguration?.disabled ?? true,
-      keys: importerConfiguration?.keys?.map((e) => ({ value: e })) ?? [],
-      onlyPatterns:
-        importerConfiguration?.onlyPatterns?.map((e) => ({ value: e })) ?? [],
+      labels: importerConfiguration?.labels ?? {},
+      // type: importer ? importerType : "sbom",
+      // source: importerConfiguration?.source || "",
+      // v3Signatures: importerConfiguration?.v3Signatures ?? false,
+      // keys: importerConfiguration?.keys?.map((e) => ({ value: e })) ?? [],
+      // onlyPatterns:
+      //   importerConfiguration?.onlyPatterns?.map((e) => ({ value: e })) ?? [],
     },
     resolver: yupResolver(validationSchema),
     // mode: "onChange",
   });
 
-  const {
-    fields: fieldsKeys,
-    append: appendKeys,
-    remove: removeKeys,
-  } = useFieldArray({
-    control: control,
-    name: "keys",
-  });
+  // const {
+  //   fields: fieldsKeys,
+  //   append: appendKeys,
+  //   remove: removeKeys,
+  // } = useFieldArray({
+  //   control: control,
+  //   name: "keys",
+  // });
 
   const onCreateSuccess = () =>
     pushNotification({
@@ -208,68 +218,55 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
   );
 
   const onSubmit = (formValues: FormValues) => {
-    const configuration: SbomImporter = {
-      ...(importerConfiguration ?? {}),
-      description: formValues.description.trim(),
-      source: formValues.source.trim(),
-      period: `${formValues.periodValue}${formValues.periodUnit.trim()}`,
-      v3Signatures: formValues.v3Signatures,
-      disabled: !formValues.enabled,
-      keys: formValues.keys.map((e) => e.value),
-      onlyPatterns: formValues.onlyPatterns.map((e) => e.value),
-    };
-
-    const payload = {
-      [formValues.type]: configuration,
-    } as ImporterConfiguration;
-
-    if (importer) {
-      updateImporter({
-        importerName: formValues.name,
-        configuration: payload,
-      });
-    } else {
-      createImporter({
-        importerName: formValues.name,
-        configuration: payload,
-      });
-    }
-    onClose();
+    // const configuration: SbomImporter = {
+    //   ...(importerConfiguration ?? {}),
+    //   description: formValues.description.trim(),
+    //   source: formValues.source.trim(),
+    //   period: `${formValues.periodValue}${formValues.periodUnit.trim()}`,
+    //   v3Signatures: formValues.v3Signatures,
+    //   disabled: !formValues.enabled,
+    //   keys: formValues.keys.map((e) => e.value),
+    //   onlyPatterns: formValues.onlyPatterns.map((e) => e.value),
+    // };
+    // const payload = {
+    //   [formValues.type]: configuration,
+    // } as ImporterConfiguration;
+    // if (importer) {
+    //   updateImporter({
+    //     importerName: formValues.name,
+    //     configuration: payload,
+    //   });
+    // } else {
+    //   createImporter({
+    //     importerName: formValues.name,
+    //     configuration: payload,
+    //   });
+    // }
+    // onClose();
   };
 
   const fillDemoSettings = () => {
-    if (getValues().type === "sbom") {
-      setValue("source", "https://access.redhat.com/security/data/sbom/beta/");
-      setValue("keys", [
-        {
-          value:
-            "https://access.redhat.com/security/data/97f5eac4.txt#77E79ABE93673533ED09EBE2DCE3823597F5EAC4",
-        },
-      ]);
-    } else if (getValues().type === "csaf") {
-      setValue(
-        "source",
-        "https://redhat.com/.well-known/csaf/provider-metadata.json",
-      );
-      setValue("keys", []);
-    }
-    setValue("v3Signatures", true);
-    trigger();
+    // if (getValues().type === "sbom") {
+    //   setValue("source", "https://access.redhat.com/security/data/sbom/beta/");
+    //   setValue("keys", [
+    //     {
+    //       value:
+    //         "https://access.redhat.com/security/data/97f5eac4.txt#77E79ABE93673533ED09EBE2DCE3823597F5EAC4",
+    //     },
+    //   ]);
+    // } else if (getValues().type === "csaf") {
+    //   setValue(
+    //     "source",
+    //     "https://redhat.com/.well-known/csaf/provider-metadata.json",
+    //   );
+    //   setValue("keys", []);
+    // }
+    // setValue("v3Signatures", true);
+    // trigger();
   };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <HookFormPFSelect
-        control={control}
-        name="type"
-        label="Type"
-        fieldId="type"
-        isRequired
-      >
-        {ALL_IMPORTERS.map((option) => (
-          <FormSelectOption key={option} value={option} label={option} />
-        ))}
-      </HookFormPFSelect>
       <HookFormPFTextInput
         control={control}
         name="name"
@@ -313,6 +310,70 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
           </span>
         )}
       />
+      <FormGroup label="Executioln period" isRequired>
+        <Split hasGutter>
+          <SplitItem>
+            <HookFormPFGroupController
+              control={control}
+              name="periodValue"
+              fieldId="periodValue"
+              renderInput={({ field: { value, onChange } }) => (
+                <NumberInput
+                  value={value}
+                  onMinus={() => {
+                    onChange(value - 1);
+                  }}
+                  onChange={onChange}
+                  onPlus={() => {
+                    onChange(value + 1);
+                  }}
+                  inputName="periodValue"
+                  inputAriaLabel="period value"
+                  minusBtnAriaLabel="minus"
+                  plusBtnAriaLabel="plus"
+                />
+              )}
+            />
+          </SplitItem>
+          <SplitItem>
+            <HookFormPFGroupController
+              control={control}
+              name="periodUnit"
+              fieldId="periodUnit"
+              renderInput={({ field: { value, onChange, onBlur } }) => (
+                <FormSelect
+                  aria-label="period-unit"
+                  isRequired
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  style={{ width: 110 }}
+                >
+                  {ALL_PERIOD_UNITS.map((option) => (
+                    <FormSelectOption
+                      key={option}
+                      value={option}
+                      label={PERIOD_UNIT_LIST[option].label}
+                    />
+                  ))}
+                </FormSelect>
+              )}
+            />
+          </SplitItem>
+        </Split>
+      </FormGroup>
+
+      <HookFormPFSelect
+        control={control}
+        name="type"
+        label="Type"
+        fieldId="type"
+        isRequired
+      >
+        {ALL_TYPES.map((option) => (
+          <FormSelectOption key={option} value={option} label={option} />
+        ))}
+      </HookFormPFSelect>
 
       <FormFieldGroupExpandable
         isExpanded
@@ -330,68 +391,15 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
           />
         }
       >
-        <HookFormPFTextInput
+        {/* <HookFormPFTextInput
           control={control}
           name="source"
           label="Source"
           fieldId="source"
           isRequired
-        />
+        /> */}
 
-        <FormGroup label="Period" isRequired>
-          <Split hasGutter>
-            <SplitItem>
-              <HookFormPFGroupController
-                control={control}
-                name="periodValue"
-                fieldId="periodValue"
-                renderInput={({ field: { value, onChange } }) => (
-                  <NumberInput
-                    value={value}
-                    onMinus={() => {
-                      onChange(value - 1);
-                    }}
-                    onChange={onChange}
-                    onPlus={() => {
-                      onChange(value + 1);
-                    }}
-                    inputName="periodValue"
-                    inputAriaLabel="period value"
-                    minusBtnAriaLabel="minus"
-                    plusBtnAriaLabel="plus"
-                  />
-                )}
-              />
-            </SplitItem>
-            <SplitItem>
-              <HookFormPFGroupController
-                control={control}
-                name="periodUnit"
-                fieldId="periodUnit"
-                renderInput={({ field: { value, onChange, onBlur } }) => (
-                  <FormSelect
-                    aria-label="period-unit"
-                    isRequired
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                    style={{ width: 110 }}
-                  >
-                    {ALL_PERIOD_UNITS.map((option) => (
-                      <FormSelectOption
-                        key={option}
-                        value={option}
-                        label={PERIOD_UNIT_LIST[option].label}
-                      />
-                    ))}
-                  </FormSelect>
-                )}
-              />
-            </SplitItem>
-          </Split>
-        </FormGroup>
-
-        <HookFormPFGroupController
+        {/* <HookFormPFGroupController
           control={control}
           name="v3Signatures"
           fieldId="v3Signatures"
@@ -418,9 +426,9 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
               </Popover>
             </span>
           )}
-        />
+        /> */}
 
-        <FormGroup label="Keys" isRequired fieldId="keys">
+        {/* <FormGroup label="Keys" isRequired fieldId="keys">
           <Stack hasGutter>
             {fieldsKeys.map((field, index) => {
               return (
@@ -469,7 +477,7 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
               </Button>
             </StackItem>
           </Stack>
-        </FormGroup>
+        </FormGroup> */}
       </FormFieldGroupExpandable>
 
       <ActionGroup>
