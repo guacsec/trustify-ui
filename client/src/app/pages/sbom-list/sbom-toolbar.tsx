@@ -35,12 +35,19 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({ showFilters }) => {
   return (
     <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
       <ToolbarContent>
-        {showFilters && <FilterToolbar {...filterToolbarProps} />}
-        <ToolbarItem>
-          <Button variant="primary" onClick={() => navigate(Paths.sbomUpload)}>
-            Upload SBOM
-          </Button>
-        </ToolbarItem>
+        {showFilters && (
+          <>
+            <FilterToolbar {...filterToolbarProps} />
+            <ToolbarItem>
+              <Button
+                variant="primary"
+                onClick={() => navigate(Paths.sbomUpload)}
+              >
+                Upload SBOM
+              </Button>
+            </ToolbarItem>
+          </>
+        )}
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination
             idPrefix="sbom-table"
