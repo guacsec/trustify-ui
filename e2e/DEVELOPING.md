@@ -50,8 +50,8 @@ The layout of the `e2e` repository looks like follows:
 - `config` contains configuration files that are common for the repository;
   currently it contains
 
-  - `openapi.yaml` - a file with the [Trustify](https://github.com/trustification/trustify)
-    API definition; every time the file changes on the [Trustify](https://github.com/trustification/trustify)
+  - `openapi.yaml` - a file with the [Trustify](https://github.com/guacsec/trustify)
+    API definition; every time the file changes on the [Trustify](https://github.com/guacsec/trustify)
     side it should be also updated here
 
   - `openapi-ts.config.ts` - a configuration for `@hey-api/openapi-ts` telling
@@ -66,14 +66,14 @@ The layout of the `e2e` repository looks like follows:
 
   - `fixtures.ts` - API tests fixtures written in TypeScript
 
-  - `client` contains a TypeScript interface to [Trustify](https://github.com/trustification/trustify)
+  - `client` contains a TypeScript interface to [Trustify](https://github.com/guacsec/trustify)
     API generated from `config/openapi.yaml` by `npm run openapi`
 
   - `dependencies` contains setup and tear down routines which are run before
     the start and after the end of the API test suite, respectively
 
   - `features` contains API tests itself; `_openapi_client_examples.ts` shows
-    how to use generated TypeScript interface to [Trustify](https://github.com/trustification/trustify)
+    how to use generated TypeScript interface to [Trustify](https://github.com/guacsec/trustify)
     in API tests
 
   - `helpers` contains auxiliary utilities used by API tests
@@ -97,11 +97,11 @@ The layout of the `e2e` repository looks like follows:
 
     - `*.feature` files are test scenarios described in [Gherkin](https://cucumber.io/docs/gherkin/);
       `*.feature` files on the top level of the `tests/ui/features` directory
-      describe scenarios that need to be implemented first in the [front end](https://github.com/trustification/trustify-ui);
+      describe scenarios that need to be implemented first in the [front end](https://github.com/guacsec/trustify-ui);
       that is, they describe the expected front end behavior
 
     - `@*` directories contain `*.feature` files and `*.step.ts` files used to
-      test the so far implemented [front end](https://github.com/trustification/trustify-ui)
+      test the so far implemented [front end](https://github.com/guacsec/trustify-ui)
       features; see also [Tags from path](https://vitalets.github.io/playwright-bdd/#/writing-steps/scoped?id=tags-from-path)
       documentation
 
@@ -129,7 +129,7 @@ there are two ways of how to proceed:
 1. **A test is covering a use case (scenario) not yet implemented.** Describe
    your use case in [Gherkin](https://cucumber.io/docs/gherkin/) and put it
    inside a `tests/ui/features/*.feature` file. The use case should be
-   communicated with the [upstream](https://github.com/trustification/trustify-ui)
+   communicated with the [upstream](https://github.com/guacsec/trustify-ui)
    before. Once the upstream implements the requested features covering your use
    case, the next step is to put your `*.feature` file(s) under a `tests/ui/features/@*`
    directory and implement missing steps to make it work under the Playwright
