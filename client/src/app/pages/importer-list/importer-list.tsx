@@ -1,4 +1,5 @@
 import React from "react";
+import { generatePath, useNavigate } from "react-router-dom";
 
 import type { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -12,7 +13,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  ModalVariant,
   PageSection,
   Toolbar,
   ToolbarContent,
@@ -60,12 +60,12 @@ import {
   TableHeaderContentWithControls,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
+import { ANSICOLOR } from "@app/Constants";
 import { useLocalTableControls } from "@app/hooks/table-controls";
 
-import { ANSICOLOR } from "@app/Constants";
+import { Paths } from "@app/Routes";
 import { ImporterProgress } from "./components/importer-progress";
 import { ImporterStatusIcon } from "./components/importer-status-icon";
-import { ImporterForm } from "./components/importer-form";
 
 type ImporterStatus = "disabled" | "scheduled" | "running";
 
@@ -83,9 +83,11 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 };
 
 export const ImporterList: React.FC = () => {
+  const navigate = useNavigate();
+
   const { pushNotification } = React.useContext(NotificationsContext);
 
-  const { importers, isFetching, fetchError, refetch } = useFetchImporters();
+  const { importers, isFetching, fetchError } = useFetchImporters();
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -96,19 +98,6 @@ export const ImporterList: React.FC = () => {
   const prepareActionOnRow = (action: RowAction, row: Importer) => {
     setSelectedRowAction(action);
     setSelectedRow(row);
-  };
-
-  // Create | Edit Actions
-  const [createUpdateModalState, setCreateUpdateModalState] = React.useState<
-    "create" | Importer | null
-  >(null);
-  const isCreateUpdateModalOpen = createUpdateModalState !== null;
-  const entityToUpdate =
-    createUpdateModalState !== "create" ? createUpdateModalState : null;
-
-  const closeCreateUpdateModal = () => {
-    setCreateUpdateModalState(null);
-    refetch();
   };
 
   // Enable/Disable Importer
@@ -304,7 +293,7 @@ export const ImporterList: React.FC = () => {
               <ToolbarItem>
                 <Button
                   variant="primary"
-                  onClick={() => setCreateUpdateModalState("create")}
+                  onClick={() => navigate(Paths.importerCreate)}
                 >
                   Create
                 </Button>
@@ -409,7 +398,11 @@ export const ImporterList: React.FC = () => {
                               {
                                 title: "Edit",
                                 onClick: () => {
-                                  setCreateUpdateModalState(item);
+                                  navigate(
+                                    generatePath(Paths.importerEdit, {
+                                      importerId: item.name,
+                                    }),
+                                  );
                                 },
                               },
                               {
@@ -467,22 +460,6 @@ export const ImporterList: React.FC = () => {
           />
         </div>
       </PageSection>
-
-      <Modal
-        variant={ModalVariant.medium}
-        isOpen={isCreateUpdateModalOpen}
-        onClose={closeCreateUpdateModal}
-      >
-        <ModalHeader
-          title={entityToUpdate ? "Update Importer" : "Create Importer"}
-        />
-        <ModalBody>
-          <ImporterForm
-            importer={entityToUpdate}
-            onClose={closeCreateUpdateModal}
-          />
-        </ModalBody>
-      </Modal>
 
       {selectedRowAction && confirmDialogProps && (
         <ConfirmDialog

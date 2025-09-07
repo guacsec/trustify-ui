@@ -4,6 +4,7 @@ import type { AxiosError } from "axios";
 import { DEFAULT_REFETCH_INTERVAL } from "@app/Constants";
 import { client } from "@app/axios-config/apiInit";
 import {
+  type Importer,
   type ImporterConfiguration,
   createImporter,
   deleteImporter,
@@ -31,7 +32,10 @@ export const useFetchImporters = (refetchDisabled = false) => {
 };
 
 export const useCreateImporterMutation = (
-  onSuccess: () => void,
+  onSuccess: (payload: {
+    importerName: string;
+    configuration: ImporterConfiguration;
+  }) => void,
   onError: (
     err: AxiosError,
     payload: {
@@ -53,8 +57,8 @@ export const useCreateImporterMutation = (
         body: payload.configuration,
       });
     },
-    onSuccess: async (_, _payload) => {
-      onSuccess();
+    onSuccess: async (_res, payload) => {
+      onSuccess(payload);
       await queryClient.invalidateQueries({ queryKey: [ImportersQueryKey] });
     },
     onError,
@@ -69,14 +73,17 @@ export const useFetchImporterById = (id: string) => {
   });
 
   return {
-    credentials: data,
+    importer: data?.data as Importer | undefined,
     isFetching: isLoading,
     fetchError: error as AxiosError,
   };
 };
 
 export const useUpdateImporterMutation = (
-  onSuccess: () => void,
+  onSuccess: (payload: {
+    importerName: string;
+    configuration: ImporterConfiguration;
+  }) => void,
   onError: (
     err: AxiosError,
     payload: { importerName: string; configuration: ImporterConfiguration },
@@ -94,8 +101,8 @@ export const useUpdateImporterMutation = (
         body: payload.configuration,
       });
     },
-    onSuccess: async (_res, _payload) => {
-      onSuccess();
+    onSuccess: async (_res, payload) => {
+      onSuccess(payload);
       await queryClient.invalidateQueries({ queryKey: [ImportersQueryKey] });
     },
     onError: onError,
