@@ -28,10 +28,10 @@ export class VulnerabilitiesTab {
     return await Table.build(this._page, "vulnerability table");
   }
 
-  async getPagination(top: boolean = true) {
+  async getPagination(location: "top" | "bottom" = "top") {
     return await Pagination.build(
       this._page,
-      `vulnerability-table-pagination-${top ? "top" : "bottom"}`,
+      `vulnerability-table-pagination-${location}`,
     );
   }
 }
