@@ -54,11 +54,11 @@ export class Pagination {
     await expect(lastPageButton).not.toBeDisabled();
 
     // Verify that navigation button to first page is disabled being on the first page
-    const fistPageButton = this._pagination.locator(
+    const firstPageButton = this._pagination.locator(
       "button[data-action='first']",
     );
-    await expect(fistPageButton).toBeVisible();
-    await expect(fistPageButton).toBeDisabled();
+    await expect(firstPageButton).toBeVisible();
+    await expect(firstPageButton).toBeDisabled();
 
     // Navigate to next page
     await nextPageButton.click();
@@ -68,11 +68,11 @@ export class Pagination {
     await expect(prevPageButton).not.toBeDisabled();
 
     // Verify that navigation button to first page is enabled after moving to next page
-    await expect(fistPageButton).toBeVisible();
-    await expect(fistPageButton).not.toBeDisabled();
+    await expect(firstPageButton).toBeVisible();
+    await expect(firstPageButton).not.toBeDisabled();
 
     // Moving back to the first page
-    await fistPageButton.click();
+    await firstPageButton.click();
   }
 
   async validateItemsPerPage(columnName: string, table: Table) {
