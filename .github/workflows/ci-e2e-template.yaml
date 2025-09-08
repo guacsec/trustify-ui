@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
@@ -125,7 +125,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
@@ -135,7 +135,7 @@ jobs:
           docker load --input /tmp/${{ inputs.artifact }}.tar
 
       - name: Checkout ui repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 22
