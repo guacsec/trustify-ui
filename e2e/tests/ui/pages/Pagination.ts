@@ -20,7 +20,7 @@ export class Pagination {
    * Selects Number of rows per page on the table
    * @param perPage Number of rows
    */
-  async selectItemsPerPage(perPage: number) {
+  async selectItemsPerPage(perPage: 10 | 20 | 50 | 100) {
     await this._pagination
       .locator(`//button[@aria-haspopup='listbox']`)
       .click();
