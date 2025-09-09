@@ -25,16 +25,23 @@
   npm run test
   ```
 
+- Run a set of tests marked with a tag:
+
+  ```
+  npm run test --grep performance
+  ```
+
 - For other methods and operating systems, see [Developing tests](DEVELOPING.md)
 
 ## Environment Variables
 
 General:
 
-| Variable       | Default Value | Description                                     |
-|----------------|---------------|-------------------------------------------------|
-| LOG_LEVEL      | info          | Possible values: debug, info, warn, error, none |
-| SKIP_INGESTION | false         | If to skip initial data ingestion/cleanup       |
+| Variable       | Default Value   | Description                                                             |
+|----------------|-----------------|-------------------------------------------------------------------------|
+| LOG_LEVEL      | info            | Possible values: debug, info, warn, error, none                         |
+| SKIP_INGESTION | false           | If to skip initial data ingestion/cleanup                               | 
+| REPORT_DIR     | "test-results/" | Where additional reports should be stored (e.g. from performance tests) |
 
 For UI tests:
 
