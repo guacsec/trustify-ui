@@ -19,7 +19,7 @@ Before submitting a PR:
 - Include relevant tests and documentation updates.
 - Link the PR to the corresponding issue (if applicable).
 
-For more information read [Trustification Versioning](https://github.com/trustification/release-tools/blob/main/VERSIONING.md).
+For more information read [Trustification Versioning](https://github.com/guacsec/trustify-release-tools/blob/main/VERSIONING.md).
 
 ### 3. Documentation Updates
 

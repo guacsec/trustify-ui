@@ -22,9 +22,9 @@ jobs:
   reconcile-issue:
     if: github.event_name == 'issues' || github.event_name == 'pull_request'
     secrets: inherit
-    uses: trustification/release-tools/.github/workflows/reconcile-issue.yaml@main
+    uses: guacsec/trustify-release-tools/.github/workflows/reconcile-issue.yaml@main
 
   reconcile-issue-comment:
     if: github.event_name == 'issue_comment'
     secrets: inherit
-    uses: trustification/release-tools/.github/workflows/reconcile-issue-comment.yaml@main
+    uses: guacsec/trustify-release-tools/.github/workflows/reconcile-issue-comment.yaml@main
