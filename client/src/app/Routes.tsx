@@ -1,10 +1,9 @@
-import type React from "react";
-import { Suspense, lazy } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { useParams, useRoutes } from "react-router-dom";
+import { lazy } from "react";
+import { createBrowserRouter, useParams } from "react-router-dom";
 
-import { Bullseye, Spinner } from "@patternfly/react-core";
-import { ErrorFallback } from "./components/ErrorFallback";
+import { LazyRouteElement } from "@app/components/LazyRouteElement";
+
+import App from "./App";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -54,64 +53,101 @@ export const Paths = {
   importers: "/importers",
 } as const;
 
-const Lazy = ({ component }: { component: React.ReactNode }) => {
-  return (
-    <Suspense
-      fallback={
-        <Bullseye>
-          <Spinner />
-        </Bullseye>
-      }
-    >
-      {component}
-    </Suspense>
-  );
-};
-
-export const AppRoutes = () => {
-  const allRoutes = useRoutes([
-    { path: "/", element: <Home /> },
-    { path: Paths.advisories, element: <Lazy component={<AdvisoryList />} /> },
-    {
-      path: Paths.advisoryUpload,
-      element: <Lazy component={<AdvisoryUpload />} />,
-    },
-    {
-      path: Paths.advisoryDetails,
-      element: <Lazy component={<AdvisoryDetails />} />,
-    },
-    {
-      path: Paths.vulnerabilities,
-      element: <Lazy component={<VulnerabilityList />} />,
-    },
-    {
-      path: Paths.vulnerabilityDetails,
-      element: <Lazy component={<VulnerabilityDetails />} />,
-    },
-    { path: Paths.packages, element: <Lazy component={<PackageList />} /> },
-    {
-      path: Paths.packageDetails,
-      element: <Lazy component={<PackageDetails />} />,
-    },
-    { path: Paths.sboms, element: <Lazy component={<SBOMList />} /> },
-    { path: Paths.sbomUpload, element: <Lazy component={<SBOMUpload />} /> },
-    {
-      path: Paths.sbomDetails,
-      element: <Lazy component={<SBOMDetails />} />,
-    },
-    {
-      path: Paths.importers,
-      element: <Lazy component={<ImporterList />} />,
-    },
-    { path: Paths.search, element: <Lazy component={<Search />} /> },
-  ]);
-
-  return (
-    <ErrorBoundary FallbackComponent={ErrorFallback} key={location.pathname}>
-      {allRoutes}
-    </ErrorBoundary>
-  );
-};
+export const AppRoutes = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <LazyRouteElement key="home" component={<Home />} />,
+      },
+      {
+        path: Paths.advisories,
+        element: (
+          <LazyRouteElement key="advisory-list" component={<AdvisoryList />} />
+        ),
+      },
+      {
+        path: Paths.advisoryUpload,
+        element: (
+          <LazyRouteElement
+            key="advisory-upload"
+            component={<AdvisoryUpload />}
+          />
+        ),
+      },
+      {
+        path: Paths.advisoryDetails,
+        element: (
+          <LazyRouteElement
+            key="advisory-details"
+            component={<AdvisoryDetails />}
+          />
+        ),
+      },
+      {
+        path: Paths.vulnerabilities,
+        element: (
+          <LazyRouteElement
+            key="vulnerability-list"
+            component={<VulnerabilityList />}
+          />
+        ),
+      },
+      {
+        path: Paths.vulnerabilityDetails,
+        element: (
+          <LazyRouteElement
+            key="vulnerability-details"
+            component={<VulnerabilityDetails />}
+          />
+        ),
+      },
+      {
+        path: Paths.packages,
+        element: (
+          <LazyRouteElement key="package-list" component={<PackageList />} />
+        ),
+      },
+      {
+        path: Paths.packageDetails,
+        element: (
+          <LazyRouteElement
+            key="package-details"
+            component={<PackageDetails />}
+          />
+        ),
+      },
+      {
+        path: Paths.sboms,
+        element: <LazyRouteElement key="sbom-list" component={<SBOMList />} />,
+      },
+      {
+        path: Paths.sbomUpload,
+        element: (
+          <LazyRouteElement key="sbom-upload" component={<SBOMUpload />} />
+        ),
+      },
+      {
+        path: Paths.sbomDetails,
+        element: (
+          <LazyRouteElement key="sbom-details" component={<SBOMDetails />} />
+        ),
+      },
+      {
+        path: Paths.importers,
+        element: (
+          <LazyRouteElement key="importer-list" component={<ImporterList />} />
+        ),
+      },
+      {
+        path: Paths.search,
+        element: <LazyRouteElement key="search" component={<Search />} />,
+      },
+    ],
+  },
+]);
 
 export const useRouteParams = (pathParam: PathParam) => {
   const params = useParams();
