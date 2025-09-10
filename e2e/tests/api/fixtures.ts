@@ -95,6 +95,7 @@ const initAxiosInstance = async (
   access_token = tokenResponse.access_token;
 
   // Intercept Requests
+  // Add access token
   axiosInstance.interceptors.request.use(
     (config) => {
       config.headers.Authorization = `Bearer ${access_token}`;
@@ -106,7 +107,16 @@ const initAxiosInstance = async (
     },
   );
 
+  // Measure request start time
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      config.headers['request-startTime'] = new Date().getTime();
+      return config
+    }
+  );
+
   // Intercept Responses
+  // Retry
   axiosInstance.interceptors.response.use(
     (response) => {
       return response;
@@ -137,6 +147,17 @@ const initAxiosInstance = async (
       return Promise.reject(error);
     },
   );
+
+  // Measure response reception time
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      const currentTime = new Date().getTime()      
+      const startTime = response.config.headers['request-startTime']      
+      
+      response.headers['request-duration'] = currentTime - startTime
+
+      return response
+  })
 };
 
 // Declare the types of your fixtures.

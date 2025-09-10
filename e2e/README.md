@@ -25,6 +25,12 @@
   npm run test
   ```
 
+- Run a set of tests marked with a tag:
+
+  ```
+  npx playwright test --grep @performance
+  ```
+
 - For other methods and operating systems, see [Developing tests](DEVELOPING.md)
 
 ## Environment Variables
