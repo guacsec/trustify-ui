@@ -19,8 +19,8 @@ export const ALL_IMPORTER_TYPES = [
   "csaf",
   "osv",
   "cve",
-  "clearly_defined",
-  "clearly_defined_curation",
+  "clearlyDefined",
+  "clearlyDefinedCuration",
   "cwe",
   "quay",
 ] as const;
@@ -222,7 +222,7 @@ export const getImporterConfigurationFromFormValues = (
       };
       break;
     }
-    case "clearly_defined": {
+    case "clearlyDefined": {
       configuration = {
         clearlyDefined: {
           ...commonConfigurationFields,
@@ -231,7 +231,7 @@ export const getImporterConfigurationFromFormValues = (
       };
       break;
     }
-    case "clearly_defined_curation": {
+    case "clearlyDefinedCuration": {
       configuration = {
         clearlyDefinedCuration: {
           ...commonConfigurationFields,

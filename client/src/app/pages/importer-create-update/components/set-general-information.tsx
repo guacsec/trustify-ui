@@ -6,11 +6,13 @@ import {
   Button,
   Card,
   Form,
+  FormGroupLabelHelp,
   FormSelectOption,
   InputGroup,
   InputGroupItem,
   Label,
   LabelGroup,
+  Popover,
   Stack,
   StackItem,
   Switch,
@@ -19,6 +21,7 @@ import {
 import PlusCircleIcon from "@patternfly/react-icons/dist/esm/icons/plus-circle-icon";
 
 import { splitStringAsKeyValue } from "@app/api/model-utils";
+import type { Importer } from "@app/client";
 import {
   HookFormPFGroupController,
   HookFormPFSelect,
@@ -26,21 +29,11 @@ import {
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
 import { validateLabelString } from "@app/utils/utils";
+
 import type { ImporterWizardFormValues } from "./schema";
-import type { Importer } from "@app/client";
+import { ALL_IMPORTER_TYPES } from "./type-utils";
 
-const SELECT_ONE = "select-one";
-
-export const ALL_IMPORTER_TYPES = [
-  "sbom",
-  "csaf",
-  "osv",
-  "cve",
-  "clearly_defined",
-  "clearly_defined_curation",
-  "cwe",
-  "quay",
-] as const;
+export const SELECT_ONE = "select-one";
 
 //
 
@@ -54,6 +47,8 @@ export const SetGeneralInformation: React.FC<ISetGeneralInformationProps> = ({
   const { control } = useFormContext<ImporterWizardFormValues>();
 
   const [labelInputTextValue, setLabelInputTextValue] = React.useState("");
+
+  const labelsHelpRef = React.useRef(null);
 
   return (
     <Form
@@ -111,6 +106,21 @@ export const SetGeneralInformation: React.FC<ISetGeneralInformationProps> = ({
         name="labels"
         label="Labels"
         fieldId="labels"
+        formGroupProps={{
+          labelHelp: (
+            <Popover
+              triggerRef={labelsHelpRef}
+              bodyContent={
+                <div>These labels will be added to each document imported.</div>
+              }
+            >
+              <FormGroupLabelHelp
+                ref={labelsHelpRef}
+                aria-label="More info for labels field"
+              />
+            </Popover>
+          ),
+        }}
         renderInput={({ field: { value, onChange } }) => {
           const onAddNewLabel = () => {
             if (validateLabelString(labelInputTextValue)) {

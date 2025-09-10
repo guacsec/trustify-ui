@@ -30,7 +30,7 @@ import {
   useAnalysisWizardFormValidationSchema,
 } from "./schema";
 import { SetConfiguration } from "./set-configuration";
-import { SetGeneralInformation } from "./set-general-information";
+import { SELECT_ONE, SetGeneralInformation } from "./set-general-information";
 import {
   getImporterConfigurationFromFormValues,
   getImporterTypeAndConfiguration,
@@ -38,8 +38,6 @@ import {
   getPeriodValueAndUnit,
   type ImporterType,
 } from "./type-utils";
-
-const SELECT_ONE = "select-one";
 
 interface IImporterWizard {
   importer: Importer | null;

@@ -70,7 +70,10 @@ export const useConfigurationFormSchema = () => {
     v3Signatures: boolean(),
     ignoreMissing: boolean(),
     fetchRetries: number().min(0),
-    sizeLimitValue: string(),
+    sizeLimitValue: string().matches(
+      /^[0-9]*\.?[0-9]*$/,
+      "Only numbers and a dot are allowed",
+    ),
     sizeLimitUnit: string().required().trim().max(250),
     onlyPatterns: array(object({ value: string().required() })),
     keys: array(object({ value: string().required().url() })),
