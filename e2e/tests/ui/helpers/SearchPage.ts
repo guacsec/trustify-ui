@@ -41,6 +41,7 @@ export class SearchPage {
 
   /**
    * Navigates to given menu option and filters data
+   * @deprecated
    * @param menu Option from Vertical navigation menu
    * @param data Search data to filter
    */

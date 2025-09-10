@@ -2,7 +2,7 @@ import { createBdd } from "playwright-bdd";
 import { expect } from "playwright/test";
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { SearchPage } from "../../helpers/SearchPage";
+import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
 
 export const { Given, When, Then } = createBdd(test);
@@ -12,8 +12,14 @@ const VULN_TABLE_NAME = "Vulnerability table";
 const SBOM_TABLE_NAME = "sbom-table";
 
 Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
-  const searchPage = new SearchPage(page, "SBOMs");
-  await searchPage.dedicatedSearch(sbomName);
+  const sbomListPage = await SbomListPage.build(page);
+
+  const toolbar = await sbomListPage.getToolbar();
+  const table = await sbomListPage.getTable();
+
+  await toolbar.applyTextFilter("Filter text", sbomName);
+  await table.waitUntilDataIsLoaded();
+  await table.verifyColumnContainsText("Name", sbomName);
 });
 
 When(
@@ -84,9 +90,7 @@ Then(
 Given(
   "An ingested SBOM {string} containing Vulnerabilities",
   async ({ page }, sbomName) => {
-    const searchPage = new SearchPage(page, "SBOMs");
-    await searchPage.dedicatedSearch(sbomName);
-    const element = await page.locator(
+    const element = page.locator(
       `xpath=(//tr[contains(.,'${sbomName}')]/td[@data-label='Vulnerabilities']/div)[1]`,
     );
     await expect(element, "SBOM have no vulnerabilities").toHaveText(

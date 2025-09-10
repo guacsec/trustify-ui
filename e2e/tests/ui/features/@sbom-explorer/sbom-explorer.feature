@@ -63,6 +63,7 @@ Feature: SBOM Explorer - View SBOM details
             | quarkus-bom | jdom        |
 
     Scenario Outline: View SBOM Vulnerabilities
+        Given An ingested SBOM "<sbomName>" is available
         Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
