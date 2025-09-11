@@ -295,7 +295,7 @@ export const ImporterList: React.FC = () => {
                   variant="primary"
                   onClick={() => navigate(Paths.importerCreate)}
                 >
-                  Create
+                  Create Importer
                 </Button>
               </ToolbarItem>
               <ToolbarItem {...paginationToolbarItemProps}>

@@ -177,13 +177,17 @@ export const SetConfiguration: React.FC = () => {
         />
       )}
       {(watchType === "sbom" || watchType === "csaf") && (
-        <HookFormPFTextInput
-          control={control}
-          name="fetchRetries"
-          label="Fetch retries"
-          fieldId="fetchRetries"
-          type="number"
-        />
+        <Split>
+          <SplitItem>
+            <HookFormPFTextInput
+              control={control}
+              name="fetchRetries"
+              label="Fetch retries"
+              fieldId="fetchRetries"
+              type="number"
+            />
+          </SplitItem>
+        </Split>
       )}
       {(watchType === "sbom" || watchType === "quay") && (
         <FormGroup label="Size limit">
@@ -359,7 +363,7 @@ export const SetConfiguration: React.FC = () => {
               return (
                 <StackItem key={field.id}>
                   <Split hasGutter>
-                    <SplitItem isFilled>
+                    <SplitItem>
                       <HookFormPFGroupController
                         control={control}
                         name={`years.${index}.value`}
@@ -407,13 +411,17 @@ export const SetConfiguration: React.FC = () => {
         </FormGroup>
       )}
       {(watchType === "osv" || watchType === "cve") && (
-        <HookFormPFTextInput
-          control={control}
-          name="startYear"
-          label="Start year"
-          fieldId="startYear"
-          type="number"
-        />
+        <Split>
+          <SplitItem>
+            <HookFormPFTextInput
+              control={control}
+              name="startYear"
+              label="Start year"
+              fieldId="startYear"
+              type="number"
+            />
+          </SplitItem>
+        </Split>
       )}
       {(watchType === "clearly_defined" ||
         watchType === "clearly_defined_curation") && (

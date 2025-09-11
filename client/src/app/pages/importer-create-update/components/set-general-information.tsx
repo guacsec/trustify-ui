@@ -3,13 +3,10 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 
 import {
-  Button,
   Card,
   Form,
   FormGroupLabelHelp,
   FormSelectOption,
-  InputGroup,
-  InputGroupItem,
   Label,
   LabelGroup,
   Popover,
@@ -18,7 +15,6 @@ import {
   Switch,
   TextInput,
 } from "@patternfly/react-core";
-import PlusCircleIcon from "@patternfly/react-icons/dist/esm/icons/plus-circle-icon";
 
 import { splitStringAsKeyValue } from "@app/api/model-utils";
 import type { Importer } from "@app/client";
@@ -163,41 +159,28 @@ export const SetGeneralInformation: React.FC<ISetGeneralInformationProps> = ({
                 </StackItem>
               )}
               <StackItem>
-                <InputGroup>
-                  <InputGroupItem isFill>
-                    <TextInput
-                      aria-label="label input"
-                      value={labelInputTextValue}
-                      type="text"
-                      onChange={(_event, inputTextValue) =>
-                        setLabelInputTextValue(inputTextValue)
-                      }
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          onAddNewLabel();
-                        }
-                      }}
-                      onBlur={() => {
-                        onAddNewLabel();
-                      }}
-                      validated={
-                        labelInputTextValue.length > 1 &&
-                        !validateLabelString(labelInputTextValue)
-                          ? "error"
-                          : undefined
-                      }
-                    />
-                  </InputGroupItem>
-                  <InputGroupItem>
-                    <Button
-                      icon={<PlusCircleIcon />}
-                      variant="tertiary"
-                      onClick={onAddNewLabel}
-                    >
-                      Add Label
-                    </Button>
-                  </InputGroupItem>
-                </InputGroup>
+                <TextInput
+                  aria-label="label input"
+                  value={labelInputTextValue}
+                  type="text"
+                  onChange={(_event, inputTextValue) =>
+                    setLabelInputTextValue(inputTextValue)
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      onAddNewLabel();
+                    }
+                  }}
+                  onBlur={() => {
+                    onAddNewLabel();
+                  }}
+                  validated={
+                    labelInputTextValue.length > 1 &&
+                    !validateLabelString(labelInputTextValue)
+                      ? "error"
+                      : undefined
+                  }
+                />
               </StackItem>
             </Stack>
           );
