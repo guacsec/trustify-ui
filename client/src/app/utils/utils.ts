@@ -146,3 +146,8 @@ export const universalComparator = (
   }
   return localeNumericCompare(String(a ?? ""), String(b ?? ""), locale);
 };
+
+export const validateLabelString = (value: string) =>
+  !!value &&
+  value.trim().length > 0 &&
+  /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/.test(value);

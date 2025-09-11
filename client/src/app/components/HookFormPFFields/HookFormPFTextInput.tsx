@@ -1,17 +1,20 @@
-import type { FieldValues, Path, PathValue } from "react-hook-form";
-
 import { getValidatedFromErrors } from "@app/utils/utils";
 import { TextInput, type TextInputProps } from "@patternfly/react-core";
+import type { FieldValues, Path, PathValue } from "react-hook-form";
 import {
-  type BaseHookFormPFGroupControllerProps,
-  HookFormPFGroupController,
   extractGroupControllerProps,
+  HookFormPFGroupController,
+  type BaseHookFormPFGroupControllerProps,
 } from "./HookFormPFGroupController";
+
+interface WithIntegerType extends Omit<TextInputProps, "type"> {
+  type?: TextInputProps["type"] | "integer";
+}
 
 export type HookFormPFTextInputProps<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
-> = TextInputProps & BaseHookFormPFGroupControllerProps<TFieldValues, TName>;
+> = WithIntegerType & BaseHookFormPFGroupControllerProps<TFieldValues, TName>;
 
 export const HookFormPFTextInput = <
   TFieldValues extends FieldValues = FieldValues,
@@ -25,7 +28,9 @@ export const HookFormPFTextInput = <
     HookFormPFTextInputProps<TFieldValues, TName>
   >(props);
   const { fieldId, helperText, isRequired, errorsSuppressed } = extractedProps;
-  const { type } = remainingProps;
+  const { type } = props;
+  const inputType = type === "integer" ? "number" : type;
+
   return (
     <HookFormPFGroupController<TFieldValues, TName>
       {...extractedProps}
@@ -42,7 +47,14 @@ export const HookFormPFTextInput = <
           onChange={(_, value) => {
             if (type === "number") {
               onChange(
-                ((value && Number.parseInt(value, 10)) || "") as PathValue<
+                ((value && Number(value)) ?? "") as PathValue<
+                  TFieldValues,
+                  TName
+                >,
+              );
+            } else if (type === "integer") {
+              onChange(
+                ((value && parseInt(value, 10)) ?? "") as PathValue<
                   TFieldValues,
                   TName
                 >,
@@ -59,6 +71,7 @@ export const HookFormPFTextInput = <
               : getValidatedFromErrors(error, isDirty, isTouched)
           }
           {...remainingProps}
+          type={inputType}
         />
       )}
     />

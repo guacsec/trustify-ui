@@ -15,7 +15,7 @@ import {
 } from "@patternfly/react-core";
 
 import type { Label as LabelModel } from "@app/api/models";
-import { getString } from "@app/utils/utils";
+import { getString, validateLabelString } from "@app/utils/utils";
 
 import {
   joinKeyValueAsString,
@@ -134,13 +134,7 @@ export const EditLabelsForm: React.FC<EditLabelsFormProps> = ({
             // - Both key and value parts do not contain backslashes or are empty
             // - The key does not start with whitespace or '='
             // This is used to validate new label options in the form.
-            validateNewOption={(value) =>
-              !!value &&
-              value.trim().length > 0 &&
-              /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/.test(
-                value,
-              )
-            }
+            validateNewOption={validateLabelString}
             filterBeforeOnChange={(selections, newOption) => {
               const newOptionKeyValue = splitStringAsKeyValue(
                 getString(newOption.name),

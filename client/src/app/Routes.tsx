@@ -27,15 +27,24 @@ const SBOMList = lazy(() => import("./pages/sbom-list"));
 const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 
+// Importers
+const ImporterList = lazy(() => import("./pages/importer-list"));
+const ImporterCreate = lazy(
+  () => import("./pages/importer-create-update/importer-create"),
+);
+const ImporterEdit = lazy(
+  () => import("./pages/importer-create-update/importer-edit"),
+);
+
 // Others
 const Search = lazy(() => import("./pages/search"));
-const ImporterList = lazy(() => import("./pages/importer-list"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
+  IMPORTER_ID = "importerId",
 }
 
 export const Paths = {
@@ -51,6 +60,8 @@ export const Paths = {
   packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
   search: "/search",
   importers: "/importers",
+  importerCreate: "/importers/create",
+  importerEdit: `/importers/:${PathParam.IMPORTER_ID}`,
 } as const;
 
 export const AppRoutes = () => {
@@ -81,6 +92,14 @@ export const AppRoutes = () => {
     {
       path: Paths.importers,
       element: <ImporterList />,
+    },
+    {
+      path: Paths.importerCreate,
+      element: <ImporterCreate />,
+    },
+    {
+      path: Paths.importerEdit,
+      element: <ImporterEdit />,
     },
     { path: Paths.search, element: <Search /> },
   ]);

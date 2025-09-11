@@ -1,4 +1,5 @@
 import React from "react";
+import { generatePath, useNavigate } from "react-router-dom";
 
 import type { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -59,9 +60,10 @@ import {
   TableHeaderContentWithControls,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
+import { ANSICOLOR } from "@app/Constants";
 import { useLocalTableControls } from "@app/hooks/table-controls";
 
-import { ANSICOLOR } from "@app/Constants";
+import { Paths } from "@app/Routes";
 import { ImporterProgress } from "./components/importer-progress";
 import { ImporterStatusIcon } from "./components/importer-status-icon";
 
@@ -81,7 +83,11 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 };
 
 export const ImporterList: React.FC = () => {
+  const navigate = useNavigate();
+
   const { pushNotification } = React.useContext(NotificationsContext);
+
+  const { importers, isFetching, fetchError } = useFetchImporters();
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -93,8 +99,6 @@ export const ImporterList: React.FC = () => {
     setSelectedRowAction(action);
     setSelectedRow(row);
   };
-
-  const { importers, isFetching, fetchError } = useFetchImporters();
 
   // Enable/Disable Importer
 
@@ -286,6 +290,14 @@ export const ImporterList: React.FC = () => {
           <Toolbar {...toolbarProps}>
             <ToolbarContent>
               <FilterToolbar showFiltersSideBySide {...filterToolbarProps} />
+              <ToolbarItem>
+                <Button
+                  variant="primary"
+                  onClick={() => navigate(Paths.importerCreate)}
+                >
+                  Create Importer
+                </Button>
+              </ToolbarItem>
               <ToolbarItem {...paginationToolbarItemProps}>
                 <SimplePagination
                   idPrefix="importer-table"
@@ -383,6 +395,19 @@ export const ImporterList: React.FC = () => {
                         <Td isActionCell>
                           <ActionsColumn
                             items={[
+                              {
+                                title: "Edit",
+                                onClick: () => {
+                                  navigate(
+                                    generatePath(Paths.importerEdit, {
+                                      importerId: item.name,
+                                    }),
+                                  );
+                                },
+                              },
+                              {
+                                isSeparator: true,
+                              },
                               ...(isImporterDisabled
                                 ? [
                                     {
