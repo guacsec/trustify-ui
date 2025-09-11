@@ -1,9 +1,9 @@
 import { createBdd } from "playwright-bdd";
 import { expect } from "playwright/test";
+import { test } from "../../fixtures";
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
-import { test } from "../../fixtures";
+import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -11,21 +11,10 @@ const PACKAGE_TABLE_NAME = "Package table";
 const VULN_TABLE_NAME = "Vulnerability table";
 const SBOM_TABLE_NAME = "sbom-table";
 
-Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
-  const sbomListPage = await SbomListPage.build(page);
-
-  const toolbar = await sbomListPage.getToolbar();
-  const table = await sbomListPage.getTable();
-
-  await toolbar.applyTextFilter("Filter text", sbomName);
-  await table.waitUntilDataIsLoaded();
-  await table.verifyColumnContainsText("Name", sbomName);
-});
-
 When(
   "User visits SBOM details Page of {string}",
   async ({ page }, sbomName) => {
-    await page.getByRole("link", { name: sbomName, exact: true }).click();
+    const _sbomDetailsPage = await SbomDetailsPage.build(page, sbomName);
   },
 );
 
