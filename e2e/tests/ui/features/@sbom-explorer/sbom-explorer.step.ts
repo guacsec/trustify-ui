@@ -76,18 +76,6 @@ Then(
   },
 );
 
-Given(
-  "An ingested SBOM {string} containing Vulnerabilities",
-  async ({ page }, sbomName) => {
-    const element = page.locator(
-      `xpath=(//tr[contains(.,'${sbomName}')]/td[@data-label='Vulnerabilities']/div)[1]`,
-    );
-    await expect(element, "SBOM have no vulnerabilities").toHaveText(
-      /^(?!0$).+/,
-    );
-  },
-);
-
 When("User Clicks on Vulnerabilities Tab Action", async ({ page }) => {
   await page.getByLabel("Tab action").click();
 });
