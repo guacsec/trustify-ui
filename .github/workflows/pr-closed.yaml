@@ -17,9 +17,9 @@ jobs:
       contents: write
     # Only run when pull request is merged
     # or when a comment starting with `/backport` is created by someone other than the
-    # https://github.com/apps/trustification-ci-bot bot user (user id: 199085543). Note that if you use your
+    # https://github.com/apps/trustify-ci-bot bot user (user id: 229904336). Note that if you use your
     # own PAT as `github_token`, that you should replace this id with yours.
-    # To get Github App user id we can do: 'curl -H "Authorization: Bearer token" -s https://api.github.com/users/trustification-ci-bot%5Bbot%5D'
+    # To get Github App user id we can do: 'curl -H "Authorization: Bearer token" -s https://api.github.com/users/trustify-ci-bot%5Bbot%5D'
     if: >
       (
         github.event_name == 'pull_request_target' &&
@@ -27,7 +27,7 @@ jobs:
       ) || (
         github.event_name == 'issue_comment' &&
         github.event.issue.pull_request &&
-        github.event.comment.user.id != 199085543 &&
+        github.event.comment.user.id != 229904336 &&
         startsWith(github.event.comment.body, '/backport')
       )
     secrets: inherit
