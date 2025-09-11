@@ -64,7 +64,6 @@ Feature: SBOM Explorer - View SBOM details
 
     Scenario Outline: View SBOM Vulnerabilities
         Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         When User Clicks on Vulnerabilities Tab Action
@@ -83,7 +82,6 @@ Feature: SBOM Explorer - View SBOM details
     @slow
     Scenario Outline: Pagination of SBOM Vulnerabilities table
         Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Pagination of Vulnerabilities list works
@@ -103,7 +101,6 @@ Feature: SBOM Explorer - View SBOM details
 
     Scenario Outline: Check Column Headers of SBOM Explorer Vulnerabilities table
         Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then List of Vulnerabilities has column "Id"
@@ -119,7 +116,6 @@ Feature: SBOM Explorer - View SBOM details
     @slow
     Scenario Outline: Sorting SBOM Vulnerabilities
         Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Table column "Description" is not sortable
