@@ -40,7 +40,7 @@ export const Review: React.FC = () => {
     formValues,
   );
 
-  const { description, disabled, labels, period, source, ...rest } =
+  const { description, disabled, labels, period, source, apiToken, ...rest } =
     // biome-ignore lint/suspicious/noExplicitAny: allowed
     (configuration as any)[configurationType] as AllImporterConfigurations;
 
@@ -78,6 +78,12 @@ export const Review: React.FC = () => {
         <DescriptionListTerm>Period</DescriptionListTerm>
         <DescriptionListDescription>{period}</DescriptionListDescription>
       </DescriptionListGroup>
+      {apiToken && (
+        <DescriptionListGroup>
+          <DescriptionListTerm>Api Token</DescriptionListTerm>
+          <DescriptionListDescription>***</DescriptionListDescription>
+        </DescriptionListGroup>
+      )}
 
       {Object.entries(rest)
         .filter(([_key, value]) => {
@@ -93,7 +99,11 @@ export const Review: React.FC = () => {
         })
         .map(([key, value]) => (
           <DescriptionListGroup key={key}>
-            <DescriptionListTerm>{key}</DescriptionListTerm>
+            <DescriptionListTerm>
+              {key
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase())}
+            </DescriptionListTerm>
             <DescriptionListDescription>
               {typeof value === "string" || typeof value === "number"
                 ? value

@@ -459,6 +459,7 @@ export const SetConfiguration: React.FC = () => {
           label="Api Token"
           fieldId="apiToken"
           isRequired
+          type="password"
         />
       )}
       {watchType === "quay" && (
