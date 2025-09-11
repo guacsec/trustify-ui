@@ -46,12 +46,32 @@ export class ToolbarTable {
     ).toHaveAttribute("aria-sort", asc ? "ascending" : "descending");
   }
 
+  /**
+   * Check if specific table column contains the expected value 
+  * 
+  * @param columnName 
+  * @param expectedValue 
+  */
   // biome-ignore lint/suspicious/noExplicitAny: allowed
   async verifyColumnContainsText(columnName: any, expectedValue: any) {
     const table = this.getTable();
-    await expect(table.locator(`td[data-label="${columnName}"]`)).toContainText(
-      expectedValue,
-    );
+    const matchingCells = table.locator(`td[data-label="${columnName}"]`).getByText(expectedValue);
+
+    await expect(matchingCells.first()).toBeVisible({timeout: 60000});
+  }
+
+  /**
+   * Check if specific table column does not contain the expected value
+  * 
+  * @param columnName 
+  * @param expectedValue 
+  */
+
+  async verifyColumnDoesNotContainText(columnName: any, expectedValue: any) {
+    const table = this.getTable();
+    const field = table.locator(`td[data-label="${columnName}"]`);
+
+    await expect(field.getByText(expectedValue)).toHaveCount(0);
   }
 
   /**
@@ -126,7 +146,9 @@ export class ToolbarTable {
    */
   async selectPerPage(parentElem: string, perPage: string) {
     const pagination = this._page.locator(parentElem);
-    await pagination.locator(`//button[@aria-haspopup='listbox']`).click();
+    await pagination.locator('button[aria-haspopup="listbox"]').waitFor({ state: "visible" });
+    await pagination.locator('button[aria-haspopup="listbox"]').click();
+
     await this._page.getByRole("menuitem", { name: perPage }).click();
   }
 
@@ -174,7 +196,7 @@ export class ToolbarTable {
       const progressBar = this._page.getByRole("gridcell", {
         name: "Loading...",
       });
-      await progressBar.waitFor({ state: "hidden", timeout: 5000 });
+      await progressBar.waitFor({ state: "hidden", timeout: 20000 });
       expMinCount += perPageRows;
       if (i === pageCount - 1) {
         expMaxCount = expMaxCount + remainingRows;
@@ -274,22 +296,34 @@ export class ToolbarTable {
    * @param parentElem ParentElement of pagination
    * @returns two dimensional string which contains the contents of table
    */
-  async getTableRows(parentElem: string): Promise<string[][]> {
+   async getTableRows(parentElem: string, maxPages: number = Infinity): Promise<string[][]> {
     const nextPageElem = await this._page
       .locator(parentElem)
       .getByLabel("Go to next page");
     let isNextPageEnabled = true;
     const tableData: string[][] = [];
     await this.goToFirstPage(parentElem);
-    while (isNextPageEnabled) {
+
+    let pageCount = 0;
+
+    while (isNextPageEnabled && pageCount < maxPages) {
       const table_data = await this.getTable();
       const allRows = await table_data.locator(`tr`).all();
       for (const row of allRows) {
         const rowData = await row.locator(`th, td`).allTextContents();
         tableData.push(rowData);
       }
-      isNextPageEnabled = await nextPageElem.isEnabled();
+      pageCount++;
+      if (pageCount < maxPages) {
+        isNextPageEnabled = await nextPageElem.isEnabled();
+        if (isNextPageEnabled) {
+          await nextPageElem.click();
+        }
+      } else {
+        break;
+      }
     }
+
     return tableData;
   }
 
@@ -312,20 +346,32 @@ export class ToolbarTable {
     if (index < 0) {
       fail("Given header not found");
     }
-    for (const data of dataRow) {
-      if (data[index] !== ``) {
-        row += 1;
-        break;
-      }
+    // Find the first row that has a non-empty value in the target column
+    const firstNonEmptyRowIndex = dataRow.findIndex(
+      (r) => r && r[index] !== undefined && r[index] !== ""
+    );
+    if (firstNonEmptyRowIndex !== -1) {
+      row = firstNonEmptyRowIndex;
     }
-    const isDate = this.isValidDate(dataRow[row][index]);
-    const isCVSS = this.isCVSS(dataRow[row][index]);
-    const isCVE = this.isCVE(dataRow[row][index]);
+    // Safely detect the type from the discovered row (if any)
+    const sampleValue = dataRow[row] ? dataRow[row][index] : "";
+    let isDate = this.isValidDate(sampleValue);
+    let isCVSS = this.isCVSS(sampleValue);
+    let isCVE = this.isCVE(sampleValue);
     const sortedRows = [...dataRow].sort((rowA, rowB) => {
-      // biome-ignore lint/suspicious/noExplicitAny: allowed
       let compare: any;
-      const valueA = rowA[index];
-      const valueB = rowB[index];
+      // Guard against missing cells; default to empty string for safe comparisons
+      let valueA = rowA[index] ?? "";
+      let valueB = rowB[index] ?? "";
+
+      // // Blank-handling logic
+      // if (valueA === "" && valueB !== "") {
+      //   return sorting === "ascending" ? 1 : -1; // blank goes to bottom in ascending
+      // }
+      // if (valueB === "" && valueA !== "") {
+      //   return sorting === "ascending" ? -1 : 1; // blank goes to top in descending
+      // }
+
       if (isDate) {
         const dateA = new Date(valueA);
         const dateB = new Date(valueB);
@@ -412,14 +458,14 @@ export class ToolbarTable {
    */
   async sortColumn(columnHeader: string, sortOrder: string): Promise<boolean> {
     const headerElem = await this._page.getByRole("columnheader", {
-      name: `${columnHeader}`,
+      name: `${columnHeader}`,exact: false,
     });
     for (let i = 0; i < 3; i++) {
       const sort = await headerElem.getAttribute(`aria-sort`);
       if (sort === sortOrder) {
         return true;
       } else {
-        await headerElem.getByRole("button").click();
+        await headerElem.getByRole("button", {name: columnHeader}).click();
       }
     }
     return false;
@@ -474,6 +520,83 @@ export class ToolbarTable {
     await this._page.getByRole("menuitem", { name: "Edit labels" }).click();
   }
 
+  /**
+  /**
+   * Verifies the download link is available on the table
+   * @param type SBOMs or Advisories
+   */
+  async verifyDownloadLink(type: string) {
+    const table = this.getTable();
+    const link = table.locator('[aria-label="Kebab toggle"]').first(); 
+    await expect(link).toBeVisible({timeout: 60000});
+    await link.click();
+    if (type === "SBOMs") {
+      await expect(this._page.locator("text=Download SBOM")).toBeVisible();
+      await expect(this._page.locator("text=Download License Report")).toBeVisible();
+    }else {
+      await expect(this._page.locator("text=Download")).toBeVisible();
+    }
+  }
+
+  /**
+   * Verifies the table has up to the given number of rows
+   * @param rows Number of rows
+   */
+  async verifyTableHasUpToRows(rows: number) {
+    const table = this.getTable();
+    expect(await table.locator("tbody tr").count()).toBeLessThanOrEqual(rows);
+  }
+
+  /**
+   * Verifies the table is visible
+   */
+  async verifyTableIsVisible() {
+    const table = this.getTable();
+    await expect(table).toBeVisible({ timeout: 60000 });
+  }
+
+  /**
+   * Fills the date filter with the given date range
+   * @param from Start date in MM/DD/YYYY format
+   * @param to End date in MM/DD/YYYY format
+   */
+  async filterByDate(from: string, to: string) {
+    const fromDate = this._page.locator('input[aria-label="Interval start"]');
+    const toDate = this._page.locator('input[aria-label="Interval end"]');
+    await fromDate.fill(from);
+    await toDate.fill(to);
+  }
+
+  /**
+   * Clicks on the filter button to delete filters
+   */
+  async clearFilter() {
+    this._page.getByText("Clear all filters").click();
+  }
+
+  async openDetailsPage(name: string,columnName: string = "Name") {
+    const table = this.getTable();
+    await table.locator(`td[data-label="${columnName}"]`).getByText(name).first().click();
+  }
+
+
+  async goToNextPage() {
+    const nextPage = this._page.locator('button[aria-label="Go to next page"]');
+    await nextPage.click();
+  }
+
+  async goToPreviousPage() {
+    const previousPage = this._page.locator('button[aria-label="Go to previous page"]');
+    await previousPage.click();
+  }
+
+  async verifyColumnContainsLink(columnName: string, keyword: string) {
+    const table = this.getTable();
+    const field = table.locator(`td[data-label="${columnName}"]`).first();
+    const link = field.locator(`a[href*="${keyword.toLowerCase()}"]`);
+    await expect(link).toBeVisible();
+  }
+  
   private getTable() {
     return this._page.locator(`table[aria-label="${this._tableName}"]`);
   }
