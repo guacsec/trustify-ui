@@ -32,14 +32,16 @@ export const ErrorFallback = ({
   const { pushNotification } = React.useContext(NotificationsContext);
   const prevError = usePrevious(error);
 
-  if (error.message !== prevError?.message) {
-    pushNotification({
-      title: "Failed",
-      message: error.message,
-      variant: "danger",
-      timeout: 30000,
-    });
-  }
+  React.useEffect(() => {
+    if (error.message !== prevError?.message) {
+      pushNotification({
+        title: "Failed",
+        message: error.message,
+        variant: "danger",
+        timeout: 30000,
+      });
+    }
+  }, [error.message, prevError?.message, pushNotification]);
 
   return (
     <Bullseye>

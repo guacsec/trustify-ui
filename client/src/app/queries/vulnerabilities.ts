@@ -1,10 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
+  type AnalysisResponse,
   type VulnerabilityDetails,
+  analyze,
   deleteVulnerability,
   getVulnerability,
   listVulnerabilities,
@@ -36,6 +38,55 @@ export const useFetchVulnerabilities = (
     isFetching: isLoading,
     fetchError: error as AxiosError,
     refetch,
+  };
+};
+
+export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
+  const chunks = {
+    ids: ids.reduce<string[][]>((chunks, item, index) => {
+      if (index % 100 === 0) {
+        chunks.push([item]);
+      } else {
+        chunks[chunks.length - 1].push(item);
+      }
+      return chunks;
+    }, []),
+    dataResolver: async (ids: string[]) => {
+      const response = await analyze({
+        client,
+        body: { purls: ids },
+      });
+      return response.data;
+    },
+  };
+
+  const userQueries = useQueries({
+    queries: chunks.ids.map((ids) => {
+      return {
+        queryKey: [VulnerabilitiesQueryKey, ids],
+        queryFn: () => chunks.dataResolver(ids),
+        retry: false,
+      };
+    }),
+  });
+
+  const isFetching = userQueries.some(({ isLoading }) => isLoading);
+  const fetchError = userQueries.find(({ error }) => !!error);
+
+  const analysisResponse: AnalysisResponse = {};
+
+  if (!isFetching) {
+    for (const data of userQueries.map((item) => item?.data ?? {})) {
+      for (const [id, analysisDetails] of Object.entries(data)) {
+        analysisResponse[id] = analysisDetails;
+      }
+    }
+  }
+
+  return {
+    analysisResponse,
+    isFetching,
+    fetchError: (fetchError?.error ?? undefined) as AxiosError | undefined,
   };
 };
 
