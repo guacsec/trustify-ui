@@ -41,7 +41,7 @@ export const convertToCSV = (data: VulnerabilityOfSbomFromAnalysis[]) => {
             published: sanitizeForCSV(
               formatDate(vulnerability.published) ?? "",
             ),
-            updated: sanitizeForCSV(formatDate(vulnerability.published) ?? ""),
+            updated: sanitizeForCSV(formatDate(vulnerability.modified) ?? ""),
           }));
         },
       );

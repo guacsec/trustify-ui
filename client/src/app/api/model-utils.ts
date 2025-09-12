@@ -18,8 +18,8 @@ import {
   t_global_icon_color_severity_undefined_default as undefinedColor,
 } from "@patternfly/react-tokens";
 
-import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 import type { Score, ScoreType } from "@app/client";
+import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 
 type ListType = {
   [key in ExtendedSeverity]: {
@@ -180,5 +180,5 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
     return null;
   }
 
-  return scores.sort(compareByScoreTypeFn((item) => item.type))[0];
+  return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
 };
