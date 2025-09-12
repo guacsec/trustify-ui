@@ -16,9 +16,13 @@ import { SbomSearchContext } from "./sbom-context";
 
 interface SbomToolbarProps {
   showFilters?: boolean;
+  showActions?: boolean;
 }
 
-export const SbomToolbar: React.FC<SbomToolbarProps> = ({ showFilters }) => {
+export const SbomToolbar: React.FC<SbomToolbarProps> = ({
+  showFilters,
+  showActions,
+}) => {
   const navigate = useNavigate();
 
   const { tableControls } = React.useContext(SbomSearchContext);
@@ -35,9 +39,9 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({ showFilters }) => {
   return (
     <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
       <ToolbarContent>
-        {showFilters && (
+        {showFilters && <FilterToolbar {...filterToolbarProps} />}
+        {showActions && (
           <>
-            <FilterToolbar {...filterToolbarProps} />
             <ToolbarItem>
               <Button
                 variant="primary"
