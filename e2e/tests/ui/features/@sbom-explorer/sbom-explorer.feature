@@ -3,7 +3,6 @@ Feature: SBOM Explorer - View SBOM details
         Given User is authenticated
 
     Scenario Outline: View SBOM Overview
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         Then The page title is "<sbomName>"
         And Tab "Info" is visible
@@ -16,7 +15,6 @@ Feature: SBOM Explorer - View SBOM details
             | quarkus-bom |
 
     Scenario Outline: View SBOM Info (Metadata)
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         Then Tab "Info" is selected
         Then "SBOM's name" is visible
@@ -30,7 +28,6 @@ Feature: SBOM Explorer - View SBOM details
             | quarkus-bom |
     
     Scenario Outline: Downloading SBOM file
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         Then "Download SBOM" action is invoked and downloaded filename is "<expectedSbomFilename>"
         Then "Download License Report" action is invoked and downloaded filename is "<expectedLicenseFilename>"
@@ -40,7 +37,6 @@ Feature: SBOM Explorer - View SBOM details
             | quarkus-bom | quarkus-bom.json     | quarkus-bom_licenses.tar.gz |
     
     Scenario Outline: View list of SBOM Packages
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Packages"
         # confirms its visible for all tabs
@@ -63,8 +59,6 @@ Feature: SBOM Explorer - View SBOM details
             | quarkus-bom | jdom        |
 
     Scenario Outline: View SBOM Vulnerabilities
-        Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         When User Clicks on Vulnerabilities Tab Action
@@ -82,8 +76,6 @@ Feature: SBOM Explorer - View SBOM details
 
     @slow
     Scenario Outline: Pagination of SBOM Vulnerabilities table
-        Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Pagination of Vulnerabilities list works
@@ -93,7 +85,6 @@ Feature: SBOM Explorer - View SBOM details
 
     @slow
     Scenario Outline: View paginated list of SBOM Packages
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Packages"
         Then Pagination of Packages list works
@@ -102,8 +93,6 @@ Feature: SBOM Explorer - View SBOM details
         | ubi9-minimal-container |
 
     Scenario Outline: Check Column Headers of SBOM Explorer Vulnerabilities table
-        Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then List of Vulnerabilities has column "Id"
@@ -118,8 +107,6 @@ Feature: SBOM Explorer - View SBOM details
 
     @slow
     Scenario Outline: Sorting SBOM Vulnerabilities
-        Given An ingested SBOM "<sbomName>" is available
-        Given An ingested SBOM "<sbomName>" containing Vulnerabilities
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Table column "Description" is not sortable
@@ -130,16 +117,7 @@ Feature: SBOM Explorer - View SBOM details
         | sbomName    |
         | quarkus-bom |
 
-    Scenario Outline: Add Labels to SBOM from SBOM List Page
-        Given An ingested SBOM "<sbomName>" is available
-        When User Adds Labels "<Labels>" to "<sbomName>" SBOM from List Page
-        Then The Label list "<Labels>" added to the SBOM "<sbomName>" on List Page
-        Examples:
-        | sbomName    |     Labels    |
-        | quarkus-bom | RANDOM_LABELS |
-
     Scenario Outline: Add Labels to SBOM from SBOM Explorer Page
-        Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User Adds Labels "<Labels>" to "<sbomName>" SBOM from Explorer Page
         Then The Label list "<Labels>" added to the SBOM "<sbomName>" on Explorer Page
