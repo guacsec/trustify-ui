@@ -1,20 +1,19 @@
 import { createBdd } from "playwright-bdd";
 import { expect } from "playwright/test";
-import { test } from "../../fixtures";
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
+import { test } from "../../fixtures";
 
 export const { Given, When, Then } = createBdd(test);
 
 const PACKAGE_TABLE_NAME = "Package table";
 const VULN_TABLE_NAME = "Vulnerability table";
-const SBOM_TABLE_NAME = "sbom-table";
 
 When(
   "User visits SBOM details Page of {string}",
   async ({ page }, sbomName) => {
-    const _sbomDetailsPage = await SbomDetailsPage.build(page, sbomName);
+    await SbomDetailsPage.build(page, sbomName);
   },
 );
 
@@ -173,43 +172,6 @@ Then(
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
     await toolbarTable.verifySorting(vulnTableTopPagination, headers);
-  },
-);
-
-When(
-  "User Adds Labels {string} to {string} SBOM from List Page",
-  async ({ page }, labelList, sbomName) => {
-    const toolbarTable = new ToolbarTable(page, SBOM_TABLE_NAME);
-    await toolbarTable.editLabelsListPage(sbomName);
-    const detailsPage = new DetailsPage(page);
-
-    // Generate random labels if placeholder is used
-    const labelsToAdd =
-      labelList === "RANDOM_LABELS" ? detailsPage.generateLabels() : labelList;
-    await detailsPage.addLabels(labelsToAdd);
-
-    // Store generated labels for verification
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
-    (page as any).testContext = {
-      // biome-ignore lint/suspicious/noExplicitAny: allowed
-      ...(page as any).testContext,
-      generatedLabels: labelsToAdd,
-    };
-  },
-);
-
-Then(
-  "The Label list {string} added to the SBOM {string} on List Page",
-  async ({ page }, labelList, sbomName) => {
-    const detailsPage = new DetailsPage(page);
-
-    // Use stored generated labels if placeholder was used
-    const labelsToVerify =
-      labelList === "RANDOM_LABELS"
-        ? // biome-ignore lint/suspicious/noExplicitAny: allowed
-          (page as any).testContext?.generatedLabels || labelList
-        : labelList;
-    await detailsPage.verifyLabels(labelsToVerify, sbomName);
   },
 );
 

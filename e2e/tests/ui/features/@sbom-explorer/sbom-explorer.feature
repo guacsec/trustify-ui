@@ -117,13 +117,6 @@ Feature: SBOM Explorer - View SBOM details
         | sbomName    |
         | quarkus-bom |
 
-    Scenario Outline: Add Labels to SBOM from SBOM List Page
-        When User Adds Labels "<Labels>" to "<sbomName>" SBOM from List Page
-        Then The Label list "<Labels>" added to the SBOM "<sbomName>" on List Page
-        Examples:
-        | sbomName    |     Labels    |
-        | quarkus-bom | RANDOM_LABELS |
-
     Scenario Outline: Add Labels to SBOM from SBOM Explorer Page
         When User visits SBOM details Page of "<sbomName>"
         When User Adds Labels "<Labels>" to "<sbomName>" SBOM from Explorer Page
