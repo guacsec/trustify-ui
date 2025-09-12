@@ -7,20 +7,16 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "clean:all": "rimraf ./dist ./node_modules",
-    "build": "npm run generate && rsbuild build && npm run build:static-report",
-    "build:static-report": "npm run generate && rsbuild build -c rsbuild.static-report.config.ts",
+    "build": "npm run generate && rsbuild build",
     "check": "biome check --error-on-warnings .",
     "check:write": "biome check --write .",
     "format": "biome format .",
     "format:fix": "biome format --write .",
     "start:dev": "npm run generate && rsbuild dev",
-    "start:dev:static-report": "npm run generate && rsbuild dev -c rsbuild.static-report.config.ts",
     "start": "rsbuild preview",
-    "start:static-report": "rsbuild preview -c rsbuild.static-report.config.ts",
     "test": "cross-env NODE_ENV=test jest --rootDir=. --config=./config/jest.config.ts",
     "generate": "openapi-ts -f ./config/openapi-ts.config.ts",
-    "preview": "rsbuild preview",
-    "preview:static-report": "rsbuild preview -c rsbuild.static-report.config.ts"
+    "preview": "rsbuild preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",

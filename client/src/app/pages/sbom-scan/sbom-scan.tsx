@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link, useBlocker, type BlockerFunction } from "react-router-dom";
 
-import { saveAs } from "file-saver";
+// import { saveAs } from "file-saver";
 
 import {
   Breadcrumb,
@@ -31,16 +31,13 @@ import DownloadIcon from "@patternfly/react-icons/dist/esm/icons/download-icon";
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
 import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
 
-import { generateStaticReport } from "@app/api/rest";
 import type { ExtractResult } from "@app/client";
-import { WINDOW_ANALYSIS_RESPONSE } from "@app/Constants";
 import { useUploadAndAnalyzeSBOM } from "@app/queries/sboms-analysis";
 import { Paths } from "@app/Routes";
 
-import { useVulnerabilitiesOfSbomByPurls } from "@static-report/hooks/useVulnerabilitiesOfSbom";
-import { VulnerabilityTable } from "@static-report/pages/vulnerabilities/components/VulnerabilityTable";
-
 import { UploadFileForAnalysis } from "./components/UploadFileForAnalysis";
+import { VulnerabilityTable } from "./components/VulnerabilityTable";
+import { useVulnerabilitiesOfSbomByPurls } from "./hooks/useVulnerabilitiesOfSbom";
 
 export const SbomScan: React.FC = () => {
   // Actions dropdown
@@ -83,30 +80,30 @@ export const SbomScan: React.FC = () => {
 
   const {
     data: { vulnerabilities },
-    analysisResponse,
+    // analysisResponse,
     isFetching,
     fetchError,
   } = useVulnerabilitiesOfSbomByPurls(allPurls);
 
   // Other actions
-  const [isDownloadingReport, setIsDownloadingReport] = React.useState(false);
+  const [isDownloadingCSV, setIsDownloadingCSV] = React.useState(false);
 
   const downloadReport = async () => {
-    setIsDownloadingReport(true);
+    setIsDownloadingCSV(true);
 
-    const form = new FormData();
-    form.append(
-      WINDOW_ANALYSIS_RESPONSE,
-      new Blob([JSON.stringify(analysisResponse)], {
-        type: "application/json",
-      }),
-    );
+    // const form = new FormData();
+    // form.append(
+    //   WINDOW_ANALYSIS_RESPONSE,
+    //   new Blob([JSON.stringify(analysisResponse)], {
+    //     type: "application/json",
+    //   }),
+    // );
 
-    await generateStaticReport(form).then((response) => {
-      saveAs(new Blob([response.data as BlobPart]), "report.tar.gz");
-    });
+    // await generateStaticReport(form).then((response) => {
+    //   saveAs(new Blob([response.data as BlobPart]), "report.tar.gz");
+    // });
 
-    setIsDownloadingReport(false);
+    setIsDownloadingCSV(false);
   };
 
   const scanAnotherFile = () => {
@@ -175,14 +172,14 @@ export const SbomScan: React.FC = () => {
               >
                 <DropdownList>
                   <DropdownItem key="scan-another" onClick={scanAnotherFile}>
-                    Scan another
+                    Generate new report
                   </DropdownItem>
                 </DropdownList>
                 <DropdownList>
                   <DropdownItem
                     key="download-report"
                     onClick={downloadReport}
-                    isDisabled={isDownloadingReport}
+                    isDisabled={isDownloadingCSV}
                   >
                     Download report
                   </DropdownItem>
@@ -261,8 +258,8 @@ export const SbomScan: React.FC = () => {
           <Button
             variant="primary"
             icon={<DownloadIcon />}
-            isLoading={isDownloadingReport}
-            isDisabled={isDownloadingReport}
+            isLoading={isDownloadingCSV}
+            isDisabled={isDownloadingCSV}
             onClick={async () => {
               await downloadReport();
               blocker.state === "blocked" && blocker.proceed();
@@ -272,7 +269,7 @@ export const SbomScan: React.FC = () => {
           </Button>
           <Button
             variant="secondary"
-            isDisabled={isDownloadingReport}
+            isDisabled={isDownloadingCSV}
             onClick={async () => {
               blocker.state === "blocked" && blocker.proceed();
             }}
@@ -282,7 +279,7 @@ export const SbomScan: React.FC = () => {
           <Button
             key="cancel"
             variant="link"
-            isDisabled={isDownloadingReport}
+            isDisabled={isDownloadingCSV}
             onClick={() => {
               blocker.state === "blocked" && blocker.reset();
             }}

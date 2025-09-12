@@ -84,14 +84,3 @@ export const downloadSbomLicense = (sbomId: string) => {
     headers: { Accept: "text/plain", responseType: "blob" },
   });
 };
-
-export const generateStaticReport = (formData: FormData) => {
-  return axios.post<Blob>("/api/v2/ui/generate-sbom-static-report", formData, {
-    responseType: "arraybuffer",
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Accept: "text/plain",
-      responseType: "blob",
-    },
-  });
-};

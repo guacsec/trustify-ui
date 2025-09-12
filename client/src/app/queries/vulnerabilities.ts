@@ -11,10 +11,7 @@ import {
   getVulnerability,
   listVulnerabilities,
 } from "@app/client";
-import { isMockDisabled, WINDOW_ANALYSIS_RESPONSE } from "@app/Constants";
 import { requestParamsQuery } from "@app/hooks/table-controls";
-
-import { mockPromise } from "./helpers";
 
 export const VulnerabilitiesQueryKey = "vulnerabilities";
 
@@ -45,34 +42,23 @@ export const useFetchVulnerabilities = (
 };
 
 export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
-  const chunks = isMockDisabled
-    ? {
-        ids: ids.reduce<string[][]>((chunks, item, index) => {
-          if (index % 100 === 0) {
-            chunks.push([item]);
-          } else {
-            chunks[chunks.length - 1].push(item);
-          }
-          return chunks;
-        }, []),
-        dataResolver: async (ids: string[]) => {
-          const response = await analyze({
-            client,
-            body: { purls: ids },
-          });
-          return response.data;
-        },
+  const chunks = {
+    ids: ids.reduce<string[][]>((chunks, item, index) => {
+      if (index % 100 === 0) {
+        chunks.push([item]);
+      } else {
+        chunks[chunks.length - 1].push(item);
       }
-    : {
-        ids: [ids],
-        dataResolver: (_ids: string[]) => {
-          return mockPromise(
-            // biome-ignore lint/suspicious/noExplicitAny: allowed
-            ((window as any)[WINDOW_ANALYSIS_RESPONSE] as AnalysisResponse) ??
-              {},
-          );
-        },
-      };
+      return chunks;
+    }, []),
+    dataResolver: async (ids: string[]) => {
+      const response = await analyze({
+        client,
+        body: { purls: ids },
+      });
+      return response.data;
+    },
+  };
 
   const userQueries = useQueries({
     queries: chunks.ids.map((ids) => {

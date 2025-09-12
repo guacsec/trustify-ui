@@ -5,8 +5,8 @@ import "./App.css";
 import { NotificationsProvider } from "./components/NotificationsContext";
 import { DefaultLayout } from "./layout";
 
-import "@patternfly/patternfly/patternfly-addons.css";
 import "@patternfly/patternfly/patternfly.css";
+import "@patternfly/patternfly/patternfly-addons.css";
 
 const App: React.FC = () => {
   return (

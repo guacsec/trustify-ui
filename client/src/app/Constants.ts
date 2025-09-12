@@ -29,8 +29,6 @@ export const isAuthRequired = ENV.AUTH_REQUIRED !== "false";
 export const isAuthServerEmbedded = ENV.OIDC_SERVER_IS_EMBEDDED === "true";
 export const uploadLimit = "500m";
 
-export const isMockDisabled = ENV.MOCK === "off";
-
 /**
  * The name of the client generated id field inserted in a object marked with mixin type
  * `WithUiId`.
@@ -74,8 +72,3 @@ export const advisoryDeletedSuccessMessage = (sbom: AdvisorySummary) =>
 
 export const advisoryDeletedErrorMessage = (_error: AxiosError) =>
   "Error occurred while deleting the Advisory";
-
-//
-
-export const WINDOW_PURLS = "purls";
-export const WINDOW_ANALYSIS_RESPONSE = "analysis_response";
