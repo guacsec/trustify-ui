@@ -7,15 +7,15 @@ import { Bullseye, Spinner } from "@patternfly/react-core";
 import { ErrorFallback } from "./ErrorFallback";
 
 export const LazyRouteElement = ({
-  key,
+  identifier,
   component,
 }: {
-  key: string;
+  identifier: string;
   component: React.ReactNode;
 }) => {
   return (
     <Suspense
-      key={key}
+      key={identifier}
       fallback={
         <Bullseye>
           <Spinner />

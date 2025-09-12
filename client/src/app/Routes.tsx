@@ -62,19 +62,22 @@ export const AppRoutes = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <LazyRouteElement key="home" component={<Home />} />,
+        element: <LazyRouteElement identifier="home" component={<Home />} />,
       },
       {
         path: Paths.advisories,
         element: (
-          <LazyRouteElement key="advisory-list" component={<AdvisoryList />} />
+          <LazyRouteElement
+            identifier="advisory-list"
+            component={<AdvisoryList />}
+          />
         ),
       },
       {
         path: Paths.advisoryUpload,
         element: (
           <LazyRouteElement
-            key="advisory-upload"
+            identifier="advisory-upload"
             component={<AdvisoryUpload />}
           />
         ),
@@ -83,7 +86,7 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.advisoryDetails,
         element: (
           <LazyRouteElement
-            key="advisory-details"
+            identifier="advisory-details"
             component={<AdvisoryDetails />}
           />
         ),
@@ -92,7 +95,7 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.vulnerabilities,
         element: (
           <LazyRouteElement
-            key="vulnerability-list"
+            identifier="vulnerability-list"
             component={<VulnerabilityList />}
           />
         ),
@@ -101,7 +104,7 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.vulnerabilityDetails,
         element: (
           <LazyRouteElement
-            key="vulnerability-details"
+            identifier="vulnerability-details"
             component={<VulnerabilityDetails />}
           />
         ),
@@ -109,47 +112,65 @@ export const AppRoutes = createBrowserRouter([
       {
         path: Paths.packages,
         element: (
-          <LazyRouteElement key="package-list" component={<PackageList />} />
+          <LazyRouteElement
+            identifier="package-list"
+            component={<PackageList />}
+          />
         ),
       },
       {
         path: Paths.packageDetails,
         element: (
           <LazyRouteElement
-            key="package-details"
+            identifier="package-details"
             component={<PackageDetails />}
           />
         ),
       },
       {
         path: Paths.sboms,
-        element: <LazyRouteElement key="sbom-list" component={<SBOMList />} />,
+        element: (
+          <LazyRouteElement identifier="sbom-list" component={<SBOMList />} />
+        ),
       },
       {
         path: Paths.sbomUpload,
         element: (
-          <LazyRouteElement key="sbom-upload" component={<SBOMUpload />} />
+          <LazyRouteElement
+            identifier="sbom-upload"
+            component={<SBOMUpload />}
+          />
         ),
       },
       {
         path: Paths.sbomScan,
-        element: <LazyRouteElement key="sbom-scan" component={<SBOMScan />} />,
+        element: (
+          <LazyRouteElement identifier="sbom-scan" component={<SBOMScan />} />
+        ),
       },
       {
         path: Paths.sbomDetails,
         element: (
-          <LazyRouteElement key="sbom-details" component={<SBOMDetails />} />
+          <LazyRouteElement
+            identifier="sbom-details"
+            component={<SBOMDetails />}
+          />
         ),
       },
       {
         path: Paths.importers,
         element: (
-          <LazyRouteElement key="importer-list" component={<ImporterList />} />
+          <LazyRouteElement
+            identifier="importer-list"
+            component={<ImporterList />}
+          />
         ),
       },
       {
         path: Paths.search,
-        element: <LazyRouteElement key="search" component={<Search />} />,
+        element: (
+          <LazyRouteElement identifier="search" component={<Search />} />
+        ),
       },
     ],
   },
