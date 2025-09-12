@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link, useBlocker, type BlockerFunction } from "react-router-dom";
 
-// import { saveAs } from "file-saver";
+import { saveAs } from "file-saver";
 
 import {
   Breadcrumb,
@@ -38,6 +38,7 @@ import { Paths } from "@app/Routes";
 import { UploadFileForAnalysis } from "./components/UploadFileForAnalysis";
 import { VulnerabilityTable } from "./components/VulnerabilityTable";
 import { useVulnerabilitiesOfSbomByPurls } from "./hooks/useVulnerabilitiesOfSbom";
+import { convertToCSV } from "./scan-utils";
 
 export const SbomScan: React.FC = () => {
   // Actions dropdown
@@ -80,7 +81,6 @@ export const SbomScan: React.FC = () => {
 
   const {
     data: { vulnerabilities },
-    // analysisResponse,
     isFetching,
     fetchError,
   } = useVulnerabilitiesOfSbomByPurls(allPurls);
@@ -88,20 +88,12 @@ export const SbomScan: React.FC = () => {
   // Other actions
   const [isDownloadingCSV, setIsDownloadingCSV] = React.useState(false);
 
-  const downloadReport = async () => {
+  const handleDownloadCSV = async () => {
     setIsDownloadingCSV(true);
 
-    // const form = new FormData();
-    // form.append(
-    //   WINDOW_ANALYSIS_RESPONSE,
-    //   new Blob([JSON.stringify(analysisResponse)], {
-    //     type: "application/json",
-    //   }),
-    // );
-
-    // await generateStaticReport(form).then((response) => {
-    //   saveAs(new Blob([response.data as BlobPart]), "report.tar.gz");
-    // });
+    const csv = convertToCSV(vulnerabilities);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    saveAs(blob, "data.csv");
 
     setIsDownloadingCSV(false);
   };
@@ -178,10 +170,10 @@ export const SbomScan: React.FC = () => {
                 <DropdownList>
                   <DropdownItem
                     key="download-report"
-                    onClick={downloadReport}
+                    onClick={handleDownloadCSV}
                     isDisabled={isDownloadingCSV}
                   >
-                    Download report
+                    Download CSV
                   </DropdownItem>
                 </DropdownList>
               </Dropdown>
@@ -261,7 +253,7 @@ export const SbomScan: React.FC = () => {
             isLoading={isDownloadingCSV}
             isDisabled={isDownloadingCSV}
             onClick={async () => {
-              await downloadReport();
+              await handleDownloadCSV();
               blocker.state === "blocked" && blocker.proceed();
             }}
           >
