@@ -1,9 +1,8 @@
 import type React from "react";
 import { Outlet } from "react-router-dom";
-import "./App.css";
 
-import { NotificationsProvider } from "./components/NotificationsContext";
-import { DefaultLayout } from "./layout";
+import { NotificationsProvider } from "@app/components/NotificationsContext";
+import { DefaultLayout } from "@static-report/layout";
 
 import "@patternfly/patternfly/patternfly-addons.css";
 import "@patternfly/patternfly/patternfly.css";

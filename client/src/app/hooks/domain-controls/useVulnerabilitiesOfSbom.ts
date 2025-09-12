@@ -53,12 +53,13 @@ const DEFAULT_SEVERITY: SeveritySummary = {
   severities: { unknown: 0, none: 0, low: 0, medium: 0, high: 0, critical: 0 },
 };
 
-const DEFAULT_SUMMARY: VulnerabilityOfSbomSummary = {
+export const DEFAULT_SUMMARY: VulnerabilityOfSbomSummary = {
   vulnerabilityStatus: {
     affected: { ...DEFAULT_SEVERITY },
     fixed: { ...DEFAULT_SEVERITY },
     not_affected: { ...DEFAULT_SEVERITY },
     known_not_affected: { ...DEFAULT_SEVERITY },
+    under_investigation: { ...DEFAULT_SEVERITY },
   },
 };
 

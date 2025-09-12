@@ -41,14 +41,24 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
       <ToolbarContent>
         {showFilters && <FilterToolbar {...filterToolbarProps} />}
         {showActions && (
-          <ToolbarItem>
-            <Button
-              variant="primary"
-              onClick={() => navigate(Paths.sbomUpload)}
-            >
-              Upload SBOM
-            </Button>
-          </ToolbarItem>
+          <>
+            <ToolbarItem>
+              <Button
+                variant="primary"
+                onClick={() => navigate(Paths.sbomUpload)}
+              >
+                Upload SBOM
+              </Button>
+            </ToolbarItem>
+            <ToolbarItem>
+              <Button
+                variant="secondary"
+                onClick={() => navigate(Paths.sbomScan)}
+              >
+                Generate vulnerability report
+              </Button>
+            </ToolbarItem>
+          </>
         )}
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination
