@@ -86,16 +86,11 @@ export const SbomScan: React.FC = () => {
   } = useVulnerabilitiesOfSbomByPurls(allPurls);
 
   // Other actions
-  const [isDownloadingCSV, setIsDownloadingCSV] = React.useState(false);
 
   const handleDownloadCSV = async () => {
-    setIsDownloadingCSV(true);
-
     const csv = convertToCSV(vulnerabilities);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     saveAs(blob, "data.csv");
-
-    setIsDownloadingCSV(false);
   };
 
   const scanAnotherFile = () => {
@@ -171,7 +166,6 @@ export const SbomScan: React.FC = () => {
                   <DropdownItem
                     key="download-report"
                     onClick={handleDownloadCSV}
-                    isDisabled={isDownloadingCSV}
                   >
                     Download CSV
                   </DropdownItem>
@@ -250,8 +244,6 @@ export const SbomScan: React.FC = () => {
           <Button
             variant="primary"
             icon={<DownloadIcon />}
-            isLoading={isDownloadingCSV}
-            isDisabled={isDownloadingCSV}
             onClick={async () => {
               await handleDownloadCSV();
               blocker.state === "blocked" && blocker.proceed();
@@ -261,7 +253,6 @@ export const SbomScan: React.FC = () => {
           </Button>
           <Button
             variant="secondary"
-            isDisabled={isDownloadingCSV}
             onClick={async () => {
               blocker.state === "blocked" && blocker.proceed();
             }}
@@ -271,7 +262,6 @@ export const SbomScan: React.FC = () => {
           <Button
             key="cancel"
             variant="link"
-            isDisabled={isDownloadingCSV}
             onClick={() => {
               blocker.state === "blocked" && blocker.reset();
             }}
