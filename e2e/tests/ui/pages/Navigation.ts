@@ -27,7 +27,7 @@ export class Navigation {
   ) {
     // By default, we do not initialize navigation at "/"" where the Dashboard is located
     // This should help us to save some time loading pages as the Dashboard fetches too much data
-    await this._page.goto("/upload");
+    await this._page.goto("/importers");
     await this._page.getByRole("link", { name: menu }).click();
   }
 }
