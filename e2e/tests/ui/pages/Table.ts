@@ -23,8 +23,12 @@ export class Table {
     return result;
   }
 
+  /**
+   * Waits until the table is not in "Loading" state.
+   */
   async waitUntilDataIsLoaded() {
-    await this._page.waitForTimeout(1000);
+    // If table already has data, we need to wait to be sure we are not asserting the previous page
+    await this._page.waitForTimeout(500);
 
     const rows = this._table.locator(
       'xpath=//tbody[not(@aria-label="Table loading")]',
