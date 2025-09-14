@@ -29,8 +29,9 @@ export class Table {
     );
     await expect(rows.first()).toBeVisible();
 
-    const rowsCount = await rows.count();
-    expect(rowsCount).toBeGreaterThanOrEqual(1);
+    await expect
+      .poll(() => rows.count())
+      .toBeGreaterThanOrEqual(1);
   }
 
   async clickSortBy(columnName: string) {
@@ -83,7 +84,9 @@ export class Table {
       await expect.poll(() => rows.count()).toBe(expectedRows.equal);
     }
     if (expectedRows.greaterThan) {
-      await expect.poll(() => rows.count()).toBeGreaterThan(expectedRows.greaterThan);
+      await expect
+        .poll(() => rows.count())
+        .toBeGreaterThan(expectedRows.greaterThan);
     }
     if (expectedRows.lessThan) {
       await expect.poll(() => rows.count()).toBeLessThan(expectedRows.lessThan);
