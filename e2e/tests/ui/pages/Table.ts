@@ -80,13 +80,13 @@ export class Table {
     const rows = this._table.locator(`td[data-label="${columnName}"]`);
 
     if (expectedRows.equal) {
-      expect(await rows.count()).toBe(expectedRows.equal);
+      await expect.poll(() => rows.count()).toBe(expectedRows.equal);
     }
     if (expectedRows.greaterThan) {
-      expect(await rows.count()).toBeGreaterThan(expectedRows.greaterThan);
+      await expect.poll(() => rows.count()).toBeGreaterThan(expectedRows.greaterThan);
     }
     if (expectedRows.lessThan) {
-      expect(await rows.count()).toBeLessThan(expectedRows.lessThan);
+      await expect.poll(() => rows.count()).toBeLessThan(expectedRows.lessThan);
     }
   }
 }
