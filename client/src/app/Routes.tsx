@@ -4,6 +4,7 @@ import { createBrowserRouter, useParams } from "react-router-dom";
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import { NotFoundPage } from "./components/NotFound";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -57,6 +58,7 @@ export const AppRoutes = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         path: "/",
