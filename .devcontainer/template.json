@@ -34,7 +34,8 @@
       ],
       "settings": {
         "cucumberautocomplete.steps": [
-          "tests/ui/features/@*/*.step.ts"
+          "tests/ui/features/@*/*.step.ts",
+          "tests/ui/steps/*.ts"
         ],
         "cucumberautocomplete.strictGherkinCompletion": true  
       }
