@@ -82,6 +82,7 @@ export class Pagination {
 
     // Verify that items less than or equal to 20 and greater than 10 are displayed
     await this.selectItemsPerPage(20);
+    await table.waitUntilDataIsLoaded();
     await table.validateNumberOfRows(
       { greaterThan: 10, lessThan: 21 },
       columnName,
