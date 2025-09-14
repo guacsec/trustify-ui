@@ -24,14 +24,14 @@ export class Table {
   }
 
   async waitUntilDataIsLoaded() {
+    await this._page.waitForTimeout(1000);
+
     const rows = this._table.locator(
       'xpath=//tbody[not(@aria-label="Table loading")]',
     );
     await expect(rows.first()).toBeVisible();
 
-    await expect
-      .poll(() => rows.count())
-      .toBeGreaterThanOrEqual(1);
+    await expect.poll(() => rows.count()).toBeGreaterThanOrEqual(1);
   }
 
   async clickSortBy(columnName: string) {
