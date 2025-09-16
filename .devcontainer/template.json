@@ -31,7 +31,14 @@
       "extensions": [
         "ms-playwright.playwright",
         "alexkrechik.cucumberautocomplete"
-      ]
+      ],
+      "settings": {
+        "cucumberautocomplete.steps": [
+          "tests/ui/features/@*/*.step.ts",
+          "tests/ui/steps/*.ts"
+        ],
+        "cucumberautocomplete.strictGherkinCompletion": true  
+      }
     }
   }
 }
