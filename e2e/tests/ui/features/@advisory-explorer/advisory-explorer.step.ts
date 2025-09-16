@@ -10,15 +10,78 @@ const VULN_TABLE_NAME = "vulnerability table";
 
 Given(
   "User visits Advisory details Page of {string}",
-  async ({ page }, advisoryName) => {
+  async ({ page }, advisoryID) => {
+    const searchPage = new SearchPage(page, "Advisories");
+    await searchPage.dedicatedSearch(advisoryID);
+    await page.getByRole("link", { name: advisoryID, exact: true }).click();
+  },
+);
+
+Given(
+  "User visits Advisory details Page of {string} with type {string}",
+  async ({ page }, advisoryName, advisoryType) => {
     const searchPage = new SearchPage(page, "Advisories");
     await searchPage.dedicatedSearch(advisoryName);
-    await page.getByRole("link", { name: advisoryName }).click();
+    const advisory = `xpath=//tr[contains(.,'${advisoryName}') and contains(.,'${advisoryType}')]/td/a`;
+    await page.locator(advisory).click();
+  },
+);
+
+// Advisory Search
+When(
+  "User searches for an advisory named {string} in the general search bar",
+  async ({ page }, item) => {
+    const searchPage = new SearchPage(page, "Dashboard");
+    await searchPage.generalSearch("Advisories", item);
+  },
+);
+
+When(
+  "User searches for {string} in the dedicated search bar",
+  async ({ page }, advisoryID) => {
+    const searchPage = new SearchPage(page, "Advisories");
+    await searchPage.dedicatedSearch(advisoryID);
   },
 );
 
 Then(
-  "User navigates to the Vulnerabilites tab on the Advisory Overview page",
+  "The advisory {string} shows in the results",
+  async ({ page }, advisoryID) => {
+    await expect(
+      page.getByRole("gridcell").filter({ hasText: advisoryID }),
+    ).toBeVisible();
+  },
+);
+
+// Advisory Explorer
+Then(
+  "The vulnerabilities table is sorted by {string}",
+  async ({ page }, columnName) => {
+    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    await toolbarTable.verifyTableIsSortedBy(columnName);
+  },
+);
+
+Then(
+  "The vulnerabilities table total results is {int}",
+  async ({ page }, totalResults) => {
+    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    await toolbarTable.verifyPaginationHasTotalResults(totalResults);
+  },
+);
+
+Then(
+  "The {string} column of the vulnerability table contains {string}",
+  async ({ page }, columnName, expectedValue) => {
+    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    await toolbarTable.verifyColumnContainsText(columnName, expectedValue);
+  },
+);
+
+// Advisory Explorer / Vulenrabilities
+
+Then(
+  "User navigates to the Vulnerabilities tab on the Advisory Overview page",
   async ({ page }) => {
     await page.getByRole("tab", { name: "Vulnerabilities" }).click();
   },
@@ -54,7 +117,9 @@ Then(
 Then(
   "The {string} information should be visible for each vulnerability",
   async ({ page }, headers: string) => {
-    const headersArr = headers.split(`,`).map((column) => column.trim());
+    const headersArr = headers
+      .split(`,`)
+      .map((column: string) => column.trim());
     for (const label of headersArr) {
       const header = page.getByRole("columnheader", { name: label });
       if (await header.count()) {
