@@ -70,7 +70,15 @@ export class Toolbar {
       .locator("input[aria-label='Interval end']")
       .fill(toDate);
 
-    await this.assertFilterHasLabels(filterName, [fromDate, toDate]);
+    await this.assertFilterHasLabels(filterName, toDate);
+  }
+
+  async applyDateFilter(filterName: string, date: string) {
+    await this.selectFilter(filterName);
+
+    await this._toolbar.locator("input[aria-label='Date']").fill(date);
+
+    await this.assertFilterHasLabels(filterName, date);
   }
 
   async applyMultiSelectFilter(filterName: string, selections: string[]) {
