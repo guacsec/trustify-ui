@@ -22,7 +22,7 @@ export const LazyRouteElement = ({
         </Bullseye>
       }
     >
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ErrorBoundary FallbackComponent={ErrorFallback} key={identifier}>
         {component}
       </ErrorBoundary>
     </Suspense>

@@ -23,14 +23,18 @@ export class Table {
     return result;
   }
 
-  async waitUntilDataIsLoaded() {
+  /**
+   * @param waitMs - Optional. Milliseconds to wait before checking table data.
+   */
+  async waitUntilDataIsLoaded(waitMs: number = 500) {
+    await this._page.waitForTimeout(waitMs);
+
     const rows = this._table.locator(
       'xpath=//tbody[not(@aria-label="Table loading")]',
     );
     await expect(rows.first()).toBeVisible();
 
-    const rowsCount = await rows.count();
-    expect(rowsCount).toBeGreaterThanOrEqual(1);
+    await expect.poll(() => rows.count()).toBeGreaterThanOrEqual(1);
   }
 
   async clickSortBy(columnName: string) {
@@ -80,13 +84,15 @@ export class Table {
     const rows = this._table.locator(`td[data-label="${columnName}"]`);
 
     if (expectedRows.equal) {
-      expect(await rows.count()).toBe(expectedRows.equal);
+      await expect.poll(() => rows.count()).toBe(expectedRows.equal);
     }
     if (expectedRows.greaterThan) {
-      expect(await rows.count()).toBeGreaterThan(expectedRows.greaterThan);
+      await expect
+        .poll(() => rows.count())
+        .toBeGreaterThan(expectedRows.greaterThan);
     }
     if (expectedRows.lessThan) {
-      expect(await rows.count()).toBeLessThan(expectedRows.lessThan);
+      await expect.poll(() => rows.count()).toBeLessThan(expectedRows.lessThan);
     }
   }
 }
