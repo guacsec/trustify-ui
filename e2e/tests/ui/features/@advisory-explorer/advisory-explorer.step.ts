@@ -57,7 +57,7 @@ Then(
 Then(
   "The vulnerabilities table is sorted by {string}",
   async ({ page }, columnName) => {
-    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyTableIsSortedBy(columnName);
   },
 );
@@ -65,7 +65,7 @@ Then(
 Then(
   "The vulnerabilities table total results is {int}",
   async ({ page }, totalResults) => {
-    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyPaginationHasTotalResults(totalResults);
   },
 );
@@ -73,7 +73,7 @@ Then(
 Then(
   "The {string} column of the vulnerability table contains {string}",
   async ({ page }, columnName, expectedValue) => {
-    const toolbarTable = new ToolbarTable(page, VULNERABILITIES_TABLE_NAME);
+    const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyColumnContainsText(columnName, expectedValue);
   },
 );
