@@ -21,12 +21,12 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await table.verifyColumnContainsText("Name", "quarkus-bom");
 
     // Date filter
-    await toolbar.applyDateRangeFilter(
-      "Created on",
-      "11/21/2023",
-      "11/23/2023",
-    );
+    await toolbar.applyDateFilter("Created before", "11/23/2023");
     await table.waitUntilDataIsLoaded();
+
+    await toolbar.applyDateFilter("Created after", "11/21/2023");
+    await table.waitUntilDataIsLoaded();
+
     await table.verifyColumnContainsText("Name", "quarkus-bom");
 
     // Labels filter
