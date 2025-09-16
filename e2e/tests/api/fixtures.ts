@@ -87,6 +87,15 @@ export const discoverTokenEndpoint = async (
   return envInfo.OIDC_SERVER_URL ?? null;
 };
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    sentAt?: number;
+  }
+  export interface AxiosResponse {
+    duration?: number;
+  }
+}
+
 const initAxiosInstance = async (
   axiosInstance: AxiosInstance,
   baseURL?: string,
@@ -110,7 +119,9 @@ const initAxiosInstance = async (
   // Measure request start time
   axiosInstance.interceptors.request.use(
     (config) => {
-      config.headers['request-startTime'] = new Date().getTime();
+      // config.headers['request-startTime'] = new Date().getTime();
+      // return config
+      config.sentAt = Date.now();
       return config
     }
   );
@@ -151,11 +162,16 @@ const initAxiosInstance = async (
   // Measure response reception time
   axiosInstance.interceptors.response.use(
     (response) => {
-      const currentTime = new Date().getTime()      
-      const startTime = response.config.headers['request-startTime']      
+      // const currentTime = new Date().getTime()      
+      // const startTime = response.config.headers['request-startTime']      
       
-      response.headers['request-duration'] = currentTime - startTime
+      // response.headers['request-duration'] = currentTime - startTime
 
+      // return response
+
+      if (response.config.sentAt != null) {
+        response.duration = Date.now() - response.config.sentAt;
+      }
       return response
   })
 };
