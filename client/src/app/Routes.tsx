@@ -31,28 +31,33 @@ const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 // Others
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
+const LicenseList = lazy(() => import("./pages/license-list"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
+  LICENSE_NAME = "licenseName",
 }
 
 export const Paths = {
   advisories: "/advisories",
-  advisoryUpload: "/advisories/upload",
   advisoryDetails: `/advisories/:${PathParam.ADVISORY_ID}`,
+  advisoryUpload: "/advisories/upload",
+  importers: "/importers",
+  licenses: "/licenses",
+  packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
+  packagesFilter: `/packages/:${PathParam.LICENSE_NAME}`,
+  packages: "/packages",
+  sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
+  sbomsFilter: `/sboms/:${PathParam.LICENSE_NAME}`,
+  sboms: "/sboms",
+  sbomScan: "/sboms/scan",
+  sbomUpload: "/sboms/upload",
+  search: "/search",
   vulnerabilities: "/vulnerabilities",
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
-  sboms: "/sboms",
-  sbomUpload: "/sboms/upload",
-  sbomScan: "/sboms/scan",
-  sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
-  packages: "/packages",
-  packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
-  search: "/search",
-  importers: "/importers",
 } as const;
 
 export const AppRoutes = createBrowserRouter([
@@ -74,15 +79,6 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.advisoryUpload,
-        element: (
-          <LazyRouteElement
-            identifier="advisory-upload"
-            component={<AdvisoryUpload />}
-          />
-        ),
-      },
-      {
         path: Paths.advisoryDetails,
         element: (
           <LazyRouteElement
@@ -92,20 +88,29 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.vulnerabilities,
+        path: Paths.advisoryUpload,
         element: (
           <LazyRouteElement
-            identifier="vulnerability-list"
-            component={<VulnerabilityList />}
+            identifier="advisory-upload"
+            component={<AdvisoryUpload />}
           />
         ),
       },
       {
-        path: Paths.vulnerabilityDetails,
+        path: Paths.importers,
         element: (
           <LazyRouteElement
-            identifier="vulnerability-details"
-            component={<VulnerabilityDetails />}
+            identifier="importer-list"
+            component={<ImporterList />}
+          />
+        ),
+      },
+      {
+        path: Paths.licenses,
+        element: (
+          <LazyRouteElement
+            identifier="license-list"
+            component={<LicenseList />}
           />
         ),
       },
@@ -134,11 +139,11 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomUpload,
+        path: Paths.sbomDetails,
         element: (
           <LazyRouteElement
-            identifier="sbom-upload"
-            component={<SBOMUpload />}
+            identifier="sbom-details"
+            component={<SBOMDetails />}
           />
         ),
       },
@@ -149,20 +154,11 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomDetails,
+        path: Paths.sbomUpload,
         element: (
           <LazyRouteElement
-            identifier="sbom-details"
-            component={<SBOMDetails />}
-          />
-        ),
-      },
-      {
-        path: Paths.importers,
-        element: (
-          <LazyRouteElement
-            identifier="importer-list"
-            component={<ImporterList />}
+            identifier="sbom-upload"
+            component={<SBOMUpload />}
           />
         ),
       },
@@ -170,6 +166,24 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.search,
         element: (
           <LazyRouteElement identifier="search" component={<Search />} />
+        ),
+      },
+      {
+        path: Paths.vulnerabilities,
+        element: (
+          <LazyRouteElement
+            identifier="vulnerability-list"
+            component={<VulnerabilityList />}
+          />
+        ),
+      },
+      {
+        path: Paths.vulnerabilityDetails,
+        element: (
+          <LazyRouteElement
+            identifier="vulnerability-details"
+            component={<VulnerabilityDetails />}
+          />
         ),
       },
     ],

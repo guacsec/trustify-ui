@@ -73,3 +73,26 @@ export const useFetchPackagesBySbomId = (
     refetch,
   };
 };
+
+export const useFetchPackagesByLicense = (license: string) => {
+  const q = license ? `license=${encodeURIComponent(license)}` : "";
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: [PackagesQueryKey, license],
+    queryFn: () =>
+      listPurl({
+        client,
+        query: {
+          q: q,
+        },
+      }),
+  });
+  return {
+    result: {
+      data: data?.data?.items || [],
+      total: data?.data?.total ?? 0,
+    },
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+    refetch,
+  };
+};
