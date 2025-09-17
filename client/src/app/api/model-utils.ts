@@ -1,6 +1,6 @@
 import type React from "react";
 
-import type { ProgressProps } from "@patternfly/react-core";
+import type { LabelProps, ProgressProps } from "@patternfly/react-core";
 import {
   SeverityCriticalIcon,
   SeverityImportantIcon,
@@ -18,7 +18,8 @@ import {
   t_global_icon_color_severity_undefined_default as undefinedColor,
 } from "@patternfly/react-tokens";
 
-import type { ExtendedSeverity, Label } from "./models";
+import type { Score, ScoreType } from "@app/client";
+import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 
 type ListType = {
   [key in ExtendedSeverity]: {
@@ -70,6 +71,36 @@ export const severityList: ListType = {
   },
 };
 
+type VulnerabilityStatusListType = {
+  [key in VulnerabilityStatus]: {
+    name: string;
+    color: LabelProps["color"];
+  };
+};
+
+export const vulnerabilityStatusList: VulnerabilityStatusListType = {
+  fixed: {
+    name: "Fixed",
+    color: "blue",
+  },
+  not_affected: {
+    name: "Not affected",
+    color: "green",
+  },
+  known_not_affected: {
+    name: "Known not affected",
+    color: "green",
+  },
+  under_investigation: {
+    name: "Under investigation",
+    color: "yellow",
+  },
+  affected: {
+    name: "Affected",
+    color: "red",
+  },
+};
+
 export const getSeverityPriority = (val: ExtendedSeverity) => {
   switch (val) {
     case "unknown":
@@ -107,4 +138,47 @@ export const joinKeyValueAsString = ({ key, value }: Label): string => {
 export const splitStringAsKeyValue = (v: string): Label => {
   const [key, value] = v.split("=");
   return { key, value: value ?? "" };
+};
+
+/**
+ * Determines the favorite ScoreType to be chosen to get the severity
+ * @param val
+ * @returns a numeric value of the priority associated to the ScoreType
+ */
+const getScoreTypePriority = (val: ScoreType | null) => {
+  if (!val) {
+    return 0;
+  }
+
+  switch (val) {
+    case "3.1":
+      return 1;
+    case "3.0":
+      return 2;
+    case "4.0":
+      return 3;
+    case "2.0":
+      return 4;
+    default:
+      return 0;
+  }
+};
+
+export function compareByScoreTypeFn<T>(
+  scoreTypeExtractor: (elem: T) => ScoreType | null,
+) {
+  return (a: T, b: T) => {
+    return (
+      getScoreTypePriority(scoreTypeExtractor(a)) -
+      getScoreTypePriority(scoreTypeExtractor(b))
+    );
+  };
+}
+
+export const extractPriorityScoreFromScores = (scores: Score[]) => {
+  if (scores.length === 0) {
+    return null;
+  }
+
+  return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
 };
