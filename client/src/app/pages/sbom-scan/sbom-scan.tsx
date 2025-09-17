@@ -27,6 +27,7 @@ import {
   type MenuToggleElement,
 } from "@patternfly/react-core";
 
+import CheckCircleIcon from "@patternfly/react-icons/dist/esm/icons/check-circle-icon";
 import DownloadIcon from "@patternfly/react-icons/dist/esm/icons/download-icon";
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
 import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
@@ -101,8 +102,11 @@ export const SbomScan: React.FC = () => {
     setUploadResponseData(null);
   };
 
-  const reportNotReady =
-    uploadResponseData === null || isFetching || fetchError;
+  const noReportToRender =
+    uploadResponseData === null ||
+    isFetching ||
+    fetchError ||
+    vulnerabilities.length === 0;
 
   return (
     <>
@@ -111,7 +115,7 @@ export const SbomScan: React.FC = () => {
           <BreadcrumbItem>
             <Link to={Paths.sboms}>SBOMs</Link>
           </BreadcrumbItem>
-          {reportNotReady ? (
+          {noReportToRender ? (
             <BreadcrumbItem isActive>
               Generate vulnerability report
             </BreadcrumbItem>
@@ -121,7 +125,7 @@ export const SbomScan: React.FC = () => {
         </Breadcrumb>
       </PageSection>
       <PageSection>
-        {reportNotReady ? (
+        {noReportToRender ? (
           <Content>
             <Content component="h1">Generate vulnerability report</Content>
             <Content component="p">
@@ -212,6 +216,26 @@ export const SbomScan: React.FC = () => {
             <EmptyStateBody>
               The file could not be analyzed. The file might be corrupted or an
               unsupported format.
+            </EmptyStateBody>
+            <EmptyStateFooter>
+              <EmptyStateActions>
+                <Button variant="primary" onClick={scanAnotherFile}>
+                  Try another file
+                </Button>
+              </EmptyStateActions>
+            </EmptyStateFooter>
+          </EmptyState>
+        ) : vulnerabilities.length === 0 ? (
+          <EmptyState
+            status="success"
+            headingLevel="h4"
+            titleText="No vulnerabilities found"
+            icon={CheckCircleIcon}
+            variant={EmptyStateVariant.sm}
+          >
+            <EmptyStateBody>
+              The {Array.from(uploads.keys()).map((e) => e.name)} was
+              successfully analyzed and found no vulnerabilities to report.
             </EmptyStateBody>
             <EmptyStateFooter>
               <EmptyStateActions>
