@@ -10,17 +10,6 @@ export const { Given, When, Then } = createBdd(test);
 const PACKAGE_TABLE_NAME = "Package table";
 const VULN_TABLE_NAME = "Vulnerability table";
 
-Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
-  const sbomListPage = await SbomListPage.build(page);
-
-  const toolbar = await sbomListPage.getToolbar();
-  const table = await sbomListPage.getTable();
-
-  await toolbar.applyTextFilter("Filter text", sbomName);
-  await table.waitUntilDataIsLoaded();
-  await table.verifyColumnContainsText("Name", sbomName);
-});
-
 When(
   "User visits SBOM details Page of {string}",
   async ({ page }, sbomName) => {
