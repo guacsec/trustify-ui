@@ -29,6 +29,7 @@ interface IPackageSearchContext {
     | "namespace"
     | "version"
     | "type"
+    | "licenses"
     | "path"
     | "qualifiers"
     | "vulnerabilities",
@@ -63,6 +64,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       namespace: "Namespace",
       version: "Version",
       type: "Type",
+      licenses: "Licenses",
       path: "Path",
       qualifiers: "Qualifiers",
       vulnerabilities: "Vulnerabilities",
@@ -121,7 +123,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       },
     }),
   );
-
+  
   const enrichedPackages = React.useMemo(() => {
     return packages.map((item) => {
       const result: PackageTableData = {

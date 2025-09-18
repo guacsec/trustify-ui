@@ -1,6 +1,5 @@
 import React from "react";
 import { generatePath, NavLink } from "react-router-dom";
-
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
@@ -11,14 +10,14 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
-
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { PackageSearchContext } from "./package-context";
+import { PackageLicenses } from "./components/PackageLicenses";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
     React.useContext(PackageSearchContext);
-
+  
   const {
     numRenderedColumns,
     currentPageItems,
@@ -41,6 +40,7 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "namespace" })} />
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
+              <Th {...getThProps({ columnKey: "licenses" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -98,6 +98,13 @@ export const PackageTable: React.FC = () => {
                     >
                       {item.decomposedPurl?.type}
                     </Td>
+                    <Td
+                      width={10}
+                      modifier="truncate"
+                      {...getTdProps({ columnKey: "licenses" })}
+                    >
+                      <PackageLicenses packageId={item.uuid} />
+                      </Td>
                     <Td
                       width={10}
                       modifier="truncate"
