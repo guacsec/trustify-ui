@@ -1,13 +1,11 @@
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
   type AnalysisResponse,
-  type VulnerabilityDetails,
   analyze,
-  deleteVulnerability,
   getVulnerability,
   listVulnerabilities,
 } from "@app/client";
@@ -100,19 +98,4 @@ export const useFetchVulnerabilityById = (id: string) => {
     isFetching: isLoading,
     fetchError: error as AxiosError,
   };
-};
-
-export const useDeleteVulnerabilityMutation = (
-  onSuccess?: (payload: VulnerabilityDetails, id: string) => void,
-  onError?: (err: AxiosError, id: string) => void,
-) => {
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const response = deleteVulnerability({ client, path: { id } });
-      return (await response).data as VulnerabilityDetails;
-    },
-    mutationKey: [VulnerabilitiesQueryKey],
-    onSuccess,
-    onError,
-  });
 };
