@@ -58,6 +58,10 @@ import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
 
+import { useLocalStorage } from "usehooks-ts";
+import { CreateAnalysis } from "./components/CreateAnalysis";
+import { ViewAnalysis } from "./components/ViewAnalysis";
+
 interface TableData {
   vulnerability: SbomStatus;
   vulnerabilityStatus: VulnerabilityStatus;
@@ -78,6 +82,23 @@ interface VulnerabilitiesBySbomProps {
 export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   sbomId,
 }) => {
+  const [analysisMap, setAnalysisMap] = useLocalStorage(
+    "analysis",
+    new Map<string, string>(),
+    {
+      serializer: (value) => {
+        return JSON.stringify([...value]);
+      },
+      deserializer: (value) => {
+        const obj = JSON.parse(value);
+        return new Map<string, string>(obj);
+      },
+      initializeWithValue: true,
+    },
+  );
+
+  //
+
   const {
     sbom,
     isFetching: isFetchingSbom,
@@ -135,6 +156,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       affectedDependencies: "Affected dependencies",
       published: "Published",
       updated: "Updated",
+      analysis: "Analysis",
     },
     hasActionsColumn: false,
     isSortEnabled: true,
@@ -247,6 +269,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
+                <Th {...getThProps({ columnKey: "analysis" })} />
               </TableHeaderContentWithControls>
             </Tr>
           </Thead>
@@ -269,7 +292,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       rowIndex={rowIndex}
                     >
                       <Td
-                        width={15}
+                        width={10}
                         modifier="breakWord"
                         {...getTdProps({ columnKey: "id" })}
                       >
@@ -315,7 +338,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         />
                       </Td>
                       <Td
-                        width={15}
+                        width={10}
                         modifier="truncate"
                         {...getTdProps({
                           columnKey: "affectedDependencies",
@@ -339,6 +362,36 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         {...getTdProps({ columnKey: "updated" })}
                       >
                         {formatDate(item.vulnerability?.modified)}
+                      </Td>
+                      <Td
+                        width={10}
+                        modifier="truncate"
+                        {...getTdProps({ columnKey: "analysis" })}
+                      >
+                        {analysisMap.has(item.vulnerability.identifier) ? (
+                          <ViewAnalysis
+                            sbomId={sbomId}
+                            analysisId={analysisMap.get(
+                              item.vulnerability.identifier,
+                            )}
+                          />
+                        ) : (
+                          <CreateAnalysis
+                            sbomId={sbomId}
+                            vulnerabilityId={item.vulnerability.identifier}
+                            onAnalysisCreated={(response) => {
+                              if (response?.id) {
+                                const newMap = new Map(analysisMap);
+                                newMap.set(
+                                  item.vulnerability.identifier,
+                                  response.id,
+                                );
+
+                                setAnalysisMap(() => newMap);
+                              }
+                            }}
+                          />
+                        )}
                       </Td>
                     </TableRowContentWithControls>
                   </Tr>

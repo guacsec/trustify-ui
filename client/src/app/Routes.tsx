@@ -27,6 +27,9 @@ const SBOMList = lazy(() => import("./pages/sbom-list"));
 const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMScan = lazy(() => import("./pages/sbom-scan"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
+const AnalysisDetails = lazy(
+  () => import("./pages/analysis-details"),
+);
 
 // Others
 const Search = lazy(() => import("./pages/search"));
@@ -37,6 +40,7 @@ export enum PathParam {
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
+  ANALYSIS_ID = "analysisId",
 }
 
 export const Paths = {
@@ -49,6 +53,7 @@ export const Paths = {
   sbomUpload: "/sboms/upload",
   sbomScan: "/sboms/scan",
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
+  analysisDetails: `/sboms/:${PathParam.SBOM_ID}/analysis/:${PathParam.ANALYSIS_ID}`,
   packages: "/packages",
   packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
   search: "/search",
@@ -154,6 +159,15 @@ export const AppRoutes = createBrowserRouter([
           <LazyRouteElement
             identifier="sbom-details"
             component={<SBOMDetails />}
+          />
+        ),
+      },
+      {
+        path: Paths.analysisDetails,
+        element: (
+          <LazyRouteElement
+            identifier="analysis-details"
+            component={<AnalysisDetails />}
           />
         ),
       },
