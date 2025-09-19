@@ -7,7 +7,6 @@ import {
   type AnalysisResponse,
   type VulnerabilityDetails,
   analyze,
-  deleteVulnerability,
   getVulnerability,
   listVulnerabilities,
 } from "@app/client";
@@ -100,19 +99,4 @@ export const useFetchVulnerabilityById = (id: string) => {
     isFetching: isLoading,
     fetchError: error as AxiosError,
   };
-};
-
-export const useDeleteVulnerabilityMutation = (
-  onSuccess?: (payload: VulnerabilityDetails, id: string) => void,
-  onError?: (err: AxiosError, id: string) => void,
-) => {
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const response = deleteVulnerability({ client, path: { id } });
-      return (await response).data as VulnerabilityDetails;
-    },
-    mutationKey: [VulnerabilitiesQueryKey],
-    onSuccess,
-    onError,
-  });
 };

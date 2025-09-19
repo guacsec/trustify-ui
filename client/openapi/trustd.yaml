@@ -2376,6 +2376,25 @@ paths:
                 items:
                   type: integer
                   format: int64
+  /api/v2/sbom/exploitiq/{id}:
+    get:
+      tags:
+      - sbom
+      summary: Fetch ExploitIQ report
+      operationId: fetchExploitIQReport
+      parameters:
+      - name: id
+        in: path
+        description: ExploitIQ report id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The proxied ExploitIQ report
+          content:
+            application/json:
+              schema: {}
   /api/v2/sbom/{id}:
     get:
       tags:
@@ -2463,6 +2482,36 @@ paths:
                   $ref: '#/components/schemas/LicenseRefMapping'
         '400':
           description: Invalid UUID format.
+  /api/v2/sbom/{id}/exploitiq:
+    post:
+      tags:
+      - sbom
+      summary: Create ExploitIQ report
+      operationId: createExploitIQReport
+      parameters:
+      - name: id
+        in: path
+        description: The id of the SBOM
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+        required: true
+      responses:
+        '201':
+          description: Create a report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResult'
+        '400':
+          description: Unable to read advisory list
+        '404':
+          description: The SBOM could not be found
   /api/v2/sbom/{id}/label:
     put:
       tags:
@@ -3061,22 +3110,6 @@ paths:
                 $ref: '#/components/schemas/VulnerabilityDetails'
         '404':
           description: The vulnerability could not be found
-    delete:
-      tags:
-      - vulnerability
-      summary: Delete vulnerability
-      operationId: deleteVulnerability
-      parameters:
-      - name: id
-        in: path
-        description: ID of the vulnerability
-        required: true
-        schema:
-          type: string
-      responses:
-        '501':
-          description: Method not yet implemented
-      deprecated: true
   /api/v2/weakness:
     get:
       tags:
@@ -4648,6 +4681,7 @@ components:
         - base
         - advisories
         - licenses
+        - licenses_ref_mapping
         properties:
           advisories:
             type: array
@@ -4658,7 +4692,11 @@ components:
           licenses:
             type: array
             items:
-              $ref: '#/components/schemas/PurlLicenseSummary'
+              $ref: '#/components/schemas/LicenseInfo'
+          licenses_ref_mapping:
+            type: array
+            items:
+              $ref: '#/components/schemas/LicenseRefMapping'
           version:
             $ref: '#/components/schemas/VersionedPurlHead'
     PurlHead:
@@ -4674,18 +4712,6 @@ components:
           type: string
           format: uuid
           description: The ID of the qualified PURL
-    PurlLicenseSummary:
-      type: object
-      required:
-      - sbom
-      - licenses
-      properties:
-        licenses:
-          type: array
-          items:
-            type: string
-        sbom:
-          $ref: '#/components/schemas/SbomHead'
     PurlStatus:
       type: object
       required:
@@ -4812,6 +4838,25 @@ components:
           type: string
           format: date-time
           description: Start of the import run
+    ReportRequest:
+      type: object
+      required:
+      - vulnerabilities
+      properties:
+        vulnerabilities:
+          type: array
+          items:
+            type: string
+    ReportResult:
+      type: object
+      required:
+      - id
+      - reportId
+      properties:
+        id:
+          type: string
+        reportId:
+          type: string
     Revisioned_Importer:
       type: object
       description: |-
