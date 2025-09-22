@@ -1,10 +1,13 @@
 import type React from "react";
+import { generatePath, useNavigate } from "react-router-dom";
+
+import { Button, Skeleton } from "@patternfly/react-core";
 
 import { IconedStatus } from "@app/components/IconedStatus";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { TableCellError } from "@app/components/TableCellError";
 import { useFetchAnalysisById } from "@app/queries/analysis";
 import { Paths } from "@app/Routes";
-import { Button } from "@patternfly/react-core";
-import { generatePath, useNavigate } from "react-router-dom";
 
 interface IViewAnalysisProps {
   sbomId: string;
@@ -17,7 +20,7 @@ export const ViewAnalysis: React.FC<IViewAnalysisProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { analysis } = useFetchAnalysisById(analysisId);
+  const { analysis, isFetching, fetchError } = useFetchAnalysisById(analysisId);
 
   const handleOnViewAnalysis = () => {
     navigate(
@@ -29,7 +32,12 @@ export const ViewAnalysis: React.FC<IViewAnalysisProps> = ({
   };
 
   return (
-    <>
+    <LoadingWrapper
+      isFetching={isFetching}
+      fetchError={fetchError}
+      isFetchingState={<Skeleton />}
+      fetchErrorState={(error) => <TableCellError error={error} />}
+    >
       {analysis && !analysis.output ? (
         <IconedStatus preset="InProgress" />
       ) : (
@@ -37,6 +45,6 @@ export const ViewAnalysis: React.FC<IViewAnalysisProps> = ({
           View
         </Button>
       )}
-    </>
+    </LoadingWrapper>
   );
 };

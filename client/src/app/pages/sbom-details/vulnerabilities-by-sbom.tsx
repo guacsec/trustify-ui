@@ -2,6 +2,7 @@ import React from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import dayjs from "dayjs";
+import { useLocalStorage } from "usehooks-ts";
 
 import {
   Card,
@@ -58,7 +59,6 @@ import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
 
-import { useLocalStorage } from "usehooks-ts";
 import { CreateAnalysis } from "./components/CreateAnalysis";
 import { ViewAnalysis } from "./components/ViewAnalysis";
 
@@ -82,13 +82,12 @@ interface VulnerabilitiesBySbomProps {
 export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   sbomId,
 }) => {
+  // Handles a Map of <VulnerabilityId, ReportId>
   const [analysisMap, setAnalysisMap] = useLocalStorage(
-    "analysis",
+    `analysis-${sbomId}`,
     new Map<string, string>(),
     {
-      serializer: (value) => {
-        return JSON.stringify([...value]);
-      },
+      serializer: (value) => JSON.stringify([...value]),
       deserializer: (value) => {
         const obj = JSON.parse(value);
         return new Map<string, string>(obj);
@@ -280,6 +279,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             numRenderedColumns={numRenderedColumns}
           >
             {currentPageItems?.map((item, rowIndex) => {
+              const analysisId = analysisMap.get(item.vulnerability.identifier);
+
               return (
                 <Tbody
                   key={item._ui_unique_id}
@@ -368,12 +369,10 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         modifier="truncate"
                         {...getTdProps({ columnKey: "analysis" })}
                       >
-                        {analysisMap.has(item.vulnerability.identifier) ? (
+                        {analysisId ? (
                           <ViewAnalysis
                             sbomId={sbomId}
-                            analysisId={analysisMap.get(
-                              item.vulnerability.identifier,
-                            )}
+                            analysisId={analysisId}
                           />
                         ) : (
                           <CreateAnalysis
@@ -387,7 +386,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                   response.id,
                                 );
 
-                                setAnalysisMap(() => newMap);
+                                setAnalysisMap(newMap);
                               }
                             }}
                           />

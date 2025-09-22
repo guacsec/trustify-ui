@@ -18,12 +18,15 @@ export interface IAdvisoriesQueryParams {
 
 export const AnalysisQueryKey = "analysis";
 
-export const useFetchAnalysisById = (id: string, refetchInterval = 10_000) => {
+export const useFetchAnalysisById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AnalysisQueryKey, id],
     queryFn: () => fetchExploitIqReport({ client, path: { id } }),
     enabled: id !== undefined,
-    refetchInterval,
+    refetchInterval: (query) => {
+      const data = query.state.data?.data as ExploitIQAnalysis | undefined;
+      return data?.output ? 0 : 10_000;
+    },
   });
 
   return {
@@ -47,8 +50,11 @@ export const useCreateAnalysisMutation = (
   ) => void,
 ) => {
   return useMutation({
-    mutationFn: (payload: { sbomId: string; vulnerabilityId: string }) => {
-      return createExploitIqReport({
+    mutationFn: async (payload: {
+      sbomId: string;
+      vulnerabilityId: string;
+    }) => {
+      return await createExploitIqReport({
         client,
         path: { id: payload.sbomId },
         body: {
@@ -56,7 +62,7 @@ export const useCreateAnalysisMutation = (
         },
       });
     },
-    onSuccess: async (response, payload) => {
+    onSuccess: (response, payload) => {
       onSuccess(payload, response.data);
     },
     onError,

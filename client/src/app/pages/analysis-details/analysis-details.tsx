@@ -38,7 +38,7 @@ export const AnalysisDetails: React.FC = () => {
     analysis,
     isFetching: isFetchingAnalysis,
     fetchError: isFetchinErrorAnalysis,
-  } = useFetchAnalysisById(analysisId, 0);
+  } = useFetchAnalysisById(analysisId);
 
   return (
     <>

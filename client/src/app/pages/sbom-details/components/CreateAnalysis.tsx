@@ -1,7 +1,5 @@
 import React from "react";
 
-import { useIsMutating } from "@tanstack/react-query";
-
 import { Button } from "@patternfly/react-core";
 
 import type { ReportResult } from "@app/client";
@@ -21,8 +19,7 @@ export const CreateAnalysis: React.FC<ICreateAnalysisProps> = ({
 }) => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
-  const isMutating = useIsMutating();
-  const { mutate: createAnalysis } = useCreateAnalysisMutation(
+  const { mutate: createAnalysis, isPending } = useCreateAnalysisMutation(
     (_payload, response) => {
       onAnalysisCreated(response);
     },
@@ -39,7 +36,11 @@ export const CreateAnalysis: React.FC<ICreateAnalysisProps> = ({
   };
 
   return (
-    <Button onClick={handleCreateAnalysis} disabled={isMutating > 0}>
+    <Button
+      onClick={handleCreateAnalysis}
+      isDisabled={isPending}
+      isLoading={isPending}
+    >
       Analyze
     </Button>
   );

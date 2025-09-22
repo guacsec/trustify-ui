@@ -27,9 +27,7 @@ const SBOMList = lazy(() => import("./pages/sbom-list"));
 const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMScan = lazy(() => import("./pages/sbom-scan"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
-const AnalysisDetails = lazy(
-  () => import("./pages/analysis-details"),
-);
+const AnalysisDetails = lazy(() => import("./pages/analysis-details"));
 
 // Others
 const Search = lazy(() => import("./pages/search"));
