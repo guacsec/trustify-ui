@@ -1,11 +1,10 @@
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
   type AnalysisResponse,
-  type VulnerabilityDetails,
   analyze,
   getVulnerability,
   listVulnerabilities,
