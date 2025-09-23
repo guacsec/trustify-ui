@@ -1,5 +1,4 @@
 import React from "react";
-
 import type { AxiosError } from "axios";
 
 import {
@@ -7,7 +6,7 @@ import {
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
 import type { DecomposedPurl } from "@app/api/models";
-import type { PurlSummary } from "@app/client";
+import type { PurlDetails } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   type ITableControls,
@@ -15,10 +14,11 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { useFetchPackages } from "@app/queries/packages";
+import { useFetchPackagesDetails } from "@app/queries/packages";
 import { decomposePurl } from "@app/utils/utils";
+import type { PurlSummary } from "@app/client";
 
-export interface PackageTableData extends PurlSummary {
+export interface PackageTableData extends PurlDetails, PurlSummary {
   decomposedPurl?: DecomposedPurl;
 }
 
@@ -106,14 +106,15 @@ export const PackageSearchProvider: React.FunctionComponent<
         ],
       },
     ],
-    isExpansionEnabled: false,
+    isExpansionEnabled: true,
+    expandableVariant: "compound",
   });
 
   const {
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackages(
+  } = useFetchPackagesDetails(
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {

@@ -64,7 +64,7 @@ const DEFAULT_SUMMARY: VulnerabilityOfPackageSummary = {
   },
 };
 
-const advisoryToModels = (advisories: PurlAdvisory[]) => {
+export const advisoryToModels = (advisories: PurlAdvisory[]) => {
   const vulnerabilities = advisories
     .flatMap((advisory) => {
       return (advisory.status ?? []).map((pkgStatus) => {
