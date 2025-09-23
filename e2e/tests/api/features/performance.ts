@@ -44,33 +44,27 @@ test.beforeEach(async ({ axios }) => {
   logger.info(`Uploaded ${sbomIds.length} SBOMs.`);
 });
 
-test.skip("@performance Delete / Increasing amount", async ({ axios }) => {});
-
 test.skip("@performance Delete / All / Sequential", async ({ axios }) => {
   const currentTimeStamp = Date.now();
   const reportFile = `${REPORT_FILE_PREFIX}sequential-${currentTimeStamp}.csv`;
   var index = 1;
 
+  var duration = "";
+
   writeRequestDurationToFile(reportFile, "No.", "SBOM ID", "Duration [ms]");
 
   for (const sbomId of sbomIds) {
-    var duration = undefined;
-
     try {
       await axios.delete(`/api/v2/sbom/${sbomId}`).then((response) => {
-        duration = response.duration;
+        duration = String(response.duration);
       });
     } catch (error) {
       logger.error(`SBOM with ID ${sbomId} could not be deleted.`, error);
       duration = "n/a";
     }
 
-    writeRequestDurationToFile(
-      reportFile,
-      String(index),
-      sbomId,
-      String(duration),
-    );
+    writeRequestDurationToFile(reportFile, String(index), sbomId, duration);
+    duration = "";
     index++;
   }
 });

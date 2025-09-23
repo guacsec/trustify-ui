@@ -9,7 +9,7 @@ export async function deleteSboms(axios: AxiosInstance, sbomIds: string[]) {
     try {
       await axios.get(`/api/v2/sbom/${sbomId}`);
       existingSbomIds.push(sbomId);
-    } catch (error) {
+    } catch (_error) {
       logger.info(`SBOM with ID ${sbomId} does not exist anymore. Skipping.`);
     }
   }

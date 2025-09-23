@@ -10,10 +10,9 @@ export function writeRequestDurationToFile(
   const line = `${sbomNumber},${sbomId},${duration}`;
 
   try {
-    fs.appendFileSync(`${REPORT_DIR}${fileName}`, line + "\n");
-    // fs.appendFileSync(`${REPORT_DIR}${fileName}`, line + '\n');
+    fs.appendFileSync(`${REPORT_DIR}${fileName}`, `${line}\n`);
     logger.debug(line);
-  } catch (error: any) {
+  } catch (error) {
     logger.error(`Error writing the request duration to file: ${error}`);
     throw error;
   }
