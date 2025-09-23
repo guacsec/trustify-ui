@@ -58,6 +58,12 @@ export const SbomScan: React.FC = () => {
       setUploadResponseData(extractedData);
     });
 
+  const joinedFileName = React.useMemo(() => {
+    return Array.from(uploads.keys())
+      .map((e) => e.name)
+      .join("_");
+  }, [uploads]);
+
   // Navigation blockers
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
@@ -91,7 +97,7 @@ export const SbomScan: React.FC = () => {
   const handleDownloadCSV = async () => {
     const csv = convertToCSV(vulnerabilities);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, "data.csv");
+    saveAs(blob, `${joinedFileName}.csv`);
   };
 
   const scanAnotherFile = () => {
@@ -234,8 +240,8 @@ export const SbomScan: React.FC = () => {
             variant={EmptyStateVariant.sm}
           >
             <EmptyStateBody>
-              The {Array.from(uploads.keys()).map((e) => e.name)} was
-              successfully analyzed and found no vulnerabilities to report.
+              The {joinedFileName} was successfully analyzed and found no
+              vulnerabilities to report.
             </EmptyStateBody>
             <EmptyStateFooter>
               <EmptyStateActions>
