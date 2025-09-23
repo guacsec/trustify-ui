@@ -17,24 +17,24 @@ const areVulnerabilityOfSbomEqual = (
 ) => {
   return (
     a.vulnerability.identifier === b.vulnerability.identifier &&
-    a.vulnerabilityStatus === b.vulnerabilityStatus
+    a.status === b.status
   );
 };
 
 interface FlatVulnerabilityOfSbom {
   vulnerability: SbomStatus;
-  vulnerabilityStatus: VulnerabilityStatus;
+  status: VulnerabilityStatus;
   advisory: SbomAdvisory;
   packages: SbomPackage[];
 }
 
+//
+
 interface VulnerabilityOfSbom {
   vulnerability: SbomStatus;
-  vulnerabilityStatus: VulnerabilityStatus;
-  relatedPackages: {
-    advisory: SbomAdvisory;
-    packages: SbomPackage[];
-  }[];
+  status: VulnerabilityStatus;
+  advisories: Map<string, SbomAdvisory>;
+  packages: Map<string, SbomPackage>;
 }
 
 export type SeveritySummary = {
@@ -69,8 +69,8 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
       return (advisory.status ?? []).map((sbomStatus) => {
         const result: FlatVulnerabilityOfSbom = {
           vulnerability: sbomStatus,
-          vulnerabilityStatus: sbomStatus.status as VulnerabilityStatus,
-          advisory: advisory,
+          status: sbomStatus.status as VulnerabilityStatus,
+          advisory,
           packages: sbomStatus.packages,
         };
         return result;
@@ -89,28 +89,42 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
           (item) => !areVulnerabilityOfSbomEqual(item, existingElement),
         );
 
+        // new advisories
+        const advisories = new Map<string, SbomAdvisory>(
+          existingElement.advisories,
+        );
+        advisories.set(current.advisory.identifier, current.advisory);
+
+        // new packages
+        const packages = current.packages.reduce((prev, current) => {
+          prev.set(current.id, current);
+          return prev;
+        }, new Map<string, SbomPackage>(existingElement.packages));
+
         const updatedItemInArray: VulnerabilityOfSbom = {
-          ...existingElement,
-          relatedPackages: [
-            ...existingElement.relatedPackages,
-            {
-              advisory: current.advisory,
-              packages: current.packages,
-            },
-          ],
+          vulnerability: existingElement.vulnerability,
+          status: existingElement.status,
+          advisories,
+          packages,
         };
 
         result = [...arrayWithoutExistingItem, updatedItemInArray];
       } else {
+        // advisories
+        const advisories = new Map<string, SbomAdvisory>();
+        advisories.set(current.advisory.identifier, current.advisory);
+
+        // packages
+        const packages = current.packages.reduce((prev, current) => {
+          prev.set(current.id, current);
+          return prev;
+        }, new Map<string, SbomPackage>());
+
         const newItemInArray: VulnerabilityOfSbom = {
           vulnerability: current.vulnerability,
-          vulnerabilityStatus: current.vulnerabilityStatus,
-          relatedPackages: [
-            {
-              advisory: current.advisory,
-              packages: current.packages,
-            },
-          ],
+          status: current.status,
+          advisories,
+          packages,
         };
         result = [...prev.slice(), newItemInArray];
       }
@@ -120,7 +134,7 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
 
   const summary = vulnerabilities.reduce(
     (prev, current) => {
-      const vulnStatus = current.vulnerabilityStatus;
+      const vulnStatus = current.status;
       const severity = extendedSeverityFromSeverity(
         current.vulnerability.average_severity,
       );

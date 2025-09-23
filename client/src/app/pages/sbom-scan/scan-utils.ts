@@ -1,11 +1,13 @@
-import type { AdvisoryHead } from "@app/client";
+import type { Labels } from "@app/client";
 import { formatDate } from "@app/utils/utils";
 import type { VulnerabilityOfSbomFromAnalysis } from "./hooks/useVulnerabilitiesOfSbom";
 
 const IMPORTER_NAME_LABEL_KEY = "importer";
 const UNKNOWN_IMPORTER_NAME = "Unknown";
 
-export const extractImporterNameFromAdvisory = (advisory: AdvisoryHead) => {
+export const extractImporterNameFromAdvisory = (advisory: {
+  labels: Labels;
+}) => {
   return advisory.labels[IMPORTER_NAME_LABEL_KEY] ?? UNKNOWN_IMPORTER_NAME;
 };
 
