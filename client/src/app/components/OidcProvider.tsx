@@ -31,7 +31,7 @@ export const OidcProvider: React.FC<IOidcProviderProps> = ({ children }) => {
       onSigninCallback={() => {
         const params = new URLSearchParams(window.location.search);
         const relativePath = params.get("state")?.split(";")?.[1];
-        AppRoutes.navigate(relativePath ?? "/");
+        AppRoutes.navigate(relativePath ?? "/", { replace: true });
       }}
     >
       <AuthEnabledOidcProvider>{children}</AuthEnabledOidcProvider>
