@@ -10,6 +10,7 @@ import {
   SETUP_TIMEOUT,
 } from "../../common/constants";
 import { test as setup } from "../fixtures";
+import { uploadSboms } from "../helpers/upload";
 
 setup.describe("Ingest initial data", () => {
   setup.skip(
@@ -21,25 +22,11 @@ setup.describe("Ingest initial data", () => {
     setup.setTimeout(SETUP_TIMEOUT);
 
     logger.info("Setup: start uploading assets");
-    await uploadSboms(axios, SBOM_FILES);
+    await uploadSboms(axios, SBOM_FILES, "../../common/assets/sbom/");
     await uploadAdvisories(axios, ADVISORY_FILES);
     logger.info("Setup: upload finished successfully");
   });
 });
-
-const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
-    fs.statSync(filePath); // Verify file exists
-
-    const fileStream = fs.createReadStream(filePath);
-    return axios.post("/api/v2/sbom", fileStream, {
-      headers: { "Content-Type": "application/json+bzip2" },
-    });
-  });
-
-  await Promise.all(uploads);
-};
 
 const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
   const uploads = files.map((e) => {
