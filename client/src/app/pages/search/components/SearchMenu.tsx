@@ -312,6 +312,7 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
   );
 
   const searchInput = (
+    // biome-ignore lint/correctness/useUniqueElementIds: allowed because <Popper /> requires query selector by id
     <SearchInput
       placeholder="Search for an SBOM, Package, Advisory, or Vulnerability"
       value={searchValue}
@@ -322,7 +323,7 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
         if (event.key && event.key !== "Enter") return;
       }}
       ref={searchInputRef}
-      aria-label="autocomplete-search"
+      id="autocomplete-search"
       style={{ width: 500 }}
     />
   );
