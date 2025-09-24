@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from "react-oidc-context";
 import { initInterceptors } from "@app/axios-config";
 import ENV from "@app/env";
 import { oidcClientSettings } from "@app/oidc";
+import { AppRoutes } from "@app/Routes";
+
 import {
   Bullseye,
   EmptyState,
@@ -29,7 +31,7 @@ export const OidcProvider: React.FC<IOidcProviderProps> = ({ children }) => {
       onSigninCallback={() => {
         const params = new URLSearchParams(window.location.search);
         const relativePath = params.get("state")?.split(";")?.[1];
-        window.history.replaceState({}, document.title, relativePath ?? "/");
+        AppRoutes.navigate(relativePath ?? "/", { replace: true });
       }}
     >
       <AuthEnabledOidcProvider>{children}</AuthEnabledOidcProvider>
