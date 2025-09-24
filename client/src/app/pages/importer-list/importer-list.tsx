@@ -657,6 +657,7 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
+            // biome-ignore lint/correctness/noNestedComponentDefinitions: allowed as Patternfly requires id
             const LogButton = ({ children }: { children: React.ReactNode }) => {
               if (item.messages) {
                 return (

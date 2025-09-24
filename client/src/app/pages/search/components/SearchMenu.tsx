@@ -322,7 +322,7 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
         if (event.key && event.key !== "Enter") return;
       }}
       ref={searchInputRef}
-      id="autocomplete-search"
+      aria-label="autocomplete-search"
       style={{ width: 500 }}
     />
   );

@@ -152,7 +152,7 @@ export const Autocomplete: React.FC<IAutocompleteProps> = ({
           toggle={toggle}
           variant="typeahead"
         >
-          <SelectList id="select-create-typeahead-listbox">
+          <SelectList aria-label="select-create-typeahead-listbox">
             {onCreateNewOption && optionsNotSelected.length === 0 ? (
               <SelectOption
                 id={createItemId("new-option")}

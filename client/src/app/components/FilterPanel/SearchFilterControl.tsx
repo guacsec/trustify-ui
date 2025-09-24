@@ -46,7 +46,6 @@ export const SearchFilterControl = <TItem, TFilterCategoryKey extends string>({
     <InputGroup>
       <TextInput
         name={id}
-        id="search-input"
         type={isNumeric ? "number" : "search"}
         onChange={(_, value) => setInputValue(value)}
         aria-label={`${category.title} filter`}
@@ -61,7 +60,6 @@ export const SearchFilterControl = <TItem, TFilterCategoryKey extends string>({
       <Button
         icon={<SearchIcon />}
         variant={ButtonVariant.control}
-        id="search-button"
         aria-label="search button for search input"
         onClick={onFilterSubmit}
         isDisabled={isDisabled}

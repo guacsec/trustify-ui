@@ -233,6 +233,7 @@ export const SbomDetails: React.FC = () => {
         </Tabs>
       </PageSection>
       <PageSection>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={0}
           id="refTabInfoSection"
@@ -243,6 +244,7 @@ export const SbomDetails: React.FC = () => {
             {sbom && <Overview sbom={sbom} />}
           </LoadingWrapper>
         </TabContent>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={1}
           id="refTabPackagesSection"
@@ -252,6 +254,7 @@ export const SbomDetails: React.FC = () => {
         >
           {sbomId && <PackagesBySbom sbomId={sbomId} />}
         </TabContent>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={2}
           id="refVulnerabilitiesSection"

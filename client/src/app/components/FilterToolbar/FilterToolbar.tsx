@@ -207,7 +207,7 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
             <Dropdown
               toggle={(toggleRef) => (
                 <MenuToggle
-                  id="filtered-by"
+                  aria-label="filtered-by"
                   ref={toggleRef}
                   onClick={() =>
                     setIsCategoryDropdownOpen(!isCategoryDropdownOpen)

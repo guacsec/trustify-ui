@@ -109,6 +109,7 @@ export const ToolbarBulkSelector = ({
             ref={toggleRef}
             onClick={() => setIsOpen(!isOpen)}
             splitButtonItems={[
+              // biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id
               <MenuToggleCheckbox
                 id="bulk-selected-items-checkbox"
                 key="bulk-select-checkbox"

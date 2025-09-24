@@ -118,6 +118,7 @@ export const PackageDetails: React.FC = () => {
         </Tabs>
       </PageSection>
       <PageSection>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={0}
           id="refTabVulnerabilitiesSection"
@@ -126,6 +127,7 @@ export const PackageDetails: React.FC = () => {
         >
           {packageId && <VulnerabilitiesByPackage packageId={packageId} />}
         </TabContent>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={1}
           id="refTabSbomsSection"
