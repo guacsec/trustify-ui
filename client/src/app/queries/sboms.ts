@@ -30,6 +30,7 @@ import {
   labelRequestParamsQuery,
   requestParamsQuery,
 } from "../hooks/table-controls";
+import { SBOM_MOCK } from "./mock";
 
 export const SBOMsQueryKey = "sboms";
 
@@ -203,15 +204,16 @@ export const useFetchSbomsAdvisory = (sbomId: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [SBOMsQueryKey, sbomId, "advisory"],
     queryFn: () => {
-      return getSbomAdvisories({
-        client,
-        path: { id: sbomId },
-      });
+      return Promise.resolve(SBOM_MOCK);
+      // return getSbomAdvisories({
+      //   client,
+      //   path: { id: sbomId },
+      // });
     },
   });
 
   return {
-    advisories: data?.data || [],
+    advisories: data || [],
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
   };
