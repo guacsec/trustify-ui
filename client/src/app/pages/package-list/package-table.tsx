@@ -1,11 +1,15 @@
 import React from "react";
 import { generatePath, NavLink } from "react-router-dom";
+import { Label, List, ListItem } from "@patternfly/react-core";
 import {
-  Label,
-  List,
-  ListItem,
-} from "@patternfly/react-core";
-import { ExpandableRowContent, Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
+  ExpandableRowContent,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@patternfly/react-table";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import type { LicenseRefMapping } from "@app/client";
@@ -34,7 +38,7 @@ const renderLicenseWithMappings = (
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
     React.useContext(PackageSearchContext);
-  
+
   const {
     numRenderedColumns,
     currentPageItems,
@@ -128,7 +132,10 @@ export const PackageTable: React.FC = () => {
                         rowIndex,
                       })}
                     >
-                      {(item.licenses?.length ?? 0)} {(item.licenses?.length ?? 0) > 1 ? "Licenses" : "License"}
+                      {item.licenses?.length ?? 0}{" "}
+                      {(item.licenses?.length ?? 0) > 1
+                        ? "Licenses"
+                        : "License"}
                     </Td>
                     <Td
                       width={10}
@@ -148,10 +155,15 @@ export const PackageTable: React.FC = () => {
                       width={20}
                       {...getTdProps({ columnKey: "vulnerabilities" })}
                     >
-                      <VulnerabilityGallery severities={advisories.summary.vulnerabilityStatus.affected.severities} />
+                      <VulnerabilityGallery
+                        severities={
+                          advisories.summary.vulnerabilityStatus.affected
+                            .severities
+                        }
+                      />
                     </Td>
                   </TableRowContentWithControls>
-                </Tr> 
+                </Tr>
                 {isCellExpanded(item) ? (
                   <Tr isExpanded>
                     <Td
