@@ -115,18 +115,18 @@ export const HeaderApp: React.FC = () => {
           </MastheadBrand>
         </MastheadMain>
         <MastheadContent>
-          <Toolbar id="toolbar" isFullHeight isStatic>
+          <Toolbar aria-label="toolbar" isFullHeight isStatic>
             <ToolbarContent>
               {/* toolbar items to always show */}
               <ToolbarGroup
-                id="header-toolbar-tasks"
+                aria-label="header-toolbar-tasks"
                 variant="action-group-plain"
                 align={{ default: "alignEnd" }}
               />
 
               {/* toolbar items to show at desktop sizes */}
               <ToolbarGroup
-                id="header-toolbar-desktop"
+                aria-label="header-toolbar-desktop"
                 variant="action-group-plain"
                 gap={{ default: "gapNone", md: "gapMd" }}
                 visibility={{
@@ -185,7 +185,7 @@ export const HeaderApp: React.FC = () => {
 
               {/* toolbar items to show at mobile sizes */}
               <ToolbarGroup
-                id="header-toolbar-mobile"
+                aria-label="header-toolbar-mobile"
                 variant="action-group-plain"
                 gap={{ default: "gapNone", md: "gapMd" }}
                 visibility={{ lg: "hidden" }}
@@ -244,7 +244,7 @@ export const HeaderApp: React.FC = () => {
 
               {/* Show the SSO menu at desktop sizes */}
               <ToolbarGroup
-                id="header-toolbar-sso"
+                aria-label="header-toolbar-sso"
                 visibility={{
                   default: "hidden",
                   md: "visible",

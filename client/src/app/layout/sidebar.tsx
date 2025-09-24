@@ -21,7 +21,7 @@ const ACTIVE_LINK_CLASS = nav.modifiers.current;
 export const SidebarApp: React.FC = () => {
   const renderPageNav = () => {
     return (
-      <Nav id="nav-sidebar" aria-label="Nav">
+      <Nav aria-label="nav-sidebar">
         <NavList>
           <li className={nav.navItem}>
             <NavLink

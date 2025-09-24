@@ -67,11 +67,10 @@ export const SearchFilterControl = <TItem, TFilterCategoryKey extends string>({
     >
       {isNumeric ? (
         <InputGroup>
-          <TextInput type="number" id="search-input" {...inputProps} />
+          <TextInput type="number" {...inputProps} />
           <Button
             icon={<SearchIcon />}
             variant={ButtonVariant.control}
-            id="search-button"
             aria-label="search button for search input"
             onClick={onFilterSubmit}
             isDisabled={isDisabled}

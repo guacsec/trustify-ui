@@ -76,7 +76,7 @@ export const PageContentWithDrawerProvider: React.FC<
             panelContent={
               <DrawerPanelContent
                 isResizable
-                id="page-drawer-content"
+                aria-label="page-drawer-content"
                 defaultSize="500px"
                 minSize="150px"
                 key={drawerPageKey}

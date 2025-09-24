@@ -157,7 +157,6 @@ export const EditLabelsForm: React.FC<EditLabelsFormProps> = ({
           <ActionGroup>
             <Button
               type="button"
-              id="submit"
               aria-label="submit"
               variant={ButtonVariant.primary}
               isDisabled={isDisabled}
@@ -167,7 +166,6 @@ export const EditLabelsForm: React.FC<EditLabelsFormProps> = ({
             </Button>
             <Button
               type="button"
-              id="cancel"
               aria-label="cancel"
               variant={ButtonVariant.link}
               isDisabled={isDisabled}

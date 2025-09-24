@@ -52,7 +52,7 @@ import { NotificationsContext } from "@app/components/NotificationsContext";
 const getPeriodValue = (period?: string) => {
   try {
     return period
-      ? Number.parseInt(period.substring(0, period.length - 1))
+      ? Number.parseInt(period.substring(0, period.length - 1), 10)
       : null;
   } catch (_e) {
     return null;
@@ -292,7 +292,6 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
         renderInput={({ field: { value, onChange } }) => (
           <span>
             <Switch
-              id="enabled"
               label="Enable"
               aria-label="Enable importer"
               isChecked={value}
@@ -398,7 +397,6 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
           renderInput={({ field: { value, onChange } }) => (
             <span>
               <Switch
-                id="v3Signatures"
                 label="Enable v3 signatures"
                 aria-label="v3 signature"
                 isChecked={value}
@@ -476,7 +474,6 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
         <Button
           type="submit"
           aria-label="submit"
-          id="source-form-submit"
           variant={ButtonVariant.primary}
           isDisabled={!isValid || isSubmitting || isValidating || !isDirty}
         >
@@ -484,7 +481,6 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
         </Button>
         <Button
           type="button"
-          id="cancel"
           aria-label="cancel"
           variant={ButtonVariant.link}
           isDisabled={isSubmitting || isValidating}

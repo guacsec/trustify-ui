@@ -92,6 +92,7 @@ export const IconedStatus: React.FC<IIconedStatusProps> = ({
     },
   };
   const presetProps = preset && presets[preset];
+  // biome-ignore lint/correctness/noNestedComponentDefinitions: allowed
   const IconWithOptionalTooltip: React.FC<{ children: React.ReactElement }> = ({
     children,
   }) =>

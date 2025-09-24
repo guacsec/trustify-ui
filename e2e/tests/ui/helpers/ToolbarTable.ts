@@ -213,7 +213,7 @@ export class ToolbarTable {
     // biome-ignore lint/style/noNonNullAssertion: allowed
     const [min, max] = counterText!
       .split("-")
-      .map((value) => parseInt(value.trim()));
+      .map((value) => parseInt(value.trim(), 10));
     await expect(min).toEqual(expMinCount);
     await expect(max).toEqual(expMaxCount);
   }
