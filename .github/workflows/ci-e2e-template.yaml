@@ -164,3 +164,12 @@ jobs:
           echo "script to run: ${script}"
 
           PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ TRUSTIFY_UI_URL=http://localhost:8081 AUTH_REQUIRED=false npm run -w e2e $script
+
+      - name: Upload Playwright artifacts
+        if: failure() # only upload if tests failed
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            e2e/test-results
+            e2e/playwright-report
