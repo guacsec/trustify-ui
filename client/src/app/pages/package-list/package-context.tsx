@@ -124,7 +124,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       },
     }),
   );
-  
+
   const enrichedPackages = React.useMemo(() => {
     return packages.map((item) => {
       const result: PackageTableData = {

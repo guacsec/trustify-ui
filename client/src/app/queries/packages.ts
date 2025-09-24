@@ -15,7 +15,8 @@ export const useFetchPackages = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [PackagesQueryKey, params],
-    queryFn: () => listPurl({
+    queryFn: () =>
+      listPurl({
         client: client,
         query: { ...requestParamsQuery(params) },
       }),
@@ -48,11 +49,14 @@ export const useFetchPackagesDetails = (
       const items = listResponse?.data?.items || [];
       const details = await Promise.all(
         items.map((pkg) =>
-          getPurl({ client, path: { key: pkg.uuid } }).then(res => res.data)
-        )
+          getPurl({ client, path: { key: pkg.uuid } }).then((res) => res.data),
+        ),
       );
       return {
-        items: items.map((pkg, idx) => ({ ...pkg, ...(details[idx] || {}) })),
+        items: items.map((pkg, idx) => ({
+          ...pkg,
+          ...(details[idx] || {}),
+        })),
         total: listResponse?.data?.total ?? 0,
       };
     },
@@ -70,7 +74,7 @@ export const useFetchPackagesDetails = (
           advisories: item.advisories ?? [],
         })),
       total: data?.total ?? 0,
-      params: params,
+      params,
     },
     isFetching: isLoading,
     fetchError: error as AxiosError,
@@ -97,7 +101,8 @@ export const useFetchPackagesBySbomId = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [PackagesQueryKey, "by-sbom", sbomId, params],
-    queryFn: () => listPackages({
+    queryFn: () =>
+      listPackages({
         client,
         path: { id: sbomId },
         query: { ...requestParamsQuery(params) },
