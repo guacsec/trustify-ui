@@ -2,7 +2,6 @@ import type React from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import {
-  Label,
   List,
   ListItem,
   Toolbar,
@@ -267,8 +266,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                   {renderLicenseWithMappings(
                                     e.license_name,
                                     item.licenses_ref_mapping,
-                                  )}{" "}
-                                  <Label isCompact>{e.license_type}</Label>
+                                  )}
                                 </ListItem>
                               ))}
                             </List>
