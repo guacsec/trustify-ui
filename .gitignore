@@ -33,9 +33,18 @@ npm-debug.log*
 # Intellij IDEA
 .idea/
 
+# Cursor
+.cursor/
+
 # Rust
 crate/target
 crate/Cargo.lock
 
 # Devcontainers
 .devcontainer/devcontainer.json
+
+# Auto-generated steps
+e2e/tests/ui/features/**/auto-generated.step.ts
+
+# Test results
+test-results/
