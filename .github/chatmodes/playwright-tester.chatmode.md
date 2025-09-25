@@ -39,7 +39,7 @@ mode: 'agent'
       cd $PROJECT_ROOT/e2e
       npx playwright test --project='bdd' --trace on -g "scenario name here" --headed
       ```
-   - In case of test failures, the above command lauched HTML server to host the test output Press `Ctrl+C` to stop the server
+   - In case of test failures, the above command launched HTML server to host the test output Press `Ctrl+C` to stop the server
 
 8. **If Failed**: Fix syntax errors, selectors, timing, page objects
 9. **Report**:
