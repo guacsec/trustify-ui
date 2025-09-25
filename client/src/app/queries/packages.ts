@@ -15,12 +15,11 @@ export const useFetchPackages = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [PackagesQueryKey, params],
-    queryFn: () => {
-      return listPurl({
+    queryFn: () =>
+      listPurl({
         client: client,
         query: { ...requestParamsQuery(params) },
-      });
-    },
+      }),
     enabled: !disableQuery,
   });
 
@@ -55,13 +54,12 @@ export const useFetchPackagesBySbomId = (
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [PackagesQueryKey, "by-sbom", sbomId, params],
-    queryFn: () => {
-      return listPackages({
+    queryFn: () =>
+      listPackages({
         client,
         path: { id: sbomId },
         query: { ...requestParamsQuery(params) },
-      });
-    },
+      }),
   });
 
   return {

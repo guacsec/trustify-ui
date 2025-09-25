@@ -1,7 +1,15 @@
 import React from "react";
 import { generatePath, NavLink } from "react-router-dom";
-
-import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
+import {
+  ExpandableRowContent,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@patternfly/react-table";
+import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -11,9 +19,12 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
-
-import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { PackageSearchContext } from "./package-context";
+import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
+import { ExpandableLicenseRow } from "./components/ExpandableLicenseRow";
+import { advisoryToModels } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
+import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
+import { PackageLicenses } from "./components/PackageLicenses";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -28,7 +39,9 @@ export const PackageTable: React.FC = () => {
       getThProps,
       getTrProps,
       getTdProps,
+      getExpandedContentTdProps,
     },
+    expansionDerivedState: { isCellExpanded },
   } = tableControls;
 
   return (
@@ -41,6 +54,7 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "namespace" })} />
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
+              <Th {...getThProps({ columnKey: "licenses" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -101,6 +115,18 @@ export const PackageTable: React.FC = () => {
                     <Td
                       width={10}
                       modifier="truncate"
+                      {...getTdProps({
+                        columnKey: "licenses",
+                        isCompoundExpandToggle: true,
+                        item,
+                        rowIndex,
+                      })}
+                    >
+                      <PackageLicenses packageId={item.uuid} />
+                    </Td>
+                    <Td
+                      width={10}
+                      modifier="truncate"
                       {...getTdProps({ columnKey: "path" })}
                     >
                       {item.decomposedPurl?.path}
@@ -111,7 +137,7 @@ export const PackageTable: React.FC = () => {
                           value={item.decomposedPurl?.qualifiers}
                         />
                       )}
-                    </Td>
+                    </Td>{" "}
                     <Td
                       width={20}
                       {...getTdProps({ columnKey: "vulnerabilities" })}
@@ -120,6 +146,25 @@ export const PackageTable: React.FC = () => {
                     </Td>
                   </TableRowContentWithControls>
                 </Tr>
+                {isCellExpanded(item) ? (
+                  <Tr isExpanded>
+                    <Td
+                      {...getExpandedContentTdProps({
+                        item,
+                      })}
+                      className={spacing.pLg}
+                    >
+                      <ExpandableRowContent>
+                        <div className={spacing.ptLg}>
+                          <ExpandableLicenseRow
+                            packageId={item.uuid}
+                            isExpanded={isCellExpanded(item, "licenses")}
+                          />
+                        </div>
+                      </ExpandableRowContent>
+                    </Td>
+                  </Tr>
+                ) : null}
               </Tbody>
             );
           })}
