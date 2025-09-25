@@ -64,6 +64,8 @@ There are some pre-configured commands you can use:
 | npm run test          | Execute UI and API tests                                                          |
 | npm run test:ui       | Execute UI tests                                                                  |
 | npm run test:ui:trace | Execute UI tests and take screenshots                                             |
+| npm run test:bdd      | Execute UI tests under feature files in BDD format                                |
+| npm run test:bdd:trace| Execute UI tests under feature files in BDD format and take screenshots           |
 | npm run test:ui:host  | Opens the Playwright UI in the browser of your OS                                 |
 | npm run test:api      | Execute API test                                                                  |
 | npm run format:fix    | Reformat source code according using `biome` (use before committing code changes) |
