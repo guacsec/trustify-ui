@@ -1,6 +1,5 @@
 import React from "react";
 import { generatePath, NavLink } from "react-router-dom";
-import { Label, List, ListItem } from "@patternfly/react-core";
 import {
   ExpandableRowContent,
   Table,
@@ -12,7 +11,6 @@ import {
 } from "@patternfly/react-table";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
-import type { LicenseRefMapping } from "@app/client";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
@@ -23,17 +21,10 @@ import {
 import { Paths } from "@app/Routes";
 import { PackageSearchContext } from "./package-context";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
+import { ExpandableLicenseRow } from "./components/ExpandableLicenseRow";
 import { advisoryToModels } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
-
-// Todo : Move it to helper file
-const renderLicenseWithMappings = (
-  license: string,
-  mappings: LicenseRefMapping[],
-) => {
-  return mappings.reduce((prev, { license_id, license_name }) => {
-    return prev.replaceAll(license_id, license_name);
-  }, `${license}`);
-};
+import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
+import { PackageLicenses } from "./components/PackageLicenses";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -77,7 +68,6 @@ export const PackageTable: React.FC = () => {
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
-            const advisories = advisoryToModels(item?.advisories || []);
             return (
               <Tbody key={item.uuid}>
                 <Tr {...getTrProps({ item })}>
@@ -127,15 +117,12 @@ export const PackageTable: React.FC = () => {
                       modifier="truncate"
                       {...getTdProps({
                         columnKey: "licenses",
-                        isCompoundExpandToggle: item.licenses.length > 0,
+                        isCompoundExpandToggle: true,
                         item,
                         rowIndex,
                       })}
                     >
-                      {item.licenses?.length ?? 0}{" "}
-                      {(item.licenses?.length ?? 0) > 1
-                        ? "Licenses"
-                        : "License"}
+                      <PackageLicenses packageId={item.uuid} />
                     </Td>
                     <Td
                       width={10}
@@ -150,17 +137,12 @@ export const PackageTable: React.FC = () => {
                           value={item.decomposedPurl?.qualifiers}
                         />
                       )}
-                    </Td>
+                    </Td>{" "}
                     <Td
                       width={20}
                       {...getTdProps({ columnKey: "vulnerabilities" })}
                     >
-                      <VulnerabilityGallery
-                        severities={
-                          advisories.summary.vulnerabilityStatus.affected
-                            .severities
-                        }
-                      />
+                      <PackageVulnerabilities packageId={item.uuid} />
                     </Td>
                   </TableRowContentWithControls>
                 </Tr>
@@ -174,21 +156,10 @@ export const PackageTable: React.FC = () => {
                     >
                       <ExpandableRowContent>
                         <div className={spacing.ptLg}>
-                          {isCellExpanded(item, "licenses") ? (
-                            <List isPlain>
-                              {item.licenses.map((e, idx) => (
-                                <ListItem
-                                  key={`${e.license_name}-${e.license_type}-${idx}`}
-                                >
-                                  {renderLicenseWithMappings(
-                                    e.license_name,
-                                    item.licenses_ref_mapping,
-                                  )}{" "}
-                                  <Label isCompact>{e.license_type}</Label>
-                                </ListItem>
-                              ))}
-                            </List>
-                          ) : null}
+                          <ExpandableLicenseRow
+                            packageId={item.uuid}
+                            isExpanded={isCellExpanded(item, "licenses")}
+                          />
                         </div>
                       </ExpandableRowContent>
                     </Td>
