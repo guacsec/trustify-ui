@@ -39,3 +39,6 @@ crate/Cargo.lock
 
 # Devcontainers
 .devcontainer/devcontainer.json
+
+# Reports
+*.csv
