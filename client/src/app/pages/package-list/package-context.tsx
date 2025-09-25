@@ -6,7 +6,6 @@ import {
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
 import type { DecomposedPurl } from "@app/api/models";
-import type { PurlDetails } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   type ITableControls,
@@ -14,11 +13,11 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { useFetchPackagesDetails } from "@app/queries/packages";
 import { decomposePurl } from "@app/utils/utils";
 import type { PurlSummary } from "@app/client";
+import { useFetchPackages } from "@app/queries/packages";
 
-export interface PackageTableData extends PurlDetails, PurlSummary {
+export interface PackageTableData extends PurlSummary {
   decomposedPurl?: DecomposedPurl;
 }
 
@@ -114,7 +113,7 @@ export const PackageSearchProvider: React.FunctionComponent<
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackagesDetails(
+  } = useFetchPackages(
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
