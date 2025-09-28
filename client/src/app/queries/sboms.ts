@@ -26,7 +26,6 @@ import {
 import { useUpload } from "@app/hooks/useUpload";
 
 import { uploadSbom } from "@app/api/rest";
-import { DEFAULT_REFETCH_INTERVAL } from "@app/Constants";
 import {
   labelRequestParamsQuery,
   requestParamsQuery,
@@ -89,7 +88,7 @@ export const useFetchSBOMs = (
 
 export const useFetchSBOMById = (
   id?: string,
-  refetchInterval? : number | false,
+  refetchInterval?: number | false,
   retry?: boolean | number,
 ) => {
   const { data, isLoading, error } = useQuery({
@@ -125,7 +124,7 @@ export const useDeleteSbomMutation = (
       onSuccess(response, id);
       await queryClient.invalidateQueries({ queryKey: [SBOMsQueryKey] });
       await queryClient.invalidateQueries({ queryKey: [DashboardQueryKey] });
-      
+
       // Required as SBOMs in other pages might need to to be removed
       // https://github.com/TanStack/query/discussions/3169#discussioncomment-14347395
       queryClient.removeQueries({ queryKey: [SBOMsQueryKey, id] });
