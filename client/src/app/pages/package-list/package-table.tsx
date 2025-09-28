@@ -20,11 +20,9 @@ import {
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
 import { PackageSearchContext } from "./package-context";
-import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
-import { ExpandableLicenseRow } from "./components/ExpandableLicenseRow";
-import { advisoryToModels } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
-import { PackageLicenses } from "./components/PackageLicenses";
+import { List, ListItem } from "@patternfly/react-core";
+import { WithPackage } from "../../components/WithPackage";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -112,18 +110,25 @@ export const PackageTable: React.FC = () => {
                     >
                       {item.decomposedPurl?.type}
                     </Td>
-                    <Td
-                      width={10}
-                      modifier="truncate"
-                      {...getTdProps({
-                        columnKey: "licenses",
-                        isCompoundExpandToggle: true,
-                        item,
-                        rowIndex,
-                      })}
-                    >
-                      <PackageLicenses packageId={item.uuid} />
-                    </Td>
+                    <WithPackage packageId={item.uuid}>
+                      {(pkg) => (
+                        <Td
+                          width={10}
+                          modifier="truncate"
+                          {...getTdProps({
+                            columnKey: "licenses",
+                            isCompoundExpandToggle: true,
+                            item,
+                            rowIndex,
+                          })}
+                        >
+                          {pkg?.licenses?.length ?? 0}{" "}
+                          {(pkg?.licenses?.length ?? 0) > 1
+                            ? "Licenses"
+                            : "License"}
+                        </Td>
+                      )}
+                    </WithPackage>
                     <Td
                       width={10}
                       modifier="truncate"
@@ -137,13 +142,17 @@ export const PackageTable: React.FC = () => {
                           value={item.decomposedPurl?.qualifiers}
                         />
                       )}
-                    </Td>{" "}
-                    <Td
-                      width={20}
-                      {...getTdProps({ columnKey: "vulnerabilities" })}
-                    >
-                      <PackageVulnerabilities packageId={item.uuid} />
                     </Td>
+                    <WithPackage packageId={item.uuid}>
+                      {(pkg) => (
+                        <Td
+                          width={20}
+                          {...getTdProps({ columnKey: "vulnerabilities" })}
+                        >
+                          <PackageVulnerabilities pkg={pkg} />
+                        </Td>
+                      )}
+                    </WithPackage>
                   </TableRowContentWithControls>
                 </Tr>
                 {isCellExpanded(item) ? (
@@ -156,10 +165,21 @@ export const PackageTable: React.FC = () => {
                     >
                       <ExpandableRowContent>
                         <div className={spacing.ptLg}>
-                          <ExpandableLicenseRow
-                            packageId={item.uuid}
-                            isExpanded={isCellExpanded(item, "licenses")}
-                          />
+                          {isCellExpanded(item, "licenses") ? (
+                            <WithPackage packageId={item.uuid}>
+                              {(pkg) => (
+                                <List isPlain>
+                                  {pkg?.licenses?.map((license, idx) => (
+                                    <ListItem
+                                      key={`${license.license_name}-${idx}`}
+                                    >
+                                      {license.license_name}
+                                    </ListItem>
+                                  ))}
+                                </List>
+                              )}
+                            </WithPackage>
+                          ) : null}
                         </div>
                       </ExpandableRowContent>
                     </Td>
