@@ -30,7 +30,6 @@ import {
   labelRequestParamsQuery,
   requestParamsQuery,
 } from "../hooks/table-controls";
-import { DashboardQueryKey } from "./dashboard";
 
 export const SBOMsQueryKey = "sboms";
 
