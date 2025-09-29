@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
@@ -19,6 +20,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
+import { useFetchLicenses } from "@app/queries/licenses";
 
 interface ISbomSearchContext {
   tableControls: ITableControls<
@@ -52,17 +54,13 @@ interface ISbomProvider {
 export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
   children,
 }) => {
-  const [inputValue, setInputValue] = React.useState("");
-  const [debouncedInputValue, setDebouncedInputValue] = React.useState("");
+  const [inputValueLabel, setInputValueLabel] = React.useState("");
+  const [debouncedInputValueLabel] = useDebounceValue(inputValueLabel, 400);
+  const { labels } = useFetchSBOMLabels(debouncedInputValueLabel);
 
-  React.useEffect(() => {
-    const delayInputTimeoutId = setTimeout(() => {
-      setDebouncedInputValue(inputValue);
-    }, 400);
-    return () => clearTimeout(delayInputTimeoutId);
-  }, [inputValue]);
-
-  const { labels } = useFetchSBOMLabels(debouncedInputValue);
+  const [inputValueLicense, setInputValueLicense] = React.useState("");
+  const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
+  const { licenses } = useFetchLicenses(debouncedInputValueLicense);
 
   const tableControlState = useTableControlState({
     tableName: "sbom",
@@ -105,7 +103,20 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
             label: keyValue,
           };
         }),
-        onInputValueChange: setInputValue,
+        onInputValueChange: setInputValueLabel,
+      },
+      {
+        categoryKey: "licenses",
+        title: "License",
+        type: FilterType.autocompleteLabel,
+        placeholderText: "Filter results by label",
+        selectOptions: licenses.map((e) => {
+          return {
+            value: e.license,
+            label: e.license,
+          };
+        }),
+        onInputValueChange: setInputValueLicense,
       },
     ],
     isExpansionEnabled: false,
