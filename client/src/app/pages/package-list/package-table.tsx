@@ -23,6 +23,7 @@ import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { List, ListItem } from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
+import { PackageLicenses } from "./components/PackageLicences";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -122,10 +123,11 @@ export const PackageTable: React.FC = () => {
                             rowIndex,
                           })}
                         >
-                          {pkg?.licenses?.length ?? 0}{" "}
-                          {(pkg?.licenses?.length ?? 0) > 1
-                            ? "Licenses"
-                            : "License"}
+                          <PackageLicenses
+                            pkg={pkg}
+                            isFetching={packageIsFetching}
+                            fetchError={packageFetchError}
+                          />
                         </Td>
                         <Td
                           width={10}
@@ -144,10 +146,7 @@ export const PackageTable: React.FC = () => {
                             />
                           )}
                         </Td>
-                        <Td
-                          width={20}
-                          {...getTdProps({ columnKey: "vulnerabilities" })}
-                        >
+                        <Td {...getTdProps({ columnKey: "vulnerabilities" })}>
                           <PackageVulnerabilities
                             pkg={pkg}
                             isFetching={packageIsFetching}

@@ -21,10 +21,6 @@ export const PackageVulnerabilities: React.FC<PackageVulnerabilitiesProps> = ({
 }) => {
   const { data } = useVulnerabilitiesOfPackage(pkg);
 
-  if (!data || !data.summary?.vulnerabilityStatus?.affected?.severities) {
-    return <span>-</span>;
-  }
-
   return (
     <LoadingWrapper
       isFetching={isFetching}
