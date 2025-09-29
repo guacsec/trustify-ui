@@ -187,13 +187,17 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {item?.version}
                     </Td>
                     <WithPackage packageId={item.purl[0].uuid}>
-                      {(pkg) => (
+                      {(pkg, isFetching, fetchError) => (
                         <Td
                           width={10}
                           modifier="breakWord"
                           {...getTdProps({ columnKey: "vulnerabilities" })}
                         >
-                          {item.purl[0] && <PackageVulnerabilities pkg={pkg} />}
+                          <PackageVulnerabilities
+                            pkg={pkg}
+                            isFetching={isFetching}
+                            fetchError={fetchError}
+                          />
                         </Td>
                       )}
                     </WithPackage>

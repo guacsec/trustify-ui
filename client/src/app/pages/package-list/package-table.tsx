@@ -67,51 +67,51 @@ export const PackageTable: React.FC = () => {
         >
           {currentPageItems.map((item, rowIndex) => {
             return (
-              <Tbody key={item.uuid}>
-                <Tr {...getTrProps({ item })}>
-                  <TableRowContentWithControls
-                    {...tableControls}
-                    item={item}
-                    rowIndex={rowIndex}
-                  >
-                    <Td
-                      width={15}
-                      modifier="breakWord"
-                      {...getTdProps({ columnKey: "name" })}
-                    >
-                      <NavLink
-                        to={generatePath(Paths.packageDetails, {
-                          packageId: item.uuid,
-                        })}
+              <WithPackage key={item.uuid} packageId={item.uuid}>
+                {(pkg, packageIsFetching, packageFetchError) => (
+                  <Tbody>
+                    <Tr {...getTrProps({ item })}>
+                      <TableRowContentWithControls
+                        {...tableControls}
+                        item={item}
+                        rowIndex={rowIndex}
                       >
-                        {item.decomposedPurl
-                          ? item.decomposedPurl?.name
-                          : item.purl}
-                      </NavLink>
-                    </Td>
-                    <Td
-                      width={15}
-                      modifier="truncate"
-                      {...getTdProps({ columnKey: "namespace" })}
-                    >
-                      {item.decomposedPurl?.namespace}
-                    </Td>
-                    <Td
-                      width={10}
-                      modifier="truncate"
-                      {...getTdProps({ columnKey: "version" })}
-                    >
-                      {item.decomposedPurl?.version}
-                    </Td>
-                    <Td
-                      width={10}
-                      modifier="truncate"
-                      {...getTdProps({ columnKey: "type" })}
-                    >
-                      {item.decomposedPurl?.type}
-                    </Td>
-                    <WithPackage packageId={item.uuid}>
-                      {(pkg) => (
+                        <Td
+                          width={15}
+                          modifier="breakWord"
+                          {...getTdProps({ columnKey: "name" })}
+                        >
+                          <NavLink
+                            to={generatePath(Paths.packageDetails, {
+                              packageId: item.uuid,
+                            })}
+                          >
+                            {item.decomposedPurl
+                              ? item.decomposedPurl?.name
+                              : item.purl}
+                          </NavLink>
+                        </Td>
+                        <Td
+                          width={15}
+                          modifier="truncate"
+                          {...getTdProps({ columnKey: "namespace" })}
+                        >
+                          {item.decomposedPurl?.namespace}
+                        </Td>
+                        <Td
+                          width={10}
+                          modifier="truncate"
+                          {...getTdProps({ columnKey: "version" })}
+                        >
+                          {item.decomposedPurl?.version}
+                        </Td>
+                        <Td
+                          width={10}
+                          modifier="truncate"
+                          {...getTdProps({ columnKey: "type" })}
+                        >
+                          {item.decomposedPurl?.type}
+                        </Td>
                         <Td
                           width={10}
                           modifier="truncate"
@@ -127,47 +127,46 @@ export const PackageTable: React.FC = () => {
                             ? "Licenses"
                             : "License"}
                         </Td>
-                      )}
-                    </WithPackage>
-                    <Td
-                      width={10}
-                      modifier="truncate"
-                      {...getTdProps({ columnKey: "path" })}
-                    >
-                      {item.decomposedPurl?.path}
-                    </Td>
-                    <Td width={20} {...getTdProps({ columnKey: "qualifiers" })}>
-                      {item.decomposedPurl?.qualifiers && (
-                        <PackageQualifiers
-                          value={item.decomposedPurl?.qualifiers}
-                        />
-                      )}
-                    </Td>
-                    <WithPackage packageId={item.uuid}>
-                      {(pkg) => (
+                        <Td
+                          width={10}
+                          modifier="truncate"
+                          {...getTdProps({ columnKey: "path" })}
+                        >
+                          {item.decomposedPurl?.path}
+                        </Td>
+                        <Td
+                          width={20}
+                          {...getTdProps({ columnKey: "qualifiers" })}
+                        >
+                          {item.decomposedPurl?.qualifiers && (
+                            <PackageQualifiers
+                              value={item.decomposedPurl?.qualifiers}
+                            />
+                          )}
+                        </Td>
                         <Td
                           width={20}
                           {...getTdProps({ columnKey: "vulnerabilities" })}
                         >
-                          <PackageVulnerabilities pkg={pkg} />
+                          <PackageVulnerabilities
+                            pkg={pkg}
+                            isFetching={packageIsFetching}
+                            fetchError={packageFetchError}
+                          />
                         </Td>
-                      )}
-                    </WithPackage>
-                  </TableRowContentWithControls>
-                </Tr>
-                {isCellExpanded(item) ? (
-                  <Tr isExpanded>
-                    <Td
-                      {...getExpandedContentTdProps({
-                        item,
-                      })}
-                      className={spacing.pLg}
-                    >
-                      <ExpandableRowContent>
-                        <div className={spacing.ptLg}>
-                          {isCellExpanded(item, "licenses") ? (
-                            <WithPackage packageId={item.uuid}>
-                              {(pkg) => (
+                      </TableRowContentWithControls>
+                    </Tr>
+                    {isCellExpanded(item) ? (
+                      <Tr isExpanded>
+                        <Td
+                          {...getExpandedContentTdProps({
+                            item,
+                          })}
+                          className={spacing.pLg}
+                        >
+                          <ExpandableRowContent>
+                            <div className={spacing.ptLg}>
+                              {isCellExpanded(item, "licenses") ? (
                                 <List isPlain>
                                   {pkg?.licenses?.map((license, idx) => (
                                     <ListItem
@@ -177,15 +176,15 @@ export const PackageTable: React.FC = () => {
                                     </ListItem>
                                   ))}
                                 </List>
-                              )}
-                            </WithPackage>
-                          ) : null}
-                        </div>
-                      </ExpandableRowContent>
-                    </Td>
-                  </Tr>
-                ) : null}
-              </Tbody>
+                              ) : null}
+                            </div>
+                          </ExpandableRowContent>
+                        </Td>
+                      </Tr>
+                    ) : null}
+                  </Tbody>
+                )}
+              </WithPackage>
             );
           })}
         </ConditionalTableBody>
