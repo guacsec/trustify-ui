@@ -146,7 +146,10 @@ export const PackageTable: React.FC = () => {
                             />
                           )}
                         </Td>
-                        <Td {...getTdProps({ columnKey: "vulnerabilities" })}>
+                        <Td
+                          width={10}
+                          {...getTdProps({ columnKey: "vulnerabilities" })}
+                        >
                           <PackageVulnerabilities
                             pkg={pkg}
                             isFetching={packageIsFetching}
