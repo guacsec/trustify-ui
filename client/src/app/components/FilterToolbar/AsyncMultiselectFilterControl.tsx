@@ -6,8 +6,6 @@ import {
   type ToolbarLabel,
 } from "@patternfly/react-core";
 
-import { getString } from "@app/utils/utils";
-
 import { AsyncMultiSelect } from "../AsyncMultiSelect/AsyncMultiSelect";
 import type { AsyncMultiSelectOptionProps } from "../AsyncMultiSelect/type-utils";
 
@@ -35,6 +33,12 @@ export const AsyncMultiselectFilterControl = <TItem,>({
     new Map<string, FilterSelectOptionProps | null>(),
   );
 
+  React.useEffect(() => {
+    for (const option of category.selectOptions) {
+      optionMap.current.set(option.value, option);
+    }
+  }, [category.selectOptions]);
+
   const [selectOptions, setSelectOptions] = React.useState<
     FilterSelectOptionProps[]
   >(Array.isArray(category.selectOptions) ? category.selectOptions : []);
@@ -59,13 +63,22 @@ export const AsyncMultiselectFilterControl = <TItem,>({
     return optionMap.current.get(optionValue);
   };
 
+  const filterSelectOptionToAsyncMultiSelectOption = (
+    option: FilterSelectOptionProps,
+  ): AsyncMultiSelectOptionProps => {
+    return {
+      id: option.value,
+      name: option.label ?? option.value,
+    };
+  };
+
   const chips = filterValue?.map((value) => {
     const option = getOptionFromOptionValue(value);
     const { chipLabel, label } = option ?? {};
     return {
       key: value,
       node: (
-        <Label isCompact textMaxWidth="400px">
+        <Label isCompact textMaxWidth="200px">
           {chipLabel ?? label ?? value}
         </Label>
       ),
@@ -84,20 +97,18 @@ export const AsyncMultiselectFilterControl = <TItem,>({
       <AsyncMultiSelect
         showBadgeCount
         isDisabled={isDisabled}
-        options={selectOptions.map((option) => ({
-          id: option.value,
-          name: option.label ?? option.value,
-        }))}
+        options={selectOptions.map(filterSelectOptionToAsyncMultiSelectOption)}
         selections={filterValue?.map((value) => {
-          const option: AsyncMultiSelectOptionProps = {
-            id: value,
-            name: value,
-          };
-          return option;
+          const option = getOptionFromOptionValue(value);
+          if (option) {
+            return filterSelectOptionToAsyncMultiSelectOption(option);
+          } else {
+            return { id: value, name: value };
+          }
         })}
         onChange={(selections) => {
           const newFilterValue = selections.map((option) => {
-            return getString(option.name);
+            return option.id;
           });
           setFilterValue(newFilterValue);
         }}

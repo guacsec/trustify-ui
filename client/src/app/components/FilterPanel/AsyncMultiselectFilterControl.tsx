@@ -1,9 +1,7 @@
-import * as React from "react";
-
-import { getString } from "@app/utils/utils";
+import React from "react";
 
 import { AsyncMultiSelect } from "../AsyncMultiSelect/AsyncMultiSelect";
-import type { AutocompleteOptionProps } from "../Autocomplete/type-utils";
+import type { AsyncMultiSelectOptionProps } from "../AsyncMultiSelect/type-utils";
 import type {
   FilterSelectOptionProps,
   IAsyncMultiselectFilterCategory,
@@ -23,6 +21,16 @@ export const AsyncMultiselectFilterControl = <TItem,>({
 }: React.PropsWithChildren<
   IAutocompleteLabelFilterControlProps<TItem>
 >): React.JSX.Element | null => {
+  const optionMap = React.useRef(
+    new Map<string, FilterSelectOptionProps | null>(),
+  );
+
+  React.useEffect(() => {
+    for (const option of category.selectOptions) {
+      optionMap.current.set(option.value, option);
+    }
+  }, [category.selectOptions]);
+
   const [selectOptions, setSelectOptions] = React.useState<
     FilterSelectOptionProps[]
   >(Array.isArray(category.selectOptions) ? category.selectOptions : []);
@@ -33,25 +41,36 @@ export const AsyncMultiselectFilterControl = <TItem,>({
     );
   }, [category.selectOptions]);
 
+  const getOptionFromOptionValue = (optionValue: string) => {
+    return optionMap.current.get(optionValue);
+  };
+
+  const filterSelectOptionToAsyncMultiSelectOption = (
+    option: FilterSelectOptionProps,
+  ): AsyncMultiSelectOptionProps => {
+    return {
+      id: option.value,
+      name: option.label ?? option.value,
+    };
+  };
+
   return (
     <AsyncMultiSelect
       showChips
       isDisabled={isDisabled}
-      options={selectOptions.map((option) => ({
-        id: option.value,
-        name: option.label ?? option.value,
-      }))}
+      options={selectOptions.map(filterSelectOptionToAsyncMultiSelectOption)}
       selections={filterValue?.map((value) => {
-        const option: AutocompleteOptionProps = {
-          id: value,
-          name: value,
-        };
-        return option;
+        const option = getOptionFromOptionValue(value);
+        if (option) {
+          return filterSelectOptionToAsyncMultiSelectOption(option);
+        } else {
+          return { id: value, name: value };
+        }
       })}
       onChange={(selections) => {
-        const newFilterValue = selections.map((option) =>
-          getString(option.name),
-        );
+        const newFilterValue = selections.map((option) => {
+          return option.id;
+        });
         setFilterValue(newFilterValue);
       }}
       noResultsMessage="No search results"
