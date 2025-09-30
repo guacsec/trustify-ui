@@ -1,11 +1,14 @@
 import React from "react";
+
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
 import type { DecomposedPurl } from "@app/api/models";
+import type { PurlSummary } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   type ITableControls,
@@ -13,11 +16,9 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { decomposePurl } from "@app/utils/utils";
-import { useDebounceValue } from "usehooks-ts";
 import { useFetchLicenses } from "@app/queries/licenses";
-import type { PurlSummary } from "@app/client";
 import { useFetchPackages } from "@app/queries/packages";
+import { decomposePurl } from "@app/utils/utils";
 
 export interface PackageTableData extends PurlSummary {
   decomposedPurl?: DecomposedPurl;
