@@ -23,7 +23,7 @@ import {
 } from "@app/components/TableControls";
 import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
-import { useVulnerabilitiesOfPackage } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
+import { useVulnerabilitiesOfPackageId } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
 import { useLocalTableControls } from "@app/hooks/table-controls";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
@@ -40,7 +40,7 @@ export const VulnerabilitiesByPackage: React.FC<
     data: { vulnerabilities },
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
-  } = useVulnerabilitiesOfPackage(packageId);
+  } = useVulnerabilitiesOfPackageId(packageId);
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
