@@ -1,6 +1,6 @@
 import type { SelectOptionProps } from "@patternfly/react-core";
 
-export interface MultiSelectOptionProps {
+export interface AsyncMultiSelectOptionProps {
   id: string;
 
   name: string | (() => string);

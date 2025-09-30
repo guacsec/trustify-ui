@@ -43,11 +43,11 @@ export interface SearchTabsProps {
     >;
     packageFilterPanelProps: IFilterPanelProps<
       PackageTableData,
-      "" | "type" | "arch"
+      "" | "type" | "arch" | "license"
     >;
     sbomFilterPanelProps: IFilterPanelProps<
       SbomSummary,
-      "" | "published" | "labels"
+      "" | "published" | "labels" | "license"
     >;
     vulnerabilityFilterPanelProps: IFilterPanelProps<
       VulnerabilitySummary,

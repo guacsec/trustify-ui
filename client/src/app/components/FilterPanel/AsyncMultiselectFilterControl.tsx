@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { getString } from "@app/utils/utils";
 
-import { Autocomplete } from "../Autocomplete/Autocomplete";
+import { AsyncMultiSelect } from "../AsyncMultiSelect/AsyncMultiSelect";
 import type { AutocompleteOptionProps } from "../Autocomplete/type-utils";
 import type {
   FilterSelectOptionProps,
@@ -15,7 +15,7 @@ export interface IAutocompleteLabelFilterControlProps<TItem>
   category: IAsyncMultiselectFilterCategory<TItem, string>;
 }
 
-export const AutocompleteLabelFilterControl = <TItem,>({
+export const AsyncMultiselectFilterControl = <TItem,>({
   category,
   filterValue,
   setFilterValue,
@@ -34,7 +34,7 @@ export const AutocompleteLabelFilterControl = <TItem,>({
   }, [category.selectOptions]);
 
   return (
-    <Autocomplete
+    <AsyncMultiSelect
       showChips
       isDisabled={isDisabled}
       options={selectOptions.map((option) => ({

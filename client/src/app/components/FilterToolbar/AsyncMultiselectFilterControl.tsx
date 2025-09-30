@@ -1,21 +1,25 @@
 import React from "react";
 
-import { Label, ToolbarFilter, type ToolbarLabel } from "@patternfly/react-core";
+import {
+  Label,
+  ToolbarFilter,
+  type ToolbarLabel,
+} from "@patternfly/react-core";
 
 import { getString } from "@app/utils/utils";
 
-import { MultiSelect } from "../MultiSelect/MultiSelect";
-import type { MultiSelectOptionProps } from "../MultiSelect/type-utils";
+import { AsyncMultiSelect } from "../AsyncMultiSelect/AsyncMultiSelect";
+import type { AsyncMultiSelectOptionProps } from "../AsyncMultiSelect/type-utils";
 
 import type { IFilterControlProps } from "./FilterControl";
 import type {
   FilterSelectOptionProps,
-  IMultiselectFilterCategory,
+  IAsyncMultiselectFilterCategory,
 } from "./FilterToolbar";
 
 export interface IMultiselectFilterControlProps<TItem>
   extends IFilterControlProps<TItem, string> {
-  category: IMultiselectFilterCategory<TItem, string>;
+  category: IAsyncMultiselectFilterCategory<TItem, string>;
 }
 
 export const AsyncMultiselectFilterControl = <TItem,>({
@@ -60,7 +64,11 @@ export const AsyncMultiselectFilterControl = <TItem,>({
     const { chipLabel, label } = option ?? {};
     return {
       key: value,
-      node: <Label isCompact textMaxWidth="400px">{chipLabel ?? label ?? value}</Label>,
+      node: (
+        <Label isCompact textMaxWidth="400px">
+          {chipLabel ?? label ?? value}
+        </Label>
+      ),
     };
   });
 
@@ -73,14 +81,15 @@ export const AsyncMultiselectFilterControl = <TItem,>({
       categoryName={category.title}
       showToolbarItem={showToolbarItem}
     >
-      <MultiSelect
+      <AsyncMultiSelect
+        showBadgeCount
         isDisabled={isDisabled}
         options={selectOptions.map((option) => ({
           id: option.value,
           name: option.label ?? option.value,
         }))}
         selections={filterValue?.map((value) => {
-          const option: MultiSelectOptionProps = {
+          const option: AsyncMultiSelectOptionProps = {
             id: value,
             name: value,
           };

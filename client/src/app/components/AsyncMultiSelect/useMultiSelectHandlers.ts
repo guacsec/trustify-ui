@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-import type { MultiSelectOptionProps } from "./type-utils";
+import type { AsyncMultiSelectOptionProps } from "./type-utils";
 
-interface IAutocompleteHandlersProps {
-  options: MultiSelectOptionProps[];
+interface IAsyncAutocompleteHandlersProps {
+  options: AsyncMultiSelectOptionProps[];
   searchString: string;
-  selections: MultiSelectOptionProps[];
-  onChange: (selections: MultiSelectOptionProps[]) => void;
+  selections: AsyncMultiSelectOptionProps[];
+  onChange: (selections: AsyncMultiSelectOptionProps[]) => void;
 
   menuRef: React.RefObject<HTMLDivElement | null>;
   searchInputRef: React.RefObject<HTMLDivElement | null>;
@@ -22,13 +22,12 @@ export const useAutocompleteHandlers = ({
   menuRef,
   searchInputRef,
   onSearchChange,
-}: IAutocompleteHandlersProps) => {
+}: IAsyncAutocompleteHandlersProps) => {
   const [inputValue, setInputValue] = useState(searchString);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const [activeItem, setActiveItem] = useState<MultiSelectOptionProps | null>(
-    null,
-  );
+  const [activeItem, setActiveItem] =
+    useState<AsyncMultiSelectOptionProps | null>(null);
   const [focusedItemIndex, setFocusedItemIndex] = useState<number | null>(null);
 
   const resetActiveAndFocusedItem = () => {
@@ -58,7 +57,7 @@ export const useAutocompleteHandlers = ({
   };
 
   // Selecting an item
-  const handleOnSelect = (value: MultiSelectOptionProps) => {
+  const handleOnSelect = (value: AsyncMultiSelectOptionProps) => {
     const isSelected = selections.some(
       (selection) => selection.id === value.id,
     );

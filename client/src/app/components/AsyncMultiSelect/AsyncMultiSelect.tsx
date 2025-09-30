@@ -18,16 +18,16 @@ import { getString } from "@app/utils/utils";
 
 import { LabelToolip } from "../LabelTooltip";
 import { SearchInputComponent } from "./SearchInput";
-import type { MultiSelectOptionProps } from "./type-utils";
+import type { AsyncMultiSelectOptionProps } from "./type-utils";
 import { useAutocompleteHandlers } from "./useMultiSelectHandlers";
 
-export interface IMultiSelectProps {
+export interface IAsyncMultiSelectProps {
   id?: string;
-  onChange: (selections: MultiSelectOptionProps[]) => void;
+  onChange: (selections: AsyncMultiSelectOptionProps[]) => void;
 
   /** The set of options to use for selection */
-  options?: MultiSelectOptionProps[];
-  selections?: MultiSelectOptionProps[];
+  options?: AsyncMultiSelectOptionProps[];
+  selections?: AsyncMultiSelectOptionProps[];
 
   placeholderText?: string;
   searchString?: string;
@@ -38,14 +38,15 @@ export interface IMultiSelectProps {
   showChips?: boolean;
   onSearchChange?: (value: string) => void;
 
+  showBadgeCount?: boolean;
+
   isDisabled?: boolean;
-  isScrollable?: boolean;
 }
 
 /**
  * Multiple type-ahead with table complete and selection labels
  */
-export const MultiSelect: React.FC<IMultiSelectProps> = ({
+export const AsyncMultiSelect: React.FC<IAsyncMultiSelectProps> = ({
   id = "",
   onChange,
   options = [],
@@ -57,6 +58,7 @@ export const MultiSelect: React.FC<IMultiSelectProps> = ({
   noResultsMessage,
   showChips,
   onSearchChange,
+  showBadgeCount,
   isDisabled,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -101,6 +103,7 @@ export const MultiSelect: React.FC<IMultiSelectProps> = ({
       selections={selections}
       isDropdownOpen={isDropdownOpen}
       activeItem={activeItem}
+      showBadgeCount={showBadgeCount}
     />
   );
 

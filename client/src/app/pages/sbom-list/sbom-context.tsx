@@ -119,7 +119,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
       {
         categoryKey: "license",
         title: "License",
-        type: FilterType.multiselectAsync,
+        type: FilterType.asyncMultiselect,
         placeholderText: "Filter results by license",
         selectOptions: licenses.map((e) => {
           return {

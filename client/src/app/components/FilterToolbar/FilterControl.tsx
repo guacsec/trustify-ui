@@ -7,6 +7,7 @@ import {
   type FilterCategory,
   FilterType,
   type FilterValue,
+  type IAsyncMultiselectFilterCategory,
   type IMultiselectFilterCategory,
   type ISearchFilterCategory,
   type ISelectFilterCategory,
@@ -61,11 +62,11 @@ export const FilterControl = <TItem, TFilterCategoryKey extends string>({
       />
     );
   }
-  if (category.type === FilterType.multiselectAsync) {
+  if (category.type === FilterType.asyncMultiselect) {
     return (
       <AsyncMultiselectFilterControl
         category={
-          category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
+          category as IAsyncMultiselectFilterCategory<TItem, TFilterCategoryKey>
         }
         {...props}
       />

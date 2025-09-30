@@ -10,7 +10,7 @@ import {
 import SearchIcon from "@patternfly/react-icons/dist/esm/icons/search-icon";
 import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 
-import type { MultiSelectOptionProps } from "./type-utils";
+import type { AsyncMultiSelectOptionProps } from "./type-utils";
 
 export interface SearchInputProps {
   id: string;
@@ -23,10 +23,12 @@ export interface SearchInputProps {
   inputValue: string;
   inputRef: React.RefObject<HTMLInputElement | null>;
 
-  selections: MultiSelectOptionProps[];
+  selections: AsyncMultiSelectOptionProps[];
 
   isDropdownOpen: boolean;
-  activeItem: MultiSelectOptionProps | null;
+  activeItem: AsyncMultiSelectOptionProps | null;
+
+  showBadgeCount?: boolean;
 }
 
 export const SearchInputComponent: React.FC<SearchInputProps> = ({
@@ -42,6 +44,7 @@ export const SearchInputComponent: React.FC<SearchInputProps> = ({
   inputRef,
   isDropdownOpen,
   activeItem,
+  showBadgeCount,
 }) => {
   return (
     <TextInputGroup isPlain>
@@ -71,7 +74,7 @@ export const SearchInputComponent: React.FC<SearchInputProps> = ({
             aria-label="Clear input value"
           />
         )}
-        {selections?.length ? (
+        {showBadgeCount && selections?.length ? (
           <Badge isRead>{selections.length}</Badge>
         ) : null}
       </TextInputGroupUtilities>

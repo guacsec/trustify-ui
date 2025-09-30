@@ -125,7 +125,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       {
         categoryKey: "license",
         title: "License",
-        type: FilterType.multiselectAsync,
+        type: FilterType.asyncMultiselect,
         placeholderText: "Filter results by license",
         selectOptions: licenses.map((e) => {
           return {

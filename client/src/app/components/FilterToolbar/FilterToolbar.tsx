@@ -17,7 +17,7 @@ import { FilterControl } from "./FilterControl";
 export enum FilterType {
   select = "select",
   multiselect = "multiselect",
-  multiselectAsync = "multiselectAsync",
+  asyncMultiselect = "asyncMultiselect",
   search = "search",
   numsearch = "numsearch",
   dateRange = "dateRange",
@@ -74,6 +74,12 @@ export interface IMultiselectFilterCategory<
   placeholderText?: string;
   /** How to connect multiple selected options together. Defaults to "AND". */
   logicOperator?: "AND" | "OR";
+}
+
+export interface IAsyncMultiselectFilterCategory<
+  TItem,
+  TFilterCategoryKey extends string,
+> extends IMultiselectFilterCategory<TItem, TFilterCategoryKey> {
   // Callback for the InputText. Use React.callback to avoid re-rendering
   onInputValueChange?: (value: string) => void;
 }
@@ -90,6 +96,7 @@ export interface ISearchFilterCategory<TItem, TFilterCategoryKey extends string>
 
 export type FilterCategory<TItem, TFilterCategoryKey extends string> =
   | IMultiselectFilterCategory<TItem, TFilterCategoryKey>
+  | IAsyncMultiselectFilterCategory<TItem, TFilterCategoryKey>
   | ISelectFilterCategory<TItem, TFilterCategoryKey>
   | ISearchFilterCategory<TItem, TFilterCategoryKey>
   | IBasicFilterCategory<TItem, TFilterCategoryKey>;
