@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { AsyncMultiselectFilterControl } from "./AsyncMultiselectFilterControl";
 import { AutocompleteLabelFilterControl } from "./AutocompleteLabelFilterControl";
 import { DateRangeFilter } from "./DateRangeFilter";
 import {
@@ -53,6 +54,16 @@ export const FilterControl = <TItem, TFilterCategoryKey extends string>({
     return (
       <MultiselectFilterControl
         isScrollable
+        category={
+          category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
+        }
+        {...props}
+      />
+    );
+  }
+  if (category.type === FilterType.multiselectAsync) {
+    return (
+      <AsyncMultiselectFilterControl
         category={
           category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
         }

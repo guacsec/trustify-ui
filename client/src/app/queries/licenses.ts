@@ -1,25 +1,34 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
+import type { HubRequestParams } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import { listLicenses } from "@app/client";
+import { requestParamsQuery } from "@app/hooks/table-controls";
 
 export const LicensesQueryKey = "licenses";
 
-export const useFetchLicenses = (filterText: string) => {
+export const useFetchLicenses = (
+  params: HubRequestParams = {},
+  disableQuery = false,
+) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [LicensesQueryKey, filterText],
+    queryKey: [LicensesQueryKey, params],
     queryFn: () => {
       return listLicenses({
         client,
-        query: { limit: 10, q: filterText },
+        query: { ...requestParamsQuery(params) },
       });
     },
-    placeholderData: keepPreviousData,
+    enabled: !disableQuery,
   });
 
   return {
-    licenses: data?.data?.items || [],
+    result: {
+      data: data?.data?.items || [],
+      total: data?.data?.total ?? 0,
+      params: params,
+    },
     isFetching: isLoading,
     fetchError: error as AxiosError,
     refetch,

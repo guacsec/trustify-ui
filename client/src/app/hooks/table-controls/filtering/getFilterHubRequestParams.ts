@@ -130,7 +130,7 @@ export const getFilterHubRequestParams = <
           value: serverFilterValue[0],
         });
       }
-      if (filterCategory.type === "multiselect") {
+      if (filterCategory.type === "multiselect" || filterCategory.type === "multiselectAsync") {
         pushOrMergeFilter(filters, {
           field: serverFilterField,
           operator: filterCategory.operator ?? "=",

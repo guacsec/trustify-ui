@@ -19,8 +19,8 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 import { useFetchLicenses } from "@app/queries/licenses";
+import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 
 interface ISbomSearchContext {
   tableControls: ITableControls<
@@ -33,7 +33,7 @@ interface ISbomSearchContext {
     | "labels"
     | "vulnerabilities",
     "name" | "published",
-    "" | "published" | "labels",
+    "" | "published" | "labels" | "license",
     string
   >;
 
@@ -60,7 +60,18 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
 
   const [inputValueLicense, setInputValueLicense] = React.useState("");
   const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
-  const { licenses } = useFetchLicenses(debouncedInputValueLicense);
+  const {
+    result: { data: licenses },
+  } = useFetchLicenses({
+    filters: [
+      {
+        field: FILTER_TEXT_CATEGORY_KEY,
+        operator: "~",
+        value: debouncedInputValueLicense,
+      },
+    ],
+    page: { pageNumber: 1, itemsPerPage: 10 },
+  });
 
   const tableControlState = useTableControlState({
     tableName: "sbom",
@@ -106,10 +117,10 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
         onInputValueChange: setInputValueLabel,
       },
       {
-        categoryKey: "licenses",
+        categoryKey: "license",
         title: "License",
-        type: FilterType.autocompleteLabel,
-        placeholderText: "Filter results by label",
+        type: FilterType.multiselectAsync,
+        placeholderText: "Filter results by license",
         selectOptions: licenses.map((e) => {
           return {
             value: e.license,

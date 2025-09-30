@@ -17,6 +17,7 @@ import { FilterControl } from "./FilterControl";
 export enum FilterType {
   select = "select",
   multiselect = "multiselect",
+  multiselectAsync = "multiselectAsync",
   search = "search",
   numsearch = "numsearch",
   dateRange = "dateRange",
