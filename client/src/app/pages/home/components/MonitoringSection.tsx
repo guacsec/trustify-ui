@@ -104,7 +104,7 @@ export const MonitoringSection: React.FC = () => {
               }
               fetchError={
                 fetchErrorBarchartSboms ||
-                fetchErrorBarchartSbomsVulnerabilities.some((e) => !!e)
+                fetchErrorBarchartSbomsVulnerabilities.find((e) => !!e)
               }
             >
               <Stack hasGutter>

@@ -71,7 +71,7 @@ export const useFetchImporterById = (id: string) => {
   return {
     credentials: data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
@@ -143,7 +143,7 @@ export const useFetchImporterReports = (
       total: data?.data?.total ?? 0,
     },
     isFetching: isLoading,
-    fetchError: error,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };

@@ -30,7 +30,7 @@ export const useFetchPackages = (
       params: params,
     },
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
@@ -44,7 +44,7 @@ export const useFetchPackageById = (id: string) => {
   return {
     pkg: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
@@ -69,7 +69,7 @@ export const useFetchPackagesBySbomId = (
       params,
     },
     isFetching: isLoading,
-    fetchError: error,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
