@@ -5,7 +5,7 @@ import {
   type VulnerabilityStatus,
   extendedSeverityFromSeverity,
 } from "@app/api/models";
-import type { PurlAdvisory, VulnerabilityHead } from "@app/client";
+import type { PurlAdvisory, PurlDetails, VulnerabilityHead } from "@app/client";
 import { useFetchPackageById } from "@app/queries/packages";
 
 const areVulnerabilityOfPackageEqual = (
@@ -155,12 +155,8 @@ const advisoryToModels = (advisories: PurlAdvisory[]) => {
   };
 };
 
-export const useVulnerabilitiesOfPackage = (packageId: string) => {
-  const {
-    pkg,
-    isFetching: isFetchingPackage,
-    fetchError: fetchErrorPackage,
-  } = useFetchPackageById(packageId);
+export const useVulnerabilitiesOfPackageId = (packageId: string) => {
+  const { pkg, isFetching, fetchError } = useFetchPackageById(packageId);
 
   const result = React.useMemo(() => {
     return advisoryToModels(pkg?.advisories || []);
@@ -168,7 +164,17 @@ export const useVulnerabilitiesOfPackage = (packageId: string) => {
 
   return {
     data: result,
-    isFetching: isFetchingPackage,
-    fetchError: fetchErrorPackage,
+    isFetching,
+    fetchError,
+  };
+};
+
+export const useVulnerabilitiesOfPackage = (pkg: PurlDetails | undefined) => {
+  const result = React.useMemo(() => {
+    return advisoryToModels(pkg?.advisories || []);
+  }, [pkg]);
+
+  return {
+    data: result,
   };
 };
