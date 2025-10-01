@@ -34,7 +34,7 @@ export const useFetchVulnerabilities = (
       params: params,
     },
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
@@ -96,6 +96,6 @@ export const useFetchVulnerabilityById = (id: string) => {
   return {
     vulnerability: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
