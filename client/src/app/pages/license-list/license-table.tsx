@@ -1,5 +1,4 @@
 import React from "react";
-import { generatePath, NavLink } from "react-router-dom";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -8,7 +7,6 @@ import {
   TableHeaderContentWithControls,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
-import { Paths } from "@app/Routes";
 import { LicenseSearchContext } from "./license-context";
 import { WithSBOMsByLicense } from "@app/components/WithSBOMsByLicense";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
@@ -60,7 +58,7 @@ export const LicenseTable: React.FC = () => {
                     rowIndex={rowIndex}
                   >
                     <Td
-                      width={35}
+                      width={70}
                       modifier="breakWord"
                       {...getTdProps({
                         columnKey: "name",
@@ -93,23 +91,15 @@ export const LicenseTable: React.FC = () => {
                               <TableCellError error={error} />
                             )}
                           >
-                            {totalPackages && totalPackages > 0 ? (
-                              <NavLink
-                                to={generatePath(Paths.packagesFilter, {
-                                  licenseName: item.license,
-                                })}
-                              >
-                                {`${totalPackages} Package${totalPackages > 1 ? "s" : ""}`}
-                              </NavLink>
-                            ) : (
-                              "0 Packages"
-                            )}
+                            {totalPackages && totalPackages > 0
+                              ? `${totalPackages} Package${totalPackages > 1 ? "s" : ""}`
+                              : "0 Packages"}
                           </LoadingWrapper>
                         )}
                       </WithPackagesByLicense>
                     </Td>
                     <Td
-                      width={50}
+                      width={15}
                       {...getTdProps({
                         columnKey: "sboms",
                         item: item,
@@ -131,17 +121,9 @@ export const LicenseTable: React.FC = () => {
                               <TableCellError error={error} />
                             )}
                           >
-                            {totalSBOMs && totalSBOMs > 0 ? (
-                              <NavLink
-                                to={generatePath(Paths.packagesFilter, {
-                                  licenseName: item.license,
-                                })}
-                              >
-                                {`${totalSBOMs} Package${totalSBOMs > 1 ? "s" : ""}`}
-                              </NavLink>
-                            ) : (
-                              "0 Packages"
-                            )}
+                            {totalSBOMs && totalSBOMs > 0
+                              ? `${totalSBOMs} SBOM${totalSBOMs > 1 ? "s" : ""}`
+                              : "0 SBOMs"}
                           </LoadingWrapper>
                         )}
                       </WithSBOMsByLicense>
