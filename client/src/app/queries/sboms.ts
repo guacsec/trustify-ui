@@ -123,8 +123,6 @@ export const useDeleteSbomMutation = (
       onSuccess(response, id);
       await queryClient.invalidateQueries({ queryKey: [SBOMsQueryKey] });
 
-      // Required as SBOMs in other pages might need to to be removed
-      // https://github.com/TanStack/query/discussions/3169#discussioncomment-14347395
       queryClient.removeQueries({ queryKey: [SBOMsQueryKey, id] });
     },
     onError: async (err: AxiosError) => {
