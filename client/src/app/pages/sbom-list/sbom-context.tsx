@@ -37,7 +37,7 @@ interface ISbomSearchContext {
 
   totalItemCount: number;
   isFetching: boolean;
-  fetchError: AxiosError;
+  fetchError: AxiosError | null;
 }
 
 const contextDefaultValue = {} as ISbomSearchContext;

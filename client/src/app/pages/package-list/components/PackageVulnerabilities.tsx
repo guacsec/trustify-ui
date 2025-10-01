@@ -11,7 +11,7 @@ import { TableCellError } from "@app/components/TableCellError";
 interface PackageVulnerabilitiesProps {
   pkg: PurlDetails | undefined;
   isFetching: boolean;
-  fetchError: AxiosError | undefined;
+  fetchError?: AxiosError | null;
 }
 
 export const PackageVulnerabilities: React.FC<PackageVulnerabilitiesProps> = ({
