@@ -85,7 +85,11 @@ export const useFetchSBOMs = (
   };
 };
 
-export const useFetchSBOMById = (id?: string) => {
+export const useFetchSBOMById = (
+  id?: string,
+  refetchInterval?: number | false,
+  retry?: boolean | number,
+) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [SBOMsQueryKey, id],
     queryFn: () => {
@@ -94,12 +98,14 @@ export const useFetchSBOMById = (id?: string) => {
         : getSbom({ client, path: { id: id } });
     },
     enabled: id !== undefined,
+    refetchInterval,
+    retry,
   });
 
   return {
     sbom: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
@@ -116,6 +122,8 @@ export const useDeleteSbomMutation = (
     onSuccess: async (response, id) => {
       onSuccess(response, id);
       await queryClient.invalidateQueries({ queryKey: [SBOMsQueryKey] });
+
+      queryClient.removeQueries({ queryKey: [SBOMsQueryKey, id] });
     },
     onError: async (err: AxiosError) => {
       onError(err);
