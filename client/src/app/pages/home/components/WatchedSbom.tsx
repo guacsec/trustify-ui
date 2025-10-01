@@ -1,6 +1,8 @@
 import React from "react";
 import { generatePath, Link } from "react-router-dom";
 
+import { useIsMutating } from "@tanstack/react-query";
+
 import {
   Button,
   Card,
@@ -61,7 +63,23 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
     sbom: currentSbom,
     isFetching: isFetchingCurrentSbom,
     fetchError: fetchErrorCurrentSbom,
-  } = useFetchSBOMById(sbomId ?? undefined);
+  } = useFetchSBOMById(sbomId ?? undefined, undefined, 1);
+
+  // Handle SBOMs that no longer exist
+
+  const assumeSbomWasDeleted = React.useMemo(() => {
+    return fetchErrorCurrentSbom?.response?.status === 404;
+  }, [fetchErrorCurrentSbom]);
+
+  const isMutating = useIsMutating();
+
+  React.useEffect(() => {
+    if (assumeSbomWasDeleted) {
+      patch(fieldName, null);
+    }
+  }, [fieldName, assumeSbomWasDeleted, patch]);
+
+  // Dropdown
 
   const {
     result: { data: sbomOptions },
@@ -113,7 +131,9 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
   return (
     <Card isFullHeight>
       <LoadingWrapper
-        isFetching={isFetchingCurrentSbom}
+        isFetching={
+          isFetchingCurrentSbom || assumeSbomWasDeleted || isMutating > 0
+        }
         fetchError={fetchErrorCurrentSbom}
       >
         {currentSbom && (
