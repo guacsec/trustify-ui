@@ -17,7 +17,7 @@ export const WithPackagesByLicense: React.FC<WithPackagesByLicenseProps> = ({
   children,
 }) => {
   const { result, isFetching, fetchError } = useFetchPackages({
-    filters: [{ field: "license", value: licenseId }],
+    filters: [{ field: "license", operator: "=", value: licenseId }],
     page: { itemsPerPage: 1, pageNumber: 1 },
   });
 
