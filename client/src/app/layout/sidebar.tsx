@@ -1,6 +1,5 @@
 import type React from "react";
 import { NavLink } from "react-router-dom";
-
 import {
   Icon,
   Nav,
@@ -71,6 +70,16 @@ export const SidebarApp: React.FC = () => {
               }}
             >
               Packages
+            </NavLink>
+          </li>
+          <li className={nav.navItem}>
+            <NavLink
+              to={Paths.licenses}
+              className={({ isActive }) => {
+                return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
+              }}
+            >
+              Licenses
             </NavLink>
           </li>
           <li className={nav.navItem}>
