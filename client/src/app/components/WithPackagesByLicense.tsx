@@ -1,7 +1,7 @@
 import type React from "react";
 
 import type { AxiosError } from "axios";
-import { useFetchPackagesByLicense } from "@app/queries/packages";
+import { useFetchPackages } from "@app/queries/packages";
 
 export interface WithPackagesByLicenseProps {
   licenseId: string;
@@ -16,8 +16,10 @@ export const WithPackagesByLicense: React.FC<WithPackagesByLicenseProps> = ({
   licenseId,
   children,
 }) => {
-  const { result, isFetching, fetchError } =
-    useFetchPackagesByLicense(licenseId);
+  const { result, isFetching, fetchError } = useFetchPackages({
+    filters: [{ field: "license", value: licenseId }],
+    page: { itemsPerPage: 1, pageNumber: 1 },
+  });
 
   return <>{children(result?.total, isFetching, fetchError)}</>;
 };

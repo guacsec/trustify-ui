@@ -264,27 +264,3 @@ export const useFetchSbomsLicenseIds = (sbomId: string) => {
     fetchError: error as AxiosError | null,
   };
 };
-
-export const useFetchSBOMsByLicense = (license: string) => {
-  console.log("useFetchSBOMsByLicense called with license:", license);
-  const q = license ? `license=${encodeURIComponent(license)}` : "";
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMsQueryKey, license],
-    queryFn: () =>
-      listSboms({
-        client,
-        query: {
-          q: q,
-        },
-      }),
-  });
-  return {
-    result: {
-      data: data?.data?.items || [],
-      total: data?.data?.total ?? 0,
-    },
-    isFetching: isLoading,
-    fetchError: error as AxiosError | null,
-    refetch,
-  };
-};
