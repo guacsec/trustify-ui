@@ -50,7 +50,7 @@ export const useFetchAdvisoryLabels = (filterText: string) => {
   return {
     labels: (data?.data as { key: string; value: string }[] | undefined) || [],
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
@@ -98,7 +98,7 @@ export const useFetchAdvisoryById = (id: string) => {
   return {
     advisory: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
@@ -133,7 +133,7 @@ export const useFetchAdvisorySourceById = (id: string) => {
   return {
     source: data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
