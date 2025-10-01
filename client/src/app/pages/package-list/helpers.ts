@@ -5,10 +5,11 @@ import { serializeFilterUrlParams } from "@app/hooks/table-controls";
 import { trimAndStringifyUrlParams } from "@app/hooks/useUrlParams";
 import { Paths } from "@app/Routes";
 
-export const getSbomFilteredByLicenseUrl = (
+export const getPackageFilteredByLicenseUrl = (
   licenses: string[],
 ): Pick<Path, "pathname" | "search"> => {
-  const prefix = (key: string) => `${TablePersistenceKeyPrefixes.sboms}:${key}`;
+  const prefix = (key: string) =>
+    `${TablePersistenceKeyPrefixes.packages}:${key}`;
 
   const filterParams = serializeFilterUrlParams({
     license: licenses,
@@ -21,7 +22,7 @@ export const getSbomFilteredByLicenseUrl = (
   })}`;
 
   return {
-    pathname: Paths.sboms,
+    pathname: Paths.packages,
     search: params,
   };
 };
