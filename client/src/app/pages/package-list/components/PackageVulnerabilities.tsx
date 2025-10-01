@@ -1,21 +1,25 @@
 import type React from "react";
 
-import { Skeleton } from "@patternfly/react-core";
-
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
-import { TableCellError } from "@app/components/TableCellError";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
 import { useVulnerabilitiesOfPackage } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
+import type { PurlDetails } from "@app/client";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import type { AxiosError } from "axios";
+import { Skeleton } from "@patternfly/react-core";
+import { TableCellError } from "@app/components/TableCellError";
 
 interface PackageVulnerabilitiesProps {
-  packageId: string;
+  pkg: PurlDetails | undefined;
+  isFetching: boolean;
+  fetchError: AxiosError | undefined;
 }
 
 export const PackageVulnerabilities: React.FC<PackageVulnerabilitiesProps> = ({
-  packageId,
+  pkg,
+  isFetching,
+  fetchError,
 }) => {
-  const { data, isFetching, fetchError } =
-    useVulnerabilitiesOfPackage(packageId);
+  const { data } = useVulnerabilitiesOfPackage(pkg);
 
   return (
     <LoadingWrapper
