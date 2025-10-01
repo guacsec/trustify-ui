@@ -43,21 +43,21 @@ export enum PathParam {
 
 export const Paths = {
   advisories: "/advisories",
-  advisoryDetails: `/advisories/:${PathParam.ADVISORY_ID}`,
   advisoryUpload: "/advisories/upload",
-  importers: "/importers",
-  licenses: "/licenses",
-  packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
-  packagesFilter: `/packages/:${PathParam.LICENSE_NAME}`,
-  packages: "/packages",
-  sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
-  sbomsFilter: `/sboms/:${PathParam.LICENSE_NAME}`,
-  sboms: "/sboms",
-  sbomScan: "/sboms/scan",
-  sbomUpload: "/sboms/upload",
-  search: "/search",
+  advisoryDetails: `/advisories/:${PathParam.ADVISORY_ID}`,
   vulnerabilities: "/vulnerabilities",
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
+  sboms: "/sboms",
+  sbomUpload: "/sboms/upload",
+  sbomScan: "/sboms/scan",
+  sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
+  sbomsFilter: `/sboms/:${PathParam.LICENSE_NAME}`,
+  packages: "/packages",
+  packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
+  packagesFilter: `/packages/:${PathParam.LICENSE_NAME}`,
+  search: "/search",
+  importers: "/importers",
+  licenses: "/licenses",
 } as const;
 
 export const AppRoutes = createBrowserRouter([
