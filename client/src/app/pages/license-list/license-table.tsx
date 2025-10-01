@@ -93,13 +93,17 @@ export const LicenseTable: React.FC = () => {
                               rowIndex,
                             })}
                           >
-                            <NavLink
-                              to={generatePath(Paths.packagesFilter, {
-                                licenseName: item.license,
-                              })}
-                            >
-                              {`${totalPackages} Package${totalPackages > 1 ? "s" : ""}`}
-                            </NavLink>
+                            {totalPackages && totalPackages > 0 ? (
+                              <NavLink
+                                to={generatePath(Paths.packagesFilter, {
+                                  licenseName: item.license,
+                                })}
+                              >
+                                {`${totalPackages} Package${totalPackages > 1 ? "s" : ""}`}
+                              </NavLink>
+                            ) : (
+                              "0 Packages"
+                            )}
                           </Td>
                         </LoadingWrapper>
                       )}
@@ -127,13 +131,17 @@ export const LicenseTable: React.FC = () => {
                               rowIndex,
                             })}
                           >
-                            <NavLink
-                              to={generatePath(Paths.sbomsFilter, {
-                                licenseName: item.license,
-                              })}
-                            >
-                              {`${totalSBOMs} SBOM${totalSBOMs > 1 ? "s" : ""}`}
-                            </NavLink>
+                            {totalSBOMs && totalSBOMs > 0 ? (
+                              <NavLink
+                                to={generatePath(Paths.packagesFilter, {
+                                  licenseName: item.license,
+                                })}
+                              >
+                                {`${totalSBOMs} Package${totalSBOMs > 1 ? "s" : ""}`}
+                              </NavLink>
+                            ) : (
+                              "0 Packages"
+                            )}
                           </Td>
                         </LoadingWrapper>
                       )}

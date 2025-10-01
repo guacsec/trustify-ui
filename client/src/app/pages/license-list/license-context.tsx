@@ -17,7 +17,7 @@ import type { LicenseText } from "@app/client";
 
 interface ILicenseSearchContext {
   tableControls: ITableControls<
-    { license: string; packages: number; sboms: number },
+    LicenseText,
     "name" | "packages" | "sboms",
     "name",
     "" | "packages" | "sboms",
@@ -92,12 +92,7 @@ export const LicenseSearchProvider: React.FunctionComponent<
   const tableControls = useTableControlProps({
     ...tableControlState,
     idProperty: "license",
-    currentPageItems:
-      licenses?.map((license) => ({
-        license: license.license,
-        packages: 0,
-        sboms: 0,
-      })) ?? [],
+    currentPageItems: licenses,
     totalItemCount,
     isLoading: isFetching,
   });
