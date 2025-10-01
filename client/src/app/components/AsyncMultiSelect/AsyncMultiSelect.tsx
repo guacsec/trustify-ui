@@ -24,22 +24,16 @@ import { useAutocompleteHandlers } from "./useMultiSelectHandlers";
 export interface IAsyncMultiSelectProps {
   id?: string;
   onChange: (selections: AsyncMultiSelectOptionProps[]) => void;
-
-  /** The set of options to use for selection */
   options?: AsyncMultiSelectOptionProps[];
   selections?: AsyncMultiSelectOptionProps[];
-
   placeholderText?: string;
   searchString?: string;
   searchInputAriaLabel?: string;
   labelColor?: LabelProps["color"];
   noResultsMessage?: string;
-
   showChips?: boolean;
   onSearchChange?: (value: string) => void;
-
   showBadgeCount?: boolean;
-
   isDisabled?: boolean;
 }
 

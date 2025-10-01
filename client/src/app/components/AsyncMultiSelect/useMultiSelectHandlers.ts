@@ -56,7 +56,6 @@ export const useAutocompleteHandlers = ({
     onChange(updatedSelections);
   };
 
-  // Selecting an item
   const handleOnSelect = (value: AsyncMultiSelectOptionProps) => {
     const isSelected = selections.some(
       (selection) => selection.id === value.id,

@@ -52,8 +52,8 @@ export const SearchInputComponent: React.FC<SearchInputProps> = ({
         id={id}
         value={inputValue}
         onClick={onClick}
-        onChange={(_e, value) => onSearchChange(value)} // verified
-        onKeyDown={onKeyHandling} // in progress
+        onChange={(_e, value) => onSearchChange(value)}
+        onKeyDown={onKeyHandling}
         autoComplete="off"
         innerRef={inputRef}
         placeholder={placeholder}

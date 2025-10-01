@@ -30,7 +30,7 @@ export const useFetchLicenses = (
       params: params,
     },
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
