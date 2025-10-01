@@ -4,6 +4,7 @@ import { createBrowserRouter, useParams } from "react-router-dom";
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import LicenseList from "./pages/license-list";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -31,14 +32,12 @@ const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 // Others
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
-const LicenseList = lazy(() => import("./pages/license-list"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
-  LICENSE_NAME = "licenseName",
 }
 
 export const Paths = {
@@ -53,9 +52,9 @@ export const Paths = {
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
   packages: "/packages",
   packageDetails: `/packages/:${PathParam.PACKAGE_ID}`,
+  licenses: "/licenses",
   search: "/search",
   importers: "/importers",
-  licenses: "/licenses",
 } as const;
 
 export const AppRoutes = createBrowserRouter([
@@ -77,15 +76,6 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.advisoryDetails,
-        element: (
-          <LazyRouteElement
-            identifier="advisory-details"
-            component={<AdvisoryDetails />}
-          />
-        ),
-      },
-      {
         path: Paths.advisoryUpload,
         element: (
           <LazyRouteElement
@@ -95,20 +85,29 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.importers,
+        path: Paths.advisoryDetails,
         element: (
           <LazyRouteElement
-            identifier="importer-list"
-            component={<ImporterList />}
+            identifier="advisory-details"
+            component={<AdvisoryDetails />}
           />
         ),
       },
       {
-        path: Paths.licenses,
+        path: Paths.vulnerabilities,
         element: (
           <LazyRouteElement
-            identifier="license-list"
-            component={<LicenseList />}
+            identifier="vulnerability-list"
+            component={<VulnerabilityList />}
+          />
+        ),
+      },
+      {
+        path: Paths.vulnerabilityDetails,
+        element: (
+          <LazyRouteElement
+            identifier="vulnerability-details"
+            component={<VulnerabilityDetails />}
           />
         ),
       },
@@ -137,11 +136,11 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomDetails,
+        path: Paths.sbomUpload,
         element: (
           <LazyRouteElement
-            identifier="sbom-details"
-            component={<SBOMDetails />}
+            identifier="sbom-upload"
+            component={<SBOMUpload />}
           />
         ),
       },
@@ -152,11 +151,29 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomUpload,
+        path: Paths.sbomDetails,
         element: (
           <LazyRouteElement
-            identifier="sbom-upload"
-            component={<SBOMUpload />}
+            identifier="sbom-details"
+            component={<SBOMDetails />}
+          />
+        ),
+      },
+      {
+        path: Paths.licenses,
+        element: (
+          <LazyRouteElement
+            identifier="license-list"
+            component={<LicenseList />}
+          />
+        ),
+      },
+      {
+        path: Paths.importers,
+        element: (
+          <LazyRouteElement
+            identifier="importer-list"
+            component={<ImporterList />}
           />
         ),
       },
@@ -164,24 +181,6 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.search,
         element: (
           <LazyRouteElement identifier="search" component={<Search />} />
-        ),
-      },
-      {
-        path: Paths.vulnerabilities,
-        element: (
-          <LazyRouteElement
-            identifier="vulnerability-list"
-            component={<VulnerabilityList />}
-          />
-        ),
-      },
-      {
-        path: Paths.vulnerabilityDetails,
-        element: (
-          <LazyRouteElement
-            identifier="vulnerability-details"
-            component={<VulnerabilityDetails />}
-          />
         ),
       },
     ],
