@@ -1,11 +1,14 @@
 import React from "react";
+
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
 import type { DecomposedPurl } from "@app/api/models";
+import type { PurlSummary } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   type ITableControls,
@@ -13,9 +16,9 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { decomposePurl } from "@app/utils/utils";
-import type { PurlSummary } from "@app/client";
+import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchPackages } from "@app/queries/packages";
+import { decomposePurl } from "@app/utils/utils";
 
 export interface PackageTableData extends PurlSummary {
   decomposedPurl?: DecomposedPurl;
@@ -33,7 +36,7 @@ interface IPackageSearchContext {
     | "qualifiers"
     | "vulnerabilities",
     "name" | "namespace" | "version",
-    "" | "type" | "arch",
+    "" | "type" | "arch" | "license",
     string
   >;
 
@@ -54,6 +57,21 @@ interface IPackageProvider {
 export const PackageSearchProvider: React.FunctionComponent<
   IPackageProvider
 > = ({ children }) => {
+  const [inputValueLicense, setInputValueLicense] = React.useState("");
+  const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
+  const {
+    result: { data: licenses },
+  } = useFetchLicenses({
+    filters: [
+      {
+        field: FILTER_TEXT_CATEGORY_KEY,
+        operator: "~",
+        value: debouncedInputValueLicense,
+      },
+    ],
+    page: { pageNumber: 1, itemsPerPage: 10 },
+  });
+
   const tableControlState = useTableControlState({
     tableName: "packages",
     persistenceKeyPrefix: TablePersistenceKeyPrefixes.packages,
@@ -103,6 +121,19 @@ export const PackageSearchProvider: React.FunctionComponent<
           { value: "s390x", label: "S390" },
           { value: "noarch", label: "No Arch" },
         ],
+      },
+      {
+        categoryKey: "license",
+        title: "License",
+        type: FilterType.asyncMultiselect,
+        placeholderText: "Filter results by license",
+        selectOptions: licenses.map((e) => {
+          return {
+            value: e.license,
+            label: e.license,
+          };
+        }),
+        onInputValueChange: setInputValueLicense,
       },
     ],
     isExpansionEnabled: true,
