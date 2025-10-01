@@ -70,28 +70,28 @@ export const LicenseTable: React.FC = () => {
                     >
                       {item.license}
                     </Td>
-                    <WithPackagesByLicense
-                      key={item.license}
-                      licenseId={item.license}
+                    <Td
+                      width={15}
+                      {...getTdProps({
+                        columnKey: "packages",
+                        item: item,
+                        rowIndex,
+                      })}
                     >
-                      {(totalPackages, isFetching, fetchError) => (
-                        <LoadingWrapper
-                          isFetching={isFetching}
-                          fetchError={fetchError}
-                          isFetchingState={
-                            <Skeleton screenreaderText="Loading contents" />
-                          }
-                          fetchErrorState={(error) => (
-                            <TableCellError error={error} />
-                          )}
-                        >
-                          <Td
-                            width={15}
-                            {...getTdProps({
-                              columnKey: "packages",
-                              item: item,
-                              rowIndex,
-                            })}
+                      <WithPackagesByLicense
+                        key={item.license}
+                        licenseId={item.license}
+                      >
+                        {(totalPackages, isFetching, fetchError) => (
+                          <LoadingWrapper
+                            isFetching={isFetching}
+                            fetchError={fetchError}
+                            isFetchingState={
+                              <Skeleton screenreaderText="Loading contents" />
+                            }
+                            fetchErrorState={(error) => (
+                              <TableCellError error={error} />
+                            )}
                           >
                             {totalPackages && totalPackages > 0 ? (
                               <NavLink
@@ -104,32 +104,32 @@ export const LicenseTable: React.FC = () => {
                             ) : (
                               "0 Packages"
                             )}
-                          </Td>
-                        </LoadingWrapper>
-                      )}
-                    </WithPackagesByLicense>
-                    <WithSBOMsByLicense
-                      key={item.license}
-                      licenseId={item.license}
+                          </LoadingWrapper>
+                        )}
+                      </WithPackagesByLicense>
+                    </Td>
+                    <Td
+                      width={50}
+                      {...getTdProps({
+                        columnKey: "sboms",
+                        item: item,
+                        rowIndex,
+                      })}
                     >
-                      {(totalSBOMs, isFetching, fetchError) => (
-                        <LoadingWrapper
-                          isFetching={isFetching}
-                          fetchError={fetchError}
-                          isFetchingState={
-                            <Skeleton screenreaderText="Loading contents" />
-                          }
-                          fetchErrorState={(error) => (
-                            <TableCellError error={error} />
-                          )}
-                        >
-                          <Td
-                            width={50}
-                            {...getTdProps({
-                              columnKey: "sboms",
-                              item: item,
-                              rowIndex,
-                            })}
+                      <WithSBOMsByLicense
+                        key={item.license}
+                        licenseId={item.license}
+                      >
+                        {(totalSBOMs, isFetching, fetchError) => (
+                          <LoadingWrapper
+                            isFetching={isFetching}
+                            fetchError={fetchError}
+                            isFetchingState={
+                              <Skeleton screenreaderText="Loading contents" />
+                            }
+                            fetchErrorState={(error) => (
+                              <TableCellError error={error} />
+                            )}
                           >
                             {totalSBOMs && totalSBOMs > 0 ? (
                               <NavLink
@@ -142,10 +142,10 @@ export const LicenseTable: React.FC = () => {
                             ) : (
                               "0 Packages"
                             )}
-                          </Td>
-                        </LoadingWrapper>
-                      )}
-                    </WithSBOMsByLicense>
+                          </LoadingWrapper>
+                        )}
+                      </WithSBOMsByLicense>
+                    </Td>
                   </TableRowContentWithControls>
                 </Tr>
               </Tbody>

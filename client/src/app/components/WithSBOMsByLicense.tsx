@@ -1,7 +1,7 @@
 import type React from "react";
 
 import type { AxiosError } from "axios";
-import { useFetchSBOMs, useFetchSBOMsByLicense } from "@app/queries/sboms";
+import { useFetchSBOMs } from "@app/queries/sboms";
 
 export interface WithSBOMsByLicenseProps {
   licenseId: string;
