@@ -92,7 +92,7 @@ export const useFetchAdvisoryById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AdvisoriesQueryKey, id],
     queryFn: () => getAdvisory({ client, path: { key: id } }),
-    enabled: id !== undefined,
+    enabled: !!id,
   });
 
   return {
@@ -127,7 +127,7 @@ export const useFetchAdvisorySourceById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AdvisoriesQueryKey, id, "source"],
     queryFn: () => downloadAdvisory({ client, path: { key: id } }),
-    enabled: id !== undefined,
+    enabled: !!id,
   });
 
   return {

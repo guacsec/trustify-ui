@@ -65,7 +65,7 @@ export const useFetchImporterById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [ImportersQueryKey, id],
     queryFn: () => getImporter({ client, path: { name: id } }),
-    enabled: id !== undefined,
+    enabled: !!id,
   });
 
   return {
