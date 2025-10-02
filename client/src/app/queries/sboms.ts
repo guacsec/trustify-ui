@@ -97,7 +97,7 @@ export const useFetchSBOMById = (
         ? Promise.resolve(undefined)
         : getSbom({ client, path: { id: id } });
     },
-    enabled: id !== undefined,
+    enabled: !!id,
     refetchInterval,
     retry,
   });
