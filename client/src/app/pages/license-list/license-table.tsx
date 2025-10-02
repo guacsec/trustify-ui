@@ -1,18 +1,24 @@
 import React from "react";
+import { Link } from "react-router-dom";
+
+import { Skeleton } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { SimplePagination } from "@app/components/SimplePagination";
+import { TableCellError } from "@app/components/TableCellError";
 import {
   ConditionalTableBody,
   TableHeaderContentWithControls,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
-import { LicenseSearchContext } from "./license-context";
-import { WithSBOMsByLicense } from "@app/components/WithSBOMsByLicense";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
-import { Skeleton } from "@patternfly/react-core";
-import { TableCellError } from "@app/components/TableCellError";
 import { WithPackagesByLicense } from "@app/components/WithPackagesByLicense";
+import { WithSBOMsByLicense } from "@app/components/WithSBOMsByLicense";
+
+import { getPackageFilteredByLicenseUrl } from "@app/pages/package-list/helpers";
+import { getSbomFilteredByLicenseUrl } from "@app/pages/sbom-list/helpers";
+
+import { LicenseSearchContext } from "./license-context";
 
 export const LicenseTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -91,9 +97,18 @@ export const LicenseTable: React.FC = () => {
                               <TableCellError error={error} />
                             )}
                           >
-                            {totalPackages && totalPackages > 0
-                              ? `${totalPackages} Package${totalPackages > 1 ? "s" : ""}`
-                              : "0 Packages"}
+                            {totalPackages && totalPackages > 0 ? (
+                              <Link
+                                to={getPackageFilteredByLicenseUrl([
+                                  item.license,
+                                ])}
+                              >
+                                {totalPackages} Package
+                                {totalPackages > 1 ? "s" : ""}
+                              </Link>
+                            ) : (
+                              "0 Packages"
+                            )}
                           </LoadingWrapper>
                         )}
                       </WithPackagesByLicense>
@@ -121,9 +136,15 @@ export const LicenseTable: React.FC = () => {
                               <TableCellError error={error} />
                             )}
                           >
-                            {totalSBOMs && totalSBOMs > 0
-                              ? `${totalSBOMs} SBOM${totalSBOMs > 1 ? "s" : ""}`
-                              : "0 SBOMs"}
+                            {totalSBOMs && totalSBOMs > 0 ? (
+                              <Link
+                                to={getSbomFilteredByLicenseUrl([item.license])}
+                              >
+                                {totalSBOMs} SBOM{totalSBOMs > 1 ? "s" : ""}
+                              </Link>
+                            ) : (
+                              "0 SBOMs"
+                            )}
                           </LoadingWrapper>
                         )}
                       </WithSBOMsByLicense>
