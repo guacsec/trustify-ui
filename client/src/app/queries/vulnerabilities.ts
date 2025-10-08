@@ -68,7 +68,7 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
     }),
   });
 
-  const isFetching = userQueries.some(({ isLoading }) => isLoading);
+  const isFetching = userQueries.some(({ isFetching }) => isFetching);
   const fetchError = userQueries.find(({ error }) => !!error);
 
   const analysisResponse: AnalysisResponse = {};
