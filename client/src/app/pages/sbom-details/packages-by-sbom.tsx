@@ -82,7 +82,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         title: "License",
         placeholderText: "Filter results by license",
         type: FilterType.multiselect,
-        operator: "~",
+        operator: "=",
         logicOperator: "OR",
         selectOptions: licenseIds.map((license) => ({
           value: license.license_id,
