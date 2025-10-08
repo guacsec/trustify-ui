@@ -211,3 +211,36 @@ and:
 ```shell
 podman-compose -f etc/playwright-compose/compose.yaml down
 ```
+
+## Using Playwright MCP server
+
+The [Playwright MCP](https://github.com/microsoft/playwright-mcp) server can be used to generate UI automation scripts. With the help of playwright-bdd library, the step definitions for the test scenarios are created and referred from the existing step definition files and page object models.
+
+### Configuration
+- Follow the [instructions](https://github.com/microsoft/playwright-mcp?tab=readme-ov-file#getting-started) to install Playwright MCP server to the client
+- Configure Playwright MCP server under `mcp.json` file with the below configuration.
+
+   ```json
+   {
+     "mcpServers": {
+       "playwright": {
+         "command": "npx",
+         "args": ["@playwright/mcp@latest"]
+       }
+     }
+   }
+   ```
+   File location,
+     - vscode `.vscode/mcp.json`
+     - cursor `.cursor/mcp.json`
+ - Prompts to generate tests for the given test scenario are available under `.github/chatmodes/playwright-tester.chatmode.md` file
+### Example workflow
+1. Install Playwright MCP server to the client
+2. Start Playwright MCP server (if needed)
+3. Update the `trustify` environment values like `PLAYWRIGHT_AUTH_URL`, `TRUSTIFY_API_URL`,`AUTH_REQUIRED` in the `.env` file
+4. Make sure to add the test scenario and the steps under relevant feature file exists under the directory `e2e/tests/**/features/**/*.feature`.
+5. Toggle Agent plane on the IDE and pass the Scenario name for which the code to be generated
+6. Review the Agent prompts before accepting to execute commands
+7. Review the steps and step definitions added under `auto-generated.step.ts` located under relevant feature file directory
+8. Move the auto generated steps to relevant step definition files
+9. Make sure to commit the changes with commit message `Assisted-by: <name of code assistant>`
