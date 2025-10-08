@@ -116,8 +116,8 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
                 variant={EmptyStateVariant.sm}
               >
                 <EmptyStateBody>
-                  The file could not be analyzed. The file might be corrupted or
-                  an unsupported format.
+                  The {file.name} file could not be analyzed. The file might be
+                  corrupted or an unsupported format.
                   {upload.error.response?.data.message && (
                     <ExpandableSection toggleText="Show details">
                       {upload.error.response?.data.message}
