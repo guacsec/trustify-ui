@@ -69,6 +69,7 @@ export const PackageSearchProvider: React.FunctionComponent<
         value: debouncedInputValueLicense,
       },
     ],
+    sort: { field: "license", direction: "asc" },
     page: { pageNumber: 1, itemsPerPage: 10 },
   });
 

@@ -70,6 +70,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
         value: debouncedInputValueLicense,
       },
     ],
+    sort: { field: "license", direction: "asc" },
     page: { pageNumber: 1, itemsPerPage: 10 },
   });
 
