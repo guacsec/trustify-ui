@@ -2057,18 +2057,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasePurlDetails'
-  /api/v2/purl/gc:
-    get:
-      tags:
-      - purl
-      operationId: garbageCollect
-      responses:
-        '200':
-          description: Performs garbage collection for orphaned packages
-          content:
-            text/plain:
-              schema:
-                type: string
   /api/v2/purl/{key}:
     get:
       tags:
@@ -4767,6 +4755,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LicenseRefMapping'
+            deprecated: true
           version:
             $ref: '#/components/schemas/VersionedPurlHead'
     PurlHead:
