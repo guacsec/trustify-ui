@@ -11,6 +11,7 @@ Scenario: Verify Generate Vulnerability Report Screen
     Then The Application should navigate to Generate Vulnerability Report screen
     Then The Page should contain Browse files option and instruction to Drag and drop files
 
+#Bug TC-2985
 Scenario: Generate Vulnerability Report for unsupported SBOM file extensions
     Given User Navigated to Generate Vulnerability Report screen
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
@@ -23,6 +24,7 @@ Scenario: Generate Vulnerability Report for unsupported SBOM file extensions
         |      fileName   | filePath|
         |    <tarfile>    |         |
 
+#Bug TC-2985
 Scenario: Generate Vulnerability Report for unsupported SBOM format
     Given User Navigated to Generate Vulnerability Report screen
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
@@ -35,18 +37,31 @@ Scenario: Generate Vulnerability Report for unsupported SBOM format
         |    <CycloneDX 1.4>    |         |
         |    <CycloneDX 1.5>    |         |
 
+#Bug TC-2985
+Scenario: Generate Vulnerability Report for SBOM with License issues
+    Given User Navigated to Generate Vulnerability Report screen
+    When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
+    Then The report generation failed with error "Report failed"
+    Then "The "<fileName>" file could not be analyzed. The file might be corrupted or an unsupported format" message should displayed 
+    Then "<Error Message>" message should be displayed  under "Show details" section
+    Then "Try another file" button should be displayed 
+    Examples:
+        |                          fileName                    |              filePath             |                                                                       Error Message                                                         |
+        |  quarkus-bom-2.13.8.Final-redhat-00004.json.bz2      |    /tests/common/assets/sbom/     | error parsing the expression: Parsing for expression `Parsing for expression `ORACLE-FREE-USE-TERMS AND CONDITIONS-(FUTC)` failed.` failed. |
+        
 Scenario: Generate Vulnerability Report For SBOM without any vulnerabilities
     Given User Navigated to Generate Vulnerability Report screen
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     Then "No Vulnerabilities found" message should be displayed
+    #Bug TC-2985
     Then "The "<fileName>" was analyzed and found no vulnerabilities report" message should be displayed
     Then "Try another file" button should be displayed 
     When User Clicks on "Try another file" button
     Then Application navigates to Generate Vulnerability Report screen
     Examples:
-        |      fileName     | filePath|
-        |  <CycloneDX>      |         |
-        |  <SPDX>           |         |
+        |               fileName            |              filePath           |
+        |  example_product_quarkus.json     |   /tests/common/assets/sbom/    |
+        |  ubi9-minimal-9.3-1361.json.bz2   |   /tests/common/assets/sbom/    |
 
 Scenario: Cancel Generate vulnerability report
     Given User Navigated to Generate Vulnerability Report screen
