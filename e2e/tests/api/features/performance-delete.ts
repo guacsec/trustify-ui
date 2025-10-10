@@ -4,6 +4,8 @@ import { deleteSboms } from "../helpers/delete";
 import { writeRequestDurationToFile } from "../helpers/report";
 import { uploadSboms } from "../helpers/upload";
 
+test.describe.configure({ mode: 'serial' });
+
 const SBOM_DIR = "../features/assets/performance/delete"; // The path is relative to the helpers/upload.ts file.
 const SBOM_FILES = [
   "1_devspaces_pluginregistry-rhel8.json.bz2",
@@ -46,7 +48,7 @@ test.describe("Performance / Deletion", { tag: "@performance" }, () => {
     logger.info(`Uploaded ${sbomIds.length} SBOMs.`);
   });
 
-  test.skip("SBOMs / Sequential", async ({ axios }) => {
+  test("SBOMs / Sequential", async ({ axios }) => {
     const currentTimeStamp = Date.now();
     const reportFile = `${REPORT_FILE_PREFIX}sequential-${currentTimeStamp}.csv`;
     var index = 1;
