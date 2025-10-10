@@ -28,7 +28,7 @@ const SBOM_FILES = [
   "quay-v3.14.0-product.json.bz2",
 ];
 
-var sbomIds: string[] = [];
+let sbomIds: string[] = [];
 
 const REPORT_FILE_PREFIX = "report-perf-delete-";
 
