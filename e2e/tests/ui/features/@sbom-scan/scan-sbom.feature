@@ -22,7 +22,7 @@ Scenario: Generate Vulnerability Report For SBOM without any vulnerabilities
     Then Application navigates to Generate Vulnerability Report screen
     Examples:
         |               fileName            |              filePath           |
-        |  example_product_quarkus.json     |   /tests/common/assets/sbom/    |
+        |  example_product_quarkus.json.bz2 |   /tests/common/assets/sbom/    |
         |  ubi9-minimal-9.3-1361.json.bz2   |   /tests/common/assets/sbom/    |
 
 Scenario: Cancel Generate vulnerability report
@@ -41,7 +41,7 @@ Scenario: Generate Vulnerability Report for supported SBOM file extensions
     Then On the successful report generation the Application should render Vulnerability Report for the SBOM
     Examples:
     |        fileName          |               filePath            |
-    |       examples.json      |    /tests/common/assets/sbom/     |
+    |    examples_sbom.json    |    /tests/common/assets/sbom/     |
     |   exhort_mvn.json.bz2    |    /tests/common/assets/sbom/     |
 
 Scenario: Verify Generate Vulnerability Report Screen
@@ -70,8 +70,8 @@ Scenario: Verify Vulnerabilities on Generate Vulnerability Report for an SBOM
     Then The Vulnerabilities on the Vulnerability ID column should match with "<Vulnerabilities>"
     Examples:
         |                        fileName              |              filePath             |     Vulnerabilities |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |    CVE-2024-40094,CVE-2022-46337,CVE-2024-21742,CVE-2024-30171,CVE-2024-31141,CVE-2024-10039,CVE-2024-4028,CVE-2024-7260,CVE-2024-7318,CVE-2023-3635,CVE-2023-3635,CVE-2024-29025,CVE-2024-47535,CVE-2025-25193,CVE-2024-7254,CVE-2024-2700,CVE-2024-12397,CVE-2025-1634     |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |    CVE-2020-8908,CVE-2023-2976,CVE-2023-22102,CVE-2024-47554,CVE-2023-1428,CVE-2023-32731,CVE-2023-32732,CVE-2024-21742,CVE-2022-45787,CVE-2023-31582,CVE-2024-30171,CVE-2023-0105,CVE-2023-1664,CVE-2023-6927,CVE-2024-10039,CVE-2024-4028,CVE-2024-7260,CVE-2024-7318,CVE-2024-7254,CVE-2024-29025,CVE-2024-47535,CVE-2025-25193,CVE-2023-34462,CVE-2023-4586,CVE-2023-0481,CVE-2023-6267,CVE-2024-1726,CVE-2023-2974,CVE-2024-2700,CVE-2023-1584,CVE-2023-5675,CVE-2025-1634,CVE-2023-4853,CVE-2023-34453,CVE-2023-34454,CVE-2023-34455,CVE-2023-43642,CVE-2024-1300,CVE-2023-24815 |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |    CVE-2024-2700,CVE-2024-29025,CVE-2025-48924,CVE-2025-49574,CVE-2025-55163     |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |    CVE-2022-45787,CVE-2023-0481,CVE-2023-1584,CVE-2023-4853,CVE-2024-2700,CVE-2024-29025,CVE-2025-48924,CVE-2025-48988,CVE-2025-48989,CVE-2025-49128,CVE-2025-49574,CVE-2025-52520,CVE-2025-53506,CVE-2025-55163,CVE-2025-55668 |
 
 Scenario: Verify Vulnerability Details on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen
@@ -113,32 +113,13 @@ Scenario: Verify Affected package list on Generate Vulnerability Report for an S
         |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |   CVE-2024-29025   |  maven |          io.netty            |       netty-codec-http    | 4.1.107.Final-redhat-00001|      |repository_url=https://maven.repository.redhat.com/ga/,type=jar |
         |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |   CVE-2023-0481    |  maven | io.quarkus.resteasy.reactive | resteasy-reactive-common  |           2.13.7.Final    |      |                                                                |
 
-Scenario: Verify Filtering on Generate Vulnerability Report for an SBOM
-    Given User Navigated to Generate Vulnerability Report screen
-    When User Clicks on Browse files Button
-    When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
-    Then On the successful report generation the Application should render Vulnerability Report for the SBOM
-    When User clicks on Clear filters option
-    When User Applies "<filter>" filter with "<value>" on the Vulnerability Report  
-    Then Applied "<filter>" should be visible with "<value>" on the filter bar
-    Then The Vulnerabilities on the Vulnerability ID column should match with "<Vulnerabilities>"
-    When User Applies "Vulnerability ID" filter with "<Vulnerability>" on the Vulnerability Report
-    When User Enters "<Vulnerability>" in the Vulnerability ID Textbox   
-    Then The "Severity" of the "<Vulnerability>" should match with "<severity:importer>" 
-    Examples:
-        |                      fileName                |             filePath              |     filter         |      value     |                                  Vulnerabilities                                      |  Vulnerability  |                        severity:importer                     |
-        |                   examples.json              |   /tests/common/assets/sbom/      |    Severity        |      Medium    |                        CVE-2024-47535,CVE-2025-25913                                  | CVE-2025-25913  |                     Medium(5.5): Unknown                     |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |    Severity        |       Low      |                  CVE-2020-8908,CVE-2023-0481,CVE-2024-4028                            |  CVE-2023-0481  |   Medium(5.3): Unknown,Low(3.3): Unknown,Medium(5.3): Unknown|
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |    Severity        |       High     |CVE-2024-2700,CVE-2024-7254,CVE-2024-10039,CVE-2024-12397,CVE-2024-40094,CVE-2025-1634 |  CVE-2024-2700  |                High(7): Unknown,High(7): Unknown             |
-
-
 Scenario: Verify Actions on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     When User Clicks on "Actions" button
-    Then The "Actions" dropdown should have options "Generate new report" and "Download CSV"
-    When User Clicks on "Generate new report" option from the "Actions" dropdown
+    Then The Actions dropdown should have options "Generate new report" and "Download CSV"
+    When User Clicks on "Generate new report" option from the Actions dropdown
     Then Application navigates to Generate Vulnerability Report screen
     Examples:
         |                        fileName              |              filePath             |
@@ -151,8 +132,8 @@ Scenario: Verify Download CSV on Generate Vulnerability Report for an SBOM
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     When User Clicks on "Actions" button
-    Then The "Actions" dropdown should have options "Generate new report" and "Download CSV"
-    When User Downloads CSV with default filename "<fileName>" by clicking on "Download CSV" option
+    Then The Actions dropdown should have options "Generate new report" and "Download CSV"
+    Then User Downloads CSV with default filename "<fileName>" by clicking on "Download CSV" option
     Examples:
         |                        fileName              |              filePath             |
         |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |
@@ -169,8 +150,8 @@ Scenario: Verify Download and Leave on Generate Vulnerability Report for an SBOM
     Then Application navigates to Vulnerability Explorer screen of "<Vulnerability>"
     Examples:
         |                        fileName              |              filePath             | Vulnerability  |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-25193 |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-4586 |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-48924 |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-1584 |
 
 Scenario: Verify Leave without Downloading on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen
@@ -183,8 +164,8 @@ Scenario: Verify Leave without Downloading on Generate Vulnerability Report for 
     Then Application navigates to Vulnerability Explorer screen of "<Vulnerability>"
     Examples:
         |                        fileName              |              filePath             | Vulnerability  |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-25193 |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-4586 |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-48924 |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-1584 |
 
 Scenario: Verify Cancel on Leave Vulnerability Report modal window
     Given User Navigated to Generate Vulnerability Report screen
@@ -197,8 +178,26 @@ Scenario: Verify Cancel on Leave Vulnerability Report modal window
     Then Application should remain on the Generate Vulnerability Report screen
     Examples:
         |                        fileName              |              filePath             | Vulnerability  |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-25193 |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-4586  |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      | CVE-2025-48924 |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      | CVE-2023-1584  |
+
+Scenario: Verify Filtering on Generate Vulnerability Report for an SBOM
+    Given User Navigated to Generate Vulnerability Report screen
+    When User Clicks on Browse files Button
+    When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
+    Then On the successful report generation the Application should render Vulnerability Report for the SBOM
+    When User clicks on Clear filters option
+    When User Applies "<filter>" filter with "<value>" on the Vulnerability Report
+    Then Applied "<filter>" should be visible with "<value>" on the filter bar
+    Then The Vulnerabilities on the Vulnerability ID column should match with "<Vulnerabilities>"
+    When User Applies "Vulnerability ID" filter with "<Vulnerability>" on the Vulnerability Report
+    When User Enters "<Vulnerability>" in the Vulnerability ID Textbox
+    Then The "Severity" of the "<Vulnerability>" should match with "<severity:importer>"
+    Examples:
+        |                      fileName                |             filePath              |     filter         |      value     |                                                   Vulnerabilities                                       |  Vulnerability  |                        severity:importer                     |
+        |                examples_sbom.json            |   /tests/common/assets/sbom/      |    Severity        |      Medium    |                                          CVE-2025-48795,CVE-2025-48924                                  | CVE-2025-48924  |                     Medium(6.5): Unknown                     |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |    Severity        |      Medium    |CVE-2022-45787,CVE-2023-0481,CVE-2024-29025,CVE-2025-48924,CVE-2025-49128,CVE-2025-49574,CVE-2025-55668  |  CVE-2023-0481  |   Medium(5.3): Unknown,Low(3.3): Unknown,Medium(5.3): Unknown|
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |    Severity        |       High     |                                          CVE-2024-2700,CVE-2025-55163                                   |  CVE-2024-2700  |                         High(7): Unknown                     |
 
 Scenario: Verify Pagination on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen

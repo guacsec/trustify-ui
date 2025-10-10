@@ -61,9 +61,6 @@ export const SBOM_FILES = [
   "rhel-9.2-eus.spdx.json.bz2",
   "spdx-ancestor-of-example.json.bz2",
   "example_container_index.json.bz2",
-  "quarkus-bom-3.8.3.redhat-00003.json.bz2",
-  "exhort_mvn.json.bz2",
-  "examples.json",
 ];
 
 export const ADVISORY_FILES = [

@@ -177,7 +177,6 @@ Then(
 Then(
   "The Vulnerabilities on the Vulnerability ID column should match with {string}",
   async ({ page }, vulnerabilitiesCsv: string) => {
-    const scanPage = await SbomScanPage.build(page);
     const parentElem = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
     const toolbarTable = new ToolbarTable(page, "Vulnerability table");
     await toolbarTable.selectPerPage(parentElem, "100 per page");
@@ -212,10 +211,6 @@ Then(
       await toolbarTable.waitForTableContent();
       await collectPage();
     }
-
-    // Use the reusable method to verify expected IDs against collected IDs
-    // Create a temporary page locator to hold the collected IDs for verification
-    const allCollectedIdsAsCsv = collectedIds.join(",");
 
     // Verify each expected ID is present at least once
     for (const id of expectedIds) {
@@ -287,12 +282,11 @@ Then(
     const cell = row.locator('td[data-label="Severity"]');
 
     // Use the reusable helper for comma-delimited severity values
-    const result = await verifyCommaDelimitedValues(
+    await verifyCommaDelimitedValues(
       cell,
       expected,
       'xpath=//ul[@aria-label="Label group category"]//li',
     );
-    console.log("debug cellText:", result);
   },
 );
 
@@ -336,65 +330,51 @@ Then(
   "The {string} column of the {string} affected package should match with {string}",
   async ({ page }, column: string, vulnerability: string, expected: string) => {
     const scanPage = await SbomScanPage.build(page);
+    const vulnerabilityRow = scanPage.getVulnerabilityRow(vulnerability);
+    const packageTable = vulnerabilityRow.locator(
+      `xpath=/following-sibling::tr[contains(@class,'expandable')]/td[@data-label='Affected packages']//table`,
+    );
+    await expect(packageTable).toBeVisible();
 
-    // Find the nested grid by looking for a grid that has "Type" as a columnheader
-    // (only the nested affected packages grid has this, not the main vulnerability table)
-    const nestedGrid = page
-      .locator("role=grid")
-      .filter({ has: page.locator('role=columnheader[name="Type"]') });
-
-    // Dynamically find the column index from the headers
-    const headerRow = nestedGrid
-      .locator("role=rowgroup")
-      .first()
-      .locator("role=row");
-    const headers = headerRow.locator("role=columnheader");
-    const headerCount = await headers.count();
-
+    const headerElements = packageTable.locator(`xpath=//th`);
+    const headerElemCount = await headerElements.count();
     let columnIndex = -1;
-    for (let i = 0; i < headerCount; i++) {
-      const headerText = await headers.nth(i).textContent();
+    for (let i = 0; i < headerElemCount; i++) {
+      const headerText = await headerElements.nth(i).textContent();
       if (headerText?.trim() === column) {
         columnIndex = i;
         break;
       }
     }
-
     if (columnIndex === -1) {
       throw new Error(
         `Column "${column}" not found in affected packages table`,
       );
     }
 
-    // Get the first data row from the nested grid's body
-    const dataRow = nestedGrid
-      .locator("role=rowgroup")
-      .last()
-      .locator("role=row")
-      .first();
-
-    // Get the cell at the column index
-    const cell = dataRow.locator("role=gridcell").nth(columnIndex);
-
-    // Special handling for Qualifiers column - qualifiers are rendered as separate elements
-    if (column === "Qualifiers") {
-      // Use the reusable helper for comma-delimited values
-      await verifyCommaDelimitedValues(cell, expected, "xpath=//td/span");
-    } else {
-      // For other columns, check if expected is empty string (for empty columns)
-      if (expected === "") {
-        const cellText = await cell.textContent();
-        await expect(cellText?.trim() || "").toBe("");
+    const rows = packageTable.locator(`xpath=//tbody/tr`);
+    const rowCount = await rows.count();
+    for (let i = 1; i <= rowCount; i++) {
+      const cell = packageTable.locator(
+        `xpath=//tbody/tr[${i}]//td[${columnIndex + 1}]`,
+      );
+      if (column === "Qualifiers") {
+        await verifyCommaDelimitedValues(cell, expected, "xpath=//span");
       } else {
-        await expect(cell).toContainText(expected);
+        if (expected === "") {
+          const cellText = await cell.textContent();
+          await expect(cellText?.trim() || "").toBe("");
+        } else {
+          await expect(cell).toContainText(expected);
+        }
       }
     }
   },
 );
 
 Then(
-  "The {string} dropdown should have options {string} and {string}",
-  async ({ page }, dropdownName: string, option1: string, option2: string) => {
+  "The Actions dropdown should have options {string} and {string}",
+  async ({ page }, option1: string, option2: string) => {
     // The dropdown should already be open from the previous step
     await expect(page.getByRole("menuitem", { name: option1 })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: option2 })).toBeVisible();
@@ -402,28 +382,22 @@ Then(
 );
 
 When(
-  "User Clicks on {string} option from the {string} dropdown",
-  async ({ page }, optionName: string, dropdownName: string) => {
+  "User Clicks on {string} option from the Actions dropdown",
+  async ({ page }, optionName: string) => {
     // Just click for non-download actions
     await page.getByRole("menuitem", { name: optionName }).click();
   },
 );
 
-When(
+Then(
   "User Downloads CSV with default filename {string} by clicking on {string} option",
-  async (
-    { page },
-    fileName: string,
-    optionName: string,
-    dropdownName: string,
-  ) => {
+  async ({ page }, fileName: string, optionName: string) => {
     // Use the reusable helper for click + download verification
-    await clickAndVerifyDownload(
-      page,
-      () => page.getByRole("menuitem", { name: optionName }).click(),
-      ".csv",
-      fileName,
+    const downloadedFileName = await clickAndVerifyDownload(page, () =>
+      page.getByRole("menuitem", { name: optionName }).click(),
     );
+    await expect(downloadedFileName).toContain(fileName);
+    await expect(downloadedFileName.endsWith(".csv")).toBeTruthy();
   },
 );
 
@@ -453,12 +427,11 @@ When(
   async ({ page }, fileName: string, buttonName: string) => {
     const modal = page.locator('[role="dialog"]');
     // Use the reusable helper for click + download verification
-    await clickAndVerifyDownload(
-      page,
-      () => modal.getByRole("button", { name: buttonName }).click(),
-      ".csv",
-      fileName,
+    const downloadedFileName = await clickAndVerifyDownload(page, () =>
+      modal.getByRole("button", { name: buttonName }).click(),
     );
+    await expect(downloadedFileName).toContain(fileName);
+    await expect(downloadedFileName.endsWith(".csv")).toBeTruthy();
   },
 );
 
