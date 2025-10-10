@@ -1,6 +1,7 @@
 import { createBdd } from "playwright-bdd";
 import { DetailsPage } from "../helpers/DetailsPage";
 import { expect } from "@playwright/test";
+import { Tabs } from "../helpers/Tabs";
 
 export const { Given, When, Then } = createBdd();
 
@@ -40,22 +41,22 @@ Then("The {string} panel is visible", async ({ page }, panelName) => {
 });
 
 Then("Tab {string} is selected", async ({ page }, tabName) => {
-  const pageWithTabs = new DetailsPage(page);
+  const pageWithTabs = new Tabs(page);
   await pageWithTabs.verifyTabIsSelected(tabName);
 });
 
 Then("Tab {string} is visible", async ({ page }, tabName) => {
-  const pageWithTabs = new DetailsPage(page);
+  const pageWithTabs = new Tabs(page);
   await pageWithTabs.verifyTabIsVisible(tabName);
 });
 
 Then("Tab {string} is not visible", async ({ page }, tabName) => {
-  const pageWithTabs = new DetailsPage(page);
+  const pageWithTabs = new Tabs(page);
   await pageWithTabs.verifyTabIsNotVisible(tabName);
 });
 
 When("User selects the Tab {string}", async ({ page }, tabName) => {
-  const detailsPage = new DetailsPage(page);
+  const detailsPage = new Tabs(page);
   await detailsPage.selectTab(tabName);
 });
 
