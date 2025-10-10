@@ -93,7 +93,7 @@ declare module "axios" {
   }
   export interface AxiosResponse {
     endTime?: number;
-    duration?: number;
+    duration?: number; // in milliseconds
   }
 }
 
@@ -152,15 +152,11 @@ const initAxiosInstance = async (
     );
   }
 
-  // Intercept Requests
-
   // Measure request start time
   axiosInstance.interceptors.request.use((config) => {
     config.startTime = Date.now();
     return config;
   });
-
-  // Intercept Responses
 
   // Measure response reception time
   axiosInstance.interceptors.response.use((response) => {
