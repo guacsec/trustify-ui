@@ -34,11 +34,11 @@ export class SbomScanPage {
   }
 
   async errorVulnerabilitiesHeading(header: string) {
-    this._page.getByRole("heading", { name: header }).isVisible();
+    await this._page.getByRole("heading", { name: header }).isVisible();
   }
 
   async errorVulnerabilitiesBody(body: string) {
-    this._page.getByText(body).isVisible();
+    await this._page.getByText(body).isVisible();
   }
 
   async assertOnScanPage() {

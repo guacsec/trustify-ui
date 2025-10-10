@@ -90,7 +90,7 @@ Scenario: Verify Vulnerability Details on Generate Vulnerability Report for an S
     Then The "Updated" column of the "<Vulnerability>" should match with "<Updated>"
     Examples:
         |                   fileName                   |             filePath              |   Vulnerability    |                                            Description                             |                                               severity:Importer                        |  status  |  affectedcount  |     Published   |      Updated      |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |   CVE-2024-29025   |                       Netty HttpPostRequestDecoder can OOM                         |  Medium(5.3): Unknown,Medium(5.3): Unknown,Medium(5.3): Unknown,Medium(5.3): Unknown   | Affected |        1        |   Mar 26, 2024  |    Feb 13, 2025   |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |   CVE-2024-29025   |                       Netty HttpPostRequestDecoder can OOM                         |  Medium(5.3): Unknown,Medium(5.3): Unknown,Medium(5.3): Unknown,Medium(5.3): Unknown   | Affected |        1        |   Mar 25, 2024  |    Feb 13, 2025   |
         |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |   CVE-2023-0481    |  In RestEasy Reactive implementation of Quarkus the insecure File.createTempFile() |                  Medium(5.3): Unknown,Low(3.3): Unknown,Medium(5.3): Unknown           | Affected |        1        |   Feb 24, 2023  |    Mar 12, 2025   |
 
 Scenario: Verify Affected package list on Generate Vulnerability Report for an SBOM
