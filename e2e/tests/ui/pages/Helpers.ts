@@ -36,21 +36,10 @@ export const expectSort = (arr: string[], asc: boolean) => {
  */
 export const verifyDownload = async (
   download: Download,
-  expectedFileExtension?: string,
-  expectedFileName?: string,
   savePath?: string,
 ): Promise<string> => {
   // Get the suggested filename
   const suggestedFilename = download.suggestedFilename();
-
-  // Verify filename pattern if provided
-  if (expectedFileName) {
-    await expect.soft(suggestedFilename).toContain(expectedFileName);
-  }
-  if (expectedFileExtension) {
-    await expect(suggestedFilename!.endsWith(expectedFileExtension));
-  }
-
   // Save the download to verify it completed successfully
   const downloadPath = savePath || `/tmp/${suggestedFilename}`;
   await download.saveAs(downloadPath);
@@ -67,17 +56,14 @@ export const verifyDownload = async (
 export const clickAndVerifyDownload = async (
   page: Page,
   clickAction: () => Promise<void>,
-  fileExtension?: string,
-  fileName?: string,
 ): Promise<string> => {
   // Set up download listener and perform click simultaneously
   const [download] = await Promise.all([
     page.waitForEvent("download", { timeout: 10000 }),
     clickAction(),
   ]);
-
   // Verify the download
-  return await verifyDownload(download, fileExtension, fileName);
+  return await verifyDownload(download);
 };
 
 /**
@@ -94,7 +80,7 @@ export const verifyCommaDelimitedValues = async (
   expectedCsv: string,
   elementSelector?: string,
   matchMode: "contains" | "exact" = "contains",
-): Promise<{ ok: boolean; actualValues: string[]; missing?: string[] }> => {
+) => {
   // If expected is empty, verify the container is empty
   if (!expectedCsv || expectedCsv.trim() === "") {
     const cellText = await containerLocator.textContent();
@@ -118,7 +104,7 @@ export const verifyCommaDelimitedValues = async (
   const actualValues: string[] = [];
   for (let i = 0; i < elementCount; i++) {
     const text = await elements.nth(i).textContent();
-    if (text && text.trim()) {
+    if (text?.trim()) {
       actualValues.push(text.trim());
     }
   }
@@ -149,11 +135,9 @@ export const verifyCommaDelimitedValues = async (
   await expect
     .soft(
       result.ok,
-      result.missing && result.missing.length
+      result.missing?.length
         ? `Missing expected values: ${result.missing.join(", ")}. Actual values: [${actualValues.join(", ")}]`
         : "Values did not match expected pattern",
     )
     .toBeTruthy();
-
-  return result;
 };

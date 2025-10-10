@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { verifyCommaDelimitedValues } from "../Helpers";
 
 export class SbomScanPage {
   private readonly _page: Page;
