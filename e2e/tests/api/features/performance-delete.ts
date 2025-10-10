@@ -32,83 +32,86 @@ let sbomIds: string[] = [];
 
 const REPORT_FILE_PREFIX = "report-perf-delete-";
 
-test.beforeEach(async ({ axios }) => {
-  logger.info("Uploading SBOMs before deletion performance tests.");
+test.describe("Performance / Deletion", { tag: "@performance" }, () => {
+  
+  test.beforeEach(async ({ axios }) => {
+    logger.info("Uploading SBOMs before deletion performance tests.");
 
-  var uploads = await uploadSboms(axios, SBOM_FILES, SBOM_DIR);
+    var uploads = await uploadSboms(axios, SBOM_FILES, SBOM_DIR);
 
-  uploads.forEach((upload) => sbomIds.push(upload.id));
+    uploads.forEach((upload) => sbomIds.push(upload.id));
 
-  sbomIds.forEach((id) => logger.info(id));
+    sbomIds.forEach((id) => logger.info(id));
 
-  logger.info(`Uploaded ${sbomIds.length} SBOMs.`);
-});
+    logger.info(`Uploaded ${sbomIds.length} SBOMs.`);
+  });
 
-test.skip("@performance Delete / All / Sequential", async ({ axios }) => {
-  const currentTimeStamp = Date.now();
-  const reportFile = `${REPORT_FILE_PREFIX}sequential-${currentTimeStamp}.csv`;
-  var index = 1;
+  test.skip("SBOMs / Sequential", async ({ axios }) => {
+    const currentTimeStamp = Date.now();
+    const reportFile = `${REPORT_FILE_PREFIX}sequential-${currentTimeStamp}.csv`;
+    var index = 1;
 
-  var duration = "";
+    var duration = "";
 
-  writeRequestDurationToFile(reportFile, "No.", "SBOM ID", "Duration [ms]");
+    writeRequestDurationToFile(reportFile, "No.", "SBOM ID", "Duration [ms]");
 
-  for (const sbomId of sbomIds) {
-    try {
-      await axios.delete(`/api/v2/sbom/${sbomId}`).then((response) => {
-        duration = String(response.duration);
-      });
-    } catch (error) {
-      logger.error(`SBOM with ID ${sbomId} could not be deleted.`, error);
-      duration = "n/a";
-    }
-
-    writeRequestDurationToFile(reportFile, String(index), sbomId, duration);
-    duration = "";
-    index++;
-  }
-});
-
-test("@performance Delete / All / Parallel", async ({ axios }) => {
-  const currentTimeStamp = Date.now();
-  const reportFile = `${REPORT_FILE_PREFIX}parallel-${currentTimeStamp}.csv`;
-
-  writeRequestDurationToFile(reportFile, "No.", "SBOM ID", "Duration [ms]");
-
-  const deletionPromises = sbomIds.map(async (sbomId) => {
-    const deletePromise = axios
-      .delete(`/api/v2/sbom/${sbomId}`)
-      .then((response) =>
-        writeRequestDurationToFile(
-          reportFile,
-          "n/a",
-          response.data.id,
-          String(response.duration),
-        ),
-      )
-      .catch((error) => {
+    for (const sbomId of sbomIds) {
+      try {
+        await axios.delete(`/api/v2/sbom/${sbomId}`).then((response) => {
+          duration = String(response.duration);
+        });
+      } catch (error) {
         logger.error(`SBOM with ID ${sbomId} could not be deleted.`, error);
-      });
+        duration = "n/a";
+      }
 
-    return deletePromise;
-  });
-
-  await Promise.all(deletionPromises);
-});
-
-// Re-try deletion of all SBOMs in case some of the SBOMs didn't get deleted during the tests.
-test.afterEach(async ({ axios }) => {
-  logger.info("Cleaning up SBOMs after deletion performance tests.");
-
-  await deleteSboms(axios, sbomIds).then((success) => {
-    if (success) {
-      logger.info("All SBOMs were deleted successfully.");
-    } else {
-      logger.warn(
-        "One or more SBOMs could not be deleted. Check the logs and/or consider deleting the SBOMs manually.",
-      );
+      writeRequestDurationToFile(reportFile, String(index), sbomId, duration);
+      duration = "";
+      index++;
     }
   });
 
-  sbomIds = [];
-});
+  test("SBOMs / Parallel", async ({ axios }) => {
+    const currentTimeStamp = Date.now();
+    const reportFile = `${REPORT_FILE_PREFIX}parallel-${currentTimeStamp}.csv`;
+
+    writeRequestDurationToFile(reportFile, "No.", "SBOM ID", "Duration [ms]");
+
+    const deletionPromises = sbomIds.map(async (sbomId) => {
+      const deletePromise = axios
+        .delete(`/api/v2/sbom/${sbomId}`)
+        .then((response) =>
+          writeRequestDurationToFile(
+            reportFile,
+            "n/a",
+            response.data.id,
+            String(response.duration),
+          ),
+        )
+        .catch((error) => {
+          logger.error(`SBOM with ID ${sbomId} could not be deleted.`, error);
+        });
+
+      return deletePromise;
+    });
+
+    await Promise.all(deletionPromises);
+  });
+
+  // Re-try deletion of all SBOMs in case some of the SBOMs didn't get deleted during the tests.
+  test.afterEach(async ({ axios }) => {
+    logger.info("Cleaning up SBOMs after deletion performance tests.");
+
+    await deleteSboms(axios, sbomIds).then((success) => {
+      if (success) {
+        logger.info("All SBOMs were deleted successfully.");
+      } else {
+        logger.warn(
+          "One or more SBOMs could not be deleted. Check the logs and/or consider deleting the SBOMs manually.",
+        );
+      }
+    });
+
+    sbomIds = [];
+  });
+})
