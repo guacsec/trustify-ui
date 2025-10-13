@@ -5,21 +5,36 @@ import type { AxiosInstance } from "axios";
 
 export async function uploadSboms(
   axios: AxiosInstance,
-  files: string[],
   sbomDirPath: string,
+  files: string[]
 ) {
   const uploads = files.map((e) => {
     const filePath = path.join(__dirname, `${sbomDirPath}/${e}`);
     fs.statSync(filePath); // Verify file exists
 
     const fileStream = fs.createReadStream(filePath);
-    const promise = axios.post("/api/v2/sbom", fileStream, {
+    return axios.post("/api/v2/sbom", fileStream, {
       headers: { "Content-Type": "application/json+bzip2" },
     });
 
-    return promise;
   });
 
   const responses = await Promise.all(uploads);
   return responses.map((response) => response.data);
+}
+
+export async function uploadAdvisories(axios: AxiosInstance, advisoryDirPath: string, files: string[]) {
+
+  const uploads = files.map((e) => {
+      const filePath = path.join(__dirname, `${advisoryDirPath}/${e}`);
+      fs.statSync(filePath); // Verify file exists
+  
+      const fileStream = fs.createReadStream(filePath);
+      return axios.post("/api/v2/advisory", fileStream, {
+        headers: { "Content-Type": "application/json+bzip2" },
+      });
+    });
+
+    const responses = await Promise.all(uploads)
+    return responses
 }
