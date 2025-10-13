@@ -19,6 +19,7 @@ import {
 
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
 import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
+import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 import UploadIcon from "@patternfly/react-icons/dist/esm/icons/upload-icon";
 
 import type { ExtractResult } from "@app/client";
@@ -105,13 +106,12 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
               );
             }
 
-            console.log(upload.error);
             return (
               <EmptyState
                 key={`${file.name}-${index}-error`}
                 status="danger"
                 headingLevel="h4"
-                titleText={`Error ${upload.error.status ?? upload.error.code}: Upload failed`}
+                titleText={"Report failed"}
                 icon={ExclamationCircleIcon}
                 variant={EmptyStateVariant.sm}
               >
@@ -142,7 +142,7 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
             <EmptyState
               key={`${file.name}-${index}-progress`}
               headingLevel="h4"
-              titleText={`Uploading SBOM ${upload.progress}%`}
+              titleText={"Analyzing SBOM"}
               icon={InProgressIcon}
               variant={EmptyStateVariant.sm}
             >
@@ -155,8 +155,9 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
                   <Button
                     variant="link"
                     onClick={() => handleCancelUpload(file)}
+                    icon={<TimesIcon />}
                   >
-                    Cancel upload
+                    Cancel Upload
                   </Button>
                 </EmptyStateActions>
               </EmptyStateFooter>
