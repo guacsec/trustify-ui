@@ -220,8 +220,8 @@ export const SbomScan: React.FC = () => {
             variant={EmptyStateVariant.sm}
           >
             <EmptyStateBody>
-              The file could not be analyzed. The file might be corrupted or an
-              unsupported format.
+              The {joinedFileName} file could not be analyzed. The file might be
+              corrupted or an unsupported format.
             </EmptyStateBody>
             <EmptyStateFooter>
               <EmptyStateActions>
