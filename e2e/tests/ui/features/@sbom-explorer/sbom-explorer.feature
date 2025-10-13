@@ -119,12 +119,12 @@ Feature: SBOM Explorer - View SBOM details
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Table column "Description" is not sortable
-        Then Sorting of "<sortableColumns>" Columns Works
+        Then Sorting of "Id, Affected dependencies, Published, Updated" Columns Works
         #Then Sorting of "CVSS" Columns works
         # Bug: https://issues.redhat.com/browse/TC-2598
         Examples:
-        | sbomName    |                   sortableColumns                  |
-        | quarkus-bom |    Id, Affected dependencies, Published, Updated   |
+        | sbomName    |
+        | quarkus-bom |
 
     Scenario Outline: Add Labels to SBOM from SBOM Explorer Page
         Given An ingested SBOM "<sbomName>" is available

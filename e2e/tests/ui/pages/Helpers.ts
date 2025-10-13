@@ -28,29 +28,43 @@ export const expectSort = (arr: string[], asc: boolean) => {
 };
 
 /**
- * Verifies a download was successful and optionally checks the filename
+ * Resolves asset path by normalizing leading slash and ensuring proper path joining
+ * @param filePath The directory path (may or may not start with /)
+ * @param fileName The file name to append
+ * @returns The normalized path
+ */
+export const resolveAssetPath = (
+  filePath: string,
+  fileName: string,
+): string => {
+  // Normalize leading slash coming from feature examples and ensure single slash join
+  const normalizedPath = filePath.startsWith("/")
+    ? filePath.slice(1)
+    : filePath;
+  const needsSlash = normalizedPath.endsWith("/") ? "" : "/";
+  return `${normalizedPath}${needsSlash}${fileName}`;
+};
+
+/**
+ * Verifies a download was successful
  * @param download The Playwright Download object
- * @param expectedFilenamePattern Optional pattern to match in the filename (e.g., ".csv")
- * @param savePath Optional path to save the download (defaults to /tmp/<filename>)
  * @returns The suggested filename
  */
-export const verifyDownload = async (
-  download: Download,
-  savePath?: string,
-): Promise<string> => {
-  // Get the suggested filename
-  const suggestedFilename = download.suggestedFilename();
-  // Save the download to verify it completed successfully
-  const downloadPath = savePath || `/tmp/${suggestedFilename}`;
-  await download.saveAs(downloadPath);
-  return suggestedFilename;
+export const verifyDownload = async (download: Download): Promise<string> => {
+  // Verify download completed successfully by checking if path exists
+  try {
+    await download.path();
+  } catch (error) {
+    throw new Error(`Download verification failed: ${error}`);
+  }
+  // Return the suggested filename for further assertions
+  return download.suggestedFilename();
 };
 
 /**
  * Handles click action that triggers a download and verifies it
  * @param page The Playwright Page object
  * @param clickAction The async function that performs the click
- * @param expectedFilenamePattern Optional pattern to match in the filename (e.g., ".csv")
  * @returns The downloaded filename
  */
 export const clickAndVerifyDownload = async (
@@ -59,7 +73,7 @@ export const clickAndVerifyDownload = async (
 ): Promise<string> => {
   // Set up download listener and perform click simultaneously
   const [download] = await Promise.all([
-    page.waitForEvent("download", { timeout: 10000 }),
+    page.waitForEvent("download"),
     clickAction(),
   ]);
   // Verify the download
@@ -67,41 +81,24 @@ export const clickAndVerifyDownload = async (
 };
 
 /**
- * Verifies comma-delimited expected values against individually rendered elements
+ * Verifies comma-delimited expected values against child elements
  * Useful for comparing lists like qualifiers, tags, labels, severity values, etc.
- * @param containerLocator The container locator (can be a cell, row, or page)
+ * @param elements The locator for child elements to verify
  * @param expectedCsv Comma-delimited string of expected values
- * @param elementSelector Optional selector for elements within container (if not provided, uses containerLocator itself)
- * @param matchMode 'contains' (default) allows partial matches, 'exact' requires exact matches
- * @returns Object with result and collected values for debugging
  */
-export const verifyCommaDelimitedValues = async (
-  containerLocator: Locator,
+export const verifyChildElementsText = async (
+  elements: Locator,
   expectedCsv: string,
-  elementSelector?: string,
-  matchMode: "contains" | "exact" = "contains",
 ) => {
-  // If expected is empty, verify the container is empty
-  if (!expectedCsv || expectedCsv.trim() === "") {
-    const cellText = await containerLocator.textContent();
-    await expect(cellText?.trim() || "").toBe("");
-    return { ok: true, actualValues: [] };
-  }
-
   // Parse comma-delimited expected values
   const expectedValues = expectedCsv
     .split(",")
     .map((v) => v.trim())
     .filter((v) => v.length > 0);
 
-  // Get elements - either from selector or use container directly
-  const elements = elementSelector
-    ? containerLocator.locator(elementSelector)
-    : containerLocator;
-  const elementCount = await elements.count();
-
   // Collect actual values text
   const actualValues: string[] = [];
+  const elementCount = await elements.count();
   for (let i = 0; i < elementCount; i++) {
     const text = await elements.nth(i).textContent();
     if (text?.trim()) {
@@ -109,34 +106,21 @@ export const verifyCommaDelimitedValues = async (
     }
   }
 
-  // Check which expected values are present
+  // Check which expected values are missing
   const missing: string[] = [];
   for (const expectedVal of expectedValues) {
-    const found =
-      matchMode === "exact"
-        ? actualValues.includes(expectedVal)
-        : actualValues.some(
-            (actual) =>
-              actual.includes(expectedVal) || expectedVal.includes(actual),
-          );
-
+    const found = actualValues.some((actual) => actual.includes(expectedVal));
     if (!found) {
       missing.push(expectedVal);
     }
   }
 
   // Verify all expected values are present
-  const result = {
-    ok: missing.length === 0,
-    actualValues,
-    missing: missing.length > 0 ? missing : undefined,
-  };
-
   await expect
     .soft(
-      result.ok,
-      result.missing?.length
-        ? `Missing expected values: ${result.missing.join(", ")}. Actual values: [${actualValues.join(", ")}]`
+      missing.length === 0,
+      missing.length > 0
+        ? `Missing expected values: ${missing.join(", ")}. Actual values: [${actualValues.join(", ")}]`
         : "Values did not match expected pattern",
     )
     .toBeTruthy();

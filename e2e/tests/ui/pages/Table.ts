@@ -95,4 +95,19 @@ export class Table {
       await expect.poll(() => rows.count()).toBeLessThan(expectedRows.lessThan);
     }
   }
+
+  /**
+   * Gets the tooltip button for a column header
+   * @param columnName The name of the column
+   * @param tooltipMessage The tooltip text (used as the accessible name of the button)
+   * @returns The tooltip button locator
+   */
+  getColumnTooltipButton(columnName: string, tooltipMessage: string): Locator {
+    const columnHeader = this._table.getByRole("columnheader", {
+      name: new RegExp(columnName),
+    });
+    return columnHeader.getByRole("button", {
+      name: tooltipMessage,
+    });
+  }
 }

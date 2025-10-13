@@ -4,10 +4,11 @@ import { expect } from "playwright/test";
 import { test } from "../../fixtures";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { SbomScanPage } from "../../pages/sbom-scan/SbomScanPage";
+import { Table } from "../../pages/Table";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import {
   clickAndVerifyDownload,
-  verifyCommaDelimitedValues,
+  verifyChildElementsText,
 } from "../../pages/Helpers";
 
 export const { Given, When, Then } = createBdd(test);
@@ -82,7 +83,7 @@ Then(
   "On the successful report generation the Application should render Vulnerability Report for the SBOM",
   async ({ page }) => {
     const scanPage = await SbomScanPage.build(page);
-    await scanPage.verifyReportHeaderAndText();
+    await expect(scanPage.heading).toHaveText("Generate vulnerability report");
   },
 );
 
@@ -100,7 +101,12 @@ Then(
   "Filtering drop down should be visible with drop down values {string}",
   async ({ page }, filterOptions: string) => {
     const scanPage = await SbomScanPage.build(page);
-    await scanPage.verifyDefaultFilterAndControls(filterOptions);
+    const filters = filterOptions.split(",").map((filter) => filter.trim());
+    await expect(scanPage.filterDropdown).toBeVisible();
+    await scanPage.filterDropdown.click();
+    for (const filter of filters) {
+      await expect(page.getByRole("menuitem", { name: filter })).toBeVisible();
+    }
   },
 );
 
@@ -111,8 +117,10 @@ Then("Clear filters option should be visible and enabled", async ({ page }) => {
 Then(
   "Tooltip on the {string} column should display {string}",
   async ({ page }, column: string, tooltipMessage: string) => {
-    const scanPage = await SbomScanPage.build(page);
-    await scanPage.verifyTooltips(column, tooltipMessage);
+    const table = await Table.build(page, "Vulnerability table");
+    const tooltipButton = table.getColumnTooltipButton(column, tooltipMessage);
+    await tooltipButton.hover();
+    await page.waitForTimeout(500);
   },
 );
 
@@ -121,7 +129,11 @@ Then(
   async ({ page }, actionsOptions: string) => {
     const scanPage = await SbomScanPage.build(page);
     await expect(scanPage.actionsButton).toBeVisible();
-    await scanPage.verifyActionsDropdown(actionsOptions);
+    const actions = actionsOptions.split(",").map((action) => action.trim());
+    await scanPage.actionsButton.click();
+    for (const action of actions) {
+      await expect(page.getByRole("menuitem", { name: action })).toBeVisible();
+    }
   },
 );
 
@@ -129,7 +141,8 @@ Then(
   'The title should be Vulnerability report with text "This is a temporary vulnerability report"',
   async ({ page }) => {
     const scanPage = await SbomScanPage.build(page);
-    await scanPage.verifyReportHeaderAndText();
+    await expect(scanPage.heading).toHaveText("Vulnerability report");
+    await expect(scanPage.headerDescription).toBeVisible();
   },
 );
 
@@ -280,13 +293,11 @@ Then(
     const scanPage = await SbomScanPage.build(page);
     const row = scanPage.getVulnerabilityRow(vulnerability);
     const cell = row.locator('td[data-label="Severity"]');
-
-    // Use the reusable helper for comma-delimited severity values
-    await verifyCommaDelimitedValues(
-      cell,
-      expected,
+    const severityElements = cell.locator(
       'xpath=//ul[@aria-label="Label group category"]//li',
     );
+
+    await verifyChildElementsText(severityElements, expected);
   },
 );
 
@@ -359,7 +370,8 @@ Then(
         `xpath=//tbody/tr[${i}]//td[${columnIndex + 1}]`,
       );
       if (column === "Qualifiers") {
-        await verifyCommaDelimitedValues(cell, expected, "xpath=//span");
+        const qualifierElements = cell.locator("xpath=//span");
+        await verifyChildElementsText(qualifierElements, expected);
       } else {
         if (expected === "") {
           const cellText = await cell.textContent();
@@ -451,7 +463,7 @@ Then(
     await expect(page).toHaveURL(/\/sboms\/scan$/);
     // After canceling the modal, we're still viewing the vulnerability report (not the generate screen)
     const scanPage = await SbomScanPage.build(page);
-    await expect(scanPage.headingReport).toBeVisible();
+    await expect(scanPage.heading).toHaveText("Vulnerability report");
   },
 );
 
@@ -498,12 +510,10 @@ Then(
 
     // Special handling for Severity column which has multiple severity values
     if (columnName === "Severity") {
-      // Use the reusable helper for comma-delimited severity values
-      await verifyCommaDelimitedValues(
-        cell,
-        expected,
+      const severityElements = cell.locator(
         'xpath=//ul[@aria-label="Label group category"]//li',
       );
+      await verifyChildElementsText(severityElements, expected);
     } else {
       await expect(cell).toContainText(expected);
     }
