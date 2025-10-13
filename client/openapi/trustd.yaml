@@ -2057,18 +2057,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasePurlDetails'
-  /api/v2/purl/gc:
-    get:
-      tags:
-      - purl
-      operationId: garbageCollect
-      responses:
-        '200':
-          description: Performs garbage collection for orphaned packages
-          content:
-            text/plain:
-              schema:
-                type: string
   /api/v2/purl/{key}:
     get:
       tags:
@@ -3290,9 +3278,7 @@ components:
     AdvisoryDetails:
       allOf:
       - $ref: '#/components/schemas/AdvisoryHead'
-      - oneOf:
-        - type: 'null'
-        - $ref: '#/components/schemas/SourceDocument'
+      - $ref: '#/components/schemas/SourceDocument'
       - type: object
         required:
         - vulnerabilities
@@ -3373,10 +3359,8 @@ components:
     AdvisorySummary:
       allOf:
       - $ref: '#/components/schemas/AdvisoryHead'
-      - oneOf:
-        - type: 'null'
-        - $ref: '#/components/schemas/SourceDocument'
-          description: Information pertaning to the underlying source document, if any.
+      - $ref: '#/components/schemas/SourceDocument'
+        description: Information pertaning to the underlying source document, if any.
       - type: object
         required:
         - average_severity
@@ -4202,10 +4186,8 @@ components:
           items:
             allOf:
             - $ref: '#/components/schemas/AdvisoryHead'
-            - oneOf:
-              - type: 'null'
-              - $ref: '#/components/schemas/SourceDocument'
-                description: Information pertaning to the underlying source document, if any.
+            - $ref: '#/components/schemas/SourceDocument'
+              description: Information pertaning to the underlying source document, if any.
             - type: object
               required:
               - average_severity
@@ -4531,9 +4513,7 @@ components:
           items:
             allOf:
             - $ref: '#/components/schemas/SbomHead'
-            - oneOf:
-              - type: 'null'
-              - $ref: '#/components/schemas/SourceDocument'
+            - $ref: '#/components/schemas/SourceDocument'
             - type: object
               required:
               - described_by
@@ -4767,6 +4747,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LicenseRefMapping'
+            deprecated: true
           version:
             $ref: '#/components/schemas/VersionedPurlHead'
     PurlHead:
@@ -5112,9 +5093,7 @@ components:
     SbomSummary:
       allOf:
       - $ref: '#/components/schemas/SbomHead'
-      - oneOf:
-        - type: 'null'
-        - $ref: '#/components/schemas/SourceDocument'
+      - $ref: '#/components/schemas/SourceDocument'
       - type: object
         required:
         - described_by
