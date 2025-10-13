@@ -20,7 +20,7 @@ export async function uploadSboms(
   });
 
   const responses = await Promise.all(uploads);
-  return responses.map((response) => response.data);
+  return responses
 }
 
 export async function uploadAdvisories(axios: AxiosInstance, advisoryDirPath: string, files: string[]) {

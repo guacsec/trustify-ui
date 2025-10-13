@@ -39,9 +39,9 @@ test.describe("Performance / Deletion", { tag: "@performance" }, () => {
   test.beforeEach(async ({ axios }) => {
     logger.info("Uploading SBOMs before deletion performance tests.");
 
-    var uploads = await uploadSboms(axios, SBOM_DIR, SBOM_FILES);
+    var uploadResponses = await uploadSboms(axios, SBOM_DIR, SBOM_FILES);
 
-    uploads.forEach((upload) => sbomIds.push(upload.id));
+    uploadResponses.forEach((response) => sbomIds.push(response.data.id));
 
     sbomIds.forEach((id) => logger.info(id));
 
