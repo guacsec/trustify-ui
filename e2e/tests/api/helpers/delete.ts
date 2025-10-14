@@ -15,16 +15,10 @@ export async function deleteSboms(axios: AxiosInstance, sbomIds: string[]) {
   }
 
   const deletionPromises = existingSbomIds.map((sbomId) =>
-    axios.delete(`/api/v2/sbom/${sbomId}`).catch((error) => {
-      logger.error(`Failed to delete SBOM with ID: ${sbomId}`, error);
-    }),
+    axios.delete(`/api/v2/sbom/${sbomId}`),
   );
 
-  const results = await Promise.allSettled(deletionPromises);
+  const responses = await Promise.allSettled(deletionPromises);
 
-  const allSuccessful = results.every(
-    (result) => result.status === "fulfilled" && result.value?.status === 200,
-  );
-
-  return allSuccessful;
+  return responses;
 }

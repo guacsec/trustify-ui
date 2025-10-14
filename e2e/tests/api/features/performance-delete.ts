@@ -38,11 +38,15 @@ test.describe("Performance / Deletion", { tag: "@performance" }, () => {
   test.beforeEach(async ({ axios }) => {
     logger.info("Uploading SBOMs before deletion performance tests.");
 
-    var uploadResponses = await uploadSboms(axios, SBOM_DIR, SBOM_FILES);
+    const uploadResponses = await uploadSboms(axios, SBOM_DIR, SBOM_FILES);
 
-    uploadResponses.forEach((response) => sbomIds.push(response.data.id));
+    uploadResponses.forEach((response) => {
+      sbomIds.push(response.data.id);
+    });
 
-    sbomIds.forEach((id) => logger.info(id));
+    sbomIds.forEach((id) => {
+      logger.info(id);
+    });
 
     logger.info(`Uploaded ${sbomIds.length} SBOMs.`);
   });
@@ -103,15 +107,20 @@ test.describe("Performance / Deletion", { tag: "@performance" }, () => {
   test.afterEach(async ({ axios }) => {
     logger.info("Cleaning up SBOMs after deletion performance tests.");
 
-    await deleteSboms(axios, sbomIds).then((success) => {
-      if (success) {
-        logger.info("All SBOMs were deleted successfully.");
-      } else {
-        logger.warn(
-          "One or more SBOMs could not be deleted. Check the logs and/or consider deleting the SBOMs manually.",
-        );
-      }
-    });
+    const deleteResponses = await deleteSboms(axios, sbomIds);
+
+    if (
+      deleteResponses.every(
+        (result) =>
+          result.status === "fulfilled" && result.value?.status === 200,
+      )
+    ) {
+      logger.info("All SBOMS have been deleted successfully.");
+    } else {
+      logger.warn(
+        "Some SBOM deletions were unsuccessful. Check the logs and/or consider deleting the SBOMs manually.",
+      );
+    }
 
     sbomIds = [];
   });

@@ -1,8 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
-import type { AxiosInstance } from "axios";
-
 import {
   ADVISORY_FILES,
   logger,
