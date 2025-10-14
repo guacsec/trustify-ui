@@ -4,7 +4,7 @@ import { deleteSboms } from "../helpers/delete";
 import { writeRequestDurationToFile } from "../helpers/report";
 import { uploadSboms } from "../helpers/upload";
 
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: "serial" });
 
 const SBOM_DIR = "../features/assets/performance/delete"; // The path is relative to the helpers/upload.ts file.
 const SBOM_FILES = [
@@ -35,7 +35,6 @@ let sbomIds: string[] = [];
 const REPORT_FILE_PREFIX = "report-perf-delete-";
 
 test.describe("Performance / Deletion", { tag: "@performance" }, () => {
-  
   test.beforeEach(async ({ axios }) => {
     logger.info("Uploading SBOMs before deletion performance tests.");
 
@@ -116,4 +115,4 @@ test.describe("Performance / Deletion", { tag: "@performance" }, () => {
 
     sbomIds = [];
   });
-})
+});

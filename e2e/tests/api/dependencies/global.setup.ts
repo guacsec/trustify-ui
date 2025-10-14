@@ -27,4 +27,3 @@ setup.describe("Ingest initial data", () => {
     logger.info("Setup: upload finished successfully");
   });
 });
-
