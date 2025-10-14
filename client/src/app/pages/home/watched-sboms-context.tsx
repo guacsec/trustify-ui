@@ -14,7 +14,7 @@ interface IWatchedSbomsContext {
   isFetching: boolean;
   fetchError: AxiosError | null;
 
-  patch: (key: string, value: string) => void;
+  patch: (key: string, value: string | null) => void;
 }
 
 const contextDefaultValue = {} as IWatchedSbomsContext;
@@ -46,10 +46,13 @@ export const WatchedSbomsProvider: React.FunctionComponent<
     onUpdateError,
   );
 
-  const patch = (key: string, value: string) => {
-    const newSboms = { ...sboms, [key]: value };
-    updateSboms(newSboms as WatchedSboms);
-  };
+  const patch = React.useCallback(
+    (key: string, value: string | null) => {
+      const newSboms = { ...sboms, [key]: value };
+      updateSboms(newSboms as WatchedSboms);
+    },
+    [sboms, updateSboms],
+  );
 
   return (
     <WatchedSbomsContext.Provider

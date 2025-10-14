@@ -4,10 +4,12 @@ import {
   type FilterCategory,
   FilterType,
   type FilterValue,
+  type IAsyncMultiselectFilterCategory,
   type IMultiselectFilterCategory,
   type ISearchFilterCategory,
   type ISelectFilterCategory,
 } from "../FilterToolbar";
+import { AsyncMultiselectFilterControl } from "./AsyncMultiselectFilterControl";
 import { AutocompleteLabelFilterControl } from "./AutocompleteLabelFilterControl";
 import { CheckboxFilterControl } from "./CheckboxFilterControl";
 import { DateRangeFilter } from "./DateRangeFilter";
@@ -53,6 +55,16 @@ export const FilterControl = <TItem, TFilterCategoryKey extends string>({
       <CheckboxFilterControl
         category={
           category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
+        }
+        {...props}
+      />
+    );
+  }
+  if (category.type === FilterType.asyncMultiselect) {
+    return (
+      <AsyncMultiselectFilterControl
+        category={
+          category as IAsyncMultiselectFilterCategory<TItem, TFilterCategoryKey>
         }
         {...props}
       />

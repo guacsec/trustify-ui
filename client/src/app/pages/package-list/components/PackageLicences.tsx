@@ -11,7 +11,7 @@ import type { PurlDetails } from "@app/client";
 interface PackageLicensesProps {
   pkg: PurlDetails | undefined;
   isFetching: boolean;
-  fetchError: AxiosError | undefined;
+  fetchError?: AxiosError | null;
 }
 
 export const PackageLicenses: React.FC<PackageLicensesProps> = ({

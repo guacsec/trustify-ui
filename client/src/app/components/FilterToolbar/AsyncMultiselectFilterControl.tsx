@@ -1,34 +1,43 @@
-import * as React from "react";
+import React from "react";
 
-import { ToolbarFilter, type ToolbarLabel } from "@patternfly/react-core";
+import {
+  Label,
+  ToolbarFilter,
+  type ToolbarLabel,
+} from "@patternfly/react-core";
 
-import { getString } from "@app/utils/utils";
+import { AsyncMultiSelect } from "../AsyncMultiSelect/AsyncMultiSelect";
+import type { AsyncMultiSelectOptionProps } from "../AsyncMultiSelect/type-utils";
 
-import { Autocomplete } from "../Autocomplete/Autocomplete";
-import type { AutocompleteOptionProps } from "../Autocomplete/type-utils";
 import type { IFilterControlProps } from "./FilterControl";
 import type {
   FilterSelectOptionProps,
   IAsyncMultiselectFilterCategory,
 } from "./FilterToolbar";
 
-export interface IAutocompleteLabelFilterControlProps<TItem>
+export interface IMultiselectFilterControlProps<TItem>
   extends IFilterControlProps<TItem, string> {
   category: IAsyncMultiselectFilterCategory<TItem, string>;
 }
 
-export const AutocompleteLabelFilterControl = <TItem,>({
+export const AsyncMultiselectFilterControl = <TItem,>({
   category,
   filterValue,
   setFilterValue,
   showToolbarItem,
   isDisabled = false,
 }: React.PropsWithChildren<
-  IAutocompleteLabelFilterControlProps<TItem>
+  IMultiselectFilterControlProps<TItem>
 >): React.JSX.Element | null => {
   const optionMap = React.useRef(
     new Map<string, FilterSelectOptionProps | null>(),
   );
+
+  React.useEffect(() => {
+    for (const option of category.selectOptions) {
+      optionMap.current.set(option.value, option);
+    }
+  }, [category.selectOptions]);
 
   const [selectOptions, setSelectOptions] = React.useState<
     FilterSelectOptionProps[]
@@ -54,40 +63,52 @@ export const AutocompleteLabelFilterControl = <TItem,>({
     return optionMap.current.get(optionValue);
   };
 
+  const filterSelectOptionToAsyncMultiSelectOption = (
+    option: FilterSelectOptionProps,
+  ): AsyncMultiSelectOptionProps => {
+    return {
+      id: option.value,
+      name: option.label ?? option.value,
+    };
+  };
+
   const chips = filterValue?.map((value) => {
     const option = getOptionFromOptionValue(value);
     const { chipLabel, label } = option ?? {};
     return {
       key: value,
-      node: chipLabel ?? label ?? value,
+      node: (
+        <Label isCompact textMaxWidth="200px">
+          {chipLabel ?? label ?? value}
+        </Label>
+      ),
     };
   });
 
   return (
     <ToolbarFilter
-      id={`filter-control-${category.categoryKey}`}
+      id={`async-filter-control-${category.categoryKey}`}
       labels={chips}
-      deleteLabel={(_, chip) => onFilterClear(chip as string)}
+      deleteLabel={(_, chip) => onFilterClear(chip)}
       deleteLabelGroup={onFilterClearAll}
       categoryName={category.title}
       showToolbarItem={showToolbarItem}
     >
-      <Autocomplete
+      <AsyncMultiSelect
+        showBadgeCount
         isDisabled={isDisabled}
-        options={selectOptions.map((option) => ({
-          id: option.value,
-          name: option.label ?? option.value,
-        }))}
+        options={selectOptions.map(filterSelectOptionToAsyncMultiSelectOption)}
         selections={filterValue?.map((value) => {
-          const option: AutocompleteOptionProps = {
-            id: value,
-            name: value,
-          };
-          return option;
+          const option = getOptionFromOptionValue(value);
+          if (option) {
+            return filterSelectOptionToAsyncMultiSelectOption(option);
+          } else {
+            return { id: value, name: value };
+          }
         })}
         onChange={(selections) => {
           const newFilterValue = selections.map((option) => {
-            return getString(option.name);
+            return option.id;
           });
           setFilterValue(newFilterValue);
         }}

@@ -50,7 +50,7 @@ export const useFetchAdvisoryLabels = (filterText: string) => {
   return {
     labels: (data?.data as { key: string; value: string }[] | undefined) || [],
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
@@ -92,13 +92,13 @@ export const useFetchAdvisoryById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AdvisoriesQueryKey, id],
     queryFn: () => getAdvisory({ client, path: { key: id } }),
-    enabled: id !== undefined,
+    enabled: !!id,
   });
 
   return {
     advisory: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 
@@ -127,13 +127,13 @@ export const useFetchAdvisorySourceById = (id: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AdvisoriesQueryKey, id, "source"],
     queryFn: () => downloadAdvisory({ client, path: { key: id } }),
-    enabled: id !== undefined,
+    enabled: !!id,
   });
 
   return {
     source: data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };
 

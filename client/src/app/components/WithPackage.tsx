@@ -9,7 +9,7 @@ export interface WithPackageProps {
   children: (
     pkg: PurlDetails | undefined,
     isFetching: boolean,
-    fetchError?: AxiosError,
+    fetchError?: AxiosError | null,
   ) => React.ReactNode;
 }
 

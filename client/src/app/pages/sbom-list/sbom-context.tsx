@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
@@ -18,6 +19,7 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
+import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 
 interface ISbomSearchContext {
@@ -31,13 +33,13 @@ interface ISbomSearchContext {
     | "labels"
     | "vulnerabilities",
     "name" | "published",
-    "" | "published" | "labels",
+    "" | "published" | "labels" | "license",
     string
   >;
 
   totalItemCount: number;
   isFetching: boolean;
-  fetchError: AxiosError;
+  fetchError: AxiosError | null;
 }
 
 const contextDefaultValue = {} as ISbomSearchContext;
@@ -52,17 +54,25 @@ interface ISbomProvider {
 export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
   children,
 }) => {
-  const [inputValue, setInputValue] = React.useState("");
-  const [debouncedInputValue, setDebouncedInputValue] = React.useState("");
+  const [inputValueLabel, setInputValueLabel] = React.useState("");
+  const [debouncedInputValueLabel] = useDebounceValue(inputValueLabel, 400);
+  const { labels } = useFetchSBOMLabels(debouncedInputValueLabel);
 
-  React.useEffect(() => {
-    const delayInputTimeoutId = setTimeout(() => {
-      setDebouncedInputValue(inputValue);
-    }, 400);
-    return () => clearTimeout(delayInputTimeoutId);
-  }, [inputValue]);
-
-  const { labels } = useFetchSBOMLabels(debouncedInputValue);
+  const [inputValueLicense, setInputValueLicense] = React.useState("");
+  const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
+  const {
+    result: { data: licenses },
+  } = useFetchLicenses({
+    filters: [
+      {
+        field: FILTER_TEXT_CATEGORY_KEY,
+        operator: "~",
+        value: debouncedInputValueLicense,
+      },
+    ],
+    sort: { field: "license", direction: "asc" },
+    page: { pageNumber: 1, itemsPerPage: 10 },
+  });
 
   const tableControlState = useTableControlState({
     tableName: "sbom",
@@ -105,7 +115,20 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
             label: keyValue,
           };
         }),
-        onInputValueChange: setInputValue,
+        onInputValueChange: setInputValueLabel,
+      },
+      {
+        categoryKey: "license",
+        title: "License",
+        type: FilterType.asyncMultiselect,
+        placeholderText: "Filter results by license",
+        selectOptions: licenses.map((e) => {
+          return {
+            value: e.license,
+            label: e.license,
+          };
+        }),
+        onInputValueChange: setInputValueLicense,
       },
     ],
     isExpansionEnabled: false,

@@ -83,7 +83,10 @@ export class Toolbar {
       await inputText.clear();
       await inputText.fill(option);
 
-      const dropdownOption = this._page.getByRole("menuitem", { name: option });
+      const dropdownOption = this._page.getByRole("menuitem", {
+        name: option,
+        exact: true,
+      });
       await expect(dropdownOption).toBeVisible();
       await dropdownOption.click();
     }

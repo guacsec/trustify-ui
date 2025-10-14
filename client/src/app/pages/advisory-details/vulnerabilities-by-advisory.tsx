@@ -31,7 +31,7 @@ import { Paths } from "@app/Routes";
 
 interface VulnerabilitiesByAdvisoryProps {
   isFetching: boolean;
-  fetchError?: AxiosError;
+  fetchError?: AxiosError | null;
   vulnerabilities: AdvisoryVulnerabilitySummary[];
 }
 
