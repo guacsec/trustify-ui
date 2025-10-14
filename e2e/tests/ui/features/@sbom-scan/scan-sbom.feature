@@ -59,8 +59,8 @@ Scenario: Verify Generate Vulnerability Report Screen
     Then "Actions" button should be visible with dropdown options "<ActionsOptions>"
     Examples:
         |                        fileName              |              filePath             |                         filters                    |              ActionsOptions         |
-        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |      Vulnerability ID, Importer, Severity  |   Generate new report, Download CSV |
-        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |      Vulnerability ID, Importer, Severity  |   Generate new report, Download CSV |
+        |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |      Vulnerability ID, Importer, Severity  |   Generate new report, Download as CSV |
+        |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |      Vulnerability ID, Importer, Severity  |   Generate new report, Download as CSV |
 
 Scenario: Verify Vulnerabilities on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen
@@ -118,7 +118,7 @@ Scenario: Verify Actions on Generate Vulnerability Report for an SBOM
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     When User Clicks on "Actions" button
-    Then The Actions dropdown should have options "Generate new report" and "Download CSV"
+    Then The Actions dropdown should have options "Generate new report" and "Download as CSV"
     When User Clicks on "Generate new report" option from the Actions dropdown
     Then Application navigates to Generate Vulnerability Report screen
     Examples:
@@ -127,13 +127,13 @@ Scenario: Verify Actions on Generate Vulnerability Report for an SBOM
         |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |
 
 
-Scenario: Verify Download CSV on Generate Vulnerability Report for an SBOM
+Scenario: Verify Download as CSV on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen        
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     When User Clicks on "Actions" button
-    Then The Actions dropdown should have options "Generate new report" and "Download CSV"
-    Then User Downloads CSV with default filename "<fileName>" by clicking on "Download CSV" option
+    Then The Actions dropdown should have options "Generate new report" and "Download as CSV"
+    Then User Downloads CSV with default filename "<fileName>" by clicking on "Download as CSV" option
     Examples:
         |                        fileName              |              filePath             |
         |     quarkus-bom-3.8.3.redhat-00003.json.bz2  |   /tests/common/assets/sbom/      |
