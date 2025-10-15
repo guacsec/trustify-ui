@@ -39,6 +39,7 @@ import { Paths } from "@app/Routes";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
+import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
 
 const renderLicenseWithMappings = (
   license: string,
@@ -191,7 +192,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       modifier="breakWord"
                       {...getTdProps({ columnKey: "vulnerabilities" })}
                     >
-                      {item.purl[0] && (
+                      {item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
                           {(pkg, isFetching, fetchError) => (
                             <PackageVulnerabilities
@@ -201,6 +202,17 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                             />
                           )}
                         </WithPackage>
+                      ) : (
+                        <VulnerabilityGallery
+                          severities={{
+                            critical: 0,
+                            high: 0,
+                            medium: 0,
+                            low: 0,
+                            none: 0,
+                            unknown: 0,
+                          }}
+                        />
                       )}
                     </Td>
                     <Td
