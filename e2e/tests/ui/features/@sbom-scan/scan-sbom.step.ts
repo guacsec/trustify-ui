@@ -88,16 +88,6 @@ Then(
 );
 
 Then(
-  "The Vulnerabilities list should be filtered by 'Affected' status by default",
-  async ({ page }) => {
-    const defaultFilter = page.locator(
-      `xpath=//span[contains(@class,'label-group') and (.='Status')]/following-sibling::ul/li/span[contains(.,'Affected')]`,
-    );
-    await expect(defaultFilter).toBeVisible();
-  },
-);
-
-Then(
   "Filtering drop down should be visible with drop down values {string}",
   async ({ page }, filterOptions: string) => {
     const scanPage = await SbomScanPage.build(page);
@@ -109,10 +99,6 @@ Then(
     }
   },
 );
-
-Then("Clear filters option should be visible and enabled", async ({ page }) => {
-  await expect(page.getByText("Clear all filters")).toBeVisible();
-});
 
 Then(
   "Tooltip on the {string} column should display {string}",
@@ -478,12 +464,6 @@ When(
     await link.click();
   },
 );
-
-When("User clicks on Clear filters option", async ({ page }) => {
-  await page.getByText("Clear all filters").click();
-  const toolbarTable = new ToolbarTable(page, "Vulnerability table");
-  await toolbarTable.waitForTableContent();
-});
 
 Then(
   "Applied {string} should be visible with {string} on the filter bar",

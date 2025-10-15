@@ -33,7 +33,7 @@ Scenario: Cancel Generate vulnerability report
     Then Application navigates to Generate Vulnerability Report screen
     Examples:
         |               fileName                     |              filePath              |              header             |   cancelLabel   |
-        |  example_component_quarkus.json.bz2        |    /tests/common/assets/sbom/      | Generating SBOM report          |   Cancel scan   |
+        |  example_component_quarkus.json.bz2        |    /tests/common/assets/sbom/      | Generating vulnerability report |  Cancel Report  |
 
 Scenario: Generate Vulnerability Report for supported SBOM file extensions
     Given User Navigated to Generate Vulnerability Report screen
@@ -50,10 +50,7 @@ Scenario: Verify Generate Vulnerability Report Screen
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     Then On the successful report generation the Application should render Vulnerability Report for the SBOM
     Then The title should be Vulnerability report with text "This is a temporary vulnerability report"
-    # Bug: TC-2980 Remove Status filter
-    Then The Vulnerabilities list should be filtered by 'Affected' status by default
     Then Filtering drop down should be visible with drop down values "<filters>"
-    Then Clear filters option should be visible and enabled
     Then Tooltip on the "Published" column should display "The date when information about this vulnerability was first made available"
     Then Tooltip on the "Updated" column should display "The date when information about this vulnerability was most recently revised"
     Then "Actions" button should be visible with dropdown options "<ActionsOptions>"
@@ -186,7 +183,6 @@ Scenario: Verify Filtering on Generate Vulnerability Report for an SBOM
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
     Then On the successful report generation the Application should render Vulnerability Report for the SBOM
-    When User clicks on Clear filters option
     When User Applies "<filter>" filter with "<value>" on the Vulnerability Report
     Then Applied "<filter>" should be visible with "<value>" on the filter bar
     Then The Vulnerabilities on the Vulnerability ID column should match with "<Vulnerabilities>"
