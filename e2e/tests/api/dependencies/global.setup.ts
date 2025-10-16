@@ -1,8 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
-import type { AxiosInstance } from "axios";
-
 import {
   ADVISORY_FILES,
   logger,
@@ -10,6 +5,7 @@ import {
   SETUP_TIMEOUT,
 } from "../../common/constants";
 import { test as setup } from "../fixtures";
+import { uploadAdvisories, uploadSboms } from "../helpers/upload";
 
 setup.describe("Ingest initial data", () => {
   setup.skip(
@@ -21,36 +17,8 @@ setup.describe("Ingest initial data", () => {
     setup.setTimeout(SETUP_TIMEOUT);
 
     logger.info("Setup: start uploading assets");
-    await uploadSboms(axios, SBOM_FILES);
-    await uploadAdvisories(axios, ADVISORY_FILES);
+    await uploadSboms(axios, "../../common/assets/sbom/", SBOM_FILES);
+    await uploadAdvisories(axios, "../../common/assets/csaf/", ADVISORY_FILES);
     logger.info("Setup: upload finished successfully");
   });
 });
-
-const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
-    fs.statSync(filePath); // Verify file exists
-
-    const fileStream = fs.createReadStream(filePath);
-    return axios.post("/api/v2/sbom", fileStream, {
-      headers: { "Content-Type": "application/json+bzip2" },
-    });
-  });
-
-  await Promise.all(uploads);
-};
-
-const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
-    fs.statSync(filePath); // Verify file exists
-
-    const fileStream = fs.createReadStream(filePath);
-    return axios.post("/api/v2/advisory", fileStream, {
-      headers: { "Content-Type": "application/json+bzip2" },
-    });
-  });
-
-  await Promise.all(uploads);
-};

@@ -40,6 +40,7 @@ export const logger = {
     CURRENT_LOG_LEVEL >= LOG_LEVELS.error && console.error("[ERROR]", ...args);
   },
 };
+export const REPORT_DIR = process.env.REPORT_DIR ?? "test-results/";
 
 export const SETUP_TIMEOUT = 240_000;
 

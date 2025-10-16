@@ -48,3 +48,7 @@ e2e/tests/ui/features/**/auto-generated.step.ts
 
 # Test results
 test-results/
+
+# Reports
+*.csv
+
