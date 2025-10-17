@@ -15,10 +15,10 @@ import {
   ModalHeader,
   MultipleFileUpload,
   MultipleFileUploadMain,
+  Spinner,
 } from "@patternfly/react-core";
 
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
-import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
 import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 import UploadIcon from "@patternfly/react-icons/dist/esm/icons/upload-icon";
 
@@ -143,7 +143,7 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
               key={`${file.name}-${index}-progress`}
               headingLevel="h4"
               titleText={"Analyzing SBOM"}
-              icon={InProgressIcon}
+              icon={Spinner}
               variant={EmptyStateVariant.sm}
             >
               <EmptyStateBody>
