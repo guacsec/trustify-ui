@@ -11,6 +11,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
+  //here
   test("Columns", async ({ page }) => {
     const listPage = await PackageListPage.build(page);
 
@@ -20,39 +21,42 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     // Full search
     await toolbar.applyTextFilter("Filter text", "keycloak-core");
     await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "keycloak-core");
+    const tableRow = table.getRowsByCellValue({
+      Name: "keycloak-core",
+      Version: "18.0.6.redhat-00001",
+    });
 
     // Namespace
-    await expect(
-      table._table.locator(`td[data-label="Namespace"]`),
-    ).toContainText("org.keycloak");
+    await expect(tableRow.locator(`td[data-label="Namespace"]`)).toContainText(
+      "org.keycloak",
+    );
 
     // Version
-    await expect(
-      table._table.locator(`td[data-label="Version"]`),
-    ).toContainText("18.0.6.redhat-00001");
+    await expect(tableRow.locator(`td[data-label="Version"]`)).toContainText(
+      "18.0.6.redhat-00001",
+    );
 
     // Type
-    await expect(table._table.locator(`td[data-label="Type"]`)).toContainText(
+    await expect(tableRow.locator(`td[data-label="Type"]`)).toContainText(
       "maven",
     );
 
     // Qualifiers
-    await expect(
-      table._table.locator(`td[data-label="Qualifiers"]`),
-    ).toContainText("type=jar");
-    await expect(
-      table._table.locator(`td[data-label="Qualifiers"]`),
-    ).toContainText("repository_url=https://maven.repository.redhat.com/ga/");
+    await expect(tableRow.locator(`td[data-label="Qualifiers"]`)).toContainText(
+      "type=jar",
+    );
+    await expect(tableRow.locator(`td[data-label="Qualifiers"]`)).toContainText(
+      "repository_url=https://maven.repository.redhat.com/ga/",
+    );
 
     // Vulnerabilities
     await expect(
-      table._table
+      tableRow
         .locator(`td[data-label="Vulnerabilities"]`)
         .locator("div[aria-label='total']"),
     ).toContainText("1");
     await expect(
-      table._table
+      tableRow
         .locator(`td[data-label="Vulnerabilities"]`)
         .locator("div[aria-label='medium']"),
     ).toContainText("1");

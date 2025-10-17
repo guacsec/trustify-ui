@@ -110,4 +110,31 @@ export class Table {
       name: tooltipMessage,
     });
   }
+
+  /**
+   * Gets table rows that match specific cell value(s)
+   * @param cellValues An object mapping column names to expected values
+   * @returns A locator for all matching rows
+   * @example
+   * // Get rows where Name column contains "curl"
+   * const rows = await table.getRowsByCellValue({ "Name": "curl" });
+   *
+   * // Get rows matching multiple criteria
+   * const rows = await table.getRowsByCellValue({ "Name": "curl", "Version": "7.29.0" });
+   */
+  getRowsByCellValue(cellValues: Record<string, string>): Locator {
+    // Start with all table rows
+    let rowLocator = this._table.locator("tbody tr");
+
+    // Filter rows based on each column-value pair
+    for (const [columnName, value] of Object.entries(cellValues)) {
+      rowLocator = rowLocator.filter({
+        has: this._page.locator(`td[data-label="${columnName}"]`, {
+          hasText: value,
+        }),
+      });
+    }
+
+    return rowLocator;
+  }
 }

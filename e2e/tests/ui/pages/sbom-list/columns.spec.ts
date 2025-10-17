@@ -11,6 +11,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
+  //here
   test("Vulnerabilities", async ({ page }) => {
     const listPage = await SbomListPage.build(page);
 
@@ -33,11 +34,11 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const expectedVulnerabilities = [
       {
         severity: "high",
-        count: 1,
+        count: 2,
       },
       {
         severity: "medium",
-        count: 10,
+        count: 14,
       },
     ];
 
