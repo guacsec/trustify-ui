@@ -73,11 +73,11 @@ export const DateRangeFilter = <TItem,>({
     }
   };
 
-   const toValidator = (date: Date) =>
-      from && isValidDate(from) && date >= from
-        ? ""
-        : 'The "to" date must be after the "from" date';
-  
+  const toValidator = (date: Date) =>
+    from && isValidDate(from) && date >= from
+      ? ""
+      : 'The "to" date must be after the "from" date';
+
   return (
     <Form>
       <FormGroup role="group" isInline label="From">
