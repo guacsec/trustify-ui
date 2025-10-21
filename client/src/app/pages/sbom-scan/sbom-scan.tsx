@@ -22,6 +22,7 @@ import {
   ModalFooter,
   ModalHeader,
   PageSection,
+  Spinner,
   Split,
   SplitItem,
   type MenuToggleElement,
@@ -30,7 +31,6 @@ import {
 import CheckCircleIcon from "@patternfly/react-icons/dist/esm/icons/check-circle-icon";
 import DownloadIcon from "@patternfly/react-icons/dist/esm/icons/download-icon";
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
-import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
 import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 
 import type { ExtractResult } from "@app/client";
@@ -198,7 +198,7 @@ export const SbomScan: React.FC = () => {
           <EmptyState
             titleText="Generating vulnerability report"
             headingLevel="h4"
-            icon={InProgressIcon}
+            icon={Spinner}
           >
             <EmptyStateBody>
               Analyzing your SBOM for security vulnerabilities and package
