@@ -10,7 +10,7 @@ export class PackageDetailsPage {
     this._layout = layout;
   }
 
-  static async build(page: Page, packageName: string) {
+  static async build(page: Page, packageDetail: Record<string, string>) {
     const navigation = await Navigation.build(page);
     await navigation.goToSidebar("Packages");
 
@@ -18,14 +18,15 @@ export class PackageDetailsPage {
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
-    await toolbar.applyTextFilter("Filter text", packageName);
+    await toolbar.applyTextFilter("Filter text", packageDetail.Name);
     await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", packageName);
-
-    await page.getByRole("link", { name: packageName, exact: true }).click();
-
+    // Get rows matching the package name
+    const matchingRows = table.getRowsByCellValue(packageDetail);
+    await matchingRows
+      .getByRole("link", { name: packageDetail.Name, exact: true })
+      .click();
     const layout = await DetailsPageLayout.build(page);
-    await layout.verifyPageHeader(packageName);
+    await layout.verifyPageHeader(packageDetail.Name);
 
     return new PackageDetailsPage(page, layout);
   }
