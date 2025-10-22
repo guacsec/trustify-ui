@@ -1,68 +1,67 @@
-import { SearchPage } from "../../helpers/SearchPage";
-import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { Tabs } from "../../helpers/Tabs";
-import { DetailsPage } from "../../helpers/DetailsPage";
 import { createBdd } from "playwright-bdd";
 import { expect } from "@playwright/test";
+import { SearchPage, Tabs } from "../../pages/search-page/SearchPage";
+import { SearchPageTabs } from "../../pages/SearchPageTabs";
 
 export const { Given, When, Then } = createBdd();
 
-/**
- * This function returns table identifier and column, which contains link to the details page
- * @param type Catogory of the data to get the table identifier and column
- */
-function getTableInfo(type: string): [string, string] {
-  switch (type) {
-    case "SBOMs":
-    case "SBOM":
-      return ["sbom-table", "Name"];
-    case "Advisories":
-    case "Advisory":
-      return ["advisory-table", "ID"];
-    case "Vulnerabilities":
-    case "CVE":
-      return ["Vulnerability table", "ID"];
-    case "Packages":
-    case "Package":
-      return ["Package table", "Name"];
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-}
+let Page!: SearchPage;
+// /**
+//  * This function returns table identifier and column, which contains link to the details page
+//  * @param type Catogory of the data to get the table identifier and column
+//  */
+// function getTableInfo(type: string): [string, string] {
+//   switch (type) {
+//     case "SBOMs":
+//     case "SBOM":
+//       return ["sbom-table", "Name"];
+//     case "Advisories":
+//     case "Advisory":
+//       return ["advisory-table", "ID"];
+//     case "Vulnerabilities":
+//     case "CVE":
+//       return ["Vulnerability table", "ID"];
+//     case "Packages":
+//     case "Package":
+//       return ["Package table", "Name"];
+//     default:
+//       throw new Error(`Unknown type: ${type}`);
+//   }
+// }
 
-function getPaginationId(type: string): string {
-  switch (type) {
-    case "Vulnerabilities":
-      return "vulnerability-table-pagination-top";
-    case "Advisories":
-      return "advisory-table-pagination-top";
-    case "Packages":
-      return "package-table-pagination-top";
-    case "SBOMs":
-      return "sbom-table-pagination-top";
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-}
+// function getPaginationId(type: string): string {
+//   switch (type) {
+//     case "Vulnerabilities":
+//       return "vulnerability-table-pagination-top";
+//     case "Advisories":
+//       return "advisory-table-pagination-top";
+//     case "Packages":
+//       return "package-table-pagination-top";
+//     case "SBOMs":
+//       return "sbom-table-pagination-top";
+//     default:
+//       throw new Error(`Unknown type: ${type}`);
+//   }
+// }
 
-function getColumns(type: string): string[] {
-  switch (type) {
-    case "Vulnerabilities":
-      return ["ID", "CVSS", "Date published"];
-    case "Advisories":
-      return ["ID", "Revision"];
-    case "Packages":
-      return ["Name", "Namespace", "Version"];
-    case "SBOMs":
-      return ["Name", "Created on"];
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-}
+// function getColumns(type: string): string[] {
+//   switch (type) {
+//     case "Vulnerabilities":
+//       return ["ID", "CVSS", "Date published"];
+//     case "Advisories":
+//       return ["ID", "Revision"];
+//     case "Packages":
+//       return ["Name", "Namespace", "Version"];
+//     case "SBOMs":
+//       return ["Name", "Created on"];
+//     default:
+//       throw new Error(`Unknown type: ${type}`);
+//   }
+// }
 
 Given("User is on the Search page", async ({ page }) => {
-  const searchPage = new SearchPage(page);
-  await searchPage.open();
+  Page = await SearchPage.build(page);
+  await page.waitForLoadState("networkidle");
 });
 
 Then(
@@ -249,9 +248,9 @@ Then(
 Then(
   "a total number of {int} {string} should be visible in the tab",
   async ({ page }, count: number, arg: string) => {
-    await page.waitForLoadState("networkidle");
-    const tabs = new Tabs(page);
-    await tabs.verifyTabHasAtLeastResults(arg, count);
+    await Page.switchTo(arg as Tabs);
+    const tab = await SearchPageTabs.build(page, arg);
+    await tab.verifyTabHasAtLeastResults(arg, count);
   },
 );
 

@@ -6,6 +6,7 @@ Background:
 	Given User is authenticated
 	And User is on the Search page
 
+@only
 Scenario: User visits search page without filling anything
 	Then a total number of 17 "SBOMs" should be visible in the tab
 	And a total number of 5537 "Packages" should be visible in the tab
