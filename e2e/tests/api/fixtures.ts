@@ -87,56 +87,87 @@ export const discoverTokenEndpoint = async (
   return envInfo.OIDC_SERVER_URL ?? null;
 };
 
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    startTime?: number;
+  }
+  export interface AxiosResponse {
+    endTime?: number;
+    duration?: number; // in milliseconds
+  }
+}
+
 const initAxiosInstance = async (
   axiosInstance: AxiosInstance,
   baseURL?: string,
 ) => {
-  const { data: tokenResponse } = await getToken(baseURL);
-  access_token = tokenResponse.access_token;
+  if (AUTH_REQUIRED === "true") {
+    logger.info("Auth enabled. Getting token.");
 
-  // Intercept Requests
-  axiosInstance.interceptors.request.use(
-    (config) => {
-      config.headers.Authorization = `Bearer ${access_token}`;
-      logger.debug(config);
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    },
-  );
+    const { data: tokenResponse } = await getToken(baseURL);
+    access_token = tokenResponse.access_token;
 
-  // Intercept Responses
-  axiosInstance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    async (error) => {
-      if (error.response && error.response.status === 401) {
-        const { data: refreshedTokenResponse } = await getToken(baseURL);
-        access_token = refreshedTokenResponse.access_token;
+    // Add access token
+    axiosInstance.interceptors.request.use(
+      (config) => {
+        config.headers.Authorization = `Bearer ${access_token}`;
+        logger.debug(config);
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      },
+    );
 
-        const retryCounter = error.config.retryCounter || 1;
-        const retryConfig = {
-          ...error.config,
-          headers: {
-            ...error.config.headers,
-            Authorization: `Bearer ${access_token}`,
-          },
-        };
+    // Retry
+    axiosInstance.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          const { data: refreshedTokenResponse } = await getToken(baseURL);
+          access_token = refreshedTokenResponse.access_token;
 
-        // Retry limited times
-        if (retryCounter < 2) {
-          return axios({
-            ...retryConfig,
-            retryCounter: retryCounter + 1,
-          });
+          const retryCounter = error.config.retryCounter || 1;
+          const retryConfig = {
+            ...error.config,
+            headers: {
+              ...error.config.headers,
+              Authorization: `Bearer ${access_token}`,
+            },
+          };
+
+          // Retry limited times
+          if (retryCounter < 2) {
+            return axios({
+              ...retryConfig,
+              retryCounter: retryCounter + 1,
+            });
+          }
         }
-      }
 
-      return Promise.reject(error);
-    },
-  );
+        return Promise.reject(error);
+      },
+    );
+  }
+
+  // Measure request start time
+  axiosInstance.interceptors.request.use((config) => {
+    config.startTime = Date.now();
+    return config;
+  });
+
+  // Measure response reception time
+  axiosInstance.interceptors.response.use((response) => {
+    if (response.config.startTime != null) {
+      response.endTime = Date.now();
+      response.duration = response.endTime - response.config.startTime;
+    } else {
+      response.duration = 0;
+    }
+    return response;
+  });
 };
 
 // Declare the types of your fixtures.
@@ -157,10 +188,8 @@ export const test = base.extend<ApiClientFixture>({
         : undefined,
     });
 
-    if (AUTH_REQUIRED === "true") {
-      logger.info("Auth enabled. Initializing configuration");
-      await initAxiosInstance(axiosInstance, TRUSTIFY_API_URL);
-    }
+    logger.info("Initializing configuration.");
+    await initAxiosInstance(axiosInstance, TRUSTIFY_API_URL);
 
     await use(axiosInstance);
   },
