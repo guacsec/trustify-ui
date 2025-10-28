@@ -41,7 +41,7 @@
       "!**/node_modules",
       "!client/coverage",
       "!client/src/app/client",
-      "!**/common/assets/**"
+      "!**/common/assets"
     ]
   }
 }

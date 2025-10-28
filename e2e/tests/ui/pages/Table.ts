@@ -117,10 +117,10 @@ export class Table {
    * @returns A locator for all matching rows
    * @example
    * // Get rows where Name column contains "curl"
-   * const rows = await table.getRowsByCellValue({ "Name": "curl" });
+   * const rows = table.getRowsByCellValue({ "Name": "curl" });
    *
    * // Get rows matching multiple criteria
-   * const rows = await table.getRowsByCellValue({ "Name": "curl", "Version": "7.29.0" });
+   * const rows = table.getRowsByCellValue({ "Name": "curl", "Version": "7.29.0" });
    */
   getRowsByCellValue(cellValues: Record<string, string>): Locator {
     // Start with all table rows

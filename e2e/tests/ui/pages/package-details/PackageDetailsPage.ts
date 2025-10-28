@@ -10,7 +10,10 @@ export class PackageDetailsPage {
     this._layout = layout;
   }
 
-  static async build(page: Page, packageDetail: Record<string, string>) {
+  static async build(
+    page: Page,
+    packageDetail: { Name: string; Version?: string },
+  ) {
     const navigation = await Navigation.build(page);
     await navigation.goToSidebar("Packages");
 

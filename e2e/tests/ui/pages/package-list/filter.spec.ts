@@ -10,7 +10,6 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
-  //here
   test("Filters", async ({ page }) => {
     const listPage = await PackageListPage.build(page);
 
@@ -20,7 +19,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     // Full search
     await toolbar.applyTextFilter("Filter text", "keycloak-core");
     await table.waitUntilDataIsLoaded();
-    let tableRow = await table.getRowsByCellValue({
+    let tableRow = table.getRowsByCellValue({
       Name: "keycloak-core",
       Version: "18.0.6.redhat-00001",
     });
@@ -29,7 +28,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     // Type filter
     await toolbar.applyMultiSelectFilter("Type", ["Maven", "RPM"]);
     await table.waitUntilDataIsLoaded();
-    tableRow = await table.getRowsByCellValue({
+    tableRow = table.getRowsByCellValue({
       Name: "keycloak-core",
       Version: "18.0.6.redhat-00001",
     });

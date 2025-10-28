@@ -11,7 +11,6 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
-  //here
   test("Columns", async ({ page }) => {
     const listPage = await PackageListPage.build(page);
 

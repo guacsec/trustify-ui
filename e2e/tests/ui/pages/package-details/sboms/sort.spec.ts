@@ -10,7 +10,6 @@ test.describe("Sort validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
-  //here
   test("Sort", async ({ page }) => {
     const sbomTab = await SbomsTab.build(page, {
       Name: "keycloak-core",

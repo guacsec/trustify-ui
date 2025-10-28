@@ -14,7 +14,10 @@ export class SbomsTab {
   }
 
   static async build(page: Page, packageDetail: Record<string, string>) {
-    const detailsPage = await PackageDetailsPage.build(page, packageDetail);
+    const detailsPage = await PackageDetailsPage.build(page, {
+      Name: packageDetail.Name,
+      Version: packageDetail.Version,
+    });
     await detailsPage._layout.selectTab("SBOMs using package");
 
     return new SbomsTab(page, detailsPage);
