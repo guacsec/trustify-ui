@@ -313,10 +313,10 @@ export class ToolbarTable {
       fail("Given header not found");
     }
     for (const data of dataRow) {
-      if (data[index] !== ``) {
-        row += 1;
+      if (data[index] != null && data[index] !== ``) {
         break;
       }
+      row += 1;
     }
     const isDate = this.isValidDate(dataRow[row][index]);
     const isCVSS = this.isCVSS(dataRow[row][index]);
@@ -419,7 +419,8 @@ export class ToolbarTable {
       if (sort === sortOrder) {
         return true;
       } else {
-        await headerElem.getByRole("button").click();
+        await headerElem.getByRole("button", { name: columnHeader }).click();
+        await this.waitForTableContent();
       }
     }
     return false;
