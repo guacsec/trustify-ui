@@ -11,14 +11,18 @@ test.describe.skip("Pagination validations", { tag: "@tier1" }, () => {
   });
 
   test("Navigation button validations", async ({ page }) => {
-    const sbomTab = await SbomsTab.build(page, "keycloak-core");
+    const sbomTab = await SbomsTab.build(page, {
+      Name: "keycloak-core",
+    });
     const pagination = await sbomTab.getPagination();
 
     await pagination.validatePagination();
   });
 
   test("Items per page validations", async ({ page }) => {
-    const sbomTab = await SbomsTab.build(page, "keycloak-core");
+    const sbomTab = await SbomsTab.build(page, {
+      Name: "keycloak-core",
+    });
 
     const pagination = await sbomTab.getPagination();
     const table = await sbomTab.getTable();

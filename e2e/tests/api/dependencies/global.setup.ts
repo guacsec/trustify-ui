@@ -31,10 +31,12 @@ const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
   const uploads = files.map((e) => {
     const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
     fs.statSync(filePath); // Verify file exists
-
     const fileStream = fs.createReadStream(filePath);
+    const contentType = e.endsWith(".bz2")
+      ? "application/json+bzip2"
+      : "application/json";
     return axios.post("/api/v2/sbom", fileStream, {
-      headers: { "Content-Type": "application/json+bzip2" },
+      headers: { "Content-Type": contentType },
     });
   });
 
@@ -45,10 +47,12 @@ const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
   const uploads = files.map((e) => {
     const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
     fs.statSync(filePath); // Verify file exists
-
     const fileStream = fs.createReadStream(filePath);
+    const contentType = e.endsWith(".bz2")
+      ? "application/json+bzip2"
+      : "application/json";
     return axios.post("/api/v2/advisory", fileStream, {
-      headers: { "Content-Type": "application/json+bzip2" },
+      headers: { "Content-Type": contentType },
     });
   });
 
