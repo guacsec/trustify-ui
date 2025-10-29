@@ -9,7 +9,6 @@ test.describe("Info Tab validations", { tag: "@tier1" }, () => {
     await login(page);
   });
 
-  // here
   test("Info", async ({ page }) => {
     await PackageDetailsPage.build(page, {
       Name: "keycloak-core",

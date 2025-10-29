@@ -117,7 +117,7 @@ export const verifyChildElementsText = async (
   }
 
   // Verify all expected values are present
-  await expect
+  expect
     .soft(
       missing.length === 0,
       missing.length > 0
