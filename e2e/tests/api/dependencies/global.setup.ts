@@ -27,34 +27,69 @@ setup.describe("Ingest initial data", () => {
   });
 });
 
-const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
+/**
+ * Get the asset configuration for the given asset type
+ * @param assetType
+ * @returns { assetPath: string, endpoint: string, displayName: string } for the given asset type
+ * @throws { Error } if the asset type is unknown
+ */
+const getAssetConfig = (
+  assetType: string,
+): { assetPath: string; endpoint: string; displayName: string } => {
+  if (assetType === "sbom") {
+    return {
+      assetPath: "../../common/assets/sbom/",
+      endpoint: "/api/v2/sbom",
+      displayName: "SBOM",
+    };
+  } else if (assetType === "advisory") {
+    return {
+      assetPath: "../../common/assets/csaf/",
+      endpoint: "/api/v2/advisory",
+      displayName: "Advisory",
+    };
+  } else {
+    throw new Error(`Unknown asset type: ${assetType}`);
+  }
+};
+
+/**
+ * Common upload function with individual file status tracking
+ * @param axios - Axios instance for making HTTP requests
+ * @param files - Array of file names to upload
+ * @param assetPath - Relative path to the asset directory
+ * @param endpoint - API endpoint to upload to
+ * @param displayName - Human-readable name for logging
+ */
+const uploadFiles = async (
+  axios: AxiosInstance,
+  files: string[],
+  assetType: string,
+) => {
+  const { assetPath, endpoint, displayName } = getAssetConfig(assetType);
+  for (const fileName of files) {
+    const filePath = path.join(__dirname, assetPath, fileName);
     fs.statSync(filePath); // Verify file exists
     const fileStream = fs.createReadStream(filePath);
-    const contentType = e.endsWith(".bz2")
+    const contentType = fileName.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
-    return axios.post("/api/v2/sbom", fileStream, {
-      headers: { "Content-Type": contentType },
-    });
-  });
+    await axios
+      .post(endpoint, fileStream, {
+        headers: { "Content-Type": contentType },
+      })
+      .catch((error) => {
+        logger.error(
+          `${displayName} upload failed: ${fileName} - ${error.message}`,
+        );
+      });
+  }
+};
 
-  await Promise.all(uploads);
+const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
+  await uploadFiles(axios, files, "sbom");
 };
 
 const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
-    fs.statSync(filePath); // Verify file exists
-    const fileStream = fs.createReadStream(filePath);
-    const contentType = e.endsWith(".bz2")
-      ? "application/json+bzip2"
-      : "application/json";
-    return axios.post("/api/v2/advisory", fileStream, {
-      headers: { "Content-Type": contentType },
-    });
-  });
-
-  await Promise.all(uploads);
+  await uploadFiles(axios, files, "advisory");
 };
