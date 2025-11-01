@@ -46,9 +46,9 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.84.1",
-    "@rsbuild/core": "^1.5.11",
-    "@rsbuild/plugin-react": "^1.4.0",
+    "@hey-api/openapi-ts": "^0.86.11",
+    "@rsbuild/core": "^1.6.0",
+    "@rsbuild/plugin-react": "^1.4.1",
     "@rsbuild/plugin-type-check": "^1.2.4",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
