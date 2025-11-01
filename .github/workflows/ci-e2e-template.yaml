@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
@@ -125,7 +125,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
