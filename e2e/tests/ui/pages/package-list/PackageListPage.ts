@@ -19,7 +19,9 @@ export class PackageListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "package-toolbar");
+    const t = await Toolbar.build<{name: string, surname: number}>(this._page, "package-toolbar");
+    t.someMethod("name");
+    return await Toolbar.build<{name: string, surname: number}>(this._page, "package-toolbar");
   }
 
   async getTable() {

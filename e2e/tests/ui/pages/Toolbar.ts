@@ -1,10 +1,17 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-export class Toolbar {
+type TFilterValue = string | number | Date;
+
+export class Toolbar<
+  TFilter extends Record<string, TFilterValue>,
+> {
   private readonly _page: Page;
   _toolbar: Locator;
 
-  private constructor(page: Page, toolbar: Locator) {
+  private constructor(
+    page: Page,
+    toolbar: Locator,
+  ) {
     this._page = page;
     this._toolbar = toolbar;
   }
@@ -14,17 +21,20 @@ export class Toolbar {
    * @param toolbarAriaLabel the unique aria-label that corresponds to the DOM element that contains the Toolbar. E.g. <div aria-label="identifier"></div>
    * @returns a new instance of a Toolbar
    */
-  static async build(page: Page, toolbarAriaLabel: string) {
+  static async build<TFilter extends Record<string, TFilterValue>>(
+    page: Page,
+    toolbarAriaLabel: string,
+  ) {
     const toolbar = page.locator(`[aria-label="${toolbarAriaLabel}"]`);
     await expect(toolbar).toBeVisible();
-    return new Toolbar(page, toolbar);
+    return new Toolbar<TFilter>(page, toolbar);
   }
 
   /**
    * Selects the main filter to be applied
    * @param filterName the name of the filter as rendered in the UI
    */
-  async selectFilter(filterName: string) {
+  async selectFilter<TFilterName extends Extract<keyof TFilter, string>>(filterName: TFilterName) {
     await this._toolbar
       .locator(".pf-m-toggle-group button.pf-v6-c-menu-toggle")
       .click();
@@ -47,7 +57,7 @@ export class Toolbar {
     }
   }
 
-  async applyTextFilter(filterName: string, filterValue: string) {
+  async applyTextFilter(filterName: TFilterName, filterValue: string) {
     await this.selectFilter(filterName);
 
     await this._toolbar.getByRole("textbox").fill(filterValue);
@@ -57,7 +67,7 @@ export class Toolbar {
   }
 
   async applyDateRangeFilter(
-    filterName: string,
+    filterName: TFilterName,
     fromDate: string,
     toDate: string,
   ) {
@@ -73,7 +83,7 @@ export class Toolbar {
     await this.assertFilterHasLabels(filterName, [fromDate, toDate]);
   }
 
-  async applyMultiSelectFilter(filterName: string, selections: string[]) {
+  async applyMultiSelectFilter(filterName: TFilterName, selections: string[]) {
     await this.selectFilter(filterName);
 
     for (const option of selections) {
@@ -94,7 +104,7 @@ export class Toolbar {
     await this.assertFilterHasLabels(filterName, selections);
   }
 
-  async applyLabelsFilter(filterName: string, labels: string[]) {
+  async applyLabelsFilter(filterName: TFilterName, labels: string[]) {
     await this.selectFilter(filterName);
 
     for (const label of labels) {
