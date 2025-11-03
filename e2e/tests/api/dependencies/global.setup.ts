@@ -29,13 +29,13 @@ setup.describe("Ingest initial data", () => {
 
 // TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  files.reduce(async (prev, next) => {
+  files.reduce(async (prev, e) => {
     await prev;
 
-    const filePath = path.join(__dirname, `../../common/assets/sbom/${next}`);
+    const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
     fs.statSync(filePath); // Verify file exists
     const fileStream = fs.createReadStream(filePath);
-    const contentType = next.endsWith(".bz2")
+    const contentType = e.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
 
@@ -47,13 +47,13 @@ const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
 
 // TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
-  files.reduce(async (prev, next) => {
+  files.reduce(async (prev, e) => {
     await prev;
 
-    const filePath = path.join(__dirname, `../../common/assets/csaf/${next}`);
+    const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
     fs.statSync(filePath); // Verify file exists
     const fileStream = fs.createReadStream(filePath);
-    const contentType = next.endsWith(".bz2")
+    const contentType = e.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
 
