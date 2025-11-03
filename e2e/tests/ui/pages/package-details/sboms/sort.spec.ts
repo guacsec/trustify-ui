@@ -11,7 +11,10 @@ test.describe("Sort validations", { tag: "@tier1" }, () => {
   });
 
   test("Sort", async ({ page }) => {
-    const sbomTab = await SbomsTab.build(page, "keycloak-core");
+    const sbomTab = await SbomsTab.build(page, {
+      Name: "keycloak-core",
+      Version: "18.0.6.redhat-00001",
+    });
     const table = await sbomTab.getTable();
 
     const columnNameSelector = table._table.locator(`td[data-label="Name"]`);

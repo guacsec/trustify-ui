@@ -26,18 +26,18 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await expect(
       table._table
         .locator(`td[data-label="Vulnerabilities"]`)
-        .locator("div[aria-label='total']", { hasText: "11" }),
+        .locator("div[aria-label='total']", { hasText: "16" }),
     ).toHaveCount(1);
 
     // Severities
     const expectedVulnerabilities = [
       {
         severity: "high",
-        count: 1,
+        count: 2,
       },
       {
         severity: "medium",
-        count: 10,
+        count: 14,
       },
     ];
 
