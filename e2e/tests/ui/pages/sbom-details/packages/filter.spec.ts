@@ -22,7 +22,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
 
     // Labels filter
     await toolbar.applyMultiSelectFilter("License", [
-      "Apache-2.0",
+      "APACHE-2.0",
       "NOASSERTION",
     ]);
     await table.waitUntilDataIsLoaded();

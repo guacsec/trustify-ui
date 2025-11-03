@@ -27,9 +27,8 @@ setup.describe("Ingest initial data", () => {
   });
 });
 
-// TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  files.reduce(async (prev, e) => {
+  await files.reduce(async (prev, e) => {
     await prev;
 
     const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
@@ -45,9 +44,8 @@ const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
   }, Promise.resolve());
 };
 
-// TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
-  files.reduce(async (prev, e) => {
+  await files.reduce(async (prev, e) => {
     await prev;
 
     const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
