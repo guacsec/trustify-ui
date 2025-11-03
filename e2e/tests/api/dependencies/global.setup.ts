@@ -27,34 +27,38 @@ setup.describe("Ingest initial data", () => {
   });
 });
 
+// TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadSboms = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/sbom/${e}`);
+  files.reduce(async (prev, next) => {
+    await prev;
+
+    const filePath = path.join(__dirname, `../../common/assets/sbom/${next}`);
     fs.statSync(filePath); // Verify file exists
     const fileStream = fs.createReadStream(filePath);
-    const contentType = e.endsWith(".bz2")
+    const contentType = next.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
+
     return axios.post("/api/v2/sbom", fileStream, {
       headers: { "Content-Type": contentType },
     });
-  });
-
-  await Promise.all(uploads);
+  }, Promise.resolve());
 };
 
+// TODO once the backend is stable the upload should be done in parallel and not serial
 const uploadAdvisories = async (axios: AxiosInstance, files: string[]) => {
-  const uploads = files.map((e) => {
-    const filePath = path.join(__dirname, `../../common/assets/csaf/${e}`);
+  files.reduce(async (prev, next) => {
+    await prev;
+
+    const filePath = path.join(__dirname, `../../common/assets/csaf/${next}`);
     fs.statSync(filePath); // Verify file exists
     const fileStream = fs.createReadStream(filePath);
-    const contentType = e.endsWith(".bz2")
+    const contentType = next.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
+
     return axios.post("/api/v2/advisory", fileStream, {
       headers: { "Content-Type": contentType },
     });
-  });
-
-  await Promise.all(uploads);
+  }, Promise.resolve());
 };
