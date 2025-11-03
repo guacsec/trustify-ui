@@ -37,10 +37,14 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       },
       {
         severity: "medium",
-        count: 13,
+        count: 12,
       },
       {
         severity: "low",
+        count: 1,
+      },
+      {
+        severity: "none",
         count: 1,
       },
     ];
