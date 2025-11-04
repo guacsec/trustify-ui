@@ -19,9 +19,12 @@ export class PackageListPage {
   }
 
   async getToolbar() {
-    const t = await Toolbar.build<{name: string, surname: number}>(this._page, "package-toolbar");
-    t.someMethod("name");
-    return await Toolbar.build<{name: string, surname: number}>(this._page, "package-toolbar");
+    return await Toolbar.build(this._page, "package-toolbar", {
+      "Filter text": "string",
+      Type: "multiSelect",
+      Architecture: "multiSelect",
+      License: "multiSelect",
+    });
   }
 
   async getTable() {

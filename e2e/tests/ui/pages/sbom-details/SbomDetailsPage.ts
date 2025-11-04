@@ -18,7 +18,7 @@ export class SbomDetailsPage {
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
-    await toolbar.applyTextFilter("Filter text", sbomName);
+    await toolbar.applyFilter({ "Filter text": sbomName });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("Name", sbomName);
 
