@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/start-trustify
         with:
           ui_image: ${{ inputs.ui_image }}
-          server_image: ${{ inputs.server_image }}
+          server_image: ghcr.io/guacsec/trustd:0.4.0
           server_db_image: ${{ inputs.server_db_image }}
 
       - name: trustify-ui - start in dev mode

@@ -76,4 +76,4 @@ jobs:
     with:
       artifact: trustify-ui
       ui_image: ghcr.io/guacsec/trustify-ui:pr-test
-      server_image: ghcr.io/guacsec/trustd:${{ needs.discover-envs-for-e2e-ci.outputs.image_tag }}
+      server_image: ghcr.io/guacsec/trustd:0.4.0
