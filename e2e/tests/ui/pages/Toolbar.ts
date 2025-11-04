@@ -76,6 +76,8 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
       Extract<keyof TFilter, string>
     >) {
       const filterValue = filters[filterName];
+      if (!filterValue) continue;
+
       const filterType = this._filters[filterName];
 
       await this.selectFilter(filterName);
