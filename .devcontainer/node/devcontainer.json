@@ -1,0 +1,15 @@
+{
+  "name": "trustify-ui",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "trustify-ui",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [
+    3000
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  }
+}
