@@ -1,0 +1,11 @@
+services:
+  playwright:
+    image: localhost/devcontainer-trustify-e2e:latest
+    build:
+      dockerfile: ./Dockerfile
+    security_opt:
+      - "label=disable"
+    userns_mode: "keep-id"
+    network_mode: host
+    volumes:
+      - ../..:/workspace:cached
