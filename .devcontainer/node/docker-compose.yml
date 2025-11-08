@@ -13,7 +13,7 @@ services:
     environment:
       TRUSTIFY_API_URL: http://trustify:8080
       OIDC_SERVER_URL: http://localhost:9090/realms/trustify
-    command: tail -f /dev/null
+    command: /bin/sh -c "while sleep 1000; do :; done"
     volumes:
       - ../..:/workspace:cached
     networks:

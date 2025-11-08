@@ -7,5 +7,6 @@ services:
       - "label=disable"
     userns_mode: "keep-id"
     network_mode: host
+    command: /bin/sh -c "while sleep 1000; do :; done"
     volumes:
       - ../..:/workspace:cached
