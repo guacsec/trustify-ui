@@ -1,7 +1,9 @@
 import { test as base } from "playwright-bdd";
-import { expect, type Page, type TestInfo } from "@playwright/test";
+import type { Page, TestInfo } from "@playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+
+import { expect } from "./fixtures/PaginationMatchers";
 
 // Istanbul coverage data interface
 interface IstanbulCoverage {
