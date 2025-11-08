@@ -26,5 +26,21 @@
     "5901": {
       "label": "real vnc"
     }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-playwright.playwright",
+        "alexkrechik.cucumberautocomplete"
+      ],
+      "settings": {
+        "git.alwaysSignOff": true,
+        "cucumberautocomplete.steps": [
+          "tests/ui/features/@*/*.step.ts",
+          "tests/ui/steps/*.ts"
+        ],
+        "cucumberautocomplete.strictGherkinCompletion": true
+      }
+    }
   }
 }
