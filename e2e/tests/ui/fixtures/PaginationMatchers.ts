@@ -2,7 +2,7 @@ import { expect as baseExpect } from "@playwright/test";
 import type { Pagination } from "../pages/Pagination";
 import type { MatcherResult } from "./types";
 
-interface PaginationMatchers {
+export interface PaginationMatchers {
   toBeFirstPage(): Promise<MatcherResult>;
   toHaveNextPage(): Promise<MatcherResult>;
   toHavePreviousPage(): Promise<MatcherResult>;
@@ -14,7 +14,7 @@ type PaginationMatcherDefinitions = {
   ) => Promise<MatcherResult>;
 };
 
-const paginationTests = baseExpect.extend<PaginationMatcherDefinitions>({
+export const paginationTests = baseExpect.extend<PaginationMatcherDefinitions>({
   toBeFirstPage: async (pagination: Pagination) => {
     try {
       // Verify that previous buttons are disabled being on the first page
@@ -28,7 +28,9 @@ const paginationTests = baseExpect.extend<PaginationMatcherDefinitions>({
       await baseExpect(firstPageButton).toBeVisible();
       await baseExpect(firstPageButton).toBeDisabled();
 
-      await expect(pagination).not.toHavePreviousPage();
+      // Verify previous pages are disabled as it is the first page
+      const isPreviousPageEnabled = false;
+      await verifyPreviousPage(pagination, isPreviousPageEnabled);
 
       return {
         pass: true,
@@ -66,16 +68,8 @@ const paginationTests = baseExpect.extend<PaginationMatcherDefinitions>({
   },
   toHavePreviousPage: async (pagination: Pagination) => {
     try {
-      // Verify that previous buttons are enabled after moving to next page
-      const prevPageButton = pagination.getPreviousPageButton();
-      await baseExpect(prevPageButton).toBeVisible();
-      await baseExpect(prevPageButton).not.toBeDisabled();
-
-      // Verify that navigation button to first page is enabled after moving to next page
-      const firstPageButton = pagination.getFirstPageButton();
-      await baseExpect(firstPageButton).toBeVisible();
-      await baseExpect(firstPageButton).not.toBeDisabled();
-
+      const isPreviousPageEnabled = true;
+      await verifyPreviousPage(pagination, isPreviousPageEnabled);
       return {
         pass: true,
         message: () => "Has previous page",
@@ -89,19 +83,26 @@ const paginationTests = baseExpect.extend<PaginationMatcherDefinitions>({
   },
 });
 
-// Type that includes both matchers and the 'not' property for type safety
-type PaginationMatchersWithNot = PaginationMatchers & {
-  not: PaginationMatchers;
+/**
+ * @param isEnabled if true then it verifies whether or not the "previous" page is enabled
+ */
+const verifyPreviousPage = async (
+  pagination: Pagination,
+  isEnabled: boolean,
+) => {
+  // Verify that "previous" button
+  const prevPageButton = pagination.getPreviousPageButton();
+  await baseExpect(prevPageButton).toBeVisible();
+  await (isEnabled
+    ? baseExpect(prevPageButton)
+    : baseExpect(prevPageButton).not
+  ).toBeEnabled();
+
+  // Verify that "go to first page" button
+  const firstPageButton = pagination.getFirstPageButton();
+  await baseExpect(firstPageButton).toBeVisible();
+  await (isEnabled
+    ? baseExpect(firstPageButton)
+    : baseExpect(firstPageButton).not
+  ).toBeEnabled();
 };
-
-// Enforce type safety
-function expect(actual: Pagination): PaginationMatchersWithNot;
-function expect<T>(actual: T): ReturnType<typeof paginationTests>;
-function expect<T>(
-  actual: T,
-): PaginationMatchersWithNot | ReturnType<typeof paginationTests> {
-  return paginationTests(actual) as unknown as PaginationMatchersWithNot &
-    ReturnType<typeof paginationTests>;
-}
-
-export { expect };
