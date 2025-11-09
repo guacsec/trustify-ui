@@ -44,7 +44,10 @@ function isTypeaheadFilter<K extends string, T extends Record<K, TFilterValue>>(
   return type === "typeahead";
 }
 
-export class Toolbar<TFilter extends Record<string, TFilterValue>> {
+export class Toolbar<
+  TFilter extends Record<string, TFilterValue>,
+  TFilterName extends Extract<keyof TFilter, string>,
+> {
   private readonly _page: Page;
   _toolbar: Locator;
   private readonly _filters: TFilter;
@@ -72,9 +75,7 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
   }
 
   async applyFilter(filters: Partial<FilterValueType<TFilter>>) {
-    for (const filterName of Object.keys(filters) as Array<
-      Extract<keyof TFilter, string>
-    >) {
+    for (const filterName of Object.keys(filters) as Array<TFilterName>) {
       const filterValue = filters[filterName];
       if (!filterValue) continue;
 
@@ -93,18 +94,17 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
     }
   }
 
-  private async applyTextFilter<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName, filterValue: string) {
+  private async applyTextFilter(filterName: TFilterName, filterValue: string) {
     await this._toolbar.getByRole("textbox").fill(filterValue);
     await this._page.keyboard.press("Enter");
 
     await this.assertFilterHasLabels(filterName, filterValue);
   }
 
-  private async applyDateRangeFilter<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName, dateRange: TDateRange) {
+  private async applyDateRangeFilter(
+    filterName: TFilterName,
+    dateRange: TDateRange,
+  ) {
     await this._toolbar
       .locator("input[aria-label='Interval start']")
       .fill(dateRange.from);
@@ -118,9 +118,10 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
     ]);
   }
 
-  private async applyMultiSelectFilter<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName, selections: string[]) {
+  private async applyMultiSelectFilter(
+    filterName: TFilterName,
+    selections: string[],
+  ) {
     for (const option of selections) {
       const inputText = this._toolbar.locator(
         "input[aria-label='Type to filter']",
@@ -139,9 +140,10 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
     await this.assertFilterHasLabels(filterName, selections);
   }
 
-  private async applyTypeaheadFilter<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName, labels: string[]) {
+  private async applyTypeaheadFilter(
+    filterName: TFilterName,
+    labels: string[],
+  ) {
     for (const label of labels) {
       await this._toolbar
         .locator("input[aria-label='select-autocomplete-listbox']")
@@ -159,18 +161,17 @@ export class Toolbar<TFilter extends Record<string, TFilterValue>> {
    * Selects the main filter to be applied
    * @param filterName the name of the filter as rendered in the UI
    */
-  private async selectFilter<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName) {
+  private async selectFilter(filterName: TFilterName) {
     await this._toolbar
       .locator(".pf-m-toggle-group button.pf-v6-c-menu-toggle")
       .click();
     await this._page.getByRole("menuitem", { name: filterName }).click();
   }
 
-  private async assertFilterHasLabels<
-    TFilterName extends Extract<keyof TFilter, string>,
-  >(filterName: TFilterName, filterValue: string | string[]) {
+  private async assertFilterHasLabels(
+    filterName: TFilterName,
+    filterValue: string | string[],
+  ) {
     await expect(
       this._toolbar.locator(".pf-m-label-group", { hasText: filterName }),
     ).toBeVisible();
