@@ -16,6 +16,22 @@ export class Pagination {
     return new Pagination(page, pagination);
   }
 
+  getFirstPageButton() {
+    return this._pagination.locator("button[data-action='first']");
+  }
+
+  getPreviousPageButton() {
+    return this._pagination.locator("button[data-action='previous']");
+  }
+
+  getNextPageButton() {
+    return this._pagination.locator("button[data-action='next']");
+  }
+
+  getLastPageButton() {
+    return this._pagination.locator("button[data-action='last']");
+  }
+
   /**
    * Selects Number of rows per page on the table
    * @param perPage Number of rows
@@ -31,6 +47,9 @@ export class Pagination {
     await expect(this._pagination.locator("input")).toHaveValue("1");
   }
 
+  /**
+   * @deprecated use fixtures/PaginationMatchers instead
+   */
   async validatePagination() {
     // Verify next buttons are enabled as there are more than 11 rows present
     const nextPageButton = this._pagination.locator(
@@ -75,6 +94,7 @@ export class Pagination {
     await firstPageButton.click();
   }
 
+  // TODO: This seems not belonging here. This matches two entities: Pagination and Table so cannot moved to fixtures/PaginationMatchers.ts. Needs refactoring.
   async validateItemsPerPage(columnName: string, table: Table) {
     // Verify that only 10 items are displayed
     await this.selectItemsPerPage(10);
