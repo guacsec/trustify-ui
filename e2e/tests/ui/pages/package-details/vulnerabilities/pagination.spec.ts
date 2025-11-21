@@ -11,20 +11,18 @@ test.describe.skip("Pagination validations", { tag: "@tier1" }, () => {
   });
 
   test("Navigation button validations", async ({ page }) => {
-    const vulnerabilitiesTab = await VulnerabilitiesTab.build(
-      page,
-      "keycloak-core",
-    );
+    const vulnerabilitiesTab = await VulnerabilitiesTab.build(page, {
+      Name: "keycloak-core",
+    });
     const pagination = await vulnerabilitiesTab.getPagination();
 
     await pagination.validatePagination();
   });
 
   test("Items per page validations", async ({ page }) => {
-    const vulnerabilitiesTab = await VulnerabilitiesTab.build(
-      page,
-      "keycloak-core",
-    );
+    const vulnerabilitiesTab = await VulnerabilitiesTab.build(page, {
+      Name: "keycloak-core",
+    });
 
     const pagination = await vulnerabilitiesTab.getPagination();
     const table = await vulnerabilitiesTab.getTable();

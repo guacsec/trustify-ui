@@ -13,8 +13,11 @@ export class VulnerabilitiesTab {
     this._detailsPage = layout;
   }
 
-  static async build(page: Page, packageName: string) {
-    const detailsPage = await PackageDetailsPage.build(page, packageName);
+  static async build(page: Page, packageDetail: Record<string, string>) {
+    const detailsPage = await PackageDetailsPage.build(page, {
+      Name: packageDetail.Name,
+      Version: packageDetail.Version,
+    });
     await detailsPage._layout.selectTab("Vulnerabilities");
 
     return new VulnerabilitiesTab(page, detailsPage);
