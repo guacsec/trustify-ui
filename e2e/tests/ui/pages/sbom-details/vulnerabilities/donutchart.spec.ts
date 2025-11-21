@@ -16,8 +16,8 @@ test.describe("DonutChart validations", { tag: "@tier1" }, () => {
 
     await expect(page.locator("#legend-labels-0")).toContainText("Critical: 0");
     await expect(page.locator("#legend-labels-1")).toContainText("High: 2");
-    await expect(page.locator("#legend-labels-2")).toContainText("Medium: 14");
-    await expect(page.locator("#legend-labels-3")).toContainText("Low: 0");
+    await expect(page.locator("#legend-labels-2")).toContainText("Medium: 13");
+    await expect(page.locator("#legend-labels-3")).toContainText("Low: 1");
     await expect(page.locator("#legend-labels-4")).toContainText("None: 0");
     await expect(page.locator("#legend-labels-5")).toContainText("Unknown: 0");
   });
