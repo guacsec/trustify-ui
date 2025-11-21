@@ -65,4 +65,4 @@ const readDirectoryRecursively = async (dir: string) => {
   }
 
   return result;
-}
+};
