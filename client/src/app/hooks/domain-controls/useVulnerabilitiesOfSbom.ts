@@ -89,8 +89,14 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
           (item) => !areVulnerabilityOfSbomEqual(item, existingElement),
         );
 
+        const vulnerabilityWithHighestScore =
+          existingElement.vulnerability.average_score >
+          current.vulnerability.average_score
+            ? existingElement
+            : current;
+
         const updatedItemInArray: VulnerabilityOfSbom = {
-          ...existingElement,
+          ...vulnerabilityWithHighestScore,
           relatedPackages: [
             ...existingElement.relatedPackages,
             {
