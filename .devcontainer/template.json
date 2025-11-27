@@ -1,24 +1,23 @@
 {
-  "name": "trustify-e2e",
-  "dockerComposeFile": "./docker-compose.yml",
-  "service": "playwright",
-  "workspaceFolder": "/workspace/e2e",
-  "remoteUser": "pwuser",
-  "forwardPorts": [
-    6080,
-    5901
+  "name": "playwright",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/trustify-ui/e2e",
+  "runArgs": [
+    "--privileged",
+    "--userns=keep-id",
+    "--network=host",
+    "--add-host=${HOSTNAME}:127.0.0.1",
+    "-e DISPLAY=:2"
   ],
+  "remoteUser": "pwuser",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "username": "pwuser"
-    },
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "22"
-    },
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "VNC_RESOLUTION": "1920x1200x16"
     }
   },
+  "forwardPorts": [6080, 5901],
   "portsAttributes": {
     "6080": {
       "label": "browser vnc"
@@ -34,12 +33,11 @@
         "alexkrechik.cucumberautocomplete"
       ],
       "settings": {
-        "git.alwaysSignOff": true,
         "cucumberautocomplete.steps": [
           "tests/ui/features/@*/*.step.ts",
           "tests/ui/steps/*.ts"
         ],
-        "cucumberautocomplete.strictGherkinCompletion": true
+        "cucumberautocomplete.strictGherkinCompletion": true  
       }
     }
   }
