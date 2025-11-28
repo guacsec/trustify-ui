@@ -19,7 +19,12 @@ export class SbomListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "sbom-toolbar");
+    return await Toolbar.build(this._page, "sbom-toolbar", {
+      "Filter text": "string",
+      "Created on": "dateRange",
+      Label: "typeahead",
+      License: "multiSelect",
+    });
   }
 
   async getTable() {

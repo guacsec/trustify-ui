@@ -18,7 +18,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const table = await packageTab.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "commons-compress");
+    await toolbar.applyFilter({ "Filter text": "commons-compress" });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("Name", "commons-compress");
 
