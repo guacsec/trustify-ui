@@ -81,9 +81,15 @@ export const Overview: React.FC<InfoProps> = ({ sbom }) => {
                   </DescriptionListDescription>
                 </DescriptionListGroup>
                 <DescriptionListGroup>
-                  <DescriptionListTerm>Creator</DescriptionListTerm>
-                  <DescriptionListDescription aria-label="SBOM's creator">
-                    {sbom.suppliers}
+                  <DescriptionListTerm>Supplier</DescriptionListTerm>
+                  <DescriptionListDescription aria-label="SBOM's supplier">
+                    {sbom.suppliers.join(", ")}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Author</DescriptionListTerm>
+                  <DescriptionListDescription aria-label="SBOM's author">
+                    {sbom.authors.join(", ")}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
