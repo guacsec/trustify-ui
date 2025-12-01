@@ -7,6 +7,7 @@ import {
   type ToolbarLabel,
   type ToolbarLabelGroup,
   Tooltip,
+  isValidDate,
   isValidDate as isValidJSDate,
 } from "@patternfly/react-core";
 
@@ -115,6 +116,11 @@ export const DateRangeFilter = <TItem,>({
     }
   };
 
+  const toValidator = (date: Date) =>
+    from && isValidDate(from) && date >= from
+      ? ""
+      : 'The "to" date must be after the "from" date';
+
   return (
     <ToolbarFilter
       key={category.categoryKey}
@@ -132,8 +138,7 @@ export const DateRangeFilter = <TItem,>({
           onChange={onFromDateChange}
           aria-label="Interval start"
           placeholder="MM/DD/YYYY"
-          // disable error text (no space in toolbar scenario)
-          invalidFormatText={""}
+          invalidFormatText={"Invalid date"}
           // default value ("parent") creates collision with sticky table header
           appendTo={document.body}
           isDisabled={isDisabled}
@@ -144,9 +149,9 @@ export const DateRangeFilter = <TItem,>({
           isDisabled={isDisabled || !isValidJSDate(from)}
           dateFormat={americanDateFormat}
           dateParse={parseAmericanDate}
-          // disable error text (no space in toolbar scenario)
-          invalidFormatText={""}
+          invalidFormatText={"Invalid date"}
           rangeStart={from}
+          validators={[toValidator]}
           aria-label="Interval end"
           placeholder="MM/DD/YYYY"
           appendTo={document.body}
