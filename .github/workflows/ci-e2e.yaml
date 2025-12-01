@@ -20,7 +20,7 @@ jobs:
   build-and-upload-for-e2e-ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: save trustify-ui image
         run: |
