@@ -44,7 +44,9 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       table._table.locator(`td[data-label="Licenses"]`),
     ).toContainText("2 Licenses");
 
-    await table._table.locator(`td[data-label="Licenses"]`).click();
+    await table._table
+      .locator(`td[data-label="Licenses"] button[aria-expanded]`)
+      .click();
 
     await expect(
       table._table
