@@ -217,7 +217,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                     </Td>
                     <Td
                       width={20}
-                      modifier="breakWord"
+                      modifier="truncate"
                       {...getTdProps({
                         columnKey: "licenses",
                         isCompoundExpandToggle: item.licenses.length > 1,
