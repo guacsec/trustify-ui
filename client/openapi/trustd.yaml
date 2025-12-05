@@ -5,7 +5,7 @@ info:
   license:
     name: Apache License, Version 2.0
     identifier: Apache-2.0
-  version: 0.4.4
+  version: 0.4.5
 paths:
   /.well-known/trustify:
     get:
@@ -519,7 +519,7 @@ paths:
           type: string
       responses:
         '200':
-          description: Retrieved component(s) located by name, pURL, or CPE
+          description: Retrieved component(s) located by an exact match of name, pURL, or CPE
           content:
             application/json:
               schema:
@@ -743,7 +743,7 @@ paths:
           type: string
       responses:
         '200':
-          description: Retrieved latest component(s) located by name, pURL, or CPE
+          description: Retrieved latest component(s) located by an exact match of name, pURL, or CPE
           content:
             application/json:
               schema:
@@ -3972,6 +3972,11 @@ components:
             - type: 'null'
             - $ref: '#/components/schemas/Relationship'
               description: The relationship the node has to it's containing node, if any.
+          warnings:
+            type: array
+            items:
+              type: string
+            description: Warnings when processing this node.
     OrganizationDetails:
       allOf:
       - $ref: '#/components/schemas/OrganizationHead'
@@ -4231,6 +4236,11 @@ components:
                   - type: 'null'
                   - $ref: '#/components/schemas/Relationship'
                     description: The relationship the node has to it's containing node, if any.
+                warnings:
+                  type: array
+                  items:
+                    type: string
+                  description: Warnings when processing this node.
         total:
           type: integer
           format: int64
