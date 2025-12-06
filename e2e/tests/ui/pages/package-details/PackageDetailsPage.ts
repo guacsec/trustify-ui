@@ -21,7 +21,7 @@ export class PackageDetailsPage {
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
-    await toolbar.applyTextFilter("Filter text", packageDetail.Name);
+    await toolbar.applyFilter({ "Filter text": packageDetail.Name });
     await table.waitUntilDataIsLoaded();
     // Get rows matching the package name
     const matchingRows = table.getRowsByCellValue(packageDetail);

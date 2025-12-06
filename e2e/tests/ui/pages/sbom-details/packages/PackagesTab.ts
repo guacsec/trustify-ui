@@ -21,7 +21,10 @@ export class PackagesTab {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "Package toolbar");
+    return await Toolbar.build(this._page, "Package toolbar", {
+      "Filter text": "string",
+      License: "multiSelect",
+    });
   }
 
   async getTable() {
