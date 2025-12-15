@@ -12,10 +12,10 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
   });
 
   test("Columns", async ({ page }) => {
-    const vulnerabilitiesTab = await VulnerabilitiesTab.build(
-      page,
-      "keycloak-core",
-    );
+    const vulnerabilitiesTab = await VulnerabilitiesTab.build(page, {
+      Name: "keycloak-core",
+      Version: "18.0.6.redhat-00001",
+    });
     const table = await vulnerabilitiesTab.getTable();
 
     const ids = await table._table

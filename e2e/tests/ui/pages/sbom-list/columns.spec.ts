@@ -18,7 +18,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const table = await listPage.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "quarkus-bom");
+    await toolbar.applyFilter({ "Filter text": "quarkus-bom" });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("Name", "quarkus-bom");
 
@@ -26,18 +26,22 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await expect(
       table._table
         .locator(`td[data-label="Vulnerabilities"]`)
-        .locator("div[aria-label='total']", { hasText: "11" }),
+        .locator("div[aria-label='total']", { hasText: "16" }),
     ).toHaveCount(1);
 
     // Severities
     const expectedVulnerabilities = [
       {
         severity: "high",
-        count: 1,
+        count: 2,
       },
       {
         severity: "medium",
-        count: 10,
+        count: 13,
+      },
+      {
+        severity: "low",
+        count: 1,
       },
     ];
 
