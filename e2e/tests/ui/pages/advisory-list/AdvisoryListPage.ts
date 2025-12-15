@@ -19,7 +19,11 @@ export class AdvisoryListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "advisory-toolbar");
+    return await Toolbar.build(this._page, "advisory-toolbar", {
+      "Filter text": "string",
+      Revision: "dateRange",
+      Label: "typeahead",
+    });
   }
 
   async getTable() {
