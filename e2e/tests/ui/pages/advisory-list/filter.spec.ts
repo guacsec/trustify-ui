@@ -16,17 +16,19 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     const table = await listPage.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "CVE-2024-26308");
+    await toolbar.applyFilter({ "Filter text": "CVE-2024-26308" });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("ID", "CVE-2024-26308");
 
     // Date filter
-    await toolbar.applyDateRangeFilter("Revision", "03/26/2025", "03/28/2025");
+    await toolbar.applyFilter({
+      Revision: { from: "03/26/2025", to: "03/28/2025" },
+    });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("ID", "CVE-2024-26308");
 
     // Labels filter
-    await toolbar.applyLabelsFilter("Label", ["type=cve"]);
+    await toolbar.applyFilter({ Label: ["type=cve"] });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("ID", "CVE-2024-26308");
   });

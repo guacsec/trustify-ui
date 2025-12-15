@@ -19,7 +19,12 @@ export class PackageListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "package-toolbar");
+    return await Toolbar.build(this._page, "package-toolbar", {
+      "Filter text": "string",
+      Type: "multiSelect",
+      Architecture: "multiSelect",
+      License: "multiSelect",
+    });
   }
 
   async getTable() {
