@@ -20,7 +20,7 @@ jobs:
   build-and-upload-for-e2e-ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: save trustify-ui image
         run: |
@@ -28,7 +28,7 @@ jobs:
           docker save -o /tmp/trustify-ui.tar ghcr.io/guacsec/trustify-ui:pr-test
 
       - name: Upload trustify-ui image as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: trustify-ui
           path: /tmp/trustify-ui.tar
