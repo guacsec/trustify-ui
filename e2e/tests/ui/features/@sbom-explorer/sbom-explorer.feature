@@ -23,7 +23,7 @@ Feature: SBOM Explorer - View SBOM details
         And "SBOM's namespace" is visible
         And "SBOM's license" is visible
         And "SBOM's creation date" is visible
-        And "SBOM's creator" is visible
+        And "SBOM's supplier" is visible
 
         Examples:
             | sbomName    |
