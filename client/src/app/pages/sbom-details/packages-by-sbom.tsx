@@ -220,17 +220,12 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       modifier="breakWord"
                       {...getTdProps({
                         columnKey: "licenses",
-                        isCompoundExpandToggle: item.licenses.length > 1,
+                        isCompoundExpandToggle: item.licenses.length > 0,
                         item: item,
                         rowIndex,
                       })}
                     >
-                      {item.licenses.length === 1
-                        ? renderLicenseWithMappings(
-                            item.licenses[0].license_name,
-                            item.licenses_ref_mapping,
-                          )
-                        : `${item.licenses.length} Licenses`}
+                      {item.licenses.length} Licenses
                     </Td>
                     <Td
                       width={20}
