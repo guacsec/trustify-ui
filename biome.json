@@ -40,6 +40,7 @@
       "!**/dist",
       "!**/node_modules",
       "!client/coverage",
+      "!client/index.html",
       "!client/src/app/client",
       "!**/common/assets"
     ]

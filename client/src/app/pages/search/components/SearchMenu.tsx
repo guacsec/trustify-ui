@@ -312,7 +312,6 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
   );
 
   const searchInput = (
-    // biome-ignore lint/correctness/useUniqueElementIds: allowed because <Popper /> requires query selector by id
     <SearchInput
       placeholder="Search for an SBOM, Package, Advisory, or Vulnerability"
       value={searchValue}
