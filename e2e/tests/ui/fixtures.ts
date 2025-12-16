@@ -1,18 +1,7 @@
-import { test as base } from "playwright-bdd";
-import {
-  mergeExpects,
-  type TestInfo,
-  type expect as baseExpect,
-  type Page,
-} from "@playwright/test";
+import type { Page, TestInfo } from "@playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-
-import {
-  paginationTests,
-  type PaginationMatchers,
-} from "./fixtures/PaginationMatchers";
-import type { Pagination } from "./pages/Pagination";
+import { test as base } from "playwright-bdd";
 
 // Istanbul coverage data interface
 interface IstanbulCoverage {
@@ -105,19 +94,3 @@ export const test = base.extend<CoverageFixtures>({
     { auto: true },
   ],
 });
-
-// Custom matchers
-
-type MatchersWithNot<T> = T & { not: T };
-type BaseExpectReturn = ReturnType<typeof baseExpect>;
-type ExpectFn = {
-  (actual: Pagination): MatchersWithNot<PaginationMatchers>;
-  // Add more custom matchers here
-
-  <T>(actual: T): BaseExpectReturn;
-};
-
-export const expect = mergeExpects(
-  paginationTests,
-  // Add more custom expects here
-) as unknown as ExpectFn;
