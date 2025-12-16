@@ -18,7 +18,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const table = await listPage.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "quarkus-bom");
+    await toolbar.applyFilter({ "Filter text": "quarkus-bom" });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("Name", "quarkus-bom");
 
@@ -37,7 +37,11 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       },
       {
         severity: "medium",
-        count: 14,
+        count: 13,
+      },
+      {
+        severity: "low",
+        count: 1,
       },
     ];
 

@@ -18,7 +18,7 @@ export class AdvisoryDetailsPage {
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
-    await toolbar.applyTextFilter("Filter text", advisoryID);
+    await toolbar.applyFilter({ "Filter text": advisoryID });
     await table.waitUntilDataIsLoaded();
     await table.verifyColumnContainsText("ID", advisoryID);
 
