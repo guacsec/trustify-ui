@@ -17,7 +17,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     const table = await listPage.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "keycloak-core");
+    await toolbar.applyFilter({ "Filter text": "keycloak-core" });
     await table.waitUntilDataIsLoaded();
     let tableRow = table.getRowsByCellValue({
       Name: "keycloak-core",
@@ -26,7 +26,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await expect(await tableRow.count()).toBeGreaterThan(0);
 
     // Type filter
-    await toolbar.applyMultiSelectFilter("Type", ["Maven", "RPM"]);
+    await toolbar.applyFilter({ Type: ["Maven", "RPM"] });
     await table.waitUntilDataIsLoaded();
     tableRow = table.getRowsByCellValue({
       Name: "keycloak-core",
@@ -35,7 +35,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await expect(await tableRow.count()).toBeGreaterThan(0);
 
     // Architecture
-    await toolbar.applyMultiSelectFilter("Architecture", ["S390", "No Arch"]);
+    await toolbar.applyFilter({ Architecture: ["S390", "No Arch"] });
     await table.waitUntilDataIsLoaded();
     await table.verifyTableHasNoData();
   });

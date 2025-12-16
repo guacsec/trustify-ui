@@ -1,15 +1,7 @@
-import { test as base } from "playwright-bdd";
-import {
-  expect as baseExpect,
-  mergeExpects,
-  type Page,
-  type TestInfo,
-} from "@playwright/test";
+import type { Page, TestInfo } from "@playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-
-import { expect as paginationExpect } from "./fixtures/PaginationMatchers";
-import { expect as tableExpect } from "./fixtures/TableMatchers";
+import { test as base } from "playwright-bdd";
 
 // Istanbul coverage data interface
 interface IstanbulCoverage {
@@ -102,6 +94,3 @@ export const test = base.extend<CoverageFixtures>({
     { auto: true },
   ],
 });
-
-// Re-export expect for convenience
-export const expect = mergeExpects(baseExpect, paginationExpect, tableExpect);

@@ -198,7 +198,6 @@ export const AdvisoryDetails: React.FC = () => {
         </Tabs>
       </PageSection>
       <PageSection>
-        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={0}
           id="refTabInfoSection"
@@ -209,7 +208,6 @@ export const AdvisoryDetails: React.FC = () => {
             {advisory && <Overview advisory={advisory} />}
           </LoadingWrapper>
         </TabContent>
-        {/** biome-ignore lint/correctness/useUniqueElementIds: allowed as Patternfly requires id*/}
         <TabContent
           eventKey={1}
           id="refVulnerabilitiesSection"
