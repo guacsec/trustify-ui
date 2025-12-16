@@ -5,7 +5,6 @@ import {
   Form,
   FormGroup,
   isValidDate,
-  isValidDate as isValidJSDate,
 } from "@patternfly/react-core";
 
 import {
@@ -98,7 +97,7 @@ export const DateRangeFilter = <TItem,>({
         <DatePicker
           value={to ? americanDateFormat(to) : ""}
           onChange={onToDateChange}
-          isDisabled={isDisabled || !isValidJSDate(from)}
+          isDisabled={isDisabled || !isValidDate(from)}
           dateFormat={americanDateFormat}
           dateParse={parseAmericanDate}
           invalidFormatText={"Invalid date"}
