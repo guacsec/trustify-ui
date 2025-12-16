@@ -1,6 +1,7 @@
 // @ts-check
 
-import { expect, test } from "../../../fixtures";
+import { expect } from "../../../assertions";
+import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { PackageDetailsPage } from "../PackageDetailsPage";
 
