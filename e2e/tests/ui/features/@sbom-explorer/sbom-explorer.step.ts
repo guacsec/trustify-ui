@@ -16,7 +16,7 @@ Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
   const toolbar = await sbomListPage.getToolbar();
   const table = await sbomListPage.getTable();
 
-  await toolbar.applyTextFilter("Filter text", sbomName);
+  await toolbar.applyFilter({ "Filter text": sbomName });
   await table.waitUntilDataIsLoaded();
   await table.verifyColumnContainsText("Name", sbomName);
 });
