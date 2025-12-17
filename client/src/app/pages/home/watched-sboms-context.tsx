@@ -13,7 +13,7 @@ interface IWatchedSbomsContext {
   sboms?: WatchedSboms;
   isFetching: boolean;
   fetchError: AxiosError | null;
-
+  mutatingKeys: Set<string>;
   patch: (key: string, value: string | null) => void;
 }
 
@@ -30,7 +30,9 @@ export const WatchedSbomsProvider: React.FunctionComponent<
   IWatchedSbomsProvider
 > = ({ children }) => {
   const { pushNotification } = React.useContext(NotificationsContext);
-
+  const [mutatingKeys, setMutatingKeys] = React.useState<Set<string>>(
+    new Set(),
+  );
   const { sboms, isFetching, fetchError } = useFetchWatchedSboms();
 
   const onUpdateSuccess = () => {};
@@ -48,8 +50,21 @@ export const WatchedSbomsProvider: React.FunctionComponent<
 
   const patch = React.useCallback(
     (key: string, value: string | null) => {
+      setMutatingKeys((prev) => {
+        const set = new Set(prev);
+        set.add(key);
+        return set;
+      });
       const newSboms = { ...sboms, [key]: value };
-      updateSboms(newSboms as WatchedSboms);
+      updateSboms(newSboms as WatchedSboms, {
+        onSettled: () => {
+          setMutatingKeys((prev) => {
+            const set = new Set(prev);
+            set.delete(key);
+            return set;
+          });
+        },
+      });
     },
     [sboms, updateSboms],
   );
@@ -61,6 +76,7 @@ export const WatchedSbomsProvider: React.FunctionComponent<
         isFetching,
         fetchError,
         patch,
+        mutatingKeys,
       }}
     >
       {children}
