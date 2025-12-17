@@ -47,53 +47,6 @@ export class Pagination {
     await expect(this._pagination.locator("input")).toHaveValue("1");
   }
 
-  /**
-   * @deprecated use fixtures/PaginationMatchers instead
-   */
-  async validatePagination() {
-    // Verify next buttons are enabled as there are more than 11 rows present
-    const nextPageButton = this._pagination.locator(
-      "button[data-action='next']",
-    );
-    await expect(nextPageButton).toBeVisible();
-    await expect(nextPageButton).not.toBeDisabled();
-
-    // Verify that previous buttons are disabled being on the first page
-    const prevPageButton = this._pagination.locator(
-      "button[data-action='previous']",
-    );
-    await expect(prevPageButton).toBeVisible();
-    await expect(prevPageButton).toBeDisabled();
-
-    // Verify that navigation button to last page is enabled
-    const lastPageButton = this._pagination.locator(
-      "button[data-action='last']",
-    );
-    await expect(lastPageButton).toBeVisible();
-    await expect(lastPageButton).not.toBeDisabled();
-
-    // Verify that navigation button to first page is disabled being on the first page
-    const firstPageButton = this._pagination.locator(
-      "button[data-action='first']",
-    );
-    await expect(firstPageButton).toBeVisible();
-    await expect(firstPageButton).toBeDisabled();
-
-    // Navigate to next page
-    await nextPageButton.click();
-
-    // Verify that previous buttons are enabled after moving to next page
-    await expect(prevPageButton).toBeVisible();
-    await expect(prevPageButton).not.toBeDisabled();
-
-    // Verify that navigation button to first page is enabled after moving to next page
-    await expect(firstPageButton).toBeVisible();
-    await expect(firstPageButton).not.toBeDisabled();
-
-    // Moving back to the first page
-    await firstPageButton.click();
-  }
-
   // TODO: This seems not belonging here. This matches two entities: Pagination and Table so cannot moved to fixtures/PaginationMatchers.ts. Needs refactoring.
   async validateItemsPerPage(columnName: string, table: Table) {
     // Verify that only 10 items are displayed
