@@ -8,6 +8,7 @@ import {
   type IMultiselectFilterCategory,
   type ISearchFilterCategory,
   type ISelectFilterCategory,
+  type IToggleFilterCategory,
 } from "../FilterToolbar";
 import { AsyncMultiselectFilterControl } from "./AsyncMultiselectFilterControl";
 import { AutocompleteLabelFilterControl } from "./AutocompleteLabelFilterControl";
@@ -15,6 +16,7 @@ import { CheckboxFilterControl } from "./CheckboxFilterControl";
 import { DateRangeFilter } from "./DateRangeFilter";
 import { RadioFilterControl } from "./RadioFilterControl";
 import { SearchFilterControl } from "./SearchFilterControl";
+import { ToggleFilterControl } from "./ToggleFilterControl";
 
 export interface IFilterControlProps<TItem, TFilterCategoryKey extends string> {
   category: FilterCategory<TItem, TFilterCategoryKey>;
@@ -79,6 +81,14 @@ export const FilterControl = <TItem, TFilterCategoryKey extends string>({
         category={
           category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
         }
+        {...props}
+      />
+    );
+  }
+  if (category.type === FilterType.toggle) {
+    return (
+      <ToggleFilterControl
+        category={category as IToggleFilterCategory<TItem, TFilterCategoryKey>}
         {...props}
       />
     );

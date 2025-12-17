@@ -7,6 +7,7 @@ import {
   DropdownList,
   MenuToggle,
   type SelectOptionProps,
+  ToolbarGroup,
   ToolbarItem,
   ToolbarToggleGroup,
 } from "@patternfly/react-core";
@@ -22,6 +23,7 @@ export enum FilterType {
   numsearch = "numsearch",
   dateRange = "dateRange",
   autocompleteLabel = "autocompleteLabel",
+  toggle = "toggle",
 }
 
 export type FilterValue = string[] | undefined | null;
@@ -62,6 +64,16 @@ export interface IBasicFilterCategory<
    * Main operator for filter value. Defaults depends on the implementation of each categorykey
    */
   operator?: "=" | "!=" | "~" | ">" | ">=" | "<" | "<=";
+  /**
+   * For dynamic operator. Returns the operator value based on the filterValue
+   */
+  getOperator?: (
+    filterValue: FilterValue,
+  ) => "=" | "!=" | "~" | ">" | ">=" | "<" | "<=";
+  /**
+   * Whether or not it will always be
+   */
+  showOutsideDropdown?: boolean;
 }
 
 export interface IMultiselectFilterCategory<
@@ -94,11 +106,17 @@ export interface ISearchFilterCategory<TItem, TFilterCategoryKey extends string>
   placeholderText: string;
 }
 
+export interface IToggleFilterCategory<TItem, TFilterCategoryKey extends string>
+  extends IBasicFilterCategory<TItem, TFilterCategoryKey> {
+  label: string;
+}
+
 export type FilterCategory<TItem, TFilterCategoryKey extends string> =
   | IMultiselectFilterCategory<TItem, TFilterCategoryKey>
   | IAsyncMultiselectFilterCategory<TItem, TFilterCategoryKey>
   | ISelectFilterCategory<TItem, TFilterCategoryKey>
   | ISearchFilterCategory<TItem, TFilterCategoryKey>
+  | IToggleFilterCategory<TItem, TFilterCategoryKey>
   | IBasicFilterCategory<TItem, TFilterCategoryKey>;
 
 export type IFilterValues<TFilterCategoryKey extends string> = Partial<
@@ -138,10 +156,14 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
 }: React.PropsWithChildren<
   IFilterToolbarProps<TItem, TFilterCategoryKey>
 >): React.JSX.Element | null => {
+  const filteredFilterCategories = showFiltersSideBySide
+    ? filterCategories
+    : filterCategories.filter((item) => !item.showOutsideDropdown);
+
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] =
     React.useState(false);
   const [currentFilterCategoryKey, setCurrentFilterCategoryKey] =
-    React.useState(filterCategories[0].categoryKey);
+    React.useState(filteredFilterCategories[0].categoryKey);
 
   const onCategorySelect = (
     category: FilterCategory<TItem, TFilterCategoryKey>,
@@ -155,11 +177,11 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
     newValue: FilterValue,
   ) => setFilterValues({ ...filterValues, [category.categoryKey]: newValue });
 
-  const currentFilterCategory = filterCategories.find(
+  const currentFilterCategory = filteredFilterCategories.find(
     (category) => category.categoryKey === currentFilterCategoryKey,
   );
 
-  const filterGroups = filterCategories.reduce((groups, category) => {
+  const filterGroups = filteredFilterCategories.reduce((groups, category) => {
     if (category.filterGroup && !groups.includes(category.filterGroup)) {
       groups.push(category.filterGroup);
     }
@@ -171,7 +193,7 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
       return filterGroups.map((filterGroup) => (
         <DropdownGroup label={filterGroup} key={filterGroup}>
           <DropdownList>
-            {filterCategories
+            {filteredFilterCategories
               .filter(
                 (filterCategory) => filterCategory.filterGroup === filterGroup,
               )
@@ -191,7 +213,7 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
       ));
     }
 
-    return filterCategories.map((category) => (
+    return filteredFilterCategories.map((category) => (
       <DropdownItem
         id={`filter-category-${category.categoryKey}`}
         key={category.categoryKey}
@@ -232,7 +254,7 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
           </ToolbarItem>
         )}
 
-        {filterCategories.map((category) => (
+        {filteredFilterCategories.map((category) => (
           <FilterControl<TItem, TFilterCategoryKey>
             key={category.categoryKey}
             category={category}
@@ -246,6 +268,24 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
           />
         ))}
       </ToolbarToggleGroup>
+      {!showFiltersSideBySide && (
+        <ToolbarGroup variant="filter-group" alignSelf="center">
+          {filterCategories
+            .filter((item) => item.showOutsideDropdown)
+            .map((category) => (
+              <FilterControl<TItem, TFilterCategoryKey>
+                key={category.categoryKey}
+                category={category}
+                filterValue={filterValues[category.categoryKey]}
+                setFilterValue={(newValue) =>
+                  setFilterValue(category, newValue)
+                }
+                showToolbarItem
+                isDisabled={isDisabled}
+              />
+            ))}
+        </ToolbarGroup>
+      )}
       {pagination ? (
         <ToolbarItem variant="pagination">{pagination}</ToolbarItem>
       ) : null}
