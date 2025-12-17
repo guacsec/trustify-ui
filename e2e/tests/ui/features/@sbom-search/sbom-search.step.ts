@@ -11,6 +11,19 @@ import { LabelsModal } from "../../pages/LabelsModal";
 
 export const { Given, When, Then } = createBdd(test);
 
+const SBOM_TABLE_NAME = "sbom-table";
+
+Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
+  const sbomListPage = await SbomListPage.build(page);
+
+  const toolbar = await sbomListPage.getToolbar();
+  const table = await sbomListPage.getTable();
+
+  await toolbar.applyFilter({ "Filter text": sbomName });
+  await table.waitUntilDataIsLoaded();
+  await table.verifyColumnContainsText("Name", sbomName);
+});
+
 Given(
   "An ingested SBOM {string} containing Vulnerabilities",
   async ({ page }, sbomName) => {
