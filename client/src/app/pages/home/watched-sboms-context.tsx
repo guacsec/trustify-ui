@@ -13,7 +13,7 @@ interface IWatchedSbomsContext {
   sboms?: WatchedSboms;
   isFetching: boolean;
   fetchError: AxiosError | null;
-  mutatingKeys: Set<string>;
+  mutatingKeys: ReadonlySet<string>;
   patch: (key: string, value: string | null) => void;
 }
 
@@ -30,7 +30,7 @@ export const WatchedSbomsProvider: React.FunctionComponent<
   IWatchedSbomsProvider
 > = ({ children }) => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const [mutatingKeys, setMutatingKeys] = React.useState<Set<string>>(
+  const [mutatingKeys, setMutatingKeys] = React.useState<ReadonlySet<string>>(
     new Set(),
   );
   const { sboms, isFetching, fetchError } = useFetchWatchedSboms();
