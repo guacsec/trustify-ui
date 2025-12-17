@@ -22,7 +22,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
       Name: "keycloak-core",
       Version: "18.0.6.redhat-00001",
     });
-    expect(await tableRow.count()).toBeGreaterThan(0);
+    await expect(tableRow.count()).resolves.toBeGreaterThan(0);
 
     // Type filter
     await toolbar.applyFilter({ Type: ["Maven", "RPM"] });
@@ -30,7 +30,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
       Name: "keycloak-core",
       Version: "18.0.6.redhat-00001",
     });
-    expect(await tableRow.count()).toBeGreaterThan(0);
+    await expect(tableRow.count()).resolves.toBeGreaterThan(0);
 
     // Architecture
     await toolbar.applyFilter({ Architecture: ["S390", "No Arch"] });

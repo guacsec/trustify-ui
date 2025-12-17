@@ -19,6 +19,10 @@ export const sortArray = (arr: string[], asc: boolean) => {
   };
 };
 
+
+/**
+ * @deprecated replace it by expect(table).toBeSortedBy("columnName")
+ */
 export const expectSort = (arr: string[], asc: boolean) => {
   const { isSorted, sorted } = sortArray(arr, asc);
   expect(
