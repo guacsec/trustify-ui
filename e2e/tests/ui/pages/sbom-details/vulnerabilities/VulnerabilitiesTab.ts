@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { SbomDetailsPage } from "../SbomDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { SbomDetailsPage } from "../SbomDetailsPage";
 
 export class VulnerabilitiesTab {
   private readonly _page: Page;
@@ -25,7 +25,19 @@ export class VulnerabilitiesTab {
   }
 
   async getTable() {
-    return await Table.build(this._page, "Vulnerability table");
+    return await Table.build(
+      this._page,
+      "Vulnerability table",
+      {
+        Id: { isSortable: true },
+        Description: { isSortable: false },
+        CVSS: { isSortable: true },
+        "Affected dependencies": { isSortable: true },
+        Published: { isSortable: true },
+        Updated: { isSortable: true },
+      },
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

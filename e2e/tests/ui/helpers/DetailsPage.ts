@@ -128,11 +128,13 @@ export class DetailsPage {
     const vulnLabelCount: { [key: string]: number } = {};
     for (const element of elements) {
       const innerText = await element.textContent();
-      const labelArr = await innerText?.split(delimiter);
-      vulnLabelCount[labelArr[0].trim().toString()] = parseInt(
-        labelArr[1].trim(),
-        10,
-      );
+      const labelArr = innerText?.split(delimiter);
+      if (labelArr) {
+        vulnLabelCount[labelArr[0].trim().toString()] = parseInt(
+          labelArr[1].trim(),
+          10,
+        );
+      }
     }
     return vulnLabelCount;
   }

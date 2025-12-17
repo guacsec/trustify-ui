@@ -1,5 +1,6 @@
 // @ts-check
 
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { VulnerabilitiesTab } from "./VulnerabilitiesTab";
@@ -21,12 +22,10 @@ test.describe.skip("Filter validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "CVE-2023-4853" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Id", "CVE-2023-4853");
+    await expect(table).toHaveColumnWithValue("Id", "CVE-2023-4853");
 
     // Labels filter
     await toolbar.applyFilter({ Severity: ["High"] });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Id", "CVE-2023-4853");
+    await expect(table).toHaveColumnWithValue("Id", "CVE-2023-4853");
   });
 });

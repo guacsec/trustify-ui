@@ -1,10 +1,10 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
 
 import { test } from "../../fixtures";
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
+import { expect } from "../../assertions";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -16,9 +16,9 @@ Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
   const toolbar = await sbomListPage.getToolbar();
   const table = await sbomListPage.getTable();
 
-  await toolbar.applyTextFilter("Filter text", sbomName);
+  await toolbar.applyFilter({ "Filter text": sbomName });
   await table.waitUntilDataIsLoaded();
-  await table.verifyColumnContainsText("Name", sbomName);
+  await expect(table).toHaveColumnWithValue("Name", sbomName);
 });
 
 Given(
