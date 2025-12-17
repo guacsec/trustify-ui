@@ -19,7 +19,6 @@ export const sortArray = (arr: string[], asc: boolean) => {
   };
 };
 
-
 /**
  * @deprecated replace it by expect(table).toBeSortedBy("columnName")
  */
