@@ -22,9 +22,9 @@ export class PackageDetailsPage {
     const table = await listPage.getTable();
 
     await toolbar.applyFilter({ "Filter text": packageDetail.Name });
-    await table.waitUntilDataIsLoaded();
+
     // Get rows matching the package name
-    const matchingRows = table.getRowsByCellValue(packageDetail);
+    const matchingRows = await table.getRowsByCellValue(packageDetail);
     await matchingRows
       .getByRole("link", { name: packageDetail.Name, exact: true })
       .click();

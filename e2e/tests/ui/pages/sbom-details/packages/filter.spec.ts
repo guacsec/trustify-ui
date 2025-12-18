@@ -1,5 +1,6 @@
 // @ts-check
 
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { PackagesTab } from "./PackagesTab";
@@ -17,12 +18,10 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "commons-compress" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "commons-compress");
+    await expect(table).toHaveColumnWithValue("Name", "commons-compress");
 
     // Labels filter
     await toolbar.applyFilter({ License: ["Apache-2.0", "NOASSERTION"] });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "commons-compress");
+    await expect(table).toHaveColumnWithValue("Name", "commons-compress");
   });
 });

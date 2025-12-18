@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { PackageDetailsPage } from "../PackageDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { PackageDetailsPage } from "../PackageDetailsPage";
 
 export class SbomsTab {
   private readonly _page: Page;
@@ -28,7 +28,16 @@ export class SbomsTab {
   }
 
   async getTable() {
-    return await Table.build(this._page, "SBOM table");
+    return await Table.build(
+      this._page,
+      "SBOM table",
+      {
+        Name: { isSortable: true },
+        Version: { isSortable: false },
+        Supplier: { isSortable: false },
+      },
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {
