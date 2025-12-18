@@ -163,7 +163,11 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] =
     React.useState(false);
   const [currentFilterCategoryKey, setCurrentFilterCategoryKey] =
-    React.useState(filteredFilterCategories[0].categoryKey);
+    React.useState(
+      filteredFilterCategories[0]?.categoryKey as
+        | TFilterCategoryKey
+        | undefined,
+    );
 
   const onCategorySelect = (
     category: FilterCategory<TItem, TFilterCategoryKey>,
