@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { PackagesTab } from "./PackagesTab";
@@ -19,8 +18,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "commons-compress" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "commons-compress");
+    await expect(table).toHaveColumnWithValue("Name", "commons-compress");
 
     // Name
     await expect(table._table.locator(`td[data-label="Name"]`)).toContainText(

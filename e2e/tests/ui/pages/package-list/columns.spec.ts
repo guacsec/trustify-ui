@@ -19,8 +19,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "keycloak-core" });
-    await table.waitUntilDataIsLoaded();
-    const tableRow = table.getRowsByCellValue({
+    const tableRow = await table.getRowsByCellValue({
       Name: "keycloak-core",
       Version: "18.0.6.redhat-00001",
     });

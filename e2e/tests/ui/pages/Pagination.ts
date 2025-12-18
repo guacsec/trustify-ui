@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import type { Table } from "./Table";
 
 export class Pagination {
   private readonly _page: Page;
@@ -45,19 +44,5 @@ export class Pagination {
       .click();
 
     await expect(this._pagination.locator("input")).toHaveValue("1");
-  }
-
-  // TODO: This seems not belonging here. This matches two entities: Pagination and Table so cannot moved to fixtures/PaginationMatchers.ts. Needs refactoring.
-  async validateItemsPerPage(columnName: string, table: Table) {
-    // Verify that only 10 items are displayed
-    await this.selectItemsPerPage(10);
-    await table.validateNumberOfRows({ equal: 10 }, columnName);
-
-    // Verify that items less than or equal to 20 and greater than 10 are displayed
-    await this.selectItemsPerPage(20);
-    await table.validateNumberOfRows(
-      { greaterThan: 10, lessThan: 21 },
-      columnName,
-    );
   }
 }

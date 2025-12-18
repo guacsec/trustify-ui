@@ -30,7 +30,7 @@ Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
 
   await toolbar.applyFilter({ "Filter text": sbomName });
   await table.waitUntilDataIsLoaded();
-  await table.verifyColumnContainsText("Name", sbomName);
+  await expect(table).toHaveColumnWithValue("Name", sbomName);
 });
 
 When(

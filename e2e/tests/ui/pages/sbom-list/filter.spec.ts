@@ -1,5 +1,6 @@
 // @ts-check
 
+import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import { SbomListPage } from "./SbomListPage";
@@ -17,19 +18,16 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "quarkus" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "quarkus-bom");
+    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom");
 
     // Date filter
     await toolbar.applyFilter({
       "Created on": { from: "11/21/2023", to: "11/23/2023" },
     });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "quarkus-bom");
+    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom");
 
     // Labels filter
     await toolbar.applyFilter({ Label: ["type=spdx"] });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "quarkus-bom");
+    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom");
   });
 });

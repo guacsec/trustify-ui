@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
 import { Navigation } from "../Navigation";
-import { Toolbar } from "../Toolbar";
-import { Table } from "../Table";
 import { Pagination } from "../Pagination";
+import { Table } from "../Table";
+import { Toolbar } from "../Toolbar";
 
 export class SbomListPage {
   private readonly _page: Page;
@@ -43,7 +43,7 @@ export class SbomListPage {
         Dependencies: { isSortable: false },
         Vulnerabilities: { isSortable: false },
       },
-      ["Edit labels", "Download SBOM", "Download License Report", "Delete"],
+      ["Edit labels", "Download SBOM", "Download License Report"]
     );
   }
 

@@ -56,7 +56,6 @@ test.describe("Action validations", { tag: "@tier1" }, () => {
     await labelsModal.clickSave();
 
     // Verify labels were added
-    await table.waitUntilDataIsLoaded();
     for (const label of labels) {
       await expect(
         table._table
@@ -73,7 +72,6 @@ test.describe("Action validations", { tag: "@tier1" }, () => {
     await labelsModal.removeLabels(labels);
     await labelsModal.clickSave();
 
-    await table.waitUntilDataIsLoaded();
     for (const label of labels) {
       await expect(
         table._table
