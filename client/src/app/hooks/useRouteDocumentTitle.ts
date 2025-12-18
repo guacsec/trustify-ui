@@ -18,7 +18,7 @@ export const useRouteDocumentTitle = (): void => {
 
   const matchWithTitle = [...matches]
     .reverse()
-    .find((match) => match.handle && match.handle.title);
+    .find((match) => match.handle?.title);
 
   const rawTitle = matchWithTitle?.handle?.title;
 
