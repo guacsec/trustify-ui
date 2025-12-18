@@ -89,11 +89,12 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.advisories,
         errorElement: <RouteErrorBoundary />,
         loader: async () => {
+          const branding = useBranding();
           return {
             ...createSeo({
               descriptors: [
                 {
-                  title: "Advisories",
+                  title: `Advisories | ${branding.application.title}`,
                 },
                 {
                   name: "Description",
