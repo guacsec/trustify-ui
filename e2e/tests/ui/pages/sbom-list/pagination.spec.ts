@@ -14,7 +14,15 @@ test.describe("Pagination validations", { tag: "@tier1" }, () => {
     const listPage = await SbomListPage.build(page);
     const pagination = await listPage.getPagination();
 
-    await pagination.validatePagination();
+    // Verify first page
+    await expect(pagination).toBeFirstPage();
+    await expect(pagination).toHaveNextPage();
+
+    // Navigate to next page
+    await pagination.getNextPageButton().click();
+
+    // Verify that previous buttons are enabled after moving to next page
+    await expect(pagination).toHavePreviousPage();
   });
 
   test("Items per page validations", async ({ page }) => {
