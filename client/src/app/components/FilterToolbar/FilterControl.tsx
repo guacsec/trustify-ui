@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { AsyncMultiselectFilterControl } from "./AsyncMultiselectFilterControl";
 import { AutocompleteLabelFilterControl } from "./AutocompleteLabelFilterControl";
+import { ToggleFilterControl } from "./ToggleFilterControl";
 import { DateRangeFilter } from "./DateRangeFilter";
 import {
   type FilterCategory,
@@ -11,6 +12,7 @@ import {
   type IMultiselectFilterCategory,
   type ISearchFilterCategory,
   type ISelectFilterCategory,
+  type IToggleFilterCategory,
 } from "./FilterToolbar";
 import { MultiselectFilterControl } from "./MultiselectFilterControl";
 import { SearchFilterControl } from "./SearchFilterControl";
@@ -81,6 +83,14 @@ export const FilterControl = <TItem, TFilterCategoryKey extends string>({
         category={
           category as IMultiselectFilterCategory<TItem, TFilterCategoryKey>
         }
+        {...props}
+      />
+    );
+  }
+  if (category.type === FilterType.toggle) {
+    return (
+      <ToggleFilterControl
+        category={category as IToggleFilterCategory<TItem, TFilterCategoryKey>}
         {...props}
       />
     );

@@ -146,3 +146,7 @@ export const universalComparator = (
   }
   return localeNumericCompare(String(a ?? ""), String(b ?? ""), locale);
 };
+
+export const parseBooleanIfPossible = (value?: string): boolean => {
+  return value?.toLocaleLowerCase() === "true";
+};

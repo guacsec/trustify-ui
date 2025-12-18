@@ -51,7 +51,7 @@ export interface SearchTabsProps {
     >;
     vulnerabilityFilterPanelProps: IFilterPanelProps<
       VulnerabilitySummary,
-      "" | "base_severity" | "published"
+      "" | "base_severity" | "published" | "publishedOnly"
     >;
   };
 
