@@ -28,7 +28,21 @@ export class PackageListPage {
   }
 
   async getTable() {
-    return await Table.build(this._page, "Package table");
+    return await Table.build(
+      this._page,
+      "Package table",
+      {
+        Name: { isSortable: true },
+        Namespace: { isSortable: true },
+        Version: { isSortable: true },
+        Type: { isSortable: false },
+        Licenses: { isSortable: false },
+        Path: { isSortable: false },
+        Qualifiers: { isSortable: false },
+        Vulnerabilities: { isSortable: false },
+      },
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

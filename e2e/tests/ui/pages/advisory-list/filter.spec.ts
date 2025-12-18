@@ -1,5 +1,6 @@
 // @ts-check
 
+import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import { AdvisoryListPage } from "./AdvisoryListPage";
@@ -17,19 +18,16 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "CVE-2024-26308" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("ID", "CVE-2024-26308");
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308");
 
     // Date filter
     await toolbar.applyFilter({
       Revision: { from: "03/26/2025", to: "03/28/2025" },
     });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("ID", "CVE-2024-26308");
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308");
 
     // Labels filter
     await toolbar.applyFilter({ Label: ["type=cve"] });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("ID", "CVE-2024-26308");
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308");
   });
 });

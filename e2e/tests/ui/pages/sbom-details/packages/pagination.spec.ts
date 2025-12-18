@@ -31,6 +31,12 @@ test.describe("Pagination validations", { tag: "@tier1" }, () => {
     const pagination = await packageTab.getPagination();
     const table = await packageTab.getTable();
 
-    await pagination.validateItemsPerPage("Name", table);
+    // Validate page with size=10
+    await pagination.selectItemsPerPage(10);
+    await expect(table).toHaveNumberOfRows({ equal: 10 });
+
+    // Validate page with size=20
+    await pagination.selectItemsPerPage(20);
+    await expect(table).toHaveNumberOfRows({ greaterThan: 10, lessThan: 21 });
   });
 });

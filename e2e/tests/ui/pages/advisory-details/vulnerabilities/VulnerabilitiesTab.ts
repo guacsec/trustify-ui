@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { AdvisoryDetailsPage } from "../AdvisoryDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { AdvisoryDetailsPage } from "../AdvisoryDetailsPage";
 
 export class VulnerabilitiesTab {
   private readonly _page: Page;
@@ -25,7 +25,19 @@ export class VulnerabilitiesTab {
   }
 
   async getTable() {
-    return await Table.build(this._page, "vulnerability table");
+    return await Table.build(
+      this._page,
+      "vulnerability table",
+      {
+        ID: { isSortable: true },
+        Title: { isSortable: false },
+        Discovery: { isSortable: false },
+        Release: { isSortable: false },
+        Score: { isSortable: false },
+        CWE: { isSortable: false },
+      },
+      [],
+    );
   }
 
   async getPagination(location: "top" | "bottom" = "top") {

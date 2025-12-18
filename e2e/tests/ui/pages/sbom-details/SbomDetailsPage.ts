@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 import { DetailsPageLayout } from "../DetailsPageLayout";
 import { Navigation } from "../Navigation";
 import { SbomListPage } from "../sbom-list/SbomListPage";
+import { expect } from "../../assertions";
 
 export class SbomDetailsPage {
   _layout: DetailsPageLayout;
@@ -19,8 +20,7 @@ export class SbomDetailsPage {
     const table = await listPage.getTable();
 
     await toolbar.applyFilter({ "Filter text": sbomName });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", sbomName);
+    await expect(table).toHaveColumnWithValue("Name", sbomName);
 
     await page.getByRole("link", { name: sbomName, exact: true }).click();
 
