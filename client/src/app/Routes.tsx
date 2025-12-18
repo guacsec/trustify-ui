@@ -1,9 +1,14 @@
 import { lazy } from "react";
-import { createBrowserRouter, useParams } from "react-router-dom";
+import { createBrowserRouter, type Params, useParams } from "react-router-dom";
 
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
+import useBranding from "./hooks/useBranding";
+import { fetchAdvisoryByIdOptions } from "./queries/advisories";
+import { queryClient } from "./queries/config";
+import { createSeo } from "./utils/seo";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -58,6 +63,19 @@ export const Paths = {
   licenses: "/licenses",
 } as const;
 
+export const usePathFromParams = (
+  params: Params<string>,
+  pathParam: PathParam,
+) => {
+  const value = params[pathParam];
+  if (value === undefined) {
+    throw new Error(
+      `ASSERTION FAILURE: required path parameter not set: ${pathParam}`,
+    );
+  }
+  return value;
+};
+
 export const AppRoutes = createBrowserRouter([
   {
     path: "/",
@@ -69,6 +87,22 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisories,
+        errorElement: <RouteErrorBoundary />,
+        loader: async () => {
+          return {
+            ...createSeo({
+              descriptors: [
+                {
+                  title: "Advisories",
+                },
+                {
+                  name: "Description",
+                  content: "Advisory list",
+                },
+              ],
+            }),
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="advisory-list"
@@ -78,6 +112,27 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisoryDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const branding = useBranding();
+          const advisoryId = usePathFromParams(params, PathParam.ADVISORY_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchAdvisoryByIdOptions(advisoryId),
+          );
+          return {
+            ...createSeo({
+              descriptors: [
+                {
+                  title: `${response.data?.document_id} | ${branding.application.title}`,
+                },
+                {
+                  name: "Description",
+                  content: "Advisory details",
+                },
+              ],
+            }),
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="advisory-details"

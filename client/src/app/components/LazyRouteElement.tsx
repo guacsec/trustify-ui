@@ -1,10 +1,9 @@
 import type React from "react";
 import { Suspense } from "react";
 
-import { ErrorBoundary } from "react-error-boundary";
-
-import { Bullseye, Spinner } from "@patternfly/react-core";
-import { ErrorFallback } from "./ErrorFallback";
+import { EmptyState, Spinner } from "@patternfly/react-core";
+import { NavigationRoute } from "./NavigationRoute";
+import { SeoMetadata } from "./SeoMetadata";
 
 export const LazyRouteElement = ({
   identifier,
@@ -17,14 +16,17 @@ export const LazyRouteElement = ({
     <Suspense
       key={identifier}
       fallback={
-        <Bullseye>
-          <Spinner />
-        </Bullseye>
+        <EmptyState
+          titleText="Loading assets"
+          headingLevel="h4"
+          icon={Spinner}
+        />
       }
     >
-      <ErrorBoundary FallbackComponent={ErrorFallback} key={identifier}>
+      <NavigationRoute>
+        <SeoMetadata />
         {component}
-      </ErrorBoundary>
+      </NavigationRoute>
     </Suspense>
   );
 };
