@@ -209,7 +209,7 @@ Then(
   async ({ page }, labelList, sbomName) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab(`Info`);
-    const infoSection = page.locator("#refTabInfoSection");
+    const infoSection = page.locator("#info-tab-section");
 
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
