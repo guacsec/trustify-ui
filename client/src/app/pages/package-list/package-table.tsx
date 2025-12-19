@@ -1,5 +1,8 @@
 import React from "react";
 import { generatePath, NavLink } from "react-router-dom";
+
+import { List, ListItem } from "@patternfly/react-core";
+import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 import {
   ExpandableRowContent,
   Table,
@@ -9,7 +12,6 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
-import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -19,11 +21,11 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
-import { PackageSearchContext } from "./package-context";
-import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
-import { List, ListItem } from "@patternfly/react-core";
+
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
+import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
+import { PackageSearchContext } from "./package-context";
 
 export const PackageTable: React.FC = () => {
   const { isFetching, fetchError, totalItemCount, tableControls } =
@@ -39,6 +41,7 @@ export const PackageTable: React.FC = () => {
       getTrProps,
       getTdProps,
       getExpandedContentTdProps,
+      getColumnVisibility,
     },
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
@@ -49,14 +52,30 @@ export const PackageTable: React.FC = () => {
         <Thead>
           <Tr>
             <TableHeaderContentWithControls {...tableControls}>
-              <Th {...getThProps({ columnKey: "name" })} />
-              <Th {...getThProps({ columnKey: "namespace" })} />
-              <Th {...getThProps({ columnKey: "version" })} />
-              <Th {...getThProps({ columnKey: "type" })} />
-              <Th {...getThProps({ columnKey: "licenses" })} />
-              <Th {...getThProps({ columnKey: "path" })} />
-              <Th {...getThProps({ columnKey: "qualifiers" })} />
-              <Th {...getThProps({ columnKey: "vulnerabilities" })} />
+              {getColumnVisibility("name") && (
+                <Th {...getThProps({ columnKey: "name" })} />
+              )}
+              {getColumnVisibility("namespace") && (
+                <Th {...getThProps({ columnKey: "namespace" })} />
+              )}
+              {getColumnVisibility("version") && (
+                <Th {...getThProps({ columnKey: "version" })} />
+              )}
+              {getColumnVisibility("type") && (
+                <Th {...getThProps({ columnKey: "type" })} />
+              )}
+              {getColumnVisibility("licenses") && (
+                <Th {...getThProps({ columnKey: "licenses" })} />
+              )}
+              {getColumnVisibility("path") && (
+                <Th {...getThProps({ columnKey: "path" })} />
+              )}
+              {getColumnVisibility("qualifiers") && (
+                <Th {...getThProps({ columnKey: "qualifiers" })} />
+              )}
+              {getColumnVisibility("vulnerabilities") && (
+                <Th {...getThProps({ columnKey: "vulnerabilities" })} />
+              )}
             </TableHeaderContentWithControls>
           </Tr>
         </Thead>
@@ -77,85 +96,101 @@ export const PackageTable: React.FC = () => {
                         item={item}
                         rowIndex={rowIndex}
                       >
-                        <Td
-                          width={15}
-                          modifier="breakWord"
-                          {...getTdProps({ columnKey: "name" })}
-                        >
-                          <NavLink
-                            to={generatePath(Paths.packageDetails, {
-                              packageId: item.uuid,
+                        {getColumnVisibility("name") && (
+                          <Td
+                            width={15}
+                            modifier="breakWord"
+                            {...getTdProps({ columnKey: "name" })}
+                          >
+                            <NavLink
+                              to={generatePath(Paths.packageDetails, {
+                                packageId: item.uuid,
+                              })}
+                            >
+                              {item.decomposedPurl
+                                ? item.decomposedPurl?.name
+                                : item.purl}
+                            </NavLink>
+                          </Td>
+                        )}
+                        {getColumnVisibility("namespace") && (
+                          <Td
+                            width={15}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "namespace" })}
+                          >
+                            {item.decomposedPurl?.namespace}
+                          </Td>
+                        )}
+                        {getColumnVisibility("version") && (
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "version" })}
+                          >
+                            {item.decomposedPurl?.version}
+                          </Td>
+                        )}
+                        {getColumnVisibility("type") && (
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "type" })}
+                          >
+                            {item.decomposedPurl?.type}
+                          </Td>
+                        )}
+                        {getColumnVisibility("licenses") && (
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({
+                              columnKey: "licenses",
+                              isCompoundExpandToggle: true,
+                              item,
+                              rowIndex,
                             })}
                           >
-                            {item.decomposedPurl
-                              ? item.decomposedPurl?.name
-                              : item.purl}
-                          </NavLink>
-                        </Td>
-                        <Td
-                          width={15}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "namespace" })}
-                        >
-                          {item.decomposedPurl?.namespace}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "version" })}
-                        >
-                          {item.decomposedPurl?.version}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "type" })}
-                        >
-                          {item.decomposedPurl?.type}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({
-                            columnKey: "licenses",
-                            isCompoundExpandToggle: true,
-                            item,
-                            rowIndex,
-                          })}
-                        >
-                          <PackageLicenses
-                            pkg={pkg}
-                            isFetching={packageIsFetching}
-                            fetchError={packageFetchError}
-                          />
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "path" })}
-                        >
-                          {item.decomposedPurl?.path}
-                        </Td>
-                        <Td
-                          width={20}
-                          {...getTdProps({ columnKey: "qualifiers" })}
-                        >
-                          {item.decomposedPurl?.qualifiers && (
-                            <PackageQualifiers
-                              value={item.decomposedPurl?.qualifiers}
+                            <PackageLicenses
+                              pkg={pkg}
+                              isFetching={packageIsFetching}
+                              fetchError={packageFetchError}
                             />
-                          )}
-                        </Td>
-                        <Td
-                          width={10}
-                          {...getTdProps({ columnKey: "vulnerabilities" })}
-                        >
-                          <PackageVulnerabilities
-                            pkg={pkg}
-                            isFetching={packageIsFetching}
-                            fetchError={packageFetchError}
-                          />
-                        </Td>
+                          </Td>
+                        )}
+                        {getColumnVisibility("path") && (
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "path" })}
+                          >
+                            {item.decomposedPurl?.path}
+                          </Td>
+                        )}
+                        {getColumnVisibility("qualifiers") && (
+                          <Td
+                            width={20}
+                            {...getTdProps({ columnKey: "qualifiers" })}
+                          >
+                            {item.decomposedPurl?.qualifiers && (
+                              <PackageQualifiers
+                                value={item.decomposedPurl?.qualifiers}
+                              />
+                            )}
+                          </Td>
+                        )}
+                        {getColumnVisibility("vulnerabilities") && (
+                          <Td
+                            width={10}
+                            {...getTdProps({ columnKey: "vulnerabilities" })}
+                          >
+                            <PackageVulnerabilities
+                              pkg={pkg}
+                              isFetching={packageIsFetching}
+                              fetchError={packageFetchError}
+                            />
+                          </Td>
+                        )}
                       </TableRowContentWithControls>
                     </Tr>
                     {isCellExpanded(item) ? (
