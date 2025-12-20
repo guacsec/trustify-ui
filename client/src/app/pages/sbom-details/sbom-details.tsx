@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import type { AxiosError } from "axios";
 
@@ -40,9 +40,9 @@ import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
+import { useTabControls } from "@app/hooks/tab-controls";
 import { useDeleteSbomMutation, useFetchSBOMById } from "@app/queries/sboms";
 
-import { useNavigate } from "react-router-dom";
 import { Overview } from "./overview";
 import { PackagesBySbom } from "./packages-by-sbom";
 import { VulnerabilitiesBySbom } from "./vulnerabilities-by-sbom";
@@ -90,7 +90,13 @@ export const SbomDetails: React.FC = () => {
   );
 
   // Tabs
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
+  const {
+    propHelpers: { getTabsProps, getTabProps, getTabContentProps },
+  } = useTabControls({
+    persistenceKeyPrefix: "sd", // sb="sbom details"
+    persistTo: "urlParams",
+    tabKeys: ["info", "packages", "vulnerabilities"],
+  });
 
   const infoTabRef = React.createRef<HTMLElement>();
   const packagesTabRef = React.createRef<HTMLElement>();
@@ -98,13 +104,6 @@ export const SbomDetails: React.FC = () => {
 
   // Tabs popover refs
   const vulnerabilitiesTabPopoverRef = React.createRef<HTMLElement>();
-
-  const handleTabClick = (
-    _event: React.MouseEvent | React.KeyboardEvent | MouseEvent,
-    tabIndex: string | number,
-  ) => {
-    setActiveTabKey(tabIndex);
-  };
 
   return (
     <>
@@ -191,27 +190,23 @@ export const SbomDetails: React.FC = () => {
       <PageSection>
         <Tabs
           mountOnEnter
-          activeKey={activeTabKey}
-          onSelect={handleTabClick}
+          {...getTabsProps()}
           aria-label="Tabs that contain the SBOM information"
           role="region"
         >
           <Tab
-            eventKey={0}
+            {...getTabProps("info")}
             title={<TabTitleText>Info</TabTitleText>}
-            tabContentId="refTabInfoSection"
             tabContentRef={infoTabRef}
           />
           <Tab
-            eventKey={1}
+            {...getTabProps("packages")}
             title={<TabTitleText>Packages</TabTitleText>}
-            tabContentId="refTabPackagesSection"
             tabContentRef={packagesTabRef}
           />
           <Tab
-            eventKey={2}
+            {...getTabProps("vulnerabilities")}
             title={<TabTitleText>Vulnerabilities</TabTitleText>}
-            tabContentId="refVulnerabilitiesSection"
             tabContentRef={vulnerabilitiesTabRef}
             actions={
               <>
@@ -234,8 +229,7 @@ export const SbomDetails: React.FC = () => {
       </PageSection>
       <PageSection>
         <TabContent
-          eventKey={0}
-          id="refTabInfoSection"
+          {...getTabContentProps("info")}
           ref={infoTabRef}
           aria-label="Information of the SBOM"
         >
@@ -244,20 +238,16 @@ export const SbomDetails: React.FC = () => {
           </LoadingWrapper>
         </TabContent>
         <TabContent
-          eventKey={1}
-          id="refTabPackagesSection"
+          {...getTabContentProps("packages")}
           ref={packagesTabRef}
           aria-label="Packages within the SBOM"
-          hidden
         >
           {sbomId && <PackagesBySbom sbomId={sbomId} />}
         </TabContent>
         <TabContent
-          eventKey={2}
-          id="refVulnerabilitiesSection"
+          {...getTabContentProps("vulnerabilities")}
           ref={vulnerabilitiesTabRef}
           aria-label="Vulnerabilities within the SBOM"
-          hidden
         >
           {sbomId && <VulnerabilitiesBySbom sbomId={sbomId} />}
         </TabContent>
