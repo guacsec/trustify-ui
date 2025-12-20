@@ -115,7 +115,7 @@ Then(
   "SBOM Name {string} should be visible inside the tab",
   async ({ page }, sbomName) => {
     const panelSbomName = await page.locator(
-      `xpath=//section[@id='info-tab-section']//dt[contains(.,'Name')]/following-sibling::dd`,
+      `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Name')]/following-sibling::dd`,
     );
     await panelSbomName.isVisible();
     await expect(await panelSbomName.textContent()).toEqual(sbomName);
@@ -124,7 +124,7 @@ Then(
 
 Then("SBOM Version should be visible inside the tab", async ({ page }) => {
   const panelSBOMVersion = await page.locator(
-    `xpath=//section[@id='info-tab-section']//dt[contains(.,'Version')]/following-sibling::dd`,
+    `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Version')]/following-sibling::dd`,
   );
   await panelSBOMVersion.isVisible();
 });
@@ -133,7 +133,7 @@ Then(
   "SBOM Creation date should be visible inside the tab",
   async ({ page }) => {
     const panelSBOMVersion = await page.locator(
-      `xpath=//section[@id='info-tab-section']//dt[contains(.,'Creation date')]/following-sibling::dd`,
+      `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Creation date')]/following-sibling::dd`,
     );
     await panelSBOMVersion.isVisible();
   },
