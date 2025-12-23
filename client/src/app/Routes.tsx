@@ -188,10 +188,7 @@ export const AppRoutes = createBrowserRouter([
       {
         path: "*",
         element: (
-          <LazyRouteElement
-            identifier="not-found"
-            component={<NotFound />}
-          />
+          <LazyRouteElement identifier="not-found" component={<NotFound />} />
         ),
       },
     ],
