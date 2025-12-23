@@ -32,6 +32,7 @@ const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
+const NotFound = lazy(() => import("./pages/not-found"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
@@ -182,6 +183,12 @@ export const AppRoutes = createBrowserRouter([
             identifier="vulnerability-details"
             component={<VulnerabilityDetails />}
           />
+        ),
+      },
+      {
+        path: "*",
+        element: (
+          <LazyRouteElement identifier="not-found" component={<NotFound />} />
         ),
       },
     ],
