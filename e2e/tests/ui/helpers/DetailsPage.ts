@@ -155,11 +155,11 @@ export class DetailsPage {
       Critical: 0,
     };
     const nextButton = await this.page.locator(
-      `xpath=(//section[@id='refVulnerabilitiesSection']//button[@data-action='next'])[1]`,
+      `xpath=(//section[@id='vulnerabilities-tab-section']//button[@data-action='next'])[1]`,
     );
 
     const noOfRows = await this.page.locator(
-      `xpath=//section[@id="refVulnerabilitiesSection"]//button[@id="pagination-id-top-toggle"]`,
+      `xpath=//section[@id="vulnerabilities-tab-section"]//button[@id="pagination-id-top-toggle"]`,
     );
     if (await noOfRows.isEnabled()) {
       noOfRows.click();
