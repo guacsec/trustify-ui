@@ -98,7 +98,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
   // Tabs
   const {
     propHelpers: { getTabsProps, getTabProps },
-    state: { activeTab },
+    derivedState: { isTabActive },
   } = useTabControls({
     persistenceKeyPrefix: "sp", // search page tabs
     persistTo: "urlParams",
@@ -115,22 +115,22 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
       <SplitItem>
         <Card isFullHeight>
           <CardBody style={{ width: 241 }}>
-            {activeTab?.tabKey === "sboms" ? (
+            {isTabActive("sboms") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...sbomFilterPanelProps}
               />
-            ) : activeTab?.tabKey === "packages" ? (
+            ) : isTabActive("packages") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...packageFilterPanelProps}
               />
-            ) : activeTab?.tabKey === "vulnerabilities" ? (
+            ) : isTabActive("vulnerabilities") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...vulnerabilityFilterPanelProps}
               />
-            ) : activeTab?.tabKey === "advisories" ? (
+            ) : isTabActive("advisories") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...advisoryFilterPanelProps}
