@@ -1,9 +1,11 @@
 import {
   keepPreviousData,
+  queryOptions,
   useMutation,
   useQueries,
   useQuery,
   useQueryClient,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
@@ -82,6 +84,25 @@ export const useFetchSBOMs = (
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,
+  };
+};
+
+export const fetchSBOMByIdOptions = (id: string) => {
+  return queryOptions({
+    queryKey: [SBOMsQueryKey, id],
+    queryFn: () => getSbom({ client, path: { id } }),
+  });
+};
+
+export const useSuspenseSBOMById = (id: string) => {
+  const { data, isLoading, error } = useSuspenseQuery({
+    ...fetchSBOMByIdOptions(id),
+  });
+
+  return {
+    sbom: data?.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
   };
 };
 

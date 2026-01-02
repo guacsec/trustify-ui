@@ -7,6 +7,9 @@ import App from "./App";
 import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 import { fetchAdvisoryByIdOptions } from "./queries/advisories";
 import { queryClient } from "./queries/config";
+import { fetchPackageByIdOptions } from "./queries/packages";
+import { fetchSBOMByIdOptions } from "./queries/sboms";
+import { fetchVulnerabilityByIdOptions } from "./queries/vulnerabilities";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -150,6 +153,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.packageDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const packageId = usePathFromParams(params, PathParam.PACKAGE_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchPackageByIdOptions(packageId),
+          );
+          return {
+            package: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="package-details"
@@ -165,6 +178,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.sbomDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const sbomId = usePathFromParams(params, PathParam.SBOM_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchSBOMByIdOptions(sbomId),
+          );
+          return {
+            sbom: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="sbom-details"
@@ -204,6 +227,19 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.vulnerabilityDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const vulnerabilityId = usePathFromParams(
+            params,
+            PathParam.VULNERABILITY_ID,
+          );
+          const response = await queryClient.ensureQueryData(
+            fetchVulnerabilityByIdOptions(vulnerabilityId),
+          );
+          return {
+            vulnerability: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="vulnerability-details"

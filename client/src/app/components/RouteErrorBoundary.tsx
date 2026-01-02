@@ -10,8 +10,9 @@ import {
   EmptyStateBody,
   EmptyStateVariant,
 } from "@patternfly/react-core";
-import PathMissingIcon from "@patternfly/react-icons/dist/esm/icons/path-missing-icon";
 import LockIcon from "@patternfly/react-icons/dist/esm/icons/lock-icon";
+import PathMissingIcon from "@patternfly/react-icons/dist/esm/icons/path-missing-icon";
+import UserNinjaIcon from "@patternfly/react-icons/dist/esm/icons/user-ninja-icon";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 export const RouteErrorBoundary: React.FC = () => {
@@ -55,6 +56,32 @@ export const RouteErrorBoundary: React.FC = () => {
           >
             <EmptyStateBody>
               Try to refresh your page or contact your admin.
+              <Button
+                variant="primary"
+                className={spacing.mtSm}
+                onClick={() => {
+                  navigate("/");
+                }}
+              >
+                Refresh
+              </Button>
+            </EmptyStateBody>
+          </EmptyState>
+        </Bullseye>
+      );
+    }
+    if (error.status && error.status >= 400 && error.status <= 599) {
+      return (
+        <Bullseye>
+          <EmptyState
+            titleText="Error"
+            headingLevel="h4"
+            icon={UserNinjaIcon}
+            variant={EmptyStateVariant.sm}
+          >
+            <EmptyStateBody>
+              Try to refresh your page or contact your admin.
+              {/* {error.message} */}
               <Button
                 variant="primary"
                 className={spacing.mtSm}

@@ -22,7 +22,7 @@ import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
-import { useFetchPackageById } from "@app/queries/packages";
+import { useSuspensePackageById } from "@app/queries/packages";
 import { decomposePurl } from "@app/utils/utils";
 
 import { SbomsByPackage } from "./sboms-by-package";
@@ -30,7 +30,7 @@ import { VulnerabilitiesByPackage } from "./vulnerabilities-by-package";
 
 export const PackageDetails: React.FC = () => {
   const packageId = useRouteParams(PathParam.PACKAGE_ID);
-  const { pkg, isFetching, fetchError } = useFetchPackageById(packageId);
+  const { pkg, isFetching, fetchError } = useSuspensePackageById(packageId);
 
   const decomposedPurl = React.useMemo(() => {
     return pkg ? decomposePurl(pkg.purl) : undefined;
