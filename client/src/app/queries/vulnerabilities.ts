@@ -4,8 +4,8 @@ import type { AxiosError } from "axios";
 import type { HubRequestParams } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
-  type AnalysisResponseV2,
-  analyze,
+  type AnalysisResponse,
+  analyzeV3,
   getVulnerability,
   listVulnerabilities,
 } from "@app/client";
@@ -50,7 +50,7 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
       return chunks;
     }, []),
     dataResolver: async (ids: string[]) => {
-      const response = await analyze({
+      const response = await analyzeV3({
         client,
         body: { purls: ids },
       });
@@ -71,7 +71,7 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
   const isFetching = userQueries.some(({ isFetching }) => isFetching);
   const fetchError = userQueries.find(({ error }) => !!error);
 
-  const analysisResponse: AnalysisResponseV2 = {};
+  const analysisResponse: AnalysisResponse = {};
 
   if (!isFetching) {
     for (const data of userQueries.map((item) => item?.data ?? {})) {

@@ -4694,6 +4694,7 @@ components:
       required:
       - vulnerability
       - advisory
+      - scores
       - average_severity
       - average_score
       - status
@@ -4710,6 +4711,11 @@ components:
           oneOf:
           - type: 'null'
           - $ref: '#/components/schemas/StatusContext'
+        scores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Score'
+          description: All CVSS scores associated with the vulnerability
         status:
           type: string
         version_range:
