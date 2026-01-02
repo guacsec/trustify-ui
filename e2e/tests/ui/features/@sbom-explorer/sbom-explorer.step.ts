@@ -122,7 +122,7 @@ Then(
   "SBOM Name {string} should be visible inside the tab",
   async ({ page }, sbomName) => {
     const panelSbomName = await page.locator(
-      `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Name')]/following-sibling::dd`,
+      `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Name')]/following-sibling::dd`,
     );
     await panelSbomName.isVisible();
     await expect(await panelSbomName.textContent()).toEqual(sbomName);
@@ -131,7 +131,7 @@ Then(
 
 Then("SBOM Version should be visible inside the tab", async ({ page }) => {
   const panelSBOMVersion = await page.locator(
-    `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Version')]/following-sibling::dd`,
+    `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Version')]/following-sibling::dd`,
   );
   await panelSBOMVersion.isVisible();
 });
@@ -191,8 +191,9 @@ Then(
   "The Label list {string} is visible on the Explorer Page for SBOM {string}",
   async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
-    await detailsPage.selectTab("Info");
+    await detailsPage.selectTab(`Info`);
     const infoSection = page.locator("#info-tab-section");
+
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
