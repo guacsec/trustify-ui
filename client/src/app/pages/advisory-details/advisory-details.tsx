@@ -37,6 +37,7 @@ import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
+import { useTabControls } from "@app/hooks/tab-controls";
 import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
@@ -86,14 +87,13 @@ export const AdvisoryDetails: React.FC = () => {
     useDeleteAdvisoryMutation(onDeleteAdvisorySuccess, onDeleteAdvisoryError);
 
   // Tabs
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
-
-  const handleTabClick = (
-    _event: React.MouseEvent | React.KeyboardEvent | MouseEvent,
-    tabIndex: string | number,
-  ) => {
-    setActiveTabKey(tabIndex);
-  };
+  const {
+    propHelpers: { getTabsProps, getTabProps, getTabContentProps },
+  } = useTabControls({
+    persistenceKeyPrefix: "ad", // ad="advisory details"
+    persistTo: "urlParams",
+    tabKeys: ["info", "vulnerabilities"],
+  });
 
   const infoTabRef = React.createRef<HTMLElement>();
   const vulnerabilitiesTabRef = React.createRef<HTMLElement>();
@@ -178,29 +178,25 @@ export const AdvisoryDetails: React.FC = () => {
       <PageSection>
         <Tabs
           mountOnEnter
-          activeKey={activeTabKey}
-          onSelect={handleTabClick}
+          {...getTabsProps()}
           aria-label="Tabs that contain the Advisory information"
           role="region"
         >
           <Tab
-            eventKey={0}
+            {...getTabProps("info")}
             title={<TabTitleText>Info</TabTitleText>}
-            tabContentId="refTabInfoSection"
             tabContentRef={infoTabRef}
           />
           <Tab
-            eventKey={1}
+            {...getTabProps("vulnerabilities")}
             title={<TabTitleText>Vulnerabilities</TabTitleText>}
-            tabContentId="refVulnerabilitiesSection"
             tabContentRef={vulnerabilitiesTabRef}
           />
         </Tabs>
       </PageSection>
       <PageSection>
         <TabContent
-          eventKey={0}
-          id="refTabInfoSection"
+          {...getTabContentProps("info")}
           ref={infoTabRef}
           aria-label="Information of the Advisory"
         >
@@ -209,11 +205,9 @@ export const AdvisoryDetails: React.FC = () => {
           </LoadingWrapper>
         </TabContent>
         <TabContent
-          eventKey={1}
-          id="refVulnerabilitiesSection"
+          {...getTabContentProps("vulnerabilities")}
           ref={vulnerabilitiesTabRef}
           aria-label="Vulnerabilities within the Advisory"
-          hidden
         >
           <VulnerabilitiesByAdvisory
             isFetching={isFetching}
