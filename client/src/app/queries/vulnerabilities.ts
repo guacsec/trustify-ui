@@ -1,4 +1,9 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useQueries,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
@@ -88,10 +93,28 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
   };
 };
 
-export const useFetchVulnerabilityById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
+export const fetchVulnerabilityByIdOptions = (id: string) => {
+  return queryOptions({
     queryKey: [VulnerabilitiesQueryKey, id],
     queryFn: () => getVulnerability({ client, path: { id } }),
+  });
+};
+
+export const useSuspenseVulnerabilityById = (id: string) => {
+  const { data, isLoading, error } = useSuspenseQuery({
+    ...fetchVulnerabilityByIdOptions(id),
+  });
+
+  return {
+    vulnerability: data?.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+export const useFetchVulnerabilityById = (id: string) => {
+  const { data, isLoading, error } = useQuery({
+    ...fetchVulnerabilityByIdOptions(id),
   });
   return {
     vulnerability: data?.data,

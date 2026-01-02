@@ -1,4 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
@@ -35,10 +39,28 @@ export const useFetchPackages = (
   };
 };
 
-export const useFetchPackageById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
+export const fetchPackageByIdOptions = (id: string) => {
+  return queryOptions({
     queryKey: [PackagesQueryKey, id],
     queryFn: () => getPurl({ client, path: { key: id } }),
+  });
+};
+
+export const useSuspensePackageById = (id: string) => {
+  const { data, isLoading, error } = useSuspenseQuery({
+    ...fetchPackageByIdOptions(id),
+  });
+
+  return {
+    pkg: data?.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+export const useFetchPackageById = (id: string) => {
+  const { data, isLoading, error } = useQuery({
+    ...fetchPackageByIdOptions(id),
   });
 
   return {

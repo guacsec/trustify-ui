@@ -1,9 +1,15 @@
 import { lazy } from "react";
-import { createBrowserRouter, useParams } from "react-router-dom";
+import { createBrowserRouter, type Params, useParams } from "react-router-dom";
 
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
+import { fetchAdvisoryByIdOptions } from "./queries/advisories";
+import { queryClient } from "./queries/config";
+import { fetchPackageByIdOptions } from "./queries/packages";
+import { fetchSBOMByIdOptions } from "./queries/sboms";
+import { fetchVulnerabilityByIdOptions } from "./queries/vulnerabilities";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -32,6 +38,7 @@ const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
+const NotFound = lazy(() => import("./pages/not-found"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
@@ -58,6 +65,19 @@ export const Paths = {
   licenses: "/licenses",
 } as const;
 
+export const usePathFromParams = (
+  params: Params<string>,
+  pathParam: PathParam,
+) => {
+  const value = params[pathParam];
+  if (value === undefined) {
+    throw new Error(
+      `ASSERTION FAILURE: required path parameter not set: ${pathParam}`,
+    );
+  }
+  return value;
+};
+
 export const AppRoutes = createBrowserRouter([
   {
     path: "/",
@@ -78,6 +98,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisoryDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const advisoryId = usePathFromParams(params, PathParam.ADVISORY_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchAdvisoryByIdOptions(advisoryId),
+          );
+          return {
+            advisory: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="advisory-details"
@@ -123,6 +153,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.packageDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const packageId = usePathFromParams(params, PathParam.PACKAGE_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchPackageByIdOptions(packageId),
+          );
+          return {
+            package: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="package-details"
@@ -138,6 +178,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.sbomDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const sbomId = usePathFromParams(params, PathParam.SBOM_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchSBOMByIdOptions(sbomId),
+          );
+          return {
+            sbom: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="sbom-details"
@@ -177,11 +227,30 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.vulnerabilityDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const vulnerabilityId = usePathFromParams(
+            params,
+            PathParam.VULNERABILITY_ID,
+          );
+          const response = await queryClient.ensureQueryData(
+            fetchVulnerabilityByIdOptions(vulnerabilityId),
+          );
+          return {
+            vulnerability: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="vulnerability-details"
             component={<VulnerabilityDetails />}
           />
+        ),
+      },
+      {
+        path: "*",
+        element: (
+          <LazyRouteElement identifier="not-found" component={<NotFound />} />
         ),
       },
     ],

@@ -41,7 +41,7 @@ import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
-import { useDeleteSbomMutation, useFetchSBOMById } from "@app/queries/sboms";
+import { useDeleteSbomMutation, useSuspenseSBOMById } from "@app/queries/sboms";
 
 import { Overview } from "./overview";
 import { PackagesBySbom } from "./packages-by-sbom";
@@ -52,7 +52,7 @@ export const SbomDetails: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
   const sbomId = useRouteParams(PathParam.SBOM_ID);
-  const { sbom, isFetching, fetchError } = useFetchSBOMById(sbomId);
+  const { sbom, isFetching, fetchError } = useSuspenseSBOMById(sbomId);
 
   // Actions Dropdown
   const [isActionsDropdownOpen, setIsActionsDropdownOpen] =
