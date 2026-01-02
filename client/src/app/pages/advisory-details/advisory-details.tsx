@@ -39,7 +39,7 @@ import { NotificationsContext } from "@app/components/NotificationsContext";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import {
   useDeleteAdvisoryMutation,
-  useFetchAdvisoryById,
+  useSuspenseAdvisoryById,
 } from "@app/queries/advisories";
 
 import { Overview } from "./overview";
@@ -50,7 +50,8 @@ export const AdvisoryDetails: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
   const advisoryId = useRouteParams(PathParam.ADVISORY_ID);
-  const { advisory, isFetching, fetchError } = useFetchAdvisoryById(advisoryId);
+  const { advisory, isFetching, fetchError } =
+    useSuspenseAdvisoryById(advisoryId);
 
   // Actions Dropdown
   const [isActionsDropdownOpen, setIsActionsDropdownOpen] =

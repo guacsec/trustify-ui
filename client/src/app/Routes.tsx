@@ -1,9 +1,12 @@
 import { lazy } from "react";
-import { createBrowserRouter, useParams } from "react-router-dom";
+import { createBrowserRouter, type Params, useParams } from "react-router-dom";
 
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
+import { fetchAdvisoryByIdOptions } from "./queries/advisories";
+import { queryClient } from "./queries/config";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -59,6 +62,19 @@ export const Paths = {
   licenses: "/licenses",
 } as const;
 
+export const usePathFromParams = (
+  params: Params<string>,
+  pathParam: PathParam,
+) => {
+  const value = params[pathParam];
+  if (value === undefined) {
+    throw new Error(
+      `ASSERTION FAILURE: required path parameter not set: ${pathParam}`,
+    );
+  }
+  return value;
+};
+
 export const AppRoutes = createBrowserRouter([
   {
     path: "/",
@@ -79,6 +95,16 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisoryDetails,
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const advisoryId = usePathFromParams(params, PathParam.ADVISORY_ID);
+          const response = await queryClient.ensureQueryData(
+            fetchAdvisoryByIdOptions(advisoryId),
+          );
+          return {
+            advisory: response.data,
+          };
+        },
         element: (
           <LazyRouteElement
             identifier="advisory-details"

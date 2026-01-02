@@ -1,8 +1,10 @@
 import {
   keepPreviousData,
+  queryOptions,
   useMutation,
   useQuery,
   useQueryClient,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
@@ -88,10 +90,28 @@ export const useFetchAdvisories = (
   };
 };
 
-export const useFetchAdvisoryById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
+export const fetchAdvisoryByIdOptions = (id: string) => {
+  return queryOptions({
     queryKey: [AdvisoriesQueryKey, id],
     queryFn: () => getAdvisory({ client, path: { key: id } }),
+  });
+};
+
+export const useSuspenseAdvisoryById = (id: string) => {
+  const { data, isLoading, error } = useSuspenseQuery({
+    ...fetchAdvisoryByIdOptions(id),
+  });
+
+  return {
+    advisory: data?.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+export const useFetchAdvisoryById = (id: string) => {
+  const { data, isLoading, error } = useQuery({
+    ...fetchAdvisoryByIdOptions(id),
     enabled: !!id,
   });
 
