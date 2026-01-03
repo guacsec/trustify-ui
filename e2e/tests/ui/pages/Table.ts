@@ -78,6 +78,16 @@ export class Table<
     await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 
+  async expandCell(columnName: TColumnName, rowIndex: number) {
+    await this._table
+      .locator(`td[data-label="${columnName}"]`)
+      .nth(rowIndex)
+      .click();
+    return this._table
+      .locator(`td[data-label="${columnName}"]`)
+      .nth(rowIndex + 1);
+  }
+
   async getColumn(columnName: TColumnName) {
     const column = this._table.locator(`td[data-label="${columnName}"]`);
     await expect(column.first()).toBeVisible();
