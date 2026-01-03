@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { VulnerabilitiesTab } from "./VulnerabilitiesTab";
@@ -24,14 +23,10 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const idIndex = ids.indexOf("CVE-2023-1664");
     expect(idIndex).not.toBe(-1);
 
-    // Name
-    await expect(
-      table._table.locator(`td[data-label="ID"]`).nth(idIndex),
-    ).toContainText("CVE-2023-1664");
+    // ID
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2023-1664", idIndex);
 
-    // Title
-    await expect(
-      table._table.locator(`td[data-label="CVSS"]`).nth(idIndex),
-    ).toContainText("Medium(6.5)");
+    // CVSS
+    await expect(table).toHaveColumnWithValue("CVSS", "Medium(6.5)", idIndex);
   });
 });
