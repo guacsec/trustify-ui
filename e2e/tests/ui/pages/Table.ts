@@ -87,6 +87,7 @@ export class Table<
   async getColumnHeader(columnName: TColumnName) {
     const columnHeader = this._table.getByRole("columnheader", {
       name: columnName,
+      exact: true,
     });
     await expect(columnHeader).toBeVisible();
     return columnHeader;
