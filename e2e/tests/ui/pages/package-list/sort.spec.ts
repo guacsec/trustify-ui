@@ -14,10 +14,10 @@ test.describe("Sort validations", { tag: "@tier1" }, () => {
     const listPage = await PackageListPage.build(page);
     const table = await listPage.getTable();
 
-    // ID Asc
+    // Name Asc
     await expect(table).toBeSortedBy("Name", "ascending");
 
-    // ID Desc
+    // Name Desc
     await table.clickSortBy("Name");
     await expect(table).toBeSortedBy("Name", "descending");
   });
