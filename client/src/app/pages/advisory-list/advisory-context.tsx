@@ -118,7 +118,7 @@ export const AdvisorySearchProvider: React.FunctionComponent<
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
-        identifier: "identifier",
+        identifier: "document_id",
         modified: "modified",
       },
     }),
