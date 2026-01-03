@@ -79,13 +79,12 @@ export class Table<
   }
 
   async expandCell(columnName: TColumnName, rowIndex: number) {
-    await this._table
-      .locator(`td[data-label="${columnName}"]`)
-      .nth(rowIndex)
-      .click();
-    return this._table
-      .locator(`td[data-label="${columnName}"]`)
-      .nth(rowIndex + 1);
+    const column = await this.getColumn(columnName);
+    await column.nth(rowIndex).click();
+
+    const expandedCell = column.nth(rowIndex + 1);
+    await expect(expandedCell).toBeVisible();
+    return expandedCell;
   }
 
   async getColumn(columnName: TColumnName) {
