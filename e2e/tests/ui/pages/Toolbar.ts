@@ -1,6 +1,7 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "../assertions";
 
-type TFilterValue = "string" | "dateRange" | "multiSelect" | "typeahead";
+export type TFilterValue = "string" | "dateRange" | "multiSelect" | "typeahead";
 
 type TDateRange = { from: string; to: string };
 type TMultiValue = string[];
@@ -12,35 +13,35 @@ type FilterValueTypeMap = {
   typeahead: TMultiValue;
 };
 
-type FilterValueType<TFilter extends Record<string, TFilterValue>> = {
+export type FilterValueType<TFilter extends Record<string, TFilterValue>> = {
   [K in keyof TFilter]: FilterValueTypeMap[TFilter[K]];
 };
 
-function isStringFilter<K extends string, T extends Record<K, TFilterValue>>(
-  type: T[K],
-  value: unknown,
-): value is string {
+export function isStringFilter<
+  K extends string,
+  T extends Record<K, TFilterValue>,
+>(type: T[K], value: unknown): value is string {
   return type === "string";
 }
 
-function isDateRangeFilter<K extends string, T extends Record<K, TFilterValue>>(
-  type: T[K],
-  value: unknown,
-): value is TDateRange {
+export function isDateRangeFilter<
+  K extends string,
+  T extends Record<K, TFilterValue>,
+>(type: T[K], value: unknown): value is TDateRange {
   return type === "dateRange";
 }
 
-function isMultiSelectFilter<
+export function isMultiSelectFilter<
   K extends string,
   T extends Record<K, TFilterValue>,
 >(type: T[K], value: unknown): value is TMultiValue {
   return type === "multiSelect";
 }
 
-function isTypeaheadFilter<K extends string, T extends Record<K, TFilterValue>>(
-  type: T[K],
-  value: unknown,
-): value is TMultiValue {
+export function isTypeaheadFilter<
+  K extends string,
+  T extends Record<K, TFilterValue>,
+>(type: T[K], value: unknown): value is TMultiValue {
   return type === "typeahead";
 }
 
@@ -50,7 +51,7 @@ export class Toolbar<
 > {
   private readonly _page: Page;
   _toolbar: Locator;
-  private readonly _filters: TFilter;
+  readonly _filters: TFilter;
 
   private constructor(page: Page, toolbar: Locator, filters: TFilter) {
     this._page = page;
@@ -84,25 +85,28 @@ export class Toolbar<
       await this.selectFilter(filterName);
       if (isStringFilter(filterType, filterValue)) {
         await this.applyTextFilter(filterName, filterValue);
-      } else if (isDateRangeFilter(filterType, filterValue)) {
+      }
+      if (isDateRangeFilter(filterType, filterValue)) {
         await this.applyDateRangeFilter(filterName, filterValue);
-      } else if (isMultiSelectFilter(filterType, filterValue)) {
+      }
+      if (isMultiSelectFilter(filterType, filterValue)) {
         await this.applyMultiSelectFilter(filterName, filterValue);
-      } else if (isTypeaheadFilter(filterType, filterValue)) {
+      }
+      if (isTypeaheadFilter(filterType, filterValue)) {
         await this.applyTypeaheadFilter(filterName, filterValue);
       }
     }
+
+    await expect(this).toHaveLabels(filters);
   }
 
-  private async applyTextFilter(filterName: TFilterName, filterValue: string) {
+  private async applyTextFilter(_filterName: TFilterName, filterValue: string) {
     await this._toolbar.getByRole("textbox").fill(filterValue);
     await this._page.keyboard.press("Enter");
-
-    await this.assertFilterHasLabels(filterName, filterValue);
   }
 
   private async applyDateRangeFilter(
-    filterName: TFilterName,
+    _filterName: TFilterName,
     dateRange: TDateRange,
   ) {
     await this._toolbar
@@ -111,15 +115,10 @@ export class Toolbar<
     await this._toolbar
       .locator("input[aria-label='Interval end']")
       .fill(dateRange.to);
-
-    await this.assertFilterHasLabels(filterName, [
-      dateRange.from,
-      dateRange.to,
-    ]);
   }
 
   private async applyMultiSelectFilter(
-    filterName: TFilterName,
+    _filterName: TFilterName,
     selections: string[],
   ) {
     for (const option of selections) {
@@ -136,12 +135,10 @@ export class Toolbar<
       await expect(dropdownOption).toBeVisible();
       await dropdownOption.click();
     }
-
-    await this.assertFilterHasLabels(filterName, selections);
   }
 
   private async applyTypeaheadFilter(
-    filterName: TFilterName,
+    _filterName: TFilterName,
     labels: string[],
   ) {
     for (const label of labels) {
@@ -153,8 +150,6 @@ export class Toolbar<
       await expect(dropdownOption).toBeVisible();
       await dropdownOption.click();
     }
-
-    await this.assertFilterHasLabels(filterName, labels);
   }
 
   /**
@@ -166,21 +161,5 @@ export class Toolbar<
       .locator(".pf-m-toggle-group button.pf-v6-c-menu-toggle")
       .click();
     await this._page.getByRole("menuitem", { name: filterName }).click();
-  }
-
-  private async assertFilterHasLabels(
-    filterName: TFilterName,
-    filterValue: string | string[],
-  ) {
-    await expect(
-      this._toolbar.locator(".pf-m-label-group", { hasText: filterName }),
-    ).toBeVisible();
-
-    const labels = Array.isArray(filterValue) ? filterValue : [filterValue];
-    for (const label of labels) {
-      await expect(
-        this._toolbar.locator(".pf-m-label-group", { hasText: label }),
-      ).toBeVisible();
-    }
   }
 }

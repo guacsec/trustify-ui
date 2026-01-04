@@ -9,9 +9,13 @@ import {
   type PaginationMatchers,
 } from "./PaginationMatchers";
 
+import type { TFilterValue, Toolbar } from "../pages/Toolbar";
+import { toolbarAssertions, type ToolbarMatchers } from "./ToolbarMatchers";
+
 const merged = mergeExpects(
   tableAssertions,
   paginationAssertions,
+  toolbarAssertions,
   // Add more custom assertions here
 );
 
@@ -39,6 +43,20 @@ function typedExpect(
   value: Pagination,
 ): Omit<ReturnType<typeof merged<Pagination>>, keyof PaginationMatchers> &
   PaginationMatchers;
+
+/**
+ * Overload from ToolbarMatchers.ts
+ */
+function typedExpect<
+  TFilter extends Record<string, TFilterValue>,
+  TFilterName extends Extract<keyof TFilter, string>,
+>(
+  value: Toolbar<TFilter, TFilterName>,
+): Omit<
+  ReturnType<typeof merged<Toolbar<TFilter, TFilterName>>>,
+  keyof ToolbarMatchers<TFilter, TFilterName>
+> &
+  ToolbarMatchers<TFilter, TFilterName>;
 
 // Default overload
 function typedExpect<T>(value: T): ReturnType<typeof merged<T>>;
