@@ -9,7 +9,8 @@ import {
   type PaginationMatchers,
 } from "./PaginationMatchers";
 
-import type { TFilterValue, Toolbar } from "../pages/Toolbar";
+import type { Toolbar } from "../pages/Toolbar";
+import type { TFilterValue } from "../pages/utils";
 import { toolbarAssertions, type ToolbarMatchers } from "./ToolbarMatchers";
 
 const merged = mergeExpects(
