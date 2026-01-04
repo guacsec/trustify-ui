@@ -1,13 +1,13 @@
 import { expect as baseExpect } from "@playwright/test";
+import type { Toolbar } from "../pages/Toolbar";
 import {
+  type FilterValueType,
   isDateRangeFilter,
   isMultiSelectFilter,
   isStringFilter,
   isTypeaheadFilter,
-  type FilterValueType,
   type TFilterValue,
-  type Toolbar,
-} from "../pages/Toolbar";
+} from "../pages/utils";
 import type { MatcherResult } from "./types";
 
 export interface ToolbarMatchers<
@@ -59,9 +59,14 @@ export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
           labels.push(...filterValue);
         }
 
+        const group = toolbar._toolbar.locator(".pf-m-label-group", {
+          hasText: filterName,
+        });
+        await baseExpect(group).toBeVisible();
+
         for (const label of labels) {
           await baseExpect(
-            toolbar._toolbar.locator(".pf-m-label-group", { hasText: label }),
+            group.locator(".pf-v6-c-label-group__list", { hasText: label }),
           ).toBeVisible();
         }
       }
