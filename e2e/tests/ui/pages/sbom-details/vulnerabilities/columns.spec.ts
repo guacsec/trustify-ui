@@ -47,25 +47,13 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
         .nth(idIndex),
     ).toContainText("3");
 
-    await table._table
-      .locator(`td[data-label="Affected dependencies"]`)
-      .nth(idIndex)
-      .click();
+    const expandedCell = await table.expandCell(
+      "Affected dependencies",
+      idIndex,
+    );
 
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-undertow");
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-keycloak-authorization");
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-vertx-http");
+    await expect(expandedCell).toContainText("quarkus-undertow");
+    await expect(expandedCell).toContainText("quarkus-keycloak-authorization");
+    await expect(expandedCell).toContainText("quarkus-vertx-http");
   });
 });
