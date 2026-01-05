@@ -1,0 +1,85 @@
+import { expect as baseExpect } from "@playwright/test";
+import type { Toolbar } from "../pages/Toolbar";
+import {
+  type FilterValueType,
+  isDateRangeFilter,
+  isMultiSelectFilter,
+  isStringFilter,
+  isTypeaheadFilter,
+  type TFilterValue,
+} from "../pages/utils";
+import type { MatcherResult } from "./types";
+
+export interface ToolbarMatchers<
+  TFilter extends Record<string, TFilterValue>,
+  _TFilterName extends Extract<keyof TFilter, string>,
+> {
+  toHaveLabels(
+    filters: Partial<FilterValueType<TFilter>>,
+  ): Promise<MatcherResult>;
+}
+
+type ToolbarMatcherDefinitions = {
+  readonly [K in keyof ToolbarMatchers<Record<string, TFilterValue>, string>]: <
+    TFilter extends Record<string, TFilterValue>,
+    TFilterName extends Extract<keyof TFilter, string>,
+  >(
+    receiver: Toolbar<TFilter, TFilterName>,
+    ...args: Parameters<ToolbarMatchers<TFilter, TFilterName>[K]>
+  ) => Promise<MatcherResult>;
+};
+
+export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
+  toHaveLabels: async <
+    TFilter extends Record<string, TFilterValue>,
+    TFilterName extends Extract<keyof TFilter, string>,
+  >(
+    toolbar: Toolbar<TFilter, TFilterName>,
+    filters: Partial<FilterValueType<TFilter>>,
+  ): Promise<MatcherResult> => {
+    try {
+      for (const filterName of Object.keys(filters) as Array<TFilterName>) {
+        const filterValue = filters[filterName];
+        if (!filterValue) continue;
+
+        const filterType = toolbar._filters[filterName];
+
+        const labels: string[] = [];
+        if (isStringFilter(filterType, filterValue)) {
+          labels.push(filterValue);
+        }
+        if (isDateRangeFilter(filterType, filterValue)) {
+          labels.push(filterValue.from);
+          labels.push(filterValue.to);
+        }
+        if (isMultiSelectFilter(filterType, filterValue)) {
+          labels.push(...filterValue);
+        }
+        if (isTypeaheadFilter(filterType, filterValue)) {
+          labels.push(...filterValue);
+        }
+
+        const group = toolbar._toolbar.locator(".pf-m-label-group", {
+          hasText: filterName,
+        });
+        await baseExpect(group).toBeVisible();
+
+        for (const label of labels) {
+          await baseExpect(
+            group.locator(".pf-v6-c-label-group__list", { hasText: label }),
+          ).toBeVisible();
+        }
+      }
+
+      return {
+        pass: true,
+        message: () => "Toolbar has labels",
+      };
+    } catch (error) {
+      return {
+        pass: false,
+        message: () => (error instanceof Error ? error.message : String(error)),
+      };
+    }
+  },
+});
