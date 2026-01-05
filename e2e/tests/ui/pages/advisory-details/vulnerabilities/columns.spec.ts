@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { VulnerabilitiesTab } from "./VulnerabilitiesTab";
@@ -24,21 +23,17 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const idIndex = ids.indexOf("CVE-2024-26308");
     expect(idIndex).not.toBe(-1);
 
-    // Name
-    await expect(
-      table._table.locator(`td[data-label="ID"]`).nth(idIndex),
-    ).toContainText("CVE-2024-26308");
+    // ID
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308", idIndex);
 
     // Title
-    await expect(
-      table._table.locator(`td[data-label="Title"]`).nth(idIndex),
-    ).toContainText(
+    await expect(table).toHaveColumnWithValue(
+      "Title",
       "Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file",
+      idIndex,
     );
 
     // CWE
-    await expect(
-      table._table.locator(`td[data-label="CWE"]`).nth(idIndex),
-    ).toContainText("CWE-770");
+    await expect(table).toHaveColumnWithValue("CWE", "CWE-770", idIndex);
   });
 });

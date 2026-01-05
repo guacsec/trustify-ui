@@ -23,18 +23,15 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308");
 
     // Title
-    await expect(table._table.locator(`td[data-label="Title"]`)).toContainText(
+    await expect(table).toHaveColumnWithValue(
+      "Title",
       "Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file",
     );
 
     // Type
-    await expect(table._table.locator(`td[data-label="Type"]`)).toContainText(
-      "cve",
-    );
+    await expect(table).toHaveColumnWithValue("Type", "cve");
 
     // Labels
-    await expect(table._table.locator(`td[data-label="Labels"]`)).toContainText(
-      "type=cve",
-    );
+    await expect(table).toHaveColumnWithValue("Labels", "type=cve");
   });
 });
