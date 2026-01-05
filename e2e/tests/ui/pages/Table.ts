@@ -78,6 +78,15 @@ export class Table<
     await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 
+  async expandCell(columnName: TColumnName, rowIndex: number) {
+    const column = await this.getColumn(columnName);
+    await column.nth(rowIndex).click();
+
+    const expandedCell = column.nth(rowIndex + 1);
+    await expect(expandedCell).toBeVisible();
+    return expandedCell;
+  }
+
   async getColumn(columnName: TColumnName) {
     const column = this._table.locator(`td[data-label="${columnName}"]`);
     await expect(column.first()).toBeVisible();
@@ -87,6 +96,7 @@ export class Table<
   async getColumnHeader(columnName: TColumnName) {
     const columnHeader = this._table.getByRole("columnheader", {
       name: columnName,
+      exact: true,
     });
     await expect(columnHeader).toBeVisible();
     return columnHeader;

@@ -44,25 +44,13 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       idIndex,
     );
 
-    await table._table
-      .locator(`td[data-label="Affected dependencies"]`)
-      .nth(idIndex)
-      .click();
+    const expandedCell = await table.expandCell(
+      "Affected dependencies",
+      idIndex,
+    );
 
-    await expect(table).toHaveColumnWithValue(
-      "Affected dependencies",
-      "quarkus-undertow",
-      idIndex + 1,
-    );
-    await expect(table).toHaveColumnWithValue(
-      "Affected dependencies",
-      "quarkus-keycloak-authorization",
-      idIndex + 1,
-    );
-    await expect(table).toHaveColumnWithValue(
-      "Affected dependencies",
-      "quarkus-vertx-http",
-      idIndex + 1,
-    );
+    await expect(expandedCell).toContainText("quarkus-undertow");
+    await expect(expandedCell).toContainText("quarkus-keycloak-authorization");
+    await expect(expandedCell).toContainText("quarkus-vertx-http");
   });
 });
