@@ -14,6 +14,7 @@ export interface TableMatchers<
   toHaveColumnWithValue(
     columnName: TColumnName,
     value: string,
+    rowIndex?: number,
   ): Promise<MatcherResult>;
   toHaveNumberOfRows(expectedRows: {
     equal?: number;
@@ -71,15 +72,22 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     table: Table<TColumn, TActions, TColumnName>,
     columnName: TColumnName,
     value: string,
+    rowIndex?: number,
   ) => {
     try {
-      await baseExpect(
-        table._table
-          .locator(`td[data-label="${columnName}"]`, {
-            hasText: value,
-          })
-          .first(),
-      ).toBeVisible();
+      if (rowIndex === undefined) {
+        await baseExpect(
+          table._table
+            .locator(`td[data-label="${columnName}"]`, {
+              hasText: value,
+            })
+            .first(),
+        ).toBeVisible();
+      } else {
+        await baseExpect(
+          table._table.locator(`td[data-label="${columnName}"]`).nth(rowIndex),
+        ).toContainText(value);
+      }
 
       return {
         pass: true,
