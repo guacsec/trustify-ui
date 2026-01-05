@@ -1,9 +1,9 @@
 // @ts-check
 
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { VulnerabilitiesTab } from "./VulnerabilitiesTab";
-import { expectSort } from "../../Helpers";
 
 test.describe("Sort validations", { tag: "@tier1" }, () => {
   test.beforeEach(async ({ page }) => {
@@ -17,14 +17,10 @@ test.describe("Sort validations", { tag: "@tier1" }, () => {
     );
     const table = await vulnerabilitiesTab.getTable();
 
-    const columnNameSelector = table._table.locator(`td[data-label="ID"]`);
-
-    const ascList = await columnNameSelector.allInnerTexts();
-    expectSort(ascList, true);
+    await expect(table).toBeSortedBy("ID", "ascending");
 
     // Reverse sorting
     await table.clickSortBy("ID");
-    const descList = await columnNameSelector.allInnerTexts();
-    expectSort(descList, false);
+    await expect(table).toBeSortedBy("ID", "descending");
   });
 });
