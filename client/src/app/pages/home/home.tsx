@@ -5,8 +5,11 @@ import { PageSection, Stack, StackItem } from "@patternfly/react-core";
 import { MonitoringSection } from "./components/MonitoringSection";
 import { WatchedSbomsSection } from "./components/WatchedSbomsSection";
 import { WatchedSbomsProvider } from "./watched-sboms-context";
+import useDocumentTitle from "@app/hooks/useDocumentTitle";
 
 export const Home: React.FC = () => {
+  useDocumentTitle('Dashboard')
+
   return (
     <PageSection hasBodyWrapper={false}>
       <Stack hasGutter>

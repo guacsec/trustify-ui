@@ -65,12 +65,10 @@ export const AppRoutes = createBrowserRouter([
     children: [
       {
         path: "/",
-        handle: { title: "Dashboard" },
         element: <LazyRouteElement identifier="home" component={<Home />} />,
       },
       {
         path: Paths.advisories,
-        handle: { title: "Advisories" },
         element: (
           <LazyRouteElement
             identifier="advisory-list"
@@ -80,7 +78,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisoryDetails,
-        handle: { title: "Advisory details" },
         element: (
           <LazyRouteElement
             identifier="advisory-details"
@@ -90,7 +87,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.advisoryUpload,
-        handle: { title: "Upload advisory" },
         element: (
           <LazyRouteElement
             identifier="advisory-upload"
@@ -100,7 +96,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.importers,
-        handle: { title: "Importers" },
         element: (
           <LazyRouteElement
             identifier="importer-list"
@@ -110,7 +105,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.licenses,
-        handle: { title: "Licenses" },
         element: (
           <LazyRouteElement
             identifier="license-list"
@@ -120,7 +114,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.packages,
-        handle: { title: "Packages" },
         element: (
           <LazyRouteElement
             identifier="package-list"
@@ -130,7 +123,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.packageDetails,
-        handle: { title: "Package details" },
         element: (
           <LazyRouteElement
             identifier="package-details"
@@ -140,14 +132,12 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.sboms,
-        handle: { title: "SBOMs" },
         element: (
           <LazyRouteElement identifier="sbom-list" component={<SBOMList />} />
         ),
       },
       {
         path: Paths.sbomDetails,
-        handle: { title: "SBOM details" },
         element: (
           <LazyRouteElement
             identifier="sbom-details"
@@ -157,14 +147,12 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.sbomScan,
-        handle: { title: "SBOM scan" },
         element: (
           <LazyRouteElement identifier="sbom-scan" component={<SBOMScan />} />
         ),
       },
       {
         path: Paths.sbomUpload,
-        handle: { title: "Upload SBOM" },
         element: (
           <LazyRouteElement
             identifier="sbom-upload"
@@ -174,14 +162,12 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.search,
-        handle: { title: "Search" },
         element: (
           <LazyRouteElement identifier="search" component={<Search />} />
         ),
       },
       {
         path: Paths.vulnerabilities,
-        handle: { title: "Vulnerabilities" },
         element: (
           <LazyRouteElement
             identifier="vulnerability-list"
@@ -191,7 +177,6 @@ export const AppRoutes = createBrowserRouter([
       },
       {
         path: Paths.vulnerabilityDetails,
-        handle: { title: "Vulnerability details" },
         element: (
           <LazyRouteElement
             identifier="vulnerability-details"
