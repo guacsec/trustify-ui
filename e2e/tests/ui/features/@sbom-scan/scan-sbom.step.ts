@@ -102,8 +102,22 @@ Then(
 
 Then(
   "Tooltip on the {string} column should display {string}",
-  async ({ page }, column: string, tooltipMessage: string) => {
-    const table = await Table.build(page, "Vulnerability table");
+  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  async ({ page }, column: any, tooltipMessage: string) => {
+    const table = await Table.build(
+      page,
+      "Vulnerability table",
+      {
+        "Vulnerability ID": { isSortable: true },
+        Description: { isSortable: false },
+        Severity: { isSortable: true },
+        Status: { isSortable: false },
+        "Affected packages": { isSortable: true },
+        Published: { isSortable: true },
+        Updated: { isSortable: true },
+      },
+      [],
+    );
     const tooltipButton = table.getColumnTooltipButton(column, tooltipMessage);
     await tooltipButton.hover();
     await page.waitForTimeout(500);

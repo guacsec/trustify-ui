@@ -1,9 +1,10 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
+
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
+import { expect } from "../../assertions";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -18,7 +19,7 @@ Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
 
   await toolbar.applyFilter({ "Filter text": sbomName });
   await table.waitUntilDataIsLoaded();
-  await table.verifyColumnContainsText("Name", sbomName);
+  await expect(table).toHaveColumnWithValue("Name", sbomName);
 });
 
 When(
@@ -114,7 +115,7 @@ Then(
   "SBOM Name {string} should be visible inside the tab",
   async ({ page }, sbomName) => {
     const panelSbomName = await page.locator(
-      `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Name')]/following-sibling::dd`,
+      `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Name')]/following-sibling::dd`,
     );
     await panelSbomName.isVisible();
     await expect(await panelSbomName.textContent()).toEqual(sbomName);
@@ -123,7 +124,7 @@ Then(
 
 Then("SBOM Version should be visible inside the tab", async ({ page }) => {
   const panelSBOMVersion = await page.locator(
-    `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Version')]/following-sibling::dd`,
+    `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Version')]/following-sibling::dd`,
   );
   await panelSBOMVersion.isVisible();
 });
@@ -132,7 +133,7 @@ Then(
   "SBOM Creation date should be visible inside the tab",
   async ({ page }) => {
     const panelSBOMVersion = await page.locator(
-      `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Creation date')]/following-sibling::dd`,
+      `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Creation date')]/following-sibling::dd`,
     );
     await panelSBOMVersion.isVisible();
   },
@@ -208,7 +209,7 @@ Then(
   async ({ page }, labelList, sbomName) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab(`Info`);
-    const infoSection = page.locator("#refTabInfoSection");
+    const infoSection = page.locator("#info-tab-section");
 
     // Use stored generated labels if placeholder was used
     const labelsToVerify =

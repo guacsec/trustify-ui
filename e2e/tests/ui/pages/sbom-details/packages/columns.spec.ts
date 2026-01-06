@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { PackagesTab } from "./PackagesTab";
@@ -19,18 +18,10 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
 
     // Full search
     await toolbar.applyFilter({ "Filter text": "commons-compress" });
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "commons-compress");
-
-    // Name
-    await expect(table._table.locator(`td[data-label="Name"]`)).toContainText(
-      "commons-compress",
-    );
+    await expect(table).toHaveColumnWithValue("Name", "commons-compress");
 
     // Version
-    await expect(
-      table._table.locator(`td[data-label="Version"]`),
-    ).toContainText("1.21.0.redhat-00001");
+    await expect(table).toHaveColumnWithValue("Version", "1.21.0.redhat-00001");
 
     // Vulnerabilities
     await expect(
@@ -62,13 +53,12 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     ).toBeVisible();
 
     // PURL
-    await expect(table._table.locator(`td[data-label="PURLs"]`)).toContainText(
+    await expect(table).toHaveColumnWithValue(
+      "PURLs",
       "pkg:maven/org.apache.commons/commons-compress@1.21.0.redhat-00001?repository_url=https://maven.repository.redhat.com/ga/&type=jar",
     );
 
     // CPE
-    await expect(table._table.locator(`td[data-label="CPEs"]`)).toContainText(
-      "0 CPEs",
-    );
+    await expect(table).toHaveColumnWithValue("CPEs", "0 CPEs");
   });
 });

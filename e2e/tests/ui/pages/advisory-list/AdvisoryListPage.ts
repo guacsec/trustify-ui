@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
 import { Navigation } from "../Navigation";
-import { Toolbar } from "../Toolbar";
-import { Table } from "../Table";
 import { Pagination } from "../Pagination";
+import { Table } from "../Table";
+import { Toolbar } from "../Toolbar";
 
 export class AdvisoryListPage {
   private readonly _page: Page;
@@ -27,7 +27,19 @@ export class AdvisoryListPage {
   }
 
   async getTable() {
-    return await Table.build(this._page, "advisory-table");
+    return await Table.build(
+      this._page,
+      "advisory-table",
+      {
+        ID: { isSortable: true },
+        Title: { isSortable: false },
+        Type: { isSortable: false },
+        Labels: { isSortable: false },
+        Revision: { isSortable: true },
+        Vulnerabilities: { isSortable: false },
+      },
+      ["Edit labels", "Download", "Delete"],
+    );
   }
 
   async getPagination(top: boolean = true) {

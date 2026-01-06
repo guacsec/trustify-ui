@@ -25,6 +25,7 @@ import {
   FilterPanel,
   type IFilterPanelProps,
 } from "@app/components/FilterPanel";
+import { useTabControls } from "@app/hooks/tab-controls";
 import { AdvisoryTable } from "@app/pages/advisory-list/advisory-table";
 import { AdvisoryToolbar } from "@app/pages/advisory-list/advisory-toolbar";
 import type { PackageTableData } from "@app/pages/package-list/package-context";
@@ -51,7 +52,7 @@ export interface SearchTabsProps {
     >;
     vulnerabilityFilterPanelProps: IFilterPanelProps<
       VulnerabilitySummary,
-      "" | "base_severity" | "published"
+      "" | "base_severity" | "published" | "publishedOnly"
     >;
   };
 
@@ -87,7 +88,6 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
   isFetchingVulnerabilities,
   isFetchingAdvisories,
 }) => {
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
   const {
     sbomFilterPanelProps,
     packageFilterPanelProps,
@@ -95,12 +95,15 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
     advisoryFilterPanelProps,
   } = filterPanelProps;
 
-  const handleTabClick = (
-    _event: React.MouseEvent | React.KeyboardEvent | MouseEvent,
-    tabIndex: string | number,
-  ) => {
-    setActiveTabKey(tabIndex);
-  };
+  // Tabs
+  const {
+    propHelpers: { getTabsProps, getTabProps },
+    derivedState: { isTabActive },
+  } = useTabControls({
+    persistenceKeyPrefix: "sp", // search page tabs
+    persistTo: "urlParams",
+    tabKeys: ["sboms", "packages", "vulnerabilities", "advisories"],
+  });
 
   const sbomPopoverRef = React.createRef<HTMLElement>();
   const packagePopoverRef = React.createRef<HTMLElement>();
@@ -112,22 +115,22 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
       <SplitItem>
         <Card isFullHeight>
           <CardBody style={{ width: 241 }}>
-            {activeTabKey === 0 ? (
+            {isTabActive("sboms") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...sbomFilterPanelProps}
               />
-            ) : activeTabKey === 1 ? (
+            ) : isTabActive("packages") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...packageFilterPanelProps}
               />
-            ) : activeTabKey === 2 ? (
+            ) : isTabActive("vulnerabilities") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...vulnerabilityFilterPanelProps}
               />
-            ) : activeTabKey === 3 ? (
+            ) : isTabActive("advisories") ? (
               <FilterPanel
                 omitFilterCategoryKeys={[""]}
                 {...advisoryFilterPanelProps}
@@ -140,13 +143,12 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
         <Tabs
           mountOnEnter
           isBox
-          activeKey={activeTabKey}
-          onSelect={handleTabClick}
+          {...getTabsProps()}
           aria-label="Tabs"
           role="region"
         >
           <Tab
-            eventKey={0}
+            {...getTabProps("sboms")}
             title={
               <TabTitleText>
                 SBOMs{"  "}
@@ -183,7 +185,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
             {sbomTable ?? <SbomTable />}
           </Tab>
           <Tab
-            eventKey={1}
+            {...getTabProps("packages")}
             title={
               <TabTitleText>
                 Packages{"  "}
@@ -223,7 +225,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
             {packageTable ?? <PackageTable />}
           </Tab>
           <Tab
-            eventKey={2}
+            {...getTabProps("vulnerabilities")}
             title={
               <TabTitleText>
                 Vulnerabilities{"  "}
@@ -263,7 +265,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
             {vulnerabilityTable ?? <VulnerabilityTable />}
           </Tab>
           <Tab
-            eventKey={3}
+            {...getTabProps("advisories")}
             title={
               <TabTitleText>
                 Advisories{"  "}
