@@ -9,7 +9,6 @@ import "@patternfly/patternfly/patternfly.css";
 import "@patternfly/patternfly/patternfly-addons.css";
 
 const App: React.FC = () => {
-
   return (
     <NotificationsProvider>
       <DefaultLayout>

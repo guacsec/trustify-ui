@@ -8,7 +8,7 @@ import { WatchedSbomsProvider } from "./watched-sboms-context";
 import useDocumentTitle from "@app/hooks/useDocumentTitle";
 
 export const Home: React.FC = () => {
-  useDocumentTitle('Dashboard')
+  useDocumentTitle("Dashboard");
 
   return (
     <PageSection hasBodyWrapper={false}>
