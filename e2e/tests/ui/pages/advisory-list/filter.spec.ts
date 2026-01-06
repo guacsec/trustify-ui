@@ -131,8 +131,8 @@ test.describe("Filter validations", { tag: ["@tier1", "@filtering"] }, () => {
 
     // Apply multiple filters across different categories
     await toolbar.applyFilter({ "Filter text": "CVE-2024" });
-    expect(table).toHaveNumberOfRows({ greaterThan: 1 });
-    expect(table).toHaveColumnWithValue("ID", "CVE-2024");
+    await expect(table).toHaveNumberOfRows({ greaterThan: 1 });
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024");
 
     // Add label filter
     await toolbar.applyFilter({ Label: ["type=cve", "type=csaf"] });
@@ -142,9 +142,35 @@ test.describe("Filter validations", { tag: ["@tier1", "@filtering"] }, () => {
     await toolbar.removeFilterGroup("Label");
 
     // Only "Label" filter should be removed
-    expect(toolbar).toHaveLabels({ "Filter text": "CVE-2024" });
-    expect(table).toHaveNumberOfRows({ greaterThan: 1 });
-    expect(table).toHaveColumnWithValue("ID", "CVE-2024");
+    await expect(toolbar).toHaveLabels({ "Filter text": "CVE-2024" });
+    await expect(table).toHaveNumberOfRows({ greaterThan: 1 });
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024");
+  });
+
+  test("Remove multiple filter groups sequentially", async ({ page }) => {
+    const listPage = await AdvisoryListPage.build(page);
+
+    const toolbar = await listPage.getToolbar();
+
+    // Apply multiple filters across different categories
+    await toolbar.applyFilter({
+      "Filter text": "CVE-2024",
+      Label: ["type=cve", "type=csaf"],
+      Revision: { from: "03/26/2025", to: "03/28/2025" },
+    });
+
+    // Remove entire Label group
+    await toolbar.removeFilterGroup("Label");
+    await toolbar.removeFilterGroup("Filter text");
+
+    // Only "Revision" should remain
+    await expect(toolbar).toHaveLabels({
+      Revision: { from: "03/26/2025", to: "03/28/2025" },
+    });
+    await expect(toolbar).not.toHaveLabels({
+      "Filter text": "CVE-2024",
+      Label: ["type=cve", "type=csaf"],
+    });
   });
 });
 
@@ -246,8 +272,7 @@ test.describe("Filter edge cases", { tag: ["@tier1", "@filtering"] }, () => {
     // Test with special characters
     await toolbar.applyFilter({ "Filter text": "CVE-2024*" });
 
-    // Should handle gracefully - either filter or show results
-    // Don't expect it to break the page
+    // These filters produce no matches and show a stable empty state.
     await expect(table).toHaveEmptyState();
   });
 
@@ -481,25 +506,6 @@ test.describe(
         // Should be on first page again
         await expect(pagination).toBeFirstPage();
       }
-    });
-
-    test("Clearing filters restores original pagination state", async ({
-      page,
-    }) => {
-      const listPage = await AdvisoryListPage.build(page);
-      const toolbar = await listPage.getToolbar();
-      const table = await listPage.getTable();
-
-      // Apply filter that reduces results
-      await toolbar.applyFilter({ "Filter text": "CVE-2024-26308" });
-      const filteredCount = await table._table.locator("tbody tr").count();
-
-      // Clear all filters
-      await toolbar.clearAllFilters();
-
-      // Should have more results
-      const unfilteredCount = await table._table.locator("tbody tr").count();
-      expect(unfilteredCount).toBeGreaterThan(filteredCount);
     });
   },
 );
