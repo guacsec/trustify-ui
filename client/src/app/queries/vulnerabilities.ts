@@ -88,11 +88,13 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
   };
 };
 
+export const vulnerabilityByIdQueryOptions = (id: string) => ({
+  queryKey: [VulnerabilitiesQueryKey, id],
+  queryFn: () => getVulnerability({ client, path: { id } }),
+});
+
 export const useFetchVulnerabilityById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: [VulnerabilitiesQueryKey, id],
-    queryFn: () => getVulnerability({ client, path: { id } }),
-  });
+  const { data, isLoading, error } = useQuery(vulnerabilityByIdQueryOptions(id));
   return {
     vulnerability: data?.data,
     isFetching: isLoading,

@@ -6,13 +6,12 @@ export const NotFound: React.FC = () => {
   return (
     <Bullseye>
       <EmptyState
-        titleText="404: That page no longer exists"
+        titleText="404: That page does not exist"
         headingLevel="h4"
         icon={PathMissingIcon}
       >
         <EmptyStateBody>
-          Another page might have the information you need, so try searching
-          TPA.
+          Another page might have the information you need.
         </EmptyStateBody>
       </EmptyState>
     </Bullseye>
