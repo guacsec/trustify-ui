@@ -236,7 +236,10 @@ export const AppRoutes = createBrowserRouter([
         ),
         errorElement: <RouteErrorBoundary />,
         loader: async ({ params }) => {
-          const vulnerabilityId = usePathFromParams(params, PathParam.VULNERABILITY_ID);
+          const vulnerabilityId = usePathFromParams(
+            params,
+            PathParam.VULNERABILITY_ID,
+          );
           const response = await queryClient.ensureQueryData(
             vulnerabilityByIdQueryOptions(vulnerabilityId),
           );

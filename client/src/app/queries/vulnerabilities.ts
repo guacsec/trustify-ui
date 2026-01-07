@@ -94,7 +94,9 @@ export const vulnerabilityByIdQueryOptions = (id: string) => ({
 });
 
 export const useFetchVulnerabilityById = (id: string) => {
-  const { data, isLoading, error } = useQuery(vulnerabilityByIdQueryOptions(id));
+  const { data, isLoading, error } = useQuery(
+    vulnerabilityByIdQueryOptions(id),
+  );
   return {
     vulnerability: data?.data,
     isFetching: isLoading,
