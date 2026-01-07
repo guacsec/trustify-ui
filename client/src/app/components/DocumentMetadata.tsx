@@ -5,9 +5,5 @@ export const DocumentMetadata = ({ title }: { title?: string }) => {
   const baseTitle = branding.application.title;
   const documentTitle = title ? `${title} | ${baseTitle}` : baseTitle;
 
-  return (
-    <>
-      <title>{documentTitle}</title>
-    </>
-  );
+  return <title>{documentTitle}</title>;
 };
