@@ -2,6 +2,8 @@ import { createBdd } from "playwright-bdd";
 
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
+import { ConfirmDialog } from "../../helpers/ConfirmDialog";
+import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
 import { expect } from "../../assertions";
 
@@ -168,3 +170,51 @@ Then(
     await detailsPage.verifyLabels(labelsToVerify, sbomName, infoSection);
   },
 );
+
+
+When(
+  "User Clicks on Actions button and Selects Delete option from the drop down",
+  async ({ page }) => {
+    const details = new DetailsPage(page);
+    await details.clickOnPageAction("Delete");
+  },
+);
+
+When(
+  "User select Delete button from the Permanently delete SBOM model window",
+  async ({ page }) => {
+    const confirm = await ConfirmDialog.build(page);
+    await confirm.verifyTitle("Permanently delete SBOM?");
+    await confirm.clickConfirm();
+  },
+);
+
+Then(
+  "Application Navigates to SBOM list page",
+  async ({ page }) => {
+    // Wait for navigation to list view where toolbar and table are present
+    const list = await SbomListPage.build(page);
+    await list.getToolbar();
+    await list.getTable();
+    await expect(page.getByRole("heading")).toContainText("SBOMs");
+  },
+);
+
+Then(
+  "The {string} should not be present on SBOM list page as it is deleted",
+  async ({ page }, sbomName) => {
+    const list = await SbomListPage.build(page);
+    const toolbar = await list.getToolbar();
+    const table = await list.getTable();
+
+    await toolbar.applyFilter({"Filter text": sbomName});
+    await table.waitUntilDataIsLoaded();
+
+    // Expect table to be empty after filtering for deleted sbom
+    await expect(
+      page.locator(`table[aria-label='sbom-table'] tbody[aria-label='Table empty']`),
+    ).toBeVisible();
+  },
+);
+
+

@@ -134,3 +134,14 @@ Feature: SBOM Explorer - View SBOM details
         Examples:
         |         sbomName       |    Labels     |
         | ubi9-minimal-container | RANDOM_LABELS |
+
+    Scenario Outline: Delete SBOM
+        Given An ingested SBOM "<sbomName>" is available
+        When User visits SBOM details Page of "<sbomName>"
+        When User Clicks on Actions button and Selects Delete option from the drop down
+        When User select Delete button from the Permanently delete SBOM model window
+        Then Application Navigates to SBOM list page
+        And The "<sbomName>" should not be present on SBOM list page as it is deleted
+        Examples:
+        |         sbomName       |
+        |          curl          |
