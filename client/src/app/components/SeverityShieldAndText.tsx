@@ -32,12 +32,12 @@ export const SeverityShieldAndText: React.FC<SeverityShieldAndTextProps> = ({
       <FlexItem>
         {showLabel ? (
           <Icon>
-            <SeverityIcon color={severityProps.color.value} />
+            <SeverityIcon color={severityProps.color.var} />
           </Icon>
         ) : (
           <Tooltip content={label}>
             <Icon>
-              <SeverityIcon color={severityProps.color.value} />
+              <SeverityIcon color={severityProps.color.var} />
             </Icon>
           </Tooltip>
         )}

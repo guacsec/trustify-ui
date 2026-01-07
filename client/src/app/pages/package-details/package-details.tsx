@@ -22,11 +22,13 @@ import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
+import { useTabControls } from "@app/hooks/tab-controls";
 import { useFetchPackageById } from "@app/queries/packages";
 import { decomposePurl } from "@app/utils/utils";
 
 import { SbomsByPackage } from "./sboms-by-package";
 import { VulnerabilitiesByPackage } from "./vulnerabilities-by-package";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const PackageDetails: React.FC = () => {
   const packageId = useRouteParams(PathParam.PACKAGE_ID);
@@ -37,14 +39,13 @@ export const PackageDetails: React.FC = () => {
   }, [pkg]);
 
   // Tabs
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
-
-  const handleTabClick = (
-    _event: React.MouseEvent | React.KeyboardEvent | MouseEvent,
-    tabIndex: string | number,
-  ) => {
-    setActiveTabKey(tabIndex);
-  };
+  const {
+    propHelpers: { getTabsProps, getTabProps, getTabContentProps },
+  } = useTabControls({
+    persistenceKeyPrefix: "pd", // pd="package details"
+    persistTo: "urlParams",
+    tabKeys: ["vulnerabilities", "sboms"],
+  });
 
   const vulnerabilitiesTabRef = React.createRef<HTMLElement>();
   const sbomsTabRef = React.createRef<HTMLElement>();
@@ -53,6 +54,7 @@ export const PackageDetails: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title={decomposedPurl?.name} />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
@@ -87,19 +89,17 @@ export const PackageDetails: React.FC = () => {
       <PageSection>
         <Tabs
           mountOnEnter
-          activeKey={activeTabKey}
-          onSelect={handleTabClick}
+          {...getTabsProps()}
           aria-label="Tabs that contain the SBOM information"
           role="region"
         >
           <Tab
-            eventKey={0}
+            {...getTabProps("vulnerabilities")}
             title={<TabTitleText>Vulnerabilities</TabTitleText>}
-            tabContentId="refTabVulnerabilitiesSection"
             tabContentRef={vulnerabilitiesTabRef}
           />
           <Tab
-            eventKey={1}
+            {...getTabProps("sboms")}
             title={<TabTitleText>SBOMs using package</TabTitleText>}
             actions={
               <>
@@ -112,26 +112,22 @@ export const PackageDetails: React.FC = () => {
                 />
               </>
             }
-            tabContentId="refTabSbomsSection"
             tabContentRef={sbomsTabRef}
           />
         </Tabs>
       </PageSection>
       <PageSection>
         <TabContent
-          eventKey={0}
-          id="refTabVulnerabilitiesSection"
+          {...getTabContentProps("vulnerabilities")}
           ref={vulnerabilitiesTabRef}
           aria-label="Vulnerabilities of the Package"
         >
           {packageId && <VulnerabilitiesByPackage packageId={packageId} />}
         </TabContent>
         <TabContent
-          eventKey={1}
-          id="refTabSbomsSection"
+          {...getTabContentProps("sboms")}
           ref={sbomsTabRef}
           aria-label="SBOMs using the Package"
-          hidden
         >
           <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
             {pkg?.purl && <SbomsByPackage purl={pkg.purl} />}

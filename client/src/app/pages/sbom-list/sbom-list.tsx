@@ -5,10 +5,12 @@ import { Content, PageSection } from "@patternfly/react-core";
 import { SbomSearchProvider } from "./sbom-context";
 import { SbomTable } from "./sbom-table";
 import { SbomToolbar } from "./sbom-toolbar";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const SbomList: React.FC = () => {
   return (
     <>
+      <DocumentMetadata title="SBOMs" />
       <PageSection hasBodyWrapper={false}>
         <Content>
           <Content component="h1">SBOMs</Content>

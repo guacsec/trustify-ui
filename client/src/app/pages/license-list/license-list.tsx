@@ -4,10 +4,12 @@ import { Content, PageSection } from "@patternfly/react-core";
 import { LicenseSearchProvider } from "./license-context";
 import { LicenseTable } from "./license-table";
 import { LicenseToolbar } from "./license-toolbar";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const LicenseList: React.FC = () => {
   return (
     <>
+      <DocumentMetadata title="Licenses" />
       <PageSection hasBodyWrapper={false}>
         <Content>
           <Content component="h1">Licenses</Content>

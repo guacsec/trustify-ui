@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import { PackageListPage } from "./PackageListPage";
@@ -25,25 +24,18 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     });
 
     // Namespace
-    await expect(tableRow.locator(`td[data-label="Namespace"]`)).toContainText(
-      "org.keycloak",
-    );
+    await expect(table).toHaveColumnWithValue("Namespace", "org.keycloak");
 
     // Version
-    await expect(tableRow.locator(`td[data-label="Version"]`)).toContainText(
-      "18.0.6.redhat-00001",
-    );
+    await expect(table).toHaveColumnWithValue("Version", "18.0.6.redhat-00001");
 
     // Type
-    await expect(tableRow.locator(`td[data-label="Type"]`)).toContainText(
-      "maven",
-    );
+    await expect(table).toHaveColumnWithValue("Type", "maven");
 
     // Qualifiers
-    await expect(tableRow.locator(`td[data-label="Qualifiers"]`)).toContainText(
-      "type=jar",
-    );
-    await expect(tableRow.locator(`td[data-label="Qualifiers"]`)).toContainText(
+    await expect(table).toHaveColumnWithValue("Qualifiers", "type=jar");
+    await expect(table).toHaveColumnWithValue(
+      "Qualifiers",
       "repository_url=https://maven.repository.redhat.com/ga/",
     );
 
