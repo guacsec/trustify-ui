@@ -28,6 +28,7 @@ import { decomposePurl } from "@app/utils/utils";
 
 import { SbomsByPackage } from "./sboms-by-package";
 import { VulnerabilitiesByPackage } from "./vulnerabilities-by-package";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const PackageDetails: React.FC = () => {
   const packageId = useRouteParams(PathParam.PACKAGE_ID);
@@ -53,6 +54,7 @@ export const PackageDetails: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title={decomposedPurl?.name} />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>

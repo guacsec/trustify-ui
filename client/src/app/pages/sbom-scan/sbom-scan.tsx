@@ -41,6 +41,7 @@ import { UploadFileForAnalysis } from "./components/UploadFileForAnalysis";
 import { VulnerabilityTable } from "./components/VulnerabilityTable";
 import { useVulnerabilitiesOfSbomByPurls } from "./hooks/useVulnerabilitiesOfSbom";
 import { convertToCSV } from "./scan-utils";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const SbomScan: React.FC = () => {
   // Actions dropdown
@@ -117,6 +118,7 @@ export const SbomScan: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title="Scan SBOM" />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>

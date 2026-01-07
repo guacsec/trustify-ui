@@ -35,7 +35,6 @@ import { SbomTable } from "@app/pages/sbom-list/sbom-table";
 import { SbomToolbar } from "@app/pages/sbom-list/sbom-toolbar";
 import { VulnerabilityTable } from "@app/pages/vulnerability-list/vulnerability-table";
 import { VulnerabilityToolbar } from "@app/pages/vulnerability-list/vulnerability-toolbar";
-import useDocumentTitle from "@app/hooks/useDocumentTitle";
 
 export interface SearchTabsProps {
   filterPanelProps: {
@@ -105,8 +104,6 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
     persistTo: "urlParams",
     tabKeys: ["sboms", "packages", "vulnerabilities", "advisories"],
   });
-
-  useDocumentTitle(`Search - ${getTabsProps().activeKey}`);
 
   const sbomPopoverRef = React.createRef<HTMLElement>();
   const packagePopoverRef = React.createRef<HTMLElement>();
