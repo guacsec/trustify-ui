@@ -45,6 +45,7 @@ import {
 
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -100,6 +101,7 @@ export const AdvisoryDetails: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title={advisory?.document_id} />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
