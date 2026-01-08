@@ -27,7 +27,7 @@ export const initInterceptors = () => {
   if (!isAuthRequired) {
     return;
   }
-  
+
   axios.interceptors.request.use(
     (config) => {
       const user = getUser();
