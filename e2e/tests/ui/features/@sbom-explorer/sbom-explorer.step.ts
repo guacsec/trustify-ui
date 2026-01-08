@@ -171,7 +171,6 @@ Then(
   },
 );
 
-
 When(
   "User Clicks on Actions button and Selects Delete option from the drop down",
   async ({ page }) => {
@@ -183,38 +182,48 @@ When(
 When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
-    const confirm = await ConfirmDialog.build(page);
-    await confirm.verifyTitle("Permanently delete SBOM?");
-    await confirm.clickConfirm();
+    const dialog = await ConfirmDialog.build(page);
+    await dialog.verifyTitle("Permanently delete");
+    await dialog.clickConfirm();
   },
 );
 
-Then(
-  "Application Navigates to SBOM list page",
+When(
+  "User Selects Delete option from the toggle option from SBOM List Page",
   async ({ page }) => {
-    // Wait for navigation to list view where toolbar and table are present
-    const list = await SbomListPage.build(page);
-    await list.getToolbar();
-    await list.getTable();
-    await expect(page.getByRole("heading")).toContainText("SBOMs");
+    const firstRow = page.locator("table tbody tr").first();
+    const kebabToggle = firstRow.getByRole("button", { name: "Kebab toggle" });
+    await kebabToggle.click();
+    await page.getByRole("menuitem", { name: "Delete" }).click();
   },
 );
+
+Then("Application Navigates to SBOM list page", async ({ page }) => {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "SBOMs" }),
+  ).toBeVisible();
+});
 
 Then(
   "The {string} should not be present on SBOM list page as it is deleted",
-  async ({ page }, sbomName) => {
+  async ({ page }, sbomName: string) => {
     const list = await SbomListPage.build(page);
     const toolbar = await list.getToolbar();
     const table = await list.getTable();
-
-    await toolbar.applyFilter({"Filter text": sbomName});
+    await toolbar.applyFilter({ "Filter text": sbomName });
     await table.waitUntilDataIsLoaded();
-
-    // Expect table to be empty after filtering for deleted sbom
     await expect(
-      page.locator(`table[aria-label='sbom-table'] tbody[aria-label='Table empty']`),
+      page.locator(
+        "table[aria-label='sbom-table'] tbody[aria-label='Table empty']",
+      ),
     ).toBeVisible();
   },
 );
 
-
+Then("The SBOM deleted message is displayed", async ({ page }) => {
+  // PatternFly toast alerts render the title as a heading inside AlertGroup
+  const alertHeading = page.getByRole("heading", { level: 4 }).filter({
+    hasText: /The SBOM .+ was deleted/,
+  });
+  await expect(alertHeading).toBeVisible({ timeout: 10000 });
+});

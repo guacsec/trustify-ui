@@ -8,18 +8,18 @@ export class ConfirmDialog {
   }
 
   static async build(page: Page) {
-    const dialog = page.locator("#confirm-dialog");
+    const dialog = page.getByRole("dialog", { name: "Confirm dialog" });
     await expect(dialog).toBeVisible();
-    await expect(page.getByRole("dialog", { name: "Confirm dialog" })).toBeVisible();
     return new ConfirmDialog(page);
   }
 
   async verifyTitle(title: string) {
-    await expect(this._page.locator("#confirm-dialog")).toContainText(title);
+    const dialog = this._page.getByRole("dialog", { name: "Confirm dialog" });
+    await expect(dialog).toContainText(title);
   }
 
   async clickConfirm() {
-    const confirmBtn = this._page.locator("#confirm-dialog-button");
+    const confirmBtn = this._page.getByRole("button", { name: "confirm" });
     await expect(confirmBtn).toBeVisible();
     await expect(confirmBtn).toBeEnabled();
     await confirmBtn.click();

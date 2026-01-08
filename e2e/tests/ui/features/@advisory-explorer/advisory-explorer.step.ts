@@ -2,7 +2,10 @@ import { createBdd } from "playwright-bdd";
 import { expect } from "playwright/test";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
+import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
 import { test } from "../../fixtures";
+import { ConfirmDialog } from "../../helpers/ConfirmDialog";
+import { DetailsPage } from "../../helpers/DetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -151,3 +154,60 @@ Then(
     ).toBeVisible();
   },
 );
+
+When(
+  "User Selects Delete option from the toggle option from Advisory List Page",
+  async ({ page }) => {
+    const firstRow = page.locator("table tbody tr").first();
+    const kebabToggle = firstRow.getByRole("button", { name: "Kebab toggle" });
+    await kebabToggle.click();
+    await page.getByRole("menuitem", { name: "Delete" }).click();
+  },
+);
+
+When(
+  "User Clicks on Actions button and Selects Delete option from the drop down",
+  async ({ page }) => {
+    const details = new DetailsPage(page);
+    await details.clickOnPageAction("Delete");
+  },
+);
+
+When(
+  "User select Delete button from the Permanently delete Advisory model window",
+  async ({ page }) => {
+    const dialog = await ConfirmDialog.build(page);
+    await dialog.verifyTitle("Permanently delete");
+    await dialog.clickConfirm();
+  },
+);
+
+Then(
+  "The {string} should not be present on Advisory list page as it is deleted",
+  async ({ page }, advisoryID: string) => {
+    const list = await AdvisoryListPage.build(page);
+    const toolbar = await list.getToolbar();
+    const table = await list.getTable();
+
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    await table.waitUntilDataIsLoaded();
+    await expect(
+      page.locator(
+        "table[aria-label='advisory-table'] tbody[aria-label='Table empty']",
+      ),
+    ).toBeVisible();
+  },
+);
+
+Then("Application Navigates to Advisory list page", async ({ page }) => {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Advisories" }),
+  ).toBeVisible();
+});
+
+Then("The Advisory deleted message is displayed", async ({ page }) => {
+  const alertHeading = page.getByRole("heading", { level: 4 }).filter({
+    hasText: /The Advisory .+ was deleted/,
+  });
+  await expect(alertHeading).toBeVisible({ timeout: 10000 });
+});
