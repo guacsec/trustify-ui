@@ -5,6 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { Bullseye, Spinner } from "@patternfly/react-core";
 import { ErrorFallback } from "./ErrorFallback";
+import { NavigationSuspense } from "./NavigationSuspense";
 
 export const LazyRouteElement = ({
   identifier,
@@ -23,7 +24,7 @@ export const LazyRouteElement = ({
       }
     >
       <ErrorBoundary FallbackComponent={ErrorFallback} key={identifier}>
-        {component}
+        <NavigationSuspense>{component}</NavigationSuspense>
       </ErrorBoundary>
     </Suspense>
   );

@@ -1,9 +1,16 @@
 import { lazy } from "react";
-import { createBrowserRouter, useParams } from "react-router-dom";
+import { createBrowserRouter, useParams, type Params } from "react-router-dom";
+
+import { queryClient } from "./queries/config";
+import { sbomByIdQueryOptions } from "./queries/sboms";
+import { packageByIdQueryOptions } from "./queries/packages";
+import { advisoryByIdQueryOptions } from "./queries/advisories";
+import { vulnerabilityByIdQueryOptions } from "./queries/vulnerabilities";
 
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
 
 import App from "./App";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -32,6 +39,7 @@ const SBOMDetails = lazy(() => import("./pages/sbom-details"));
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
+const NotFound = lazy(() => import("./pages/not-found"));
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",
@@ -57,6 +65,19 @@ export const Paths = {
   importers: "/importers",
   licenses: "/licenses",
 } as const;
+
+export const usePathFromParams = (
+  params: Params<string>,
+  pathParam: PathParam,
+) => {
+  const value = params[pathParam];
+  if (value === undefined) {
+    throw new Error(
+      `ASSERTION FAILURE: required path parameter not set: ${pathParam}`,
+    );
+  }
+  return value;
+};
 
 export const AppRoutes = createBrowserRouter([
   {
@@ -84,6 +105,16 @@ export const AppRoutes = createBrowserRouter([
             component={<AdvisoryDetails />}
           />
         ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const advisoryId = usePathFromParams(params, PathParam.ADVISORY_ID);
+          const response = await queryClient.ensureQueryData(
+            advisoryByIdQueryOptions(advisoryId),
+          );
+          return {
+            advisory: response.data,
+          };
+        },
       },
       {
         path: Paths.advisoryUpload,
@@ -129,6 +160,16 @@ export const AppRoutes = createBrowserRouter([
             component={<PackageDetails />}
           />
         ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const packageId = usePathFromParams(params, PathParam.PACKAGE_ID);
+          const response = await queryClient.ensureQueryData(
+            packageByIdQueryOptions(packageId),
+          );
+          return {
+            package: response.data,
+          };
+        },
       },
       {
         path: Paths.sboms,
@@ -144,6 +185,16 @@ export const AppRoutes = createBrowserRouter([
             component={<SBOMDetails />}
           />
         ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const sbomId = usePathFromParams(params, PathParam.SBOM_ID);
+          const response = await queryClient.ensureQueryData(
+            sbomByIdQueryOptions(sbomId),
+          );
+          return {
+            sbom: response?.data,
+          };
+        },
       },
       {
         path: Paths.sbomScan,
@@ -182,6 +233,25 @@ export const AppRoutes = createBrowserRouter([
             identifier="vulnerability-details"
             component={<VulnerabilityDetails />}
           />
+        ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const vulnerabilityId = usePathFromParams(
+            params,
+            PathParam.VULNERABILITY_ID,
+          );
+          const response = await queryClient.ensureQueryData(
+            vulnerabilityByIdQueryOptions(vulnerabilityId),
+          );
+          return {
+            vulnerability: response.data,
+          };
+        },
+      },
+      {
+        path: "*",
+        element: (
+          <LazyRouteElement identifier="not-found" component={<NotFound />} />
         ),
       },
     ],
