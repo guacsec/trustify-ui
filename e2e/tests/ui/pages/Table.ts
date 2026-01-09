@@ -87,6 +87,25 @@ export class Table<
     return expandedCell;
   }
 
+  async expandRow(rowIndex: number) {
+    const rows = await this.getRows();
+    const row = rows.nth(rowIndex);
+
+    const toggleButton = row.getByRole("button", { name: "Details" });
+    await expect(toggleButton).toBeVisible();
+    await toggleButton.click();
+
+    const expandedArea = row.locator(".pf-m-expanded");
+    await expect(expandedArea).toBeVisible();
+    return expandedArea;
+  }
+
+  async getRows() {
+    const rows = this._table.locator("tbody");
+    await expect(rows).toBeVisible();
+    return rows;
+  }
+
   async getColumn(columnName: TColumnName) {
     const column = this._table.locator(`td[data-label="${columnName}"]`);
     await expect(column.first()).toBeVisible();
