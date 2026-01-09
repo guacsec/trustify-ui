@@ -46,6 +46,7 @@ import { useDeleteSbomMutation, useFetchSBOMById } from "@app/queries/sboms";
 import { Overview } from "./overview";
 import { PackagesBySbom } from "./packages-by-sbom";
 import { VulnerabilitiesBySbom } from "./vulnerabilities-by-sbom";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const SbomDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ export const SbomDetails: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title={sbom?.name} />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
