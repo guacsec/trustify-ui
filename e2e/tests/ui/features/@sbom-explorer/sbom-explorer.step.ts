@@ -2,7 +2,6 @@ import { createBdd } from "playwright-bdd";
 
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
 import { expect } from "../../assertions";
 
@@ -10,17 +9,6 @@ export const { Given, When, Then } = createBdd(test);
 
 const PACKAGE_TABLE_NAME = "Package table";
 const VULN_TABLE_NAME = "Vulnerability table";
-
-Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
-  const sbomListPage = await SbomListPage.build(page);
-
-  const toolbar = await sbomListPage.getToolbar();
-  const table = await sbomListPage.getTable();
-
-  await toolbar.applyFilter({ "Filter text": sbomName });
-  await table.waitUntilDataIsLoaded();
-  await expect(table).toHaveColumnWithValue("Name", sbomName);
-});
 
 When(
   "User visits SBOM details Page of {string}",
@@ -32,21 +20,6 @@ When(
 Then("{string} is visible", async ({ page }, fieldName) => {
   await expect(page.locator(`[aria-label="${fieldName}"]`)).toBeVisible();
 });
-
-Then(
-  "{string} action is invoked and downloaded filename is {string}",
-  async ({ page }, actionName, expectedFilename) => {
-    const downloadPromise = page.waitForEvent("download");
-
-    const detailsPage = new DetailsPage(page);
-    await detailsPage.clickOnPageAction(actionName);
-
-    const download = await downloadPromise;
-
-    const filename = download.suggestedFilename();
-    expect(filename).toEqual(expectedFilename);
-  },
-);
 
 Then(
   "The Package table is sorted by {string}",
@@ -147,18 +120,6 @@ Then(
   },
 );
 
-Then("Pagination of Vulnerabilities list works", async ({ page }) => {
-  const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
-  const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-  await toolbarTable.verifyPagination(vulnTableTopPagination);
-});
-
-Then("Pagination of Packages list works", async ({ page }) => {
-  const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
-  const vulnTableTopPagination = `xpath=//div[@id="package-table-pagination-top"]`;
-  await toolbarTable.verifyPagination(vulnTableTopPagination);
-});
-
 Then(
   "List of Vulnerabilities has column {string}",
   async ({ page }, columnHeader) => {
@@ -172,18 +133,6 @@ Then(
   async ({ page }, columnHeader) => {
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyColumnIsNotSortable(columnHeader);
-  },
-);
-
-Then(
-  "Sorting of {string} Columns Works",
-  async ({ page }, columnHeaders: string) => {
-    const headers = columnHeaders
-      .split(`,`)
-      .map((column: string) => column.trim());
-    const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
-    const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-    await toolbarTable.verifySorting(vulnTableTopPagination, headers);
   },
 );
 
@@ -210,7 +159,6 @@ Then(
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab(`Info`);
     const infoSection = page.locator("#info-tab-section");
-
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
