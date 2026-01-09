@@ -119,9 +119,7 @@ Feature: SBOM Explorer - View SBOM details
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Table column "Description" is not sortable
-        Then Sorting of "Id, Affected dependencies, Published, Updated" Columns Works
-        #Then Sorting of "CVSS" Columns works
-        # Bug: https://issues.redhat.com/browse/TC-2598
+        Then Sorting of "Id, CVSS, Affected dependencies, Published, Updated" Columns Works
         Examples:
         | sbomName    |
         | quarkus-bom |
@@ -134,3 +132,25 @@ Feature: SBOM Explorer - View SBOM details
         Examples:
         |         sbomName       |    Labels     |
         | ubi9-minimal-container | RANDOM_LABELS |
+
+    Scenario Outline: Delete SBOM from SBOM Explorer Page
+        Given An ingested SBOM "<sbomName>" is available
+        When User visits SBOM details Page of "<sbomName>"
+        When User Clicks on Actions button and Selects Delete option from the drop down
+        When User select Delete button from the Permanently delete SBOM model window
+        Then The SBOM deleted message is displayed
+        And Application Navigates to SBOM list page
+        And The "<sbomName>" should not be present on SBOM list page as it is deleted
+        Examples:
+        |         sbomName       |
+        |        MRG-M-3.0.0     |
+
+    Scenario Outline: Delete SBOM from SBOM List Page
+        When User Deletes "<sbomName>" using the toggle option from SBOM List Page
+        When User select Delete button from the Permanently delete SBOM model window
+        Then The SBOM deleted message is displayed
+        And Application Navigates to SBOM list page
+        And The "<sbomName>" should not be present on SBOM list page as it is deleted
+        Examples:
+        |         sbomName       |
+        |      rhn_satellite     |

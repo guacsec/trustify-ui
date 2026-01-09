@@ -37,7 +37,7 @@ mode: 'agent'
    - Automatically run test with:
       ```bash
       cd $PROJECT_ROOT/e2e
-      npx playwright test --project='bdd' --trace on -g "scenario name here" --headed
+      npx playwright test --project='bdd' --trace on -g "scenario name here"
       ```
    - In case of test failures, the above command launched HTML server to host the test output Press `Ctrl+C` to stop the server
 
