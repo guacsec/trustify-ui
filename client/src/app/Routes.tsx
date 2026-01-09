@@ -105,15 +105,6 @@ export const AppRoutes = createBrowserRouter([
             component={<AdvisoryDetails />}
           />
         ),
-      },
-      {
-        path: Paths.advisoryUpload,
-        element: (
-          <LazyRouteElement
-            identifier="advisory-upload"
-            component={<AdvisoryUpload />}
-          />
-        ),
         errorElement: <RouteErrorBoundary />,
         loader: async ({ params }) => {
           const advisoryId = usePathFromParams(params, PathParam.ADVISORY_ID);
@@ -124,6 +115,15 @@ export const AppRoutes = createBrowserRouter([
             advisory: response.data,
           };
         },
+      },
+      {
+        path: Paths.advisoryUpload,
+        element: (
+          <LazyRouteElement
+            identifier="advisory-upload"
+            component={<AdvisoryUpload />}
+          />
+        ),
       },
       {
         path: Paths.importers,
