@@ -146,8 +146,7 @@ Feature: SBOM Explorer - View SBOM details
         |        MRG-M-3.0.0     |
 
     Scenario Outline: Delete SBOM from SBOM List Page
-        Given An ingested SBOM "<sbomName>" is available
-        When User Selects Delete option from the toggle option from SBOM List Page
+        When User Deletes "<sbomName>" using the toggle option from SBOM List Page
         When User select Delete button from the Permanently delete SBOM model window
         Then The SBOM deleted message is displayed
         And Application Navigates to SBOM list page

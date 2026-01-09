@@ -2,7 +2,7 @@ import { createBdd } from "playwright-bdd";
 
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { ConfirmDialog } from "../../helpers/ConfirmDialog";
+import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
 import { expect } from "../../assertions";
@@ -182,19 +182,21 @@ When(
 When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
-    const dialog = await ConfirmDialog.build(page);
-    await dialog.verifyTitle("Permanently delete");
+    const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
+    await expect(dialog).toHaveTitle("Warning alert:Permanently delete SBOM?");
     await dialog.clickConfirm();
   },
 );
 
 When(
-  "User Selects Delete option from the toggle option from SBOM List Page",
-  async ({ page }) => {
-    const firstRow = page.locator("table tbody tr").first();
-    const kebabToggle = firstRow.getByRole("button", { name: "Kebab toggle" });
-    await kebabToggle.click();
-    await page.getByRole("menuitem", { name: "Delete" }).click();
+  "User Deletes {string} using the toggle option from SBOM List Page",
+  async ({ page }, sbomName) => {
+    const listPage = await SbomListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": sbomName });
+    const table = await listPage.getTable();
+    const rowToDelete = 0;
+    await table.clickAction("Delete", rowToDelete);
   },
 );
 
@@ -211,12 +213,7 @@ Then(
     const toolbar = await list.getToolbar();
     const table = await list.getTable();
     await toolbar.applyFilter({ "Filter text": sbomName });
-    await table.waitUntilDataIsLoaded();
-    await expect(
-      page.locator(
-        "table[aria-label='sbom-table'] tbody[aria-label='Table empty']",
-      ),
-    ).toBeVisible();
+    await expect(table).toHaveEmptyState();
   },
 );
 

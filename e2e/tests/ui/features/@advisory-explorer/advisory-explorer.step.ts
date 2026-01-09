@@ -1,10 +1,10 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
+import { expect } from "../../assertions";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
 import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
 import { test } from "../../fixtures";
-import { ConfirmDialog } from "../../helpers/ConfirmDialog";
+import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { DetailsPage } from "../../helpers/DetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
@@ -156,12 +156,14 @@ Then(
 );
 
 When(
-  "User Selects Delete option from the toggle option from Advisory List Page",
-  async ({ page }) => {
-    const firstRow = page.locator("table tbody tr").first();
-    const kebabToggle = firstRow.getByRole("button", { name: "Kebab toggle" });
-    await kebabToggle.click();
-    await page.getByRole("menuitem", { name: "Delete" }).click();
+  "User Deletes {string} using the toggle option from Advisory List Page",
+  async ({ page }, advisoryID) => {
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    const table = await listPage.getTable();
+    const rowToDelete = 0;
+    await table.clickAction("Delete", rowToDelete);
   },
 );
 
@@ -176,8 +178,10 @@ When(
 When(
   "User select Delete button from the Permanently delete Advisory model window",
   async ({ page }) => {
-    const dialog = await ConfirmDialog.build(page);
-    await dialog.verifyTitle("Permanently delete");
+    const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
+    await expect(dialog).toHaveTitle(
+      "Warning alert:Permanently delete Advisory?",
+    );
     await dialog.clickConfirm();
   },
 );
@@ -188,14 +192,8 @@ Then(
     const list = await AdvisoryListPage.build(page);
     const toolbar = await list.getToolbar();
     const table = await list.getTable();
-
     await toolbar.applyFilter({ "Filter text": advisoryID });
-    await table.waitUntilDataIsLoaded();
-    await expect(
-      page.locator(
-        "table[aria-label='advisory-table'] tbody[aria-label='Table empty']",
-      ),
-    ).toBeVisible();
+    await expect(table).toHaveEmptyState();
   },
 );
 

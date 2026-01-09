@@ -83,8 +83,7 @@ Scenario: Delete an advisory from the Advisory Explorer page
     |         CVE-2025-22130   |
 
 Scenario: Delete an advisory from the Advisory List Page
-    Given User searches for "<advisoryID>" in the dedicated search bar
-    When User Selects Delete option from the toggle option from Advisory List Page
+    When User Deletes "<advisoryID>" using the toggle option from Advisory List Page
     When User select Delete button from the Permanently delete Advisory model window
     Then The Advisory deleted message is displayed
     And Application Navigates to Advisory list page
