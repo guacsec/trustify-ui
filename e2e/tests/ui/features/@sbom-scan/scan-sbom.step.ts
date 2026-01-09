@@ -513,21 +513,3 @@ Then(
     }
   },
 );
-
-Then("Pagination of Vulnerability list works", async ({ page }) => {
-  const parentElem = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-  const toolbarTable = new ToolbarTable(page, "Vulnerability table");
-  await toolbarTable.verifyPagination(parentElem);
-});
-
-Then(
-  "Sorting of {string} Columns Works",
-  async ({ page }, columnHeaders: string) => {
-    const headers = columnHeaders
-      .split(",")
-      .map((column: string) => column.trim());
-    const toolbarTable = new ToolbarTable(page, "Vulnerability table");
-    const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-    await toolbarTable.verifySorting(vulnTableTopPagination, headers);
-  },
-);
