@@ -127,4 +127,62 @@ export class Toolbar<
       .click();
     await this._page.getByRole("menuitem", { name: filterName }).click();
   }
+
+  /**
+   * Clears all applied filters by clicking the "Clear all filters" button
+   */
+  async clearAllFilters() {
+    const clearButton = this._toolbar.getByRole("button", {
+      name: "Clear all filters",
+    });
+    await expect(clearButton).toBeVisible();
+    await clearButton.click();
+
+    // Verify all filter chips are removed
+    await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
+  }
+
+  /**
+   * Removes a specific filter chip by clicking its close button
+   * @param filterName the name of the filter category (e.g., "Filter text", "Revision", "Label")
+   * @param chipValue the specific value of the chip to remove
+   */
+  async removeFilterChip(filterName: TFilterName, chipValue: string) {
+    const chipGroup = this._toolbar.locator(".pf-m-label-group", {
+      hasText: filterName,
+    });
+    await expect(chipGroup).toBeVisible();
+
+    const chip = chipGroup.locator(".pf-v6-c-label", {
+      hasText: chipValue,
+    });
+    await expect(chip).toBeVisible();
+
+    const closeButton = chip.getByRole("button", { name: /close/i });
+    await closeButton.click();
+
+    // Verify chip is removed
+    await expect(chip).not.toBeVisible();
+  }
+
+  /**
+   * Removes all filters from a specific category/group by clicking the group's close button
+   * @param filterName the name of the filter category to remove (e.g., "Filter text", "Revision", "Label")
+   */
+  async removeFilterGroup(filterName: TFilterName) {
+    const chipGroup = this._toolbar.locator(".pf-m-label-group", {
+      hasText: filterName,
+    });
+    await expect(chipGroup).toBeVisible();
+
+    // // Find the close button for the entire group (usually in the chip group header)
+    const groupCloseButton = chipGroup
+      .locator(".pf-v6-c-label-group__close")
+      .getByRole("button");
+    await expect(groupCloseButton).toBeVisible();
+    await groupCloseButton.click();
+
+    // Verify the entire group is removed
+    await expect(chipGroup).not.toBeVisible();
+  }
 }
