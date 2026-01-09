@@ -85,18 +85,22 @@ export const useFetchSBOMs = (
   };
 };
 
+export const sbomByIdQueryOptions = (id: string | undefined) => ({
+  queryKey: [SBOMsQueryKey, id] as const,
+  queryFn: () => {
+    return id === undefined
+      ? Promise.resolve(undefined)
+      : getSbom({ client, path: { id: id } });
+  },
+});
+
 export const useFetchSBOMById = (
   id?: string,
   refetchInterval?: number | false,
   retry?: boolean | number,
 ) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: [SBOMsQueryKey, id],
-    queryFn: () => {
-      return id === undefined
-        ? Promise.resolve(undefined)
-        : getSbom({ client, path: { id: id } });
-    },
+    ...sbomByIdQueryOptions(id),
     enabled: !!id,
     refetchInterval,
     retry,
