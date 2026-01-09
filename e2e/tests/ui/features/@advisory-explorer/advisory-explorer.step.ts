@@ -87,12 +87,6 @@ Then(
   },
 );
 
-Then("Pagination of Vulnerabilities list works", async ({ page }) => {
-  const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
-  const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-  await toolbarTable.verifyPagination(vulnTableTopPagination);
-});
-
 Then(
   "A list of all active vulnerabilites tied to the advisory should display",
   async ({ page }) => {
