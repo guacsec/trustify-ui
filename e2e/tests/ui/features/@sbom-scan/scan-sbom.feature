@@ -199,7 +199,7 @@ Scenario: Verify Pagination on Generate Vulnerability Report for an SBOM
     Given User Navigated to Generate Vulnerability Report screen
     When User Clicks on Browse files Button
     When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
-    Then Pagination of Vulnerability list works
+    Then Pagination of "Vulnerability" table works
     Examples:
         |                        fileName              |              filePath             |
         |               exhort_mvn.json.bz2            |   /tests/common/assets/sbom/      |

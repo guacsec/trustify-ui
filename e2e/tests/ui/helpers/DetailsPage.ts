@@ -238,7 +238,6 @@ export class DetailsPage {
     if (!parentElem) {
       parentElem = this.page.locator(`xpath=//td[.='${entity}']/parent::tr/td`);
     }
-
     const moreElem = parentElem.getByRole("button", { name: "more" });
     if (await moreElem.isVisible({ timeout: 2000 })) {
       await moreElem.click();
