@@ -82,7 +82,7 @@ Feature: SBOM Explorer - View SBOM details
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Pagination of "Vulnerability" table works
-
+        Examples:
         Examples:
             | sbomName    |
             | quarkus-bom |
@@ -93,7 +93,7 @@ Feature: SBOM Explorer - View SBOM details
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Packages"
         Then Pagination of "Package" table works
-
+        Examples:
         Examples:
             | sbomName               |
             | ubi9-minimal-container |

@@ -22,17 +22,6 @@ export const { Given, When, Then } = createBdd(test);
 const PACKAGE_TABLE_NAME = "Package table";
 const VULN_TABLE_NAME = "Vulnerability table";
 
-Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
-  const sbomListPage = await SbomListPage.build(page);
-
-  const toolbar = await sbomListPage.getToolbar();
-  const table = await sbomListPage.getTable();
-
-  await toolbar.applyFilter({ "Filter text": sbomName });
-  await table.waitUntilDataIsLoaded();
-  await expect(table).toHaveColumnWithValue("Name", sbomName);
-});
-
 When(
   "User visits SBOM details Page of {string}",
   async ({ page }, sbomName: string) => {
@@ -193,7 +182,6 @@ Then(
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab(`Info`);
     const infoSection = page.locator("#info-tab-section");
-
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"

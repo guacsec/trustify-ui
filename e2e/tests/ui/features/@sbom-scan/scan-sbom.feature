@@ -117,14 +117,7 @@ Feature: Scan SBOM - To Generate Vulnerability Report for SBOM
             | quarkus-bom-3.8.3.redhat-00003.json.bz2 | /tests/common/assets/sbom/ | CVE-2024-29025 | maven | io.netty                         | netty-codec-http         | 4.1.107.Final-redhat-00001 |      | repository_url=https://maven.repository.redhat.com/ga/,type=jar|
             | exhort_mvn.json.bz2                     | /tests/common/assets/sbom/ | CVE-2023-0481  | maven | io.quarkus.resteasy.reactive     | resteasy-reactive-common | 2.13.7.Final               |      |                                                                |
 
-    Scenario: Verify Actions on Generate Vulnerability Report for an SBOM
-        Given User Navigated to Generate Vulnerability Report screen
-        When User Clicks on Browse files Button
-        When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
-        When User Clicks on "Actions" button
-        Then The Actions dropdown should have options "Generate new report" and "Download as CSV"
-        When User Clicks on "Generate new report" option from the Actions dropdown
-        Then Application navigates to Generate Vulnerability Report screen
+        Examples:
 
         Examples:
             | fileName                                | filePath                   |
