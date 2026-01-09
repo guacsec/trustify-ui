@@ -61,7 +61,7 @@ Feature: Advisory Explorer
 Scenario: Display vulnerabilities tied to a single advisory
     Given User visits Advisory details Page of "<advisoryName>" with type "<advisoryType>"
     Then User navigates to the Vulnerabilities tab on the Advisory Overview page
-    Then Pagination of Vulnerabilities list works
+    Then Pagination of "vulnerability" table works
     Then A list of all active vulnerabilites tied to the advisory should display
     And The "ID, Title, Discovery, Release, Score, CWE" information should be visible for each vulnerability
     And The vulnerabilities should be sorted by ID by default

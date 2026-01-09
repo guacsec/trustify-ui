@@ -84,7 +84,7 @@ Feature: SBOM Explorer - View SBOM details
         Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
-        Then Pagination of Vulnerabilities list works
+        Then Pagination of "Vulnerability" table works
         Examples:
         | sbomName    |
         | quarkus-bom |
@@ -94,7 +94,7 @@ Feature: SBOM Explorer - View SBOM details
         Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Packages"
-        Then Pagination of Packages list works
+        Then Pagination of "Package" table works
         Examples:
         |        sbomName        |
         | ubi9-minimal-container |
