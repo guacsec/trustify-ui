@@ -85,25 +85,13 @@ npm test -- path/to/test.test.ts
 
 - Playwright server running on port 5001
   - Assume the developer has started the playwright server using:
-```bash
-podman run --rm --init -it \
---network host \
---workdir /home/pwuser \
---user pwuser \
-mcr.microsoft.com/playwright:v1.57.0-noble \
-/bin/sh -c "npx -y playwright@1.57.0 run-server --port 5001"
-```
-
-- Development server running on port 3000
-
-**CRITICAL: When running e2e tests, you MUST always use the full command with environment variables:**
 
 ```bash
-# Run all e2e tests
-CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test
+# Run e2e tests (Playwright)
+npm run e2e:test
 
-# Run a single e2e test file (ALWAYS use this format)
-CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test -- path/to/test.test.ts
+# Run a single e2e test file
+npm run e2e:test -- path/to/test.test.ts
 ```
 
 #### E2E Testing with Custom Assertions
@@ -312,7 +300,4 @@ import { Overview } from "./overview";
 - Table controls provide URL persistence - users can share filtered/sorted views
 - PatternFly 6 is the design system - use PF components for consistency
 - Authentication is optional (controlled by `AUTH_REQUIRED` env var)
-- **E2E tests**:
-  - **MUST always run with environment variables:** `CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test -- path/to/test.test.ts`
-  - Always use custom assertions from `e2e/tests/ui/assertions/` instead of manual DOM queries for better maintainability and type safety
-  - Never use `npm run e2e:test` without the required environment variables
+- **E2E tests**: Always use custom assertions from `e2e/tests/ui/assertions/` instead of manual DOM queries for better maintainability and type safety
