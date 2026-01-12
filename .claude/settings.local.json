@@ -7,7 +7,7 @@
       "Bash(npm run check:format:*)",
       "Bash(npx tsc:*)",
       "Bash(grep:*)",
-      "Bash(CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test:*)"
+      "Bash(SKIP_INGESTION=true CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
