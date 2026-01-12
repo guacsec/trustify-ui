@@ -13,10 +13,14 @@ import type { Toolbar } from "../pages/Toolbar";
 import type { TFilterValue } from "../pages/utils";
 import { toolbarAssertions, type ToolbarMatchers } from "./ToolbarMatchers";
 
+import type { DeletionConfirmDialog } from "../pages/ConfirmDialog";
+import { dialogAssertions, type DialogMatchers } from "./DialogMatchers";
+
 const merged = mergeExpects(
   tableAssertions,
   paginationAssertions,
   toolbarAssertions,
+  dialogAssertions,
   // Add more custom assertions here
 );
 
@@ -58,6 +62,17 @@ function typedExpect<
   keyof ToolbarMatchers<TFilter, TFilterName>
 > &
   ToolbarMatchers<TFilter, TFilterName>;
+
+/**
+ * Overload from DialogMatchers.ts
+ */
+function typedExpect(
+  value: DeletionConfirmDialog,
+): Omit<
+  ReturnType<typeof merged<DeletionConfirmDialog>>,
+  keyof DialogMatchers
+> &
+  DialogMatchers;
 
 // Default overload
 function typedExpect<T>(value: T): ReturnType<typeof merged<T>>;

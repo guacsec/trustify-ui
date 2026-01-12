@@ -193,6 +193,14 @@ Then(
 );
 
 When(
+  "User Clicks on Actions button and Selects Delete option from the drop down",
+  async ({ page }) => {
+    const details = new DetailsPage(page);
+    await details.clickOnPageAction("Delete");
+  },
+);
+
+When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
@@ -214,8 +222,9 @@ When(
 );
 
 Then("Application Navigates to SBOM list page", async ({ page }) => {
-  const heading = page.getByRole("heading", { level: 1, name: "SBOMs" });
-  await expect(heading).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "SBOMs" }),
+  ).toBeVisible();
 });
 
 Then(

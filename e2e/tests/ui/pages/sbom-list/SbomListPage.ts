@@ -43,7 +43,7 @@ export class SbomListPage {
         Dependencies: { isSortable: false },
         Vulnerabilities: { isSortable: false },
       },
-      ["Edit labels", "Download SBOM", "Download License Report"]
+      ["Edit labels", "Download SBOM", "Download License Report", "Delete"]
     );
   }
 
