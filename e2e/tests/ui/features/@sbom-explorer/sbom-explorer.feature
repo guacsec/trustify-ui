@@ -154,3 +154,32 @@ Feature: SBOM Explorer - View SBOM details
         Examples:
         |         sbomName       |
         |      rhn_satellite     |
+
+    Scenario Outline: SBOM Explorer Vulnerability Correlation with Affected Advisory
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        When User clicks on the vulnerability row with ID "<vulnerabilityID>"
+        Then The Application navigates to the Vulnerability details Page of "<vulnerabilityID>"
+        And The Related SBOMs tab loaded with SBOM "<sbomName>" with status "<status>"
+        Examples:
+        |         sbomName       | vulnerabilityID | status |
+        |        quarkus-bom     | CVE-2023-0044   | Affected |
+
+    Scenario Outline: SBOM Explorer Vulnerability Correlation with Fixed Advisory
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        Then The vulnerability "<vulnerabilityID>" does not show in the Vulnerabilities table
+        When User visits Vulnerability details Page of "<vulnerabilityID>"
+        Then The Related SBOMs tab loaded with SBOM "<sbomName>" with status "<status>"
+        Examples:
+        |         sbomName       | vulnerabilityID | status |
+        |        quarkus-bom     | CVE-2023-1584   | Fixed |
+
+    Scenario Outline: SBOM Explorer Package Correlation with SBOM
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        When User clicks on Affected dependencies count button of the "<vulnerabilityID>"
+        And User clicks on the package name "<packageName>" link on the expanded table
+        Then The Application navigates to the Package details Page of "<packageName>"
+        And Vulnerability "<vulnerabilityID>" visible under Vulnerabilities tab
+        And The SBOMs using package tab loaded with SBOM "<sbomName>"
+        Examples:
+        |         sbomName       | vulnerabilityID | packageName |
+        |        quarkus-bom     | CVE-2023-0044   | quarkus-vertx-http |

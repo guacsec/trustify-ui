@@ -2,6 +2,12 @@ import { createBdd } from "playwright-bdd";
 import { expect } from "playwright/test";
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
+import { VulnerabilitiesTab } from "../../pages/sbom-details/vulnerabilities/VulnerabilitiesTab";
+import { VulnerabilityDetailsPage } from "../../pages/vulnerability-details/VulnerabilityDetailsPage";
+import { SbomsTab } from "../../pages/vulnerability-details/sboms/SbomsTab";
+import { PackageDetailsPage } from "../../pages/package-details/PackageDetailsPage";
+import { VulnerabilitiesTab as PackageVulnerabilitiesTab } from "../../pages/package-details/vulnerabilities/VulnerabilitiesTab";
+import { SbomsTab as PackageSbomsTab } from "../../pages/package-details/sboms/SbomsTab";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { test } from "../../fixtures";
@@ -223,3 +229,120 @@ Then("The SBOM deleted message is displayed", async ({ page }) => {
   });
   await expect(alertHeading).toBeVisible({ timeout: 10000 });
 });
+
+Given(
+  "User is on the Vulnerabilities tab with {string} rows per page for SBOM {string}",
+  async ({ page }, rowsPerPage: string, sbomName: string) => {
+    const vulnerabilitiesTab = await VulnerabilitiesTab.build(page, sbomName);
+    const pagination = await vulnerabilitiesTab.getPagination(true);
+    await pagination.selectItemsPerPage(
+      Number(rowsPerPage) as 10 | 20 | 50 | 100,
+    );
+  },
+);
+
+When(
+  "User clicks on the vulnerability row with ID {string}",
+  async ({ page }, vulnerabilityID: string) => {
+    await page
+      .getByRole("link", { name: vulnerabilityID, exact: true })
+      .click();
+  },
+);
+
+Then(
+  "The Application navigates to the Vulnerability details Page of {string}",
+  async ({ page }, vulnerabilityID: string) => {
+    const vulnDetailsPage = await VulnerabilityDetailsPage.fromCurrentPage(
+      page,
+      vulnerabilityID,
+    );
+    await vulnDetailsPage._layout.verifyPageHeader(vulnerabilityID);
+  },
+);
+
+Then(
+  "The Related SBOMs tab loaded with SBOM {string} with status {string}",
+  async ({ page }, sbomName: string, status: string) => {
+    const sbomsTab = await SbomsTab.fromCurrentPage(page);
+    const table = await sbomsTab.getTable();
+    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
+    await expect(table).toHaveColumnWithValue("Status", status, 0);
+  },
+);
+
+Then(
+  "The vulnerability {string} does not show in the Vulnerabilities table",
+  async ({ page }, vulnerabilityID: string) => {
+    const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
+    await toolbarTable.waitForTableContent();
+    const vulnerabilityLink = page.getByRole("link", {
+      name: vulnerabilityID,
+      exact: true,
+    });
+    await expect(vulnerabilityLink).not.toBeVisible();
+  },
+);
+
+When(
+  "User visits Vulnerability details Page of {string}",
+  async ({ page }, vulnerabilityID: string) => {
+    await VulnerabilityDetailsPage.build(page, vulnerabilityID);
+  },
+);
+
+When(
+  "User clicks on Affected dependencies count button of the {string}",
+  async ({ page }, vulnerabilityID: string) => {
+    const vulnerabilityRow = page.locator(
+      `table[aria-label="Vulnerability table"] tbody:has(a:text-is("${vulnerabilityID}"))`,
+    );
+    const affectedDepsButton = vulnerabilityRow
+      .first()
+      .locator('td[data-label="Affected dependencies"] button');
+    await affectedDepsButton.click();
+  },
+);
+
+When(
+  "User clicks on the package name {string} link on the expanded table",
+  async ({ page }, packageName: string) => {
+    const innerTable = page.locator(
+      'table[aria-label="Vulnerability table"] td[data-label="Affected dependencies"] table',
+    );
+    const packageLink = innerTable.getByRole("link", {
+      name: packageName,
+      exact: true,
+    });
+    await packageLink.click();
+  },
+);
+
+Then(
+  "The Application navigates to the Package details Page of {string}",
+  async ({ page }, packageName: string) => {
+    const packageDetailsPage = await PackageDetailsPage.fromCurrentPage(
+      page,
+      packageName,
+    );
+    await packageDetailsPage._layout.verifyPageHeader(packageName);
+  },
+);
+
+Then(
+  "Vulnerability {string} visible under Vulnerabilities tab",
+  async ({ page }, vulnerabilityID: string) => {
+    const vulnTab = await PackageVulnerabilitiesTab.fromCurrentPage(page);
+    const table = await vulnTab.getTable();
+    await expect(table).toHaveColumnWithValue("ID", vulnerabilityID);
+  },
+);
+
+Then(
+  "The SBOMs using package tab loaded with SBOM {string}",
+  async ({ page }, sbomName: string) => {
+    const sbomsTab = await PackageSbomsTab.fromCurrentPage(page);
+    const table = await sbomsTab.getTable();
+    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
+  },
+);

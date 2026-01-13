@@ -10,6 +10,10 @@ export class SbomDetailsPage {
     this._layout = layout;
   }
 
+  /**
+   * Build the page object by navigating from the sidebar to the SBOM list,
+   * filtering, and clicking on the SBOM link.
+   */
   static async build(page: Page, sbomName: string) {
     const navigation = await Navigation.build(page);
     await navigation.goToSidebar("SBOMs");
@@ -26,6 +30,21 @@ export class SbomDetailsPage {
 
     const layout = await DetailsPageLayout.build(page);
     await layout.verifyPageHeader(sbomName);
+
+    return new SbomDetailsPage(page, layout);
+  }
+
+  /**
+   * Build the page object from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param sbomName - Optional SBOM name to verify the page header
+   */
+  static async fromCurrentPage(page: Page, sbomName?: string) {
+    const layout = await DetailsPageLayout.build(page);
+
+    if (sbomName) {
+      await layout.verifyPageHeader(sbomName);
+    }
 
     return new SbomDetailsPage(page, layout);
   }
