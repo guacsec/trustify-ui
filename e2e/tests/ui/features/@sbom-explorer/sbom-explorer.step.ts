@@ -260,11 +260,9 @@ Given(
 When(
   "User clicks on the vulnerability row with ID {string}",
   async ({ page }, vulnerabilityID: string) => {
-    const vulnerabilityLink = page.getByRole("link", {
-      name: vulnerabilityID,
-      exact: true,
-    });
-    await vulnerabilityLink.click();
+    await page
+      .getByRole("link", { name: vulnerabilityID, exact: true })
+      .click();
   },
 );
 
@@ -314,12 +312,9 @@ Given(
 When(
   "User clicks on Affected dependencies count button of the {string}",
   async ({ page }, vulnerabilityID: string) => {
-    const vulnerabilityTable = page.locator(
-      `table[aria-label="Vulnerability table"]`,
+    const vulnerabilityRow = page.locator(
+      `table[aria-label="Vulnerability table"] tbody:has(a:text-is("${vulnerabilityID}"))`,
     );
-    const vulnerabilityRow = vulnerabilityTable.locator("tbody").filter({
-      has: page.getByRole("link", { name: vulnerabilityID, exact: true }),
-    });
     const affectedDepsButton = vulnerabilityRow
       .first()
       .locator('td[data-label="Affected dependencies"] button');
@@ -330,11 +325,8 @@ When(
 When(
   "User clicks on the package name {string} link on the expanded table",
   async ({ page }, packageName: string) => {
-    const vulnerabilityTable = page.locator(
-      'table[aria-label="Vulnerability table"]',
-    );
-    const innerTable = vulnerabilityTable.locator(
-      'td[data-label="Affected dependencies"] table',
+    const innerTable = page.locator(
+      'table[aria-label="Vulnerability table"] td[data-label="Affected dependencies"] table',
     );
     const packageLink = innerTable.getByRole("link", {
       name: packageName,
