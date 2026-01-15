@@ -111,7 +111,10 @@ export class Toolbar<
         .locator("input[aria-label='select-autocomplete-listbox']")
         .fill(label);
 
-      const dropdownOption = this._page.getByRole("option", { name: label });
+      const dropdownOption = this._page.getByRole("menuitem", {
+        name: label,
+        exact: true,
+      });
       await expect(dropdownOption).toBeVisible();
       await dropdownOption.click();
     }

@@ -17,6 +17,7 @@ export interface ToolbarMatchers<
   toHaveLabels(
     filters: Partial<FilterValueType<TFilter>>,
   ): Promise<MatcherResult>;
+  toHaveNoLabels(): Promise<MatcherResult>;
 }
 
 type ToolbarMatcherDefinitions = {
@@ -74,6 +75,35 @@ export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
       return {
         pass: true,
         message: () => "Toolbar has labels",
+      };
+    } catch (error) {
+      return {
+        pass: false,
+        message: () => (error instanceof Error ? error.message : String(error)),
+      };
+    }
+  },
+  toHaveNoLabels: async <
+    TFilter extends Record<string, TFilterValue>,
+    TFilterName extends Extract<keyof TFilter, string>,
+  >(
+    toolbar: Toolbar<TFilter, TFilterName>,
+  ): Promise<MatcherResult> => {
+    try {
+      // Verify the clear all button does not exist
+      const clearButton = toolbar._toolbar.getByRole("button", {
+        name: "Clear all filters",
+      });
+      await baseExpect(clearButton).not.toBeVisible();
+
+      // Verify no filter categories are there
+      await baseExpect(
+        toolbar._toolbar.locator(".pf-m-label-group"),
+      ).toHaveCount(0);
+
+      return {
+        pass: true,
+        message: () => "Toolbar has no labels",
       };
     } catch (error) {
       return {
