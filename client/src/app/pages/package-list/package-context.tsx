@@ -87,6 +87,9 @@ export const PackageSearchProvider: React.FunctionComponent<
       qualifiers: "Qualifiers",
       vulnerabilities: "Vulnerabilities",
     },
+    initialColumns: {
+      name: { isIdentity: true },
+    },
     isPaginationEnabled: true,
     isSortEnabled: true,
     sortableColumns: ["name", "namespace", "version"],
@@ -139,6 +142,8 @@ export const PackageSearchProvider: React.FunctionComponent<
     ],
     isExpansionEnabled: true,
     expandableVariant: "compound",
+    isActiveItemEnabled: false,
+    isSelectionEnabled: false,
   });
 
   const {
