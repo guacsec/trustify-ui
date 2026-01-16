@@ -26,7 +26,7 @@ export class SbomListPage {
       "Filter text": "string",
       "Created on": "dateRange",
       Label: "typeahead",
-      License: "multiSelect",
+      License: "typeahead",
     });
   }
 

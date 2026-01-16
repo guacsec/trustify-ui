@@ -141,6 +141,7 @@ export const Autocomplete: React.FC<IAutocompleteProps> = ({
     <Flex direction={{ default: "column" }}>
       <FlexItem key="input">
         <Select
+          role="menu"
           isOpen={
             isDropdownOpen &&
             (optionsNotSelected.length > 0 ||
