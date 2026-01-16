@@ -13,10 +13,23 @@ export class VulnerabilitiesTab {
     this._detailsPage = layout;
   }
 
+  /**
+   * Build the tab by navigating to the SBOM details page and selecting the tab.
+   */
   static async build(page: Page, sbomName: string) {
     const detailsPage = await SbomDetailsPage.build(page, sbomName);
     await detailsPage._layout.selectTab("Vulnerabilities");
 
+    return new VulnerabilitiesTab(page, detailsPage);
+  }
+
+  /**
+   * Build the tab from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param sbomName - Optional SBOM name to verify the page header
+   */
+  static async fromCurrentPage(page: Page, sbomName?: string) {
+    const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
     return new VulnerabilitiesTab(page, detailsPage);
   }
 

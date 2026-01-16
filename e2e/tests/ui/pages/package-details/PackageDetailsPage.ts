@@ -10,6 +10,11 @@ export class PackageDetailsPage {
     this._layout = layout;
   }
 
+  /**
+   * Build the page object by navigating from the sidebar to the package list,
+   * filtering, and clicking on the package link.
+   * Use this for unit tests or when starting from scratch.
+   */
   static async build(
     page: Page,
     packageDetail: { Name: string; Version?: string },
@@ -30,6 +35,24 @@ export class PackageDetailsPage {
       .click();
     const layout = await DetailsPageLayout.build(page);
     await layout.verifyPageHeader(packageDetail.Name);
+
+    return new PackageDetailsPage(page, layout);
+  }
+
+  /**
+   * Build the page object from the current page state WITHOUT navigating.
+   * Use this in E2E flows when the application has already navigated to this page
+   * (e.g., after clicking a package link from another page).
+   *
+   * @param page - The Playwright page object
+   * @param packageName - Optional package name to verify the page header
+   */
+  static async fromCurrentPage(page: Page, packageName?: string) {
+    const layout = await DetailsPageLayout.build(page);
+
+    if (packageName) {
+      await layout.verifyPageHeader(packageName);
+    }
 
     return new PackageDetailsPage(page, layout);
   }

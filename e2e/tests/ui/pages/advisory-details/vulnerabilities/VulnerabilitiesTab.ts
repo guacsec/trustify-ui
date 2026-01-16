@@ -13,8 +13,26 @@ export class VulnerabilitiesTab {
     this._detailsPage = layout;
   }
 
-  static async build(page: Page, packageName: string) {
-    const detailsPage = await AdvisoryDetailsPage.build(page, packageName);
+  /**
+   * Build the tab by navigating to the advisory details page and selecting the tab.
+   */
+  static async build(page: Page, advisoryID: string) {
+    const detailsPage = await AdvisoryDetailsPage.build(page, advisoryID);
+    await detailsPage._layout.selectTab("Vulnerabilities");
+
+    return new VulnerabilitiesTab(page, detailsPage);
+  }
+
+  /**
+   * Build the tab from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param advisoryID - Optional advisory ID to verify the page header
+   */
+  static async fromCurrentPage(page: Page, advisoryID?: string) {
+    const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(
+      page,
+      advisoryID,
+    );
     await detailsPage._layout.selectTab("Vulnerabilities");
 
     return new VulnerabilitiesTab(page, detailsPage);
