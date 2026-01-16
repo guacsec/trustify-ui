@@ -2,10 +2,10 @@
 
 import type { Page } from "@playwright/test";
 
-import { expect } from "../assertions";
-import { test } from "../fixtures";
-import type { Table, TColumnValue } from "../pages/Table";
-import type { Toolbar } from "../pages/Toolbar";
+import { expect } from "../../assertions";
+import { test } from "../../fixtures";
+import type { Table, TColumnValue } from "../../pages/Table";
+import type { Toolbar } from "../../pages/Toolbar";
 import {
   isDateRangeFilter,
   isMultiSelectFilter,
@@ -13,7 +13,7 @@ import {
   isTypeaheadFilter,
   type FilterValueType,
   type TFilterValue,
-} from "../pages/utils";
+} from "../../pages/utils";
 
 /**
  * Configuration for filter test helpers

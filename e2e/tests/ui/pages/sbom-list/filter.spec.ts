@@ -10,7 +10,7 @@ import {
   testFilterShowsEmptyState,
   testRemovalOfFiltersFromToolbar,
   testUrlPersistence,
-} from "../../helpers/filter-test-helpers";
+} from "../common/filter-test-helpers";
 import { SbomListPage } from "./SbomListPage";
 
 test.describe("Filter validations", { tag: "@tier1" }, () => {
