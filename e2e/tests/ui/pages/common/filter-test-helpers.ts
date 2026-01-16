@@ -309,7 +309,7 @@ export const testBrowserNavigationBackAndForward = <
     const { toolbar } = config;
 
     // Apply filters
-    toolbar.applyFilter(filters);
+    await toolbar.applyFilter(filters);
 
     const urlWithFilters = page.url();
 
