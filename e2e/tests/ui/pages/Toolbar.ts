@@ -111,7 +111,10 @@ export class Toolbar<
         .locator("input[aria-label='select-autocomplete-listbox']")
         .fill(label);
 
-      const dropdownOption = this._page.getByRole("option", { name: label });
+      const dropdownOption = this._page.getByRole("menuitem", {
+        name: label,
+        exact: true,
+      });
       await expect(dropdownOption).toBeVisible();
       await dropdownOption.click();
     }
@@ -153,12 +156,18 @@ export class Toolbar<
     });
     await expect(chipGroup).toBeVisible();
 
-    const chip = chipGroup.locator(".pf-v6-c-label", {
-      hasText: chipValue,
+    const chip = chipGroup.locator(".pf-v6-c-label-group__list-item").filter({
+      has: this._page.locator(".pf-v6-c-label__content").filter({
+        hasText: new RegExp(
+          `^${chipValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+        ),
+      }),
     });
+
     await expect(chip).toBeVisible();
 
     const closeButton = chip.getByRole("button", { name: /close/i });
+    await expect(closeButton).toBeVisible();
     await closeButton.click();
 
     // Verify chip is removed
