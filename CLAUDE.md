@@ -1,10 +1,13 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Overview
 
-Trustify UI is a React-based web application for software supply chain security (SBOMs, advisories, vulnerabilities). It uses a monorepo structure with npm workspaces and connects to the Trustify backend API.
+Trustify UI is a React-based web application for software supply chain
+security (SBOMs, advisories, vulnerabilities). It uses a monorepo structure with
+npm workspaces and connects to the Trustify backend API.
 
 ## Workspace Structure
 
@@ -33,6 +36,7 @@ This monorepo uses 4 npm workspaces:
 ## Essential Commands
 
 ### Development
+
 ```bash
 # Install dependencies
 npm ci
@@ -46,6 +50,7 @@ npm run start:dev:common  # Common in watch mode
 ```
 
 ### Building
+
 ```bash
 # Build all workspaces
 npm run build
@@ -55,12 +60,13 @@ npm run generate
 ```
 
 ### Code Quality
+
 ```bash
 # Lint and format check
 npm run check
 
 # Auto-fix lint
-npm run check:Write
+npm run check:write
 
 # Auto-fix formatting
 npm run format:fix
@@ -71,6 +77,7 @@ npm run format:fix
 ### Testing
 
 #### Unit Tests
+
 ```bash
 # Run unit tests (Jest)
 npm test
@@ -80,11 +87,6 @@ npm test -- path/to/test.test.ts
 ```
 
 #### E2E Tests (Playwright)
-
-**Prerequisites:**
-
-- Playwright server running on port 5001
-  - Assume the developer has started the playwright server using:
 
 ```bash
 # Run e2e tests (Playwright)
@@ -96,17 +98,21 @@ npm run e2e:test -- path/to/test.test.ts
 
 #### E2E Testing with Custom Assertions
 
-The e2e tests use custom Playwright assertions for better readability and maintainability. **Always prefer these custom assertions** over manual DOM queries or counts.
+The e2e tests use custom Playwright assertions for better readability and
+maintainability. **Always prefer these custom assertions** over manual DOM
+queries or counts.
 
 **Custom assertions are located in:** `e2e/tests/ui/assertions/`
 
-**Import from:** `e2e/tests/ui/assertions` (exports typed `expect` with custom matchers)
+**Import from:** `e2e/tests/ui/assertions` (exports typed `expect` with custom
+matchers)
 
 ## Architecture
 
 ### Application Structure
 
 Client app follows this component hierarchy:
+
 ```
 OidcProvider (auth)
   └─ QueryClientProvider (TanStack Query)
@@ -139,7 +145,9 @@ client/src/app/
 ### Key Patterns
 
 #### **Page Structure Pattern**
+
 Every page follows this consistent structure:
+
 ```
 pages/[page-name]/
 ├── [page-name].tsx          # Main page component
@@ -165,7 +173,8 @@ pages/[page-name]/
 
 #### **API Integration**
 
-- **Generated client**: `@hey-api/openapi-ts` generates TypeScript client from `openapi/trustd.yaml`
+- **Generated client**: `@hey-api/openapi-ts` generates TypeScript client from
+  `openapi/trustd.yaml`
   - Output: `client/src/app/client/` (types, SDK methods)
   - Regenerate: `npm run generate` (runs automatically on `npm ci`)
 
@@ -173,7 +182,8 @@ pages/[page-name]/
   - Adds Bearer token from OIDC session to all requests
   - Auto-retries on 401 with silent token refresh (max 2 retries)
 
-- **Custom REST helpers**: `api/rest.ts` for special cases (file uploads, endpoints not in OpenAPI)
+- **Custom REST helpers**: `api/rest.ts` for special cases (file uploads,
+  endpoints not in OpenAPI)
 
 #### **Routing**
 
@@ -193,7 +203,9 @@ Defined in `common/src/environment.ts`:
 - `OIDC_SCOPE` - OIDC scope (default: `"openid"`)
 
 **How env vars work:**
-- **Production**: Server injects env as base64 JSON into `index.html.ejs`, client decodes from `window._env`
+
+- **Production**: Server injects env as base64 JSON into `index.html.ejs`,
+  client decodes from `window._env`
 - **Development**: Rsbuild injects env directly into HTML template
 
 ### Authentication Flow
@@ -225,11 +237,12 @@ Defined in `common/src/environment.ts`:
 ### Table with Filters
 
 Use the table controls pattern (see `pages/advisory-list/advisory-context.tsx`):
+
 ```tsx
 const tableControlState = useTableControlState({
   tableName: "advisory",
   persistTo: "urlParams", // State persists in URL
-  columnNames: { identifier: "ID", title: "Title" },
+  columnNames: {identifier: "ID", title: "Title"},
   filterCategories: [...],
   sortableColumns: ["identifier", "modified"],
   isPaginationEnabled: true,
@@ -252,9 +265,13 @@ const tableControls = useTableControlProps({
 
 - **TypeScript**: Strict mode enabled
   - Path alias: `@app/*` → `src/app/*`
-  - **Import Order**: Group imports alphabetically and follow the order below, with each block separated by a blank line:
-    1. **React/Router block**: Dependencies from `react`, `react-dom`, `react-router`, `react-router-dom`, `react-oidc-context`, `react-hook-form`, etc.
-    2. **Package dependencies block**: Any dependency declared in `package.json` (e.g., `axios`, `dayjs`, `yup`, `lodash`, etc.)
+  - **Import Order**: Group imports alphabetically and follow the order below,
+    with each block separated by a blank line:
+    1. **React/Router block**: Dependencies from `react`, `react-dom`,
+       `react-router`, `react-router-dom`, `react-oidc-context`,
+       `react-hook-form`, etc.
+    2. **Package dependencies block**: Any dependency declared in
+       `package.json` (e.g., `axios`, `dayjs`, `yup`, `lodash`, etc.)
     3. **PatternFly block**: Any `@patternfly/*` dependency
     4. **App imports block**: Any `@app/*` dependency
     5. **Relative imports block**: Local relative imports (`./`, `../`, etc.)
@@ -263,9 +280,9 @@ const tableControls = useTableControlProps({
 
 ```ts
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
-import type { AxiosError } from "axios";
+import type {AxiosError} from "axios";
 import dayjs from "dayjs";
 import arraySupport from "dayjs/plugin/arraySupport";
 
@@ -274,10 +291,10 @@ import {
   Tab,
 } from "@patternfly/react-core";
 
-import { PathParam, Paths, useRouteParams } from "@app/Routes";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import {PathParam, Paths, useRouteParams} from "@app/Routes";
+import {LoadingWrapper} from "@app/components/LoadingWrapper";
 
-import { Overview } from "./overview";
+import {Overview} from "./overview";
 ```
 
 - **CSS Modules**: Enabled for component-scoped styles
@@ -285,19 +302,23 @@ import { Overview } from "./overview";
 ### Backend Integration
 
 **Development:**
+
 - Rsbuild proxies `/api` → `TRUSTIFY_API_URL` (default: `http://localhost:8080`)
 - Rsbuild proxies `/auth` → `OIDC_SERVER_URL`
 - Start local backend: `cargo run --bin trustd` (in trustify repo)
 
 **Production:**
+
 - Express server proxies requests
 - Environment injected at server startup
 
 ## Important Notes
 
 - Always read existing files before modifying them
-- The OpenAPI client (`client/src/app/client/`) is auto-generated - don't edit manually
+- The OpenAPI client (`client/src/app/client/`) is auto-generated - don't edit
+  manually
 - Table controls provide URL persistence - users can share filtered/sorted views
 - PatternFly 6 is the design system - use PF components for consistency
 - Authentication is optional (controlled by `AUTH_REQUIRED` env var)
-- **E2E tests**: Always use custom assertions from `e2e/tests/ui/assertions/` instead of manual DOM queries for better maintainability and type safety
+- **E2E tests**: Always use custom assertions from `e2e/tests/ui/assertions/`
+  instead of manual DOM queries for better maintainability and type safety

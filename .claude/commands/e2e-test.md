@@ -17,15 +17,20 @@ Create E2E Playwright tests based on [summary] and following these guidelines:
 
 ## Review the work
 
-- **Invoke the e2e-test-reviewer subagent** to review your work and implement suggestions where needed/
+- **Invoke the e2e-test-reviewer subagent** to review your work and implement
+  suggestions where needed/
 - Iterate on the review process when needed
 
 ## Execute the work
 
 - Execute the generated tests using the command below:
+
 ```bash
 # Run a single e2e test file (ALWAYS use this format)
 SKIP_INGESTION=true CONSOLE_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5001/ npm run e2e:test -- path/to/test.test.ts --workers=2
 ```
+
 - Iterate to make the tests pass successfully when needed
-  - Do not over iterate too much. Let the developer do the refinement manually when needed. Always suggest possible pollising actions so the human can take action
+  - Do not over iterate too much. Let the developer do the refinement manually
+    when needed. Always suggest possible polishing actions so the human can take
+    action

@@ -1,6 +1,37 @@
 ---
 name: e2e-test-reviewer
-description: Use this agent when the user is writing, modifying, or reviewing end-to-end (e2e) tests for the Trustify UI application. This includes:\n\n<example>\nContext: The agent should be used when writing new e2e tests that need to follow project patterns.\nuser: "I need to write a test that verifies the advisory list page displays correctly"\nassistant: "I'm going to use the Task tool to launch the e2e-test-reviewer agent to help write this test following the project's e2e testing patterns."\n<task tool invocation to e2e-test-reviewer agent>\n</example>\n\n<example>\nContext: The agent should review existing e2e tests to ensure they follow best practices.\nuser: "Please review the e2e test I just wrote for the SBOM details page"\nassistant: "I'll use the e2e-test-reviewer agent to review your test and ensure it properly uses custom assertions and page objects."\n<task tool invocation to e2e-test-reviewer agent>\n</example>\n\n<example>\nContext: Proactively suggest using the agent when e2e test code is detected.\nuser: "Here's my new Playwright test for the vulnerability page"\nassistant: "I notice you're working on an e2e test. Let me use the e2e-test-reviewer agent to review it and ensure it follows the project's testing standards."\n<task tool invocation to e2e-test-reviewer agent>\n</example>
+description: |
+  Use this agent when the user is writing, modifying, or reviewing end-to-end (e2e) tests for the Trustify UI application. This includes:
+
+  <example>
+  Context: The agent should be used when writing new e2e tests that need to follow project patterns.
+
+  user: "I need to write a test that verifies the advisory list page displays correctly"
+
+  assistant: "I'm going to use the Task tool to launch the e2e-test-reviewer agent to help write this test following the project's e2e testing patterns."
+
+  <task tool invocation to e2e-test-reviewer agent>
+  </example>
+
+  <example>
+  Context: The agent should review existing e2e tests to ensure they follow best practices.
+
+  user: "Please review the e2e test I just wrote for the SBOM details page"
+
+  assistant: "I'll use the e2e-test-reviewer agent to review your test and ensure it properly uses custom assertions and page objects."
+
+  <task tool invocation to e2e-test-reviewer agent>
+  </example>
+
+  <example>
+  Context: Proactively suggest using the agent when e2e test code is detected.
+
+  user: "Here's my new Playwright test for the vulnerability page"
+
+  assistant: "I notice you're working on an e2e test. Let me use the e2e-test-reviewer agent to review it and ensure it follows the project's testing standards."
+
+  <task tool invocation to e2e-test-reviewer agent>
+  </example>
 model: sonnet
 ---
 
