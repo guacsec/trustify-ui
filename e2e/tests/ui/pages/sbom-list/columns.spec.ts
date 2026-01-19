@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import { SbomListPage } from "./SbomListPage";
@@ -18,9 +17,8 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const table = await listPage.getTable();
 
     // Full search
-    await toolbar.applyTextFilter("Filter text", "quarkus-bom");
-    await table.waitUntilDataIsLoaded();
-    await table.verifyColumnContainsText("Name", "quarkus-bom");
+    await toolbar.applyFilter({ "Filter text": "quarkus-bom" });
+    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom");
 
     // Total Vulnerabilities
     await expect(

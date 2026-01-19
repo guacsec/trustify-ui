@@ -1,7 +1,6 @@
 // @ts-check
 
-import { expect } from "@playwright/test";
-
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { VulnerabilitiesTab } from "./VulnerabilitiesTab";
@@ -25,47 +24,33 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const idIndex = ids.indexOf("CVE-2023-4853");
     expect(idIndex).not.toBe(-1);
 
-    // Name
-    await expect(
-      table._table.locator(`td[data-label="Id"]`).nth(idIndex),
-    ).toContainText("CVE-2023-4853");
+    // Id
+    await expect(table).toHaveColumnWithValue("Id", "CVE-2023-4853", idIndex);
 
     // Description
-    await expect(
-      table._table.locator(`td[data-label="Description"]`).nth(idIndex),
-    ).toContainText("quarkus: HTTP security policy bypass");
+    await expect(table).toHaveColumnWithValue(
+      "Description",
+      "quarkus: HTTP security policy bypass",
+      idIndex,
+    );
 
-    // Vulnerabilities
-    await expect(
-      table._table.locator(`td[data-label="CVSS"]`).nth(idIndex),
-    ).toContainText("High(8.1)");
+    // CVSS
+    await expect(table).toHaveColumnWithValue("CVSS", "High(8.1)", idIndex);
 
     // Affected dependencies
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex),
-    ).toContainText("3");
+    await expect(table).toHaveColumnWithValue(
+      "Affected dependencies",
+      "3",
+      idIndex,
+    );
 
-    await table._table
-      .locator(`td[data-label="Affected dependencies"]`)
-      .nth(idIndex)
-      .click();
+    const expandedCell = await table.expandCell(
+      "Affected dependencies",
+      idIndex,
+    );
 
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-undertow");
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-keycloak-authorization");
-    await expect(
-      table._table
-        .locator(`td[data-label="Affected dependencies"]`)
-        .nth(idIndex + 1),
-    ).toContainText("quarkus-vertx-http");
+    await expect(expandedCell).toContainText("quarkus-undertow");
+    await expect(expandedCell).toContainText("quarkus-keycloak-authorization");
+    await expect(expandedCell).toContainText("quarkus-vertx-http");
   });
 });

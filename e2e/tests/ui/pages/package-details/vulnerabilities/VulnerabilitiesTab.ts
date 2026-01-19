@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { PackageDetailsPage } from "../PackageDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { PackageDetailsPage } from "../PackageDetailsPage";
 
 export class VulnerabilitiesTab {
   private readonly _page: Page;
@@ -13,6 +13,9 @@ export class VulnerabilitiesTab {
     this._detailsPage = layout;
   }
 
+  /**
+   * Build the tab by navigating to the package details page and selecting the tab.
+   */
   static async build(page: Page, packageDetail: Record<string, string>) {
     const detailsPage = await PackageDetailsPage.build(page, {
       Name: packageDetail.Name,
@@ -23,12 +26,37 @@ export class VulnerabilitiesTab {
     return new VulnerabilitiesTab(page, detailsPage);
   }
 
+  /**
+   * Build the tab from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param packageName - Optional package name to verify the page header
+   */
+  static async fromCurrentPage(page: Page, packageName?: string) {
+    const detailsPage = await PackageDetailsPage.fromCurrentPage(
+      page,
+      packageName,
+    );
+    await detailsPage._layout.selectTab("Vulnerabilities");
+
+    return new VulnerabilitiesTab(page, detailsPage);
+  }
+
   async getToolbar() {
     return await Toolbar.build(this._page, "vulnerability toolbar");
   }
 
   async getTable() {
-    return await Table.build(this._page, "vulnerability table");
+    return await Table.build(
+      this._page,
+      "vulnerability table",
+      {
+        ID: { isSortable: true },
+        Description: { isSortable: false },
+        CVSS: { isSortable: true },
+        "Date published": { isSortable: true },
+      },
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

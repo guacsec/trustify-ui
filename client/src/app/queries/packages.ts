@@ -35,11 +35,13 @@ export const useFetchPackages = (
   };
 };
 
+export const packageByIdQueryOptions = (id: string) => ({
+  queryKey: [PackagesQueryKey, id],
+  queryFn: () => getPurl({ client, path: { key: id } }),
+});
+
 export const useFetchPackageById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: [PackagesQueryKey, id],
-    queryFn: () => getPurl({ client, path: { key: id } }),
-  });
+  const { data, isLoading, error } = useQuery(packageByIdQueryOptions(id));
 
   return {
     pkg: data?.data,

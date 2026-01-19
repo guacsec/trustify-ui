@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 
 import { AuthProvider, useAuth } from "react-oidc-context";
 
-import { initInterceptors } from "@app/axios-config";
 import ENV from "@app/env";
 import { oidcClientSettings } from "@app/oidc";
 import { AppRoutes } from "@app/Routes";
@@ -51,10 +50,6 @@ const AuthEnabledOidcProvider: React.FC<IOidcProviderProps> = ({
       });
     }
   }, [auth.isAuthenticated, auth.isLoading, auth.error, auth.signinRedirect]);
-
-  React.useEffect(() => {
-    initInterceptors();
-  }, []);
 
   if (auth.isAuthenticated) {
     return <Suspense fallback={<AppPlaceholder />}>{children}</Suspense>;

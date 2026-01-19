@@ -23,7 +23,7 @@ Feature: SBOM Explorer - View SBOM details
         And "SBOM's namespace" is visible
         And "SBOM's license" is visible
         And "SBOM's creation date" is visible
-        And "SBOM's creator" is visible
+        And "SBOM's supplier" is visible
 
         Examples:
             | sbomName    |
@@ -84,7 +84,7 @@ Feature: SBOM Explorer - View SBOM details
         Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
-        Then Pagination of Vulnerabilities list works
+        Then Pagination of "Vulnerability" table works
         Examples:
         | sbomName    |
         | quarkus-bom |
@@ -94,7 +94,7 @@ Feature: SBOM Explorer - View SBOM details
         Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Packages"
-        Then Pagination of Packages list works
+        Then Pagination of "Package" table works
         Examples:
         |        sbomName        |
         | ubi9-minimal-container |
@@ -119,9 +119,7 @@ Feature: SBOM Explorer - View SBOM details
         When User visits SBOM details Page of "<sbomName>"
         When User selects the Tab "Vulnerabilities"
         Then Table column "Description" is not sortable
-        Then Sorting of "Id, Affected dependencies, Published, Updated" Columns Works
-        #Then Sorting of "CVSS" Columns works
-        # Bug: https://issues.redhat.com/browse/TC-2598
+        Then Sorting of "Id, CVSS, Affected dependencies, Published, Updated" Columns Works
         Examples:
         | sbomName    |
         | quarkus-bom |
@@ -134,3 +132,54 @@ Feature: SBOM Explorer - View SBOM details
         Examples:
         |         sbomName       |    Labels     |
         | ubi9-minimal-container | RANDOM_LABELS |
+
+    Scenario Outline: Delete SBOM from SBOM Explorer Page
+        Given An ingested SBOM "<sbomName>" is available
+        When User visits SBOM details Page of "<sbomName>"
+        When User Clicks on Actions button and Selects Delete option from the drop down
+        When User select Delete button from the Permanently delete SBOM model window
+        Then The SBOM deleted message is displayed
+        And Application Navigates to SBOM list page
+        And The "<sbomName>" should not be present on SBOM list page as it is deleted
+        Examples:
+        |         sbomName       |
+        |        MRG-M-3.0.0     |
+
+    Scenario Outline: Delete SBOM from SBOM List Page
+        When User Deletes "<sbomName>" using the toggle option from SBOM List Page
+        When User select Delete button from the Permanently delete SBOM model window
+        Then The SBOM deleted message is displayed
+        And Application Navigates to SBOM list page
+        And The "<sbomName>" should not be present on SBOM list page as it is deleted
+        Examples:
+        |         sbomName       |
+        |      rhn_satellite     |
+
+    Scenario Outline: SBOM Explorer Vulnerability Correlation with Affected Advisory
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        When User clicks on the vulnerability row with ID "<vulnerabilityID>"
+        Then The Application navigates to the Vulnerability details Page of "<vulnerabilityID>"
+        And The Related SBOMs tab loaded with SBOM "<sbomName>" with status "<status>"
+        Examples:
+        |         sbomName       | vulnerabilityID | status |
+        |        quarkus-bom     | CVE-2023-0044   | Affected |
+
+    Scenario Outline: SBOM Explorer Vulnerability Correlation with Fixed Advisory
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        Then The vulnerability "<vulnerabilityID>" does not show in the Vulnerabilities table
+        When User visits Vulnerability details Page of "<vulnerabilityID>"
+        Then The Related SBOMs tab loaded with SBOM "<sbomName>" with status "<status>"
+        Examples:
+        |         sbomName       | vulnerabilityID | status |
+        |        quarkus-bom     | CVE-2023-1584   | Fixed |
+
+    Scenario Outline: SBOM Explorer Package Correlation with SBOM
+        Given User is on the Vulnerabilities tab with "100" rows per page for SBOM "<sbomName>"
+        When User clicks on Affected dependencies count button of the "<vulnerabilityID>"
+        And User clicks on the package name "<packageName>" link on the expanded table
+        Then The Application navigates to the Package details Page of "<packageName>"
+        And Vulnerability "<vulnerabilityID>" visible under Vulnerabilities tab
+        And The SBOMs using package tab loaded with SBOM "<sbomName>"
+        Examples:
+        |         sbomName       | vulnerabilityID | packageName |
+        |        quarkus-bom     | CVE-2023-0044   | quarkus-vertx-http |

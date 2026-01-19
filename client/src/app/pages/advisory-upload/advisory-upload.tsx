@@ -13,12 +13,14 @@ import {
 import { UploadFiles } from "@app/components/UploadFiles";
 import { useUploadAdvisory } from "@app/queries/advisories";
 import { Paths } from "@app/Routes";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const AdvisoryUpload: React.FC = () => {
   const { uploads, handleUpload, handleRemoveUpload } = useUploadAdvisory();
 
   return (
     <>
+      <DocumentMetadata title="Upload advisory" />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>

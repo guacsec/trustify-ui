@@ -133,7 +133,6 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
 
       const prevVulnStatusValue = prev.vulnerabilityStatus[vulnStatus];
 
-      // biome-ignore lint/performance/noAccumulatingSpread: allowed
       const result: VulnerabilityOfSbomSummary = Object.assign(prev, {
         vulnerabilityStatus: {
           ...prev.vulnerabilityStatus,

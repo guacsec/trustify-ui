@@ -61,7 +61,7 @@ Feature: Advisory Explorer
 Scenario: Display vulnerabilities tied to a single advisory
     Given User visits Advisory details Page of "<advisoryName>" with type "<advisoryType>"
     Then User navigates to the Vulnerabilities tab on the Advisory Overview page
-    Then Pagination of Vulnerabilities list works
+    Then Pagination of "vulnerability" table works
     Then A list of all active vulnerabilites tied to the advisory should display
     And The "ID, Title, Discovery, Release, Score, CWE" information should be visible for each vulnerability
     And The vulnerabilities should be sorted by ID by default
@@ -70,3 +70,24 @@ Scenario: Display vulnerabilities tied to a single advisory
     Examples:
         | advisoryName    | vulnerabilityID | advisoryType |
         | CVE-2023-3223   | CVE-2023-3223   |     csaf     |
+
+Scenario: Delete an advisory from the Advisory Explorer page
+    Given User visits Advisory details Page of "<advisoryID>"
+    When User Clicks on Actions button and Selects Delete option from the drop down
+    When User select Delete button from the Permanently delete Advisory model window
+    Then The Advisory deleted message is displayed
+    And Application Navigates to Advisory list page
+    And The "<advisoryID>" should not be present on Advisory list page as it is deleted
+    Examples:
+    |         advisoryID       |
+    |         CVE-2025-22130   |
+
+Scenario: Delete an advisory from the Advisory List Page
+    When User Deletes "<advisoryID>" using the toggle option from Advisory List Page
+    When User select Delete button from the Permanently delete Advisory model window
+    Then The Advisory deleted message is displayed
+    And Application Navigates to Advisory list page
+    And The "<advisoryID>" should not be present on Advisory list page as it is deleted
+    Examples:
+    |         advisoryID       |
+    |         CVE-2023-1906    |

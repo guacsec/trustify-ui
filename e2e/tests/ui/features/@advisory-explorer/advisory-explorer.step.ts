@@ -1,8 +1,11 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
+import { expect } from "../../assertions";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
+import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
 import { test } from "../../fixtures";
+import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
+import { DetailsPage } from "../../helpers/DetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -87,12 +90,6 @@ Then(
   },
 );
 
-Then("Pagination of Vulnerabilities list works", async ({ page }) => {
-  const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
-  const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-  await toolbarTable.verifyPagination(vulnTableTopPagination);
-});
-
 Then(
   "A list of all active vulnerabilites tied to the advisory should display",
   async ({ page }) => {
@@ -157,3 +154,58 @@ Then(
     ).toBeVisible();
   },
 );
+
+When(
+  "User Deletes {string} using the toggle option from Advisory List Page",
+  async ({ page }, advisoryID) => {
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    const table = await listPage.getTable();
+    const rowToDelete = 0;
+    await table.clickAction("Delete", rowToDelete);
+  },
+);
+
+When(
+  "User Clicks on Actions button and Selects Delete option from the drop down",
+  async ({ page }) => {
+    const details = new DetailsPage(page);
+    await details.clickOnPageAction("Delete");
+  },
+);
+
+When(
+  "User select Delete button from the Permanently delete Advisory model window",
+  async ({ page }) => {
+    const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
+    await expect(dialog).toHaveTitle(
+      "Warning alert:Permanently delete Advisory?",
+    );
+    await dialog.clickConfirm();
+  },
+);
+
+Then(
+  "The {string} should not be present on Advisory list page as it is deleted",
+  async ({ page }, advisoryID: string) => {
+    const list = await AdvisoryListPage.build(page);
+    const toolbar = await list.getToolbar();
+    const table = await list.getTable();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    await expect(table).toHaveEmptyState();
+  },
+);
+
+Then("Application Navigates to Advisory list page", async ({ page }) => {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Advisories" }),
+  ).toBeVisible();
+});
+
+Then("The Advisory deleted message is displayed", async ({ page }) => {
+  const alertHeading = page.getByRole("heading", { level: 4 }).filter({
+    hasText: /The Advisory .+ was deleted/,
+  });
+  await expect(alertHeading).toBeVisible({ timeout: 10000 });
+});

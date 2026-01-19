@@ -19,6 +19,7 @@ import { PackageSearchContext } from "../package-list/package-context";
 import { SbomSearchContext } from "../sbom-list/sbom-context";
 import { VulnerabilitySearchContext } from "../vulnerability-list/vulnerability-context";
 import { SearchTabs } from "./components/SearchTabs";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 type SearchPageProps = {
   searchBodyOverride?: React.ReactNode;
@@ -123,6 +124,7 @@ export const Search: React.FC<SearchPageProps> = ({ searchBodyOverride }) => {
 
   return (
     <>
+      <DocumentMetadata title="Search" />
       <PageSection hasBodyWrapper={false}>
         <Toolbar isStatic>
           <ToolbarContent>

@@ -1,8 +1,6 @@
 import React from "react";
 import { generatePath, Link } from "react-router-dom";
 
-import { useIsMutating } from "@tanstack/react-query";
-
 import {
   Button,
   Card,
@@ -44,7 +42,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
   fieldName,
   sbomId,
 }) => {
-  const { patch } = React.useContext(WatchedSbomsContext);
+  const { patch, mutatingKeys } = React.useContext(WatchedSbomsContext);
 
   const textInputRef = React.useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = React.useState<string>("");
@@ -71,7 +69,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
     return fetchErrorCurrentSbom?.response?.status === 404;
   }, [fetchErrorCurrentSbom]);
 
-  const isMutating = useIsMutating();
+  const isMutating = mutatingKeys.has(fieldName);
 
   React.useEffect(() => {
     if (assumeSbomWasDeleted) {
@@ -131,9 +129,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
   return (
     <Card isFullHeight>
       <LoadingWrapper
-        isFetching={
-          isFetchingCurrentSbom || assumeSbomWasDeleted || isMutating > 0
-        }
+        isFetching={isFetchingCurrentSbom || assumeSbomWasDeleted || isMutating}
         fetchError={fetchErrorCurrentSbom}
       >
         {currentSbom && (
