@@ -305,7 +305,7 @@ import {Overview} from "./overview";
 
 - Rsbuild proxies `/api` → `TRUSTIFY_API_URL` (default: `http://localhost:8080`)
 - Rsbuild proxies `/auth` → `OIDC_SERVER_URL`
-- Start local backend: `cargo run --bin trustd` (in trustify repo)
+- Start local backend: `cargo run --bin trustd` (in trustify [repo](https://github.com/guacsec/trustify))
 
 **Production:**
 

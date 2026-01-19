@@ -94,7 +94,7 @@ When writing or reviewing e2e tests:
 ## Red Flags to Catch
 
 - Direct use of `page.locator()` instead of page object methods
-- Manual element counting (e.g., `expect(elements.length).toBe(5)`)
+- Manual element counting (e.g., Use `expect(page.locator(elem)).toHaveCount(5)` instead of `expect(elements.length).toBe(5)`)
 - Custom expect logic that should be in a custom assertion
 - Importing base Playwright `expect` instead of typed custom `expect`
 - Duplicate selectors across multiple tests (should be in page object)
