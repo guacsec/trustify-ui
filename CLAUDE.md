@@ -33,6 +33,22 @@ This monorepo uses 4 npm workspaces:
   - `tests/ui/` - UI tests with Page Object Model
   - `tests/ui/features/` - BDD tests with Gherkin + playwright-bdd
 
+## Environment Variables
+
+Defined in `common/src/environment.ts`:
+
+- `TRUSTIFY_API_URL` - Backend API URL (default: `http://localhost:8080`)
+- `AUTH_REQUIRED` - Enable/disable authentication (default: `"true"`)
+- `OIDC_SERVER_URL` - Keycloak/OIDC server URL
+- `OIDC_CLIENT_ID` - OIDC client ID (default: `"frontend"`)
+- `OIDC_SCOPE` - OIDC scope (default: `"openid"`)
+
+**How env vars work:**
+
+- **Production**: Server injects env as base64 JSON into `index.html.ejs`,
+  client decodes from `window._env`
+- **Development**: Rsbuild injects env directly into HTML template
+
 ## Essential Commands
 
 ### Development
@@ -191,22 +207,6 @@ pages/[page-name]/
 - Routes defined in `client/src/app/Routes.tsx`
 - Lazy-loaded page components
 - Type-safe params via `useRouteParams()` hook
-
-### Environment Variables
-
-Defined in `common/src/environment.ts`:
-
-- `TRUSTIFY_API_URL` - Backend API URL (default: `http://localhost:8080`)
-- `AUTH_REQUIRED` - Enable/disable authentication (default: `"true"`)
-- `OIDC_SERVER_URL` - Keycloak/OIDC server URL
-- `OIDC_CLIENT_ID` - OIDC client ID (default: `"frontend"`)
-- `OIDC_SCOPE` - OIDC scope (default: `"openid"`)
-
-**How env vars work:**
-
-- **Production**: Server injects env as base64 JSON into `index.html.ejs`,
-  client decodes from `window._env`
-- **Development**: Rsbuild injects env directly into HTML template
 
 ### Authentication Flow
 
