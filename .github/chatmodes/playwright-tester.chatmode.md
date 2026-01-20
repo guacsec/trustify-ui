@@ -32,7 +32,15 @@ mode: 'agent'
    - Never use direct imports from playwright-bdd; always use the local createBdd(test) pattern
    - If a step definition is already present in any .step.ts file, do not add or redefine it in auto-generated.step.ts
    - Make steps generic, reusable, parameterized
-   - Use Page Object Model where possible
+   - **CRITICAL**: Use Page Object Model with proper construction patterns:
+     - For page objects in `e2e/tests/ui/pages/**/`, ALWAYS use static async `build()` or `fromCurrentPage()` methods
+     - NEVER use direct DOM manipulation (page.locator(), page.getByRole()) - always use page object methods
+     - Example: `const listPage = await AdvisoryListPage.build(page);`
+     - Example: `const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);`
+   - **CRITICAL**: Always use custom assertions from `e2e/tests/ui/assertions/`
+     - Import: `import { expect } from "../../assertions";`
+     - Use custom matchers instead of manual DOM queries
+     - Example: `await expect(page).toHaveTableRowCount('advisory-table', 5);`
 7. **Execute**: 
    - Automatically run test with:
       ```bash
@@ -55,3 +63,53 @@ mode: 'agent'
 - Follow existing code patterns
 - Use environment variables from .env
 - Execute all commands from e2e/ directory
+
+## Code Quality Standards
+
+### Import Order (MANDATORY)
+Required order with blank lines between groups:
+1. playwright-bdd imports
+2. Test fixtures
+3. Assertions
+4. Helpers (SearchPage, ToolbarTable, etc.)
+5. Page objects (domain-specific pages)
+6. Utilities
+
+### Page Object Construction (CRITICAL)
+**NEVER use direct DOM manipulation. ALWAYS use page objects.**
+
+```typescript
+// ✅ GOOD - Page objects with static async methods
+const listPage = await AdvisoryListPage.build(page);
+const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
+
+// ❌ BAD - Direct DOM manipulation
+await page.getByRole("tab", { name: "Advisories" }).click();
+const table = page.locator(`table[aria-label="Advisory table"]`);
+const row = table.locator("tbody tr").filter({ hasText: advisoryID });
+```
+
+### Custom Assertions (CRITICAL)
+**NEVER use manual DOM queries. ALWAYS use custom assertions.**
+
+```typescript
+// ✅ GOOD - Custom assertion
+import { expect } from "../../assertions";
+await expect(page).toHaveTableRowCount('advisory-table', 5);
+
+// ❌ BAD - Manual counting
+const rows = await page.locator('tr').count();
+expect(rows).toBe(5);
+```
+
+### playwright-bdd Pattern (MANDATORY)
+```typescript
+// ✅ REQUIRED
+import { createBdd } from "playwright-bdd";
+import { test } from "../../fixtures";
+
+export const { Given, When, Then } = createBdd(test);
+
+// ❌ NEVER DO THIS
+import { Given, When, Then } from "playwright-bdd";
+```
