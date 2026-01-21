@@ -21,7 +21,7 @@ mode: 'agent'
 
 ## Process
 1. **Input**: Scenario name in format "Scenario Outline: scenario name here"
-2. **Search**: Find scenario in `tests/**/features/**/*.feature`
+2. **Search**: Find scenario in `e2e/tests/ui/features/**/*.feature`
 3. **Not Found**: Respond "Scenario not found" + suggest similar scenarios
 4. **Found**: Read scenario steps
 5. **Analyze**: 
@@ -66,7 +66,14 @@ mode: 'agent'
 
 ## Code Quality Standards
 
+**See standards documentation for comprehensive guidelines:**
+- [Playwright Standards](../../.claude/shared/playwright-standards.md) - Core Playwright best practices
+- [BDD Standards](../../.claude/shared/bdd-standards.md) - BDD and Gherkin patterns
+
 ### Import Order (MANDATORY)
+
+See [BDD Standards §1: Import Order](../../.claude/shared/bdd-standards.md#1-import-order-for-bdd-step-definitions-mandatory)
+
 Required order with blank lines between groups:
 1. playwright-bdd imports
 2. Test fixtures
@@ -76,40 +83,37 @@ Required order with blank lines between groups:
 6. Utilities
 
 ### Page Object Construction (CRITICAL)
+
+See [Playwright Standards §2: Page Object Construction](../../.claude/shared/playwright-standards.md#2-page-object-construction-critical)
+
 **NEVER use direct DOM manipulation. ALWAYS use page objects.**
 
-```typescript
-// ✅ GOOD - Page objects with static async methods
-const listPage = await AdvisoryListPage.build(page);
-const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
+**Required patterns:**
+- Use `await PageObject.build(page)` for navigation
+- Use `await PageObject.fromCurrentPage(page)` when already on page
+- NO `page.locator()` or `page.getByRole()`
 
-// ❌ BAD - Direct DOM manipulation
-await page.getByRole("tab", { name: "Advisories" }).click();
-const table = page.locator(`table[aria-label="Advisory table"]`);
-const row = table.locator("tbody tr").filter({ hasText: advisoryID });
-```
+See shared standards for code examples.
 
 ### Custom Assertions (CRITICAL)
+
+See [Playwright Standards §3: Custom Assertions](../../.claude/shared/playwright-standards.md#3-custom-assertions-critical)
+
 **NEVER use manual DOM queries. ALWAYS use custom assertions.**
 
-```typescript
-// ✅ GOOD - Custom assertion
-import { expect } from "../../assertions";
-await expect(page).toHaveTableRowCount('advisory-table', 5);
+**Required:**
+- Import: `import { expect } from "../../assertions";`
+- Use custom matchers: `toHaveTableRowCount()`, `toHaveToolbarFilter()`, etc.
+- NO manual DOM queries or counting
 
-// ❌ BAD - Manual counting
-const rows = await page.locator('tr').count();
-expect(rows).toBe(5);
-```
+See shared standards for code examples.
 
 ### playwright-bdd Pattern (MANDATORY)
-```typescript
-// ✅ REQUIRED
-import { createBdd } from "playwright-bdd";
-import { test } from "../../fixtures";
 
-export const { Given, When, Then } = createBdd(test);
+See [BDD Standards §2: playwright-bdd Pattern](../../.claude/shared/bdd-standards.md#2-playwright-bdd-pattern-mandatory)
 
-// ❌ NEVER DO THIS
-import { Given, When, Then } from "playwright-bdd";
-```
+**Required:**
+- Local `createBdd(test)` pattern
+- NOT direct import from playwright-bdd
+
+See shared standards for code examples.

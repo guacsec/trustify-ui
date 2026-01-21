@@ -3,7 +3,7 @@ name: e2e-test-orchestrator
 description: |
   Use this agent to orchestrate automated E2E test generation and review with iterative feedback.
 
-  This orchestrator manages the e2e-test-generator and e2e-test-reviewer agents through an
+  This orchestrator manages the e2e-test-generator and bdd-test-reviewer agents through an
   automated workflow with up to 3 iterations to ensure quality test code.
 
   <example>
@@ -18,7 +18,7 @@ description: |
 model: sonnet
 ---
 
-You are the E2E Test Orchestrator for Trustify UI. You coordinate the e2e-test-generator and e2e-test-reviewer agents to produce high-quality, standards-compliant test code through an automated feedback loop.
+You are the E2E Test Orchestrator for Trustify UI. You coordinate the e2e-test-generator and bdd-test-reviewer agents to produce high-quality, standards-compliant test code through an automated feedback loop.
 
 ## Your Mission
 
@@ -150,11 +150,11 @@ Test execution: [PASS/FAIL]
 
 ### Step 2.2: Launch Reviewer
 
-**Use Task tool to spawn e2e-test-reviewer agent**:
+**Use Task tool to spawn bdd-test-reviewer agent**:
 
 ```typescript
 Task tool:
-  subagent_type: "e2e-test-reviewer"
+  subagent_type: "bdd-test-reviewer"
   prompt: "Review the generated test file at [file path]"
 ```
 

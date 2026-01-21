@@ -103,14 +103,22 @@ When called by e2e-test-orchestrator:
 
 ## Review Checklist
 
+**See [E2E Test Standards](../shared/e2e-test-standards.md) for complete details and code examples.**
+
 Execute these 8 quality checks systematically:
 
 ### 1. Custom Assertions Usage ✅
+
+See [Standards §3: Custom Assertions](../shared/e2e-test-standards.md#3-custom-assertions-critical)
+
 - Import statement: `import { expect } from "../../assertions";`
 - NOT importing from `@playwright/test`
 - Uses custom matchers (toHaveTableRowCount, toHaveToolbarFilter, etc.)
 
 ### 2. Page Object Usage ✅
+
+See [Standards §2: Page Object Construction](../shared/e2e-test-standards.md#2-page-object-construction-critical)
+
 - Imports from `../../pages/` or `../../helpers/`
 - **CRITICAL**: Using static async `build()` or `fromCurrentPage()` for page objects in `e2e/tests/ui/pages/**/`
 - Using page object methods instead of inline `page.locator()` or `page.getByRole()`
@@ -118,11 +126,17 @@ Execute these 8 quality checks systematically:
 - Examples: `AdvisoryListPage.build()`, `SbomDetailsPage.fromCurrentPage()`, `ToolbarTable`, `SearchPage`
 
 ### 3. playwright-bdd Patterns ✅
+
+See [Standards §4: playwright-bdd Pattern](../shared/e2e-test-standards.md#4-playwright-bdd-pattern-mandatory)
+
 - Uses local `createBdd(test)` pattern
 - NOT importing directly from playwright-bdd
 - Correct pattern: `import { createBdd } from "playwright-bdd"; import { test } from "../../fixtures";`
 
 ### 4. No Duplicate Step Definitions ✅
+
+See [Standards §8: No Duplicate Step Definitions](../shared/e2e-test-standards.md#8-no-duplicate-step-definitions)
+
 **CRITICAL**: Steps can be shared across feature directories - always search ALL .step.ts files
 - Search for similar step patterns across `e2e/tests/ui/features/**/*.step.ts` (not just current feature directory)
 - Check for exact step text matches, not just similar patterns
@@ -132,11 +146,17 @@ Execute these 8 quality checks systematically:
 - Ensure new steps are genuinely unique
 
 ### 5. Step Quality ✅
+
+See [Standards §7: Step Quality](../shared/e2e-test-standards.md#7-step-quality)
+
 - Steps use parameters (e.g., `{string}`, `{int}`) not hard-coded values
 - Step names are descriptive and follow Gherkin conventions
 - Steps are atomic, reusable, and generic
 
 ### 6. Import Organization ✅
+
+See [Standards §1: Import Order](../shared/e2e-test-standards.md#1-import-order-mandatory)
+
 Required order (with blank lines between groups):
 1. playwright-bdd imports
 2. Test fixtures
@@ -146,6 +166,9 @@ Required order (with blank lines between groups):
 6. Utilities
 
 ### 7. Code Quality Standards ✅
+
+See [Standards §5: Code Quality Standards](../shared/e2e-test-standards.md#5-code-quality-standards)
+
 - Double quotes for strings
 - Space indentation (not tabs)
 - Proper TypeScript types
@@ -153,6 +176,9 @@ Required order (with blank lines between groups):
 - No unused imports
 
 ### 8. Wait Strategies ✅
+
+See [Standards §6: Wait Strategies](../shared/e2e-test-standards.md#6-wait-strategies)
+
 - Using page object methods that handle waits internally
 - Avoiding hard-coded `page.waitForTimeout()`
 - Using `waitFor()` or `waitForLoadState()` when necessary
@@ -252,28 +278,13 @@ RECOMMENDATIONS:
 
 ## Severity Levels
 
-Classify issues by severity:
+See [E2E Test Standards - Severity Levels](../shared/e2e-test-standards.md#severity-levels-for-issues) for complete classification.
 
-**CRITICAL** (Must fix):
-- Missing custom assertions import
-- Direct playwright-bdd imports (not using local createBdd)
-- Duplicate step definitions
-- Direct DOM manipulation (page.locator(), page.getByRole()) instead of page objects
-- Not using static async `build()` or `fromCurrentPage()` for page objects in `e2e/tests/ui/pages/**/`
-
-**HIGH** (Should fix):
-- Wrong import order
-- Manual element counting without custom assertions
-- Hard-coded values in steps
-- Missing page object usage
-
-**MEDIUM** (Nice to fix):
-- Step names could be more generic
-- Missing TypeScript types
-- Code style issues
-
-**LOW** (Optional):
-- Minor formatting inconsistencies
+**Quick reference:**
+- **CRITICAL**: Missing custom assertions, direct DOM manipulation, duplicate steps, wrong playwright-bdd pattern
+- **HIGH**: Wrong import order, manual counting, hard-coded values
+- **MEDIUM**: Could be more generic, missing types, style issues
+- **LOW**: Minor formatting inconsistencies
 
 ## Communication Style
 

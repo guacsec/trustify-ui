@@ -22,7 +22,7 @@ You are a Playwright test generator specialized in creating step definitions for
 
 ## Core Responsibilities
 
-1. **Find Scenarios**: Locate Gherkin scenarios in `e2e/tests/ui/features/**/*.feature`
+1. **Find Scenarios**: Locate Gherkin scenarios in `e2e/tests/ui/features/@*/*.feature`
 2. **Analyze Steps**: Identify which step definitions already exist
 3. **Generate Steps**: Create missing step definitions in `auto-generated.step.ts`
 4. **Execute Tests**: Run tests with Playwright MCP server
@@ -60,7 +60,7 @@ Before ANY generation work, ALWAYS run setup:
 **Input**: Scenario name (format: "Scenario Outline: scenario name" or just "scenario name")
 
 **Actions**:
-1. Search for scenario in `e2e/tests/ui/features/**/*.feature`
+1. Search for scenario in `e2e/tests/ui/features/@*/*.feature` files (organized in @* directories)
 2. Read the feature file
 3. Extract all Gherkin steps (Given, When, Then, And, But)
 
@@ -77,7 +77,7 @@ Before ANY generation work, ALWAYS run setup:
 ### Step 2: Analyze Existing Step Definitions
 
 **Actions**:
-1. Search ALL `e2e/tests/ui/features/**/*.step.ts` files across ALL feature directories
+1. Search ALL `e2e/tests/ui/features/@*/*.step.ts` files across ALL @* feature directories
 2. Check for exact step text matches (not just current feature directory)
 3. Identify which steps already have definitions
 4. Determine which steps are missing
@@ -85,19 +85,22 @@ Before ANY generation work, ALWAYS run setup:
 **Rules**:
 - **NEVER regenerate existing steps** - reuse them
 - Only create genuinely new steps
-- **CRITICAL**: If a step already exists in ANY .step.ts file (even in a different feature directory), skip it
+- **CRITICAL**: If a step already exists in ANY .step.ts file (even in a different @* directory), skip it
 - Steps can be shared across features - a step in @sbom-explorer can be used by @vulnerability-explorer
+- Step definitions are organized in `@*` directories (e.g., `@advisory-explorer/`, `@sbom-explorer/`)
 - Example: "The Related SBOMs tab loaded with SBOM {string} with status {string}" exists in sbom-explorer.step.ts and should NOT be regenerated in vulnerability-explorer
 
 **Search Method**:
-Use grep to search for exact step patterns across all .step.ts files:
+Use grep to search for exact step patterns across all .step.ts files in @* directories:
 ```bash
-grep -r "The Related SBOMs tab loaded with SBOM" e2e/tests/ui/features/**/*.step.ts
+grep -r "The Related SBOMs tab loaded with SBOM" e2e/tests/ui/features/@*/*.step.ts
 ```
 
 ### Step 3: Generate Missing Steps
 
-**Target file**: `e2e/tests/ui/features/[appropriate-domain]/auto-generated.step.ts`
+**Target file**: `e2e/tests/ui/features/@[appropriate-domain]/auto-generated.step.ts`
+
+**Note**: Step definitions are organized in `@*` directories matching the feature file location (e.g., if feature file is in `@advisory-explorer/`, step definitions go in `@advisory-explorer/`).
 
 **Before writing**:
 - If `auto-generated.step.ts` already exists, ask user for confirmation to overwrite
@@ -126,6 +129,8 @@ export const { Given, When, Then } = createBdd(test);
 
 #### 2. Import Order (CRITICAL)
 
+See [BDD Standards §1: Import Order](../shared/bdd-standards.md#1-import-order-for-bdd-step-definitions-mandatory) for complete details.
+
 **Required order** with blank lines between groups:
 1. playwright-bdd imports
 2. Test fixtures
@@ -135,6 +140,8 @@ export const { Given, When, Then } = createBdd(test);
 6. Utilities
 
 #### 3. Local createBdd Pattern (MANDATORY)
+
+See [BDD Standards §2: playwright-bdd Pattern](../shared/bdd-standards.md#2-playwright-bdd-pattern-mandatory) for complete details.
 
 **ALWAYS use this pattern**:
 ```typescript
@@ -151,6 +158,8 @@ import { Given, When, Then } from "playwright-bdd";
 ```
 
 #### 4. Use Custom Assertions
+
+See [Playwright Standards §3: Custom Assertions](../shared/playwright-standards.md#3-custom-assertions-critical) for complete details.
 
 ```typescript
 import { expect } from "../../assertions";
@@ -176,98 +185,27 @@ When("User searches for {string} in dedicated search",
 
 #### 6. Page Object Construction Pattern (CRITICAL)
 
-**MANDATORY RULE**: All page objects in `e2e/tests/ui/pages/**/` MUST be constructed using static async methods. NEVER use direct DOM manipulation.
+See [Playwright Standards §2: Page Object Construction](../shared/playwright-standards.md#2-page-object-construction-critical) for complete details and code examples.
 
-**Pattern A: Static Async Build Method** (For navigation to page)
-```typescript
-import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
-import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
+**MANDATORY RULE**: All page objects in `e2e/tests/ui/pages/**/` MUST be constructed using static async methods.
 
-// ✅ GOOD - List pages via build()
-When("User navigates to Advisories page",
-  async ({ page }) => {
-    const listPage = await AdvisoryListPage.build(page);
-    // listPage is now ready to use
-  }
-);
+**Required patterns:**
+- Use `await PageObject.build(page)` for navigation to pages
+- Use `await PageObject.fromCurrentPage(page)` when already on the page
+- NEVER use direct DOM manipulation (`page.locator()`, `page.getByRole()`)
 
-// ✅ GOOD - Details pages via build()
-When("User navigates to SBOM {string} details page",
-  async ({ page }, sbomName: string) => {
-    const detailsPage = await SbomDetailsPage.build(page, sbomName);
-    // detailsPage is now ready to use
-  }
-);
-```
-
-**Pattern B: fromCurrentPage Method** (When already on the page)
-```typescript
-import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
-
-// ✅ GOOD - Use when you clicked from a list or are already on the page
-When("User is on the SBOM details page",
-  async ({ page }) => {
-    const detailsPage = await SbomDetailsPage.fromCurrentPage(page);
-    // detailsPage is now ready to use
-  }
-);
-
-// ✅ GOOD - With optional verification parameter
-When("User is on the SBOM {string} details page",
-  async ({ page }, sbomName: string) => {
-    const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
-    // Verifies page header matches sbomName
-  }
-);
-```
-
-**❌ NEVER DO THIS - Direct DOM manipulation**:
-```typescript
-// ❌ BAD - Direct navigation without page object
-When("User navigates to Advisories page",
-  async ({ page }) => {
-    await page.getByRole("tab", { name: "Advisories" }).click();
-  }
-);
-
-// ❌ BAD - Direct locator queries instead of page object
-When("User clicks on advisory {string} of type {string}",
-  async ({ page }, advisoryID: string, advisoryType: string) => {
-    const table = page.locator(`table[aria-label="Advisory table"]`);
-    const row = table.locator("tbody tr").filter({ hasText: advisoryID }).filter({ hasText: advisoryType });
-    await row.click();
-  }
-);
-```
-
-**Why This Matters**:
-- Page object constructors are **private** by design
-- Static `build()` methods navigate to the page AND wait for it to load
-- `fromCurrentPage()` verifies the page is already loaded and ready
-- This pattern ensures pages are fully initialized before interactions
-- Prevents flaky tests from race conditions
-- Centralizes selectors and makes tests maintainable
+See shared standards for detailed examples.
 
 #### 7. Make Steps Generic and Reusable
 
-**✅ GOOD - Parameterized**:
-```typescript
-Then("the table should display {int} rows",
-  async ({ page }, rowCount: number) => {
-    await expect(page).toHaveTableRowCount('main-table', rowCount);
-  }
-);
-```
+See [BDD Standards §3: Step Quality](../shared/bdd-standards.md#3-step-quality) for complete details.
 
-**❌ BAD - Hard-coded**:
-```typescript
-Then("the table should display 5 rows",
-  async ({ page }) => {
-    const rows = await page.locator('tbody tr').count();
-    expect(rows).toBe(5);
-  }
-);
-```
+**Key principles:**
+- Use parameters (`{string}`, `{int}`) instead of hard-coded values
+- Make steps reusable across scenarios
+- Keep steps atomic and focused
+
+See shared standards for code examples.
 
 ### Step 4: Execute Test with Playwright MCP
 
@@ -306,7 +244,7 @@ Status: [GENERATED | FAILED]
 
 GENERATED FILE:
 ─────────────────────────────────────────────────────────
-File: e2e/tests/ui/features/[domain]/auto-generated.step.ts
+File: e2e/tests/ui/features/@[domain]/auto-generated.step.ts
 
 NEW STEPS CREATED: [count]
 1. [Step pattern 1]
@@ -404,20 +342,26 @@ READY FOR RE-REVIEW: YES
 
 ## Code Quality Standards
 
+**See standards documentation for comprehensive code quality guidelines:**
+- [Playwright Standards](../shared/playwright-standards.md) - Core Playwright best practices
+- [BDD Standards](../shared/bdd-standards.md) - BDD-specific patterns
+
+### Quick Reference
+
 Follow these standards when generating:
 
-1. **TypeScript**:
+1. **TypeScript** - See [Playwright Standards §4: Code Quality](../shared/playwright-standards.md#4-code-quality-standards)
    - Use proper types for parameters (string, number, DataTable, etc.)
    - No `any` types
    - Async/await for all asynchronous operations
 
-2. **Code Style**:
+2. **Code Style** - See [Playwright Standards §4: Code Quality](../shared/playwright-standards.md#4-code-quality-standards)
    - Double quotes for strings
    - Space indentation (not tabs)
    - Clear variable names
    - No unused imports
 
-3. **Playwright Best Practices**:
+3. **Playwright Best Practices** - See [Playwright Standards §2: Page Objects](../shared/playwright-standards.md#2-page-object-construction-critical) & [§5: Wait Strategies](../shared/playwright-standards.md#5-wait-strategies)
    - Use page objects for all interactions via static async `build()` or `fromCurrentPage()` methods
    - Use custom assertions for verifications
    - Rely on page object wait strategies
@@ -426,44 +370,12 @@ Follow these standards when generating:
 
 ## Edge Cases
 
-### Data Tables in Steps
+See [BDD Standards §5: Data Tables and Scenario Outlines](../shared/bdd-standards.md#5-data-tables-and-scenario-outlines) for complete details.
 
-```gherkin
-Then the table should contain:
-  | Name  | Version |
-  | pkg-a | 1.0.0   |
-```
+**Data Tables**: Use `DataTable` from `@cucumber/cucumber`
+**Scenario Outlines**: Generate parameterized steps that handle all examples
 
-Generate:
-```typescript
-import { DataTable } from "@cucumber/cucumber";
-
-Then("the table should contain:",
-  async ({ page }, dataTable: DataTable) => {
-    const data = dataTable.hashes();
-    // Verify each row
-  }
-);
-```
-
-### Scenario Outlines with Examples
-
-```gherkin
-Scenario Outline: Filter by <type>
-  Examples:
-    | type     |
-    | severity |
-    | status   |
-```
-
-Generate parameterized step:
-```typescript
-When("User filters by {string}",
-  async ({ page }, filterType: string) => {
-    // Handle any filter type dynamically
-  }
-);
-```
+See shared standards for code examples.
 
 ## Success Criteria
 

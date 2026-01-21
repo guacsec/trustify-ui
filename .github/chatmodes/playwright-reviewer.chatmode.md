@@ -37,74 +37,52 @@ Review generated Playwright test step definitions to ensure they follow project 
 
 ## Review Checklist
 
+**See standards documentation for complete details and code examples:**
+- [Playwright Standards](../../.claude/shared/playwright-standards.md) - Core Playwright best practices
+- [BDD Standards](../../.claude/shared/bdd-standards.md) - BDD and Gherkin patterns
+
 ### 1. Custom Assertions Usage ✅
+
+See [Playwright Standards §3: Custom Assertions](../../.claude/shared/playwright-standards.md#3-custom-assertions-critical)
+
 **Rule**: Always use custom assertions from `e2e/tests/ui/assertions/` instead of manual DOM queries.
 
 **Check for**:
-- Import statement: `import { expect } from "../../assertions";` (or appropriate path)
+- Import statement: `import { expect } from "../../assertions";`
 - NOT importing from `@playwright/test`
-- Uses custom matchers like:
-  - `toHaveTableRowCount()` instead of manual counting
-  - `toHaveToolbarFilter()` instead of checking filter elements
-  - `toHavePagination()` instead of checking pagination state
-  - Dialog matchers from custom assertions
+- Uses custom matchers: `toHaveTableRowCount()`, `toHaveToolbarFilter()`, `toHavePagination()`, etc.
 
-**Red Flags**:
-```typescript
-// ❌ BAD - Manual counting
-const rows = await page.locator('tr').count();
-expect(rows).toBe(5);
-
-// ✅ GOOD - Custom assertion
-await expect(page).toHaveTableRowCount('my-table', 5);
-```
+See shared standards for code examples.
 
 ### 2. Page Object Usage ✅
+
+See [Playwright Standards §2: Page Object Construction](../../.claude/shared/playwright-standards.md#2-page-object-construction-critical)
+
 **Rule**: Always use page objects from `e2e/tests/ui/pages/` via static async methods. NEVER use direct DOM manipulation.
 
 **Check for**:
 - Import statements from `../../pages/` or `../../helpers/`
-- Using static `build()` or `fromCurrentPage()` methods for page objects in `e2e/tests/ui/pages/**/`
-- Using page object methods instead of inline `page.locator()` or `page.getByRole()`
-- Examples: `AdvisoryListPage.build()`, `SbomDetailsPage.fromCurrentPage()`, etc.
+- Using static `build()` or `fromCurrentPage()` methods for page objects
+- NO direct `page.locator()` or `page.getByRole()` calls
 
-**Red Flags**:
-```typescript
-// ❌ BAD - Direct DOM manipulation
-await page.getByRole("tab", { name: "Advisories" }).click();
-
-// ❌ BAD - Direct locator queries
-const table = page.locator(`table[aria-label="Advisory table"]`);
-const row = table.locator("tbody tr").filter({ hasText: advisoryID });
-await row.click();
-
-// ✅ GOOD - Page object with static async build
-const listPage = await AdvisoryListPage.build(page);
-const table = await listPage.getTable();
-
-// ✅ GOOD - Page object with fromCurrentPage
-const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
-```
+See shared standards for code examples.
 
 ### 3. playwright-bdd Patterns ✅
+
+See [BDD Standards §2: playwright-bdd Pattern](../../.claude/shared/bdd-standards.md#2-playwright-bdd-pattern-mandatory)
+
 **Rule**: Must use local `createBdd(test)` pattern, never import directly from playwright-bdd.
 
 **Check for**:
-```typescript
-// ✅ REQUIRED
-import { createBdd } from "playwright-bdd";
-import { test } from "../../fixtures";
+- Local `createBdd(test)` pattern
+- NOT importing `Given, When, Then` directly from playwright-bdd
 
-export const { Given, When, Then } = createBdd(test);
-```
-
-**Red Flags**:
-```typescript
-// ❌ BAD - Direct import
-import { Given, When, Then } from "playwright-bdd";
-```
+See shared standards for code examples.
 
 ### 4. No Duplicate Step Definitions ✅
+
+See [BDD Standards §4: No Duplicate Step Definitions](../../.claude/shared/bdd-standards.md#4-no-duplicate-step-definitions-critical)
+
 **Rule**: Step definitions must not duplicate existing steps in other `.step.ts` files.
 
 **CRITICAL**: Steps can be shared across feature directories - always search ALL .step.ts files, not just the current feature directory.
@@ -118,82 +96,53 @@ import { Given, When, Then } from "playwright-bdd";
 - Ensure new steps are genuinely unique
 
 ### 5. Step Quality ✅
+
+See [BDD Standards §3: Step Quality](../../.claude/shared/bdd-standards.md#3-step-quality)
+
 **Rule**: Steps should be generic, reusable, and parameterized.
 
 **Check for**:
 - Steps use parameters (e.g., `{string}`, `{int}`) not hard-coded values
 - Step names are descriptive and follow Gherkin conventions
-- Steps are atomic and focused on single actions
-- Steps can be reused across multiple scenarios
+- Steps are atomic, reusable, and generic
 
-**Example**:
-```typescript
-// ✅ GOOD - Generic and parameterized
-When("User searches for {string} in the dedicated search bar",
-  async ({ page }, searchTerm) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(searchTerm);
-  }
-);
-
-// ❌ BAD - Hard-coded and specific
-When("User searches for RHSA-2024:1234 in the search bar",
-  async ({ page }) => {
-    await page.locator('#search').fill('RHSA-2024:1234');
-  }
-);
-```
+See shared standards for code examples.
 
 ### 6. Import Organization ✅
+
+See [BDD Standards §1: Import Order](../../.claude/shared/bdd-standards.md#1-import-order-for-bdd-step-definitions-mandatory)
+
 **Rule**: Follow project import order standards.
 
-**Required order for E2E test files** (with blank lines between groups):
-1. **playwright-bdd block**: `createBdd` and related imports
-2. **Test fixtures block**: Test fixtures from local fixtures
-3. **Assertions block**: Custom expect from assertions
-4. **Helpers block**: Helper classes (SearchPage, ToolbarTable, DetailsPage, etc.)
-5. **Page objects block**: Specific page objects (AdvisoryListPage, SBOMListPage, etc.)
-6. **Utilities block**: Other utilities
+**Required order** (with blank lines between groups):
+1. playwright-bdd imports
+2. Test fixtures
+3. Assertions
+4. Helpers
+5. Page objects
+6. Utilities
 
-**Example for E2E tests**:
-```typescript
-import { createBdd } from "playwright-bdd";
-
-import { test } from "../../fixtures";
-
-import { expect } from "../../assertions";
-
-import { ToolbarTable } from "../../helpers/ToolbarTable";
-import { SearchPage } from "../../helpers/SearchPage";
-
-import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
-```
+See shared standards for code examples.
 
 ### 7. Code Quality Standards ✅
+
+See [Playwright Standards §4: Code Quality Standards](../../.claude/shared/playwright-standards.md#4-code-quality-standards)
+
 **Rule**: Follow project TypeScript and code quality standards.
 
-**Linting and Formatting**:
-- **Linter**: Biome (config: `biome.json` in project root)
-- **String quotes**: Double quotes for all strings
-- **Indentation**: Spaces (not tabs)
-- **Import organization**: Manual control (not auto-sorted)
+**Check for**:
+- Double quotes for strings
+- Space indentation
+- Proper TypeScript types
+- Async/await patterns
+- No unused imports
 
-**TypeScript Requirements**:
-- Strict mode enabled
-- Proper TypeScript types (avoid `any`)
-- Path alias: `@app/*` for application code (not applicable in e2e tests)
-- Async/await patterns for asynchronous operations
-- No unused imports or variables
-- Clear, descriptive variable names
-
-**Code Style**:
-- Use `const` for variables that don't change
-- Use `let` for variables that change
-- Prefer arrow functions for callbacks
-- Use template literals for string interpolation
-- Proper error handling with try/catch where appropriate
+See shared standards for complete details.
 
 ### 8. Wait Strategies ✅
+
+See [Playwright Standards §5: Wait Strategies](../../.claude/shared/playwright-standards.md#5-wait-strategies)
+
 **Rule**: Use appropriate wait strategies for stability.
 
 **Check for**:

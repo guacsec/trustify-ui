@@ -56,7 +56,7 @@ For each iteration (up to 3 times):
 **Generator**: Use `playwright-tester.chatmode.md` instructions
 
 **Generator Tasks**:
-1. Search for scenario in `tests/**/features/**/*.feature`
+1. Search for scenario in `e2e/tests/ui/features/**/*.feature`
 2. Read scenario steps
 3. Analyze existing step definitions
 4. Generate missing steps in `auto-generated.step.ts`
@@ -347,7 +347,8 @@ Generate and review E2E test for: "Scenario Outline: User filters SBOMs by packa
 
 This orchestrator works alongside:
 - `.claude/commands/e2e-test.md` - Claude Code command
-- `.claude/agents/e2e-test-reviewer.md` - Claude Code reviewer agent
+- `.claude/agents/bdd-test-reviewer.md` - Claude Code BDD reviewer agent
+- `.claude/agents/playwright-test-reviewer.md` - Claude Code Playwright reviewer agent (invoked by bdd-test-reviewer)
 - Playwright MCP server - For browser interactions during test execution
 
 The orchestrator can be invoked independently or as part of a larger test generation workflow.
