@@ -55,7 +55,7 @@ test("Recommendations - Get recommendation for a single PURL", async ({
 
 test("Recommendations - No duplicate vulnerabilities", async ({ axios }) => {
   const body = {
-    purls: ["pkg:maven/io.quarkus.arc/arc-processor@3.20.2"]
+    purls: ["pkg:maven/io.quarkus.arc/arc-processor@3.20.2"],
   };
   const res = await axios.post(recommendationsEndpoint, body);
 
