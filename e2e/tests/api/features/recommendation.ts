@@ -53,24 +53,23 @@ test("Recommendations - Get recommendation for a single PURL", async ({
   );
 });
 
-// TODO: Uncomment this test once https://issues.redhat.com/projects/TC/issues/TC-3256 is fixed
-// test("Recommendations - No duplicate vulnerabilities", async ({ axios }) => {
-//   const body = {
-//     purls: ["pkg:maven/io.quarkus.arc/arc-processor@3.20.2"]
-//   };
-//   const res = await axios.post(recommendationsEndpoint, body);
+test("Recommendations - No duplicate vulnerabilities", async ({ axios }) => {
+  const body = {
+    purls: ["pkg:maven/io.quarkus.arc/arc-processor@3.20.2"]
+  };
+  const res = await axios.post(recommendationsEndpoint, body);
 
-//   expect(res.status).toBe(200);
+  expect(res.status).toBe(200);
 
-//   const recs = res.data.recommendations;
-//   const key = Object.keys(recs)[0];
-//   const item = recs[key][0];
-//   const vulnerabilities = item.vulnerabilities;
-//   const ids = vulnerabilities.map((v: { id: string }) => v.id);
-//   const uniqueIds = new Set(ids);
+  const recs = res.data.recommendations;
+  const key = Object.keys(recs)[0];
+  const item = recs[key][0];
+  const vulnerabilities = item.vulnerabilities;
+  const ids = vulnerabilities.map((v: { id: string }) => v.id);
+  const uniqueIds = new Set(ids);
 
-//   expect(uniqueIds.size).toBe(ids.length);
-// });
+  expect(uniqueIds.size).toBe(ids.length);
+});
 
 test("Recommendations - Get recommendation for a PURL, which is not in the database", async ({
   axios,
