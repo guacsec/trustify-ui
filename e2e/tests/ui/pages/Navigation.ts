@@ -18,7 +18,7 @@ export class Navigation {
     menu:
       | "Dashboard"
       | "Search"
-      | "SBOMs"
+      | "All SBOMs"
       | "Vulnerabilities"
       | "Packages"
       | "Advisories"

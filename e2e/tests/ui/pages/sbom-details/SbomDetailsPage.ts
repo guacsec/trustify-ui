@@ -17,7 +17,7 @@ export class SbomDetailsPage {
    */
   static async build(page: Page, sbomName: string) {
     const navigation = await Navigation.build(page);
-    await navigation.goToSidebar("SBOMs");
+    await navigation.goToSidebar("All SBOMs");
 
     const listPage = await SbomListPage.build(page);
     const toolbar = await listPage.getToolbar();

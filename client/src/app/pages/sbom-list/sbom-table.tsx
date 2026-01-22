@@ -43,8 +43,16 @@ import { SbomSearchContext } from "./sbom-context";
 export const SbomTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
-  const { isFetching, fetchError, totalItemCount, tableControls } =
-    React.useContext(SbomSearchContext);
+  const {
+    isFetching,
+    fetchError,
+    totalItemCount,
+    tableControls,
+    bulkSelection: {
+      isEnabled: showBulkSelector,
+      controls: bulkSelectionControls,
+    },
+  } = React.useContext(SbomSearchContext);
 
   const [editLabelsModalState, setEditLabelsModalState] =
     React.useState<SbomSummary | null>(null);
@@ -64,6 +72,11 @@ export const SbomTable: React.FC = () => {
     expansionDerivedState: { isCellExpanded },
     filterState: { filterValues, setFilterValues },
   } = tableControls;
+
+  const {
+    selectedItems: _selectedItems,
+    propHelpers: { getSelectCheckboxTdProps },
+  } = bulkSelectionControls;
 
   const { downloadSBOM, downloadSBOMLicenses } = useDownload();
 
@@ -123,6 +136,9 @@ export const SbomTable: React.FC = () => {
                 <Tr {...getTrProps({ item })}>
                   <TableRowContentWithControls
                     {...tableControls}
+                    getSelectCheckboxTdProps={
+                      showBulkSelector ? getSelectCheckboxTdProps : undefined
+                    }
                     item={item}
                     rowIndex={rowIndex}
                   >
