@@ -56,54 +56,59 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 
   return (
     <>
-    <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
-      <ToolbarContent>
-        {showBulkSelector && (
-          <ToolbarBulkSelector {...toolbarBulkSelectorProps} />
-        )}
-        {showFilters && <FilterToolbar {...filterToolbarProps} />}
-        {showActions && (
-          <>
-            <ToolbarItem>
-              <Button variant="primary" onClick={()=>setCreateGroupOpened(true)}>Create group</Button>
-            </ToolbarItem>
-            <ToolbarItem>
-              <Button variant="secondary" isDisabled>
-                Add to group
-              </Button>
-            </ToolbarItem>
-            <ToolbarItem>
-              <KebabDropdown
-                ariaLabel="SBOM actions"
-                dropdownItems={[
-                  <DropdownItem
-                    key="upload-sbom"
-                    component="button"
-                    onClick={() => navigate(Paths.sbomUpload)}
-                  >
-                    Upload SBOM
-                  </DropdownItem>,
-                  <DropdownItem
-                    key="scan-sbom"
-                    component="button"
-                    onClick={() => navigate(Paths.sbomScan)}
-                  >
-                    Generate vulnerability report
-                  </DropdownItem>,
-                ]}
-              />
-            </ToolbarItem>
-          </>
-        )}
-        <ToolbarItem {...paginationToolbarItemProps}>
-          <SimplePagination
-            idPrefix="sbom-table"
-            isTop
-            paginationProps={paginationProps}
-          />
-        </ToolbarItem>
-      </ToolbarContent>
-    </Toolbar>
+      <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
+        <ToolbarContent>
+          {showBulkSelector && (
+            <ToolbarBulkSelector {...toolbarBulkSelectorProps} />
+          )}
+          {showFilters && <FilterToolbar {...filterToolbarProps} />}
+          {showActions && (
+            <>
+              <ToolbarItem>
+                <Button
+                  variant="primary"
+                  onClick={() => setCreateGroupOpened(true)}
+                >
+                  Create group
+                </Button>
+              </ToolbarItem>
+              <ToolbarItem>
+                <Button variant="secondary" isDisabled>
+                  Add to group
+                </Button>
+              </ToolbarItem>
+              <ToolbarItem>
+                <KebabDropdown
+                  ariaLabel="SBOM actions"
+                  dropdownItems={[
+                    <DropdownItem
+                      key="upload-sbom"
+                      component="button"
+                      onClick={() => navigate(Paths.sbomUpload)}
+                    >
+                      Upload SBOM
+                    </DropdownItem>,
+                    <DropdownItem
+                      key="scan-sbom"
+                      component="button"
+                      onClick={() => navigate(Paths.sbomScan)}
+                    >
+                      Generate vulnerability report
+                    </DropdownItem>,
+                  ]}
+                />
+              </ToolbarItem>
+            </>
+          )}
+          <ToolbarItem {...paginationToolbarItemProps}>
+            <SimplePagination
+              idPrefix="sbom-table"
+              isTop
+              paginationProps={paginationProps}
+            />
+          </ToolbarItem>
+        </ToolbarContent>
+      </Toolbar>
       <SBOMGroupFormModal
         isOpen={createGroupOpened}
         onClose={closeCreateGroup}
