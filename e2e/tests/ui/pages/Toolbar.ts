@@ -230,10 +230,11 @@ export class Toolbar<
   }
 
   async clickKebabAction(actionName: TKebabActions[number]) {
-    if (this._kebabActionButton) {
-      await this._kebabActionButton.click();
+    if (!this._kebabActionButton) {
+      throw new Error("No Kebab action button defined");
     }
 
+    await this._kebabActionButton.click();
     await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 }
