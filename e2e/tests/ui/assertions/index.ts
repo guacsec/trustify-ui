@@ -55,13 +55,14 @@ function typedExpect(
 function typedExpect<
   TFilter extends Record<string, TFilterValue>,
   TFilterName extends Extract<keyof TFilter, string>,
+  TKebabActions extends readonly string[],
 >(
-  value: Toolbar<TFilter, TFilterName>,
+  value: Toolbar<TFilter, TFilterName, TKebabActions>,
 ): Omit<
-  ReturnType<typeof merged<Toolbar<TFilter, TFilterName>>>,
-  keyof ToolbarMatchers<TFilter, TFilterName>
+  ReturnType<typeof merged<Toolbar<TFilter, TFilterName, TKebabActions>>>,
+  keyof ToolbarMatchers<TFilter, TFilterName, TKebabActions>
 > &
-  ToolbarMatchers<TFilter, TFilterName>;
+  ToolbarMatchers<TFilter, TFilterName, TKebabActions>;
 
 /**
  * Overload from DialogMatchers.ts

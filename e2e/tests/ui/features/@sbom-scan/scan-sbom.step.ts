@@ -18,10 +18,9 @@ When("User Navigates to SBOMs List page", async ({ page }) => {
 });
 
 When("User Clicks Generate Vulnerability Button", async ({ page }) => {
-  // The toolbar button label comes from client/src/app/pages/sbom-list/sbom-toolbar.tsx
-  await page
-    .getByRole("button", { name: "Generate vulnerability report" })
-    .click();
+  const sbomListPage = await SbomListPage.build(page);
+  const toolbar = await sbomListPage.getToolbar();
+  await toolbar.clickKebabAction("Generate vulnerability report");
 });
 
 Then(
@@ -51,10 +50,9 @@ Given(
   "User Navigated to Generate Vulnerability Report screen",
   async ({ page }) => {
     // Direct navigation via sidebar to SBOMs then click action button
-    await SbomListPage.build(page);
-    await page
-      .getByRole("button", { name: "Generate vulnerability report" })
-      .click();
+    const sbomListPage = await SbomListPage.build(page);
+    const toolbar = await sbomListPage.getToolbar();
+    await toolbar.clickKebabAction("Generate vulnerability report");
     await expect(page).toHaveURL(/\/sboms\/scan$/);
   },
 );
