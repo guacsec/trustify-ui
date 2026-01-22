@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 import {
   Button,
+  DropdownItem,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
 } from "@patternfly/react-core";
 
 import { FilterToolbar } from "@app/components/FilterToolbar";
+import { KebabDropdown } from "@app/components/KebabDropdown";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
@@ -57,20 +59,33 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
         {showActions && (
           <>
             <ToolbarItem>
-              <Button
-                variant="primary"
-                onClick={() => navigate(Paths.sbomUpload)}
-              >
-                Upload SBOM
+              <Button variant="primary">Create group</Button>
+            </ToolbarItem>
+            <ToolbarItem>
+              <Button variant="secondary" isDisabled>
+                Add to group
               </Button>
             </ToolbarItem>
             <ToolbarItem>
-              <Button
-                variant="secondary"
-                onClick={() => navigate(Paths.sbomScan)}
-              >
-                Generate vulnerability report
-              </Button>
+              <KebabDropdown
+                ariaLabel="SBOM actions"
+                dropdownItems={[
+                  <DropdownItem
+                    key="upload-sbom"
+                    component="button"
+                    onClick={() => navigate(Paths.sbomUpload)}
+                  >
+                    Upload SBOM
+                  </DropdownItem>,
+                  <DropdownItem
+                    key="scan-sbom"
+                    component="button"
+                    onClick={() => navigate(Paths.sbomScan)}
+                  >
+                    Generate vulnerability report
+                  </DropdownItem>,
+                ]}
+              />
             </ToolbarItem>
           </>
         )}

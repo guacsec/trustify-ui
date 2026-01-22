@@ -13,6 +13,7 @@ import type { MatcherResult } from "./types";
 export interface ToolbarMatchers<
   TFilter extends Record<string, TFilterValue>,
   _TFilterName extends Extract<keyof TFilter, string>,
+  _TKebabActions extends readonly string[],
 > {
   toHaveLabels(
     filters: Partial<FilterValueType<TFilter>>,
@@ -21,12 +22,17 @@ export interface ToolbarMatchers<
 }
 
 type ToolbarMatcherDefinitions = {
-  readonly [K in keyof ToolbarMatchers<Record<string, TFilterValue>, string>]: <
+  readonly [K in keyof ToolbarMatchers<
+    Record<string, TFilterValue>,
+    string,
+    string[]
+  >]: <
     TFilter extends Record<string, TFilterValue>,
     TFilterName extends Extract<keyof TFilter, string>,
+    TKebabActions extends readonly string[],
   >(
-    receiver: Toolbar<TFilter, TFilterName>,
-    ...args: Parameters<ToolbarMatchers<TFilter, TFilterName>[K]>
+    receiver: Toolbar<TFilter, TFilterName, TKebabActions>,
+    ...args: Parameters<ToolbarMatchers<TFilter, TFilterName, TKebabActions>[K]>
   ) => Promise<MatcherResult>;
 };
 
@@ -34,8 +40,9 @@ export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
   toHaveLabels: async <
     TFilter extends Record<string, TFilterValue>,
     TFilterName extends Extract<keyof TFilter, string>,
+    TKebabActions extends readonly string[],
   >(
-    toolbar: Toolbar<TFilter, TFilterName>,
+    toolbar: Toolbar<TFilter, TFilterName, TKebabActions>,
     filters: Partial<FilterValueType<TFilter>>,
   ): Promise<MatcherResult> => {
     try {
@@ -86,8 +93,9 @@ export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
   toHaveNoLabels: async <
     TFilter extends Record<string, TFilterValue>,
     TFilterName extends Extract<keyof TFilter, string>,
+    TKebabActions extends readonly string[],
   >(
-    toolbar: Toolbar<TFilter, TFilterName>,
+    toolbar: Toolbar<TFilter, TFilterName, TKebabActions>,
   ): Promise<MatcherResult> => {
     try {
       // Verify the clear all button does not exist
