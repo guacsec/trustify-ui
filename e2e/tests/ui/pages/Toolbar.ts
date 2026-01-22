@@ -13,15 +13,27 @@ import {
 export class Toolbar<
   TFilter extends Record<string, TFilterValue>,
   TFilterName extends Extract<keyof TFilter, string>,
+  const TKebabActions extends readonly string[],
 > {
   private readonly _page: Page;
   _toolbar: Locator;
   readonly _filters: TFilter;
 
-  private constructor(page: Page, toolbar: Locator, filters: TFilter) {
+  private readonly _kebabActionButton: Locator | null;
+  _kebabActions: TKebabActions | null;
+
+  private constructor(
+    page: Page,
+    toolbar: Locator,
+    filters: TFilter,
+    kebabActions: TKebabActions,
+    kebabActionButton: Locator | null,
+  ) {
     this._page = page;
     this._toolbar = toolbar;
     this._filters = filters;
+    this._kebabActions = kebabActions;
+    this._kebabActionButton = kebabActionButton;
   }
 
   /**
@@ -30,14 +42,36 @@ export class Toolbar<
    * @param filters a key value object that represents the filters available for the toolbar
    * @returns a new instance of a Toolbar
    */
-  static async build<TFilter extends Record<string, TFilterValue>>(
+  static async build<
+    TFilter extends Record<string, TFilterValue>,
+    const TKebabActions extends readonly string[] = [],
+  >(
     page: Page,
     toolbarAriaLabel: string,
     filters: TFilter = {} as TFilter,
+    kebabActions?: {
+      buttonAriaLabel: string;
+      actions: TKebabActions;
+    },
   ) {
     const toolbar = page.locator(`[aria-label="${toolbarAriaLabel}"]`);
     await expect(toolbar).toBeVisible();
-    return new Toolbar(page, toolbar, filters);
+
+    let kebabActionButton: Locator | null = null;
+    if (kebabActions?.buttonAriaLabel) {
+      kebabActionButton = page.getByRole("button", {
+        name: kebabActions.buttonAriaLabel,
+      });
+      await expect(kebabActionButton).toBeVisible();
+    }
+
+    return new Toolbar(
+      page,
+      toolbar,
+      filters,
+      kebabActions?.actions ?? [],
+      kebabActionButton,
+    );
   }
 
   async applyFilter(filters: Partial<FilterValueType<TFilter>>) {
@@ -193,5 +227,13 @@ export class Toolbar<
 
     // Verify the entire group is removed
     await expect(chipGroup).not.toBeVisible();
+  }
+
+  async clickKebabAction(actionName: TKebabActions[number]) {
+    if (this._kebabActionButton) {
+      await this._kebabActionButton.click();
+    }
+
+    await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 }
