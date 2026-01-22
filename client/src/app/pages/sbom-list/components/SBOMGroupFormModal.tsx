@@ -3,12 +3,9 @@ import React from "react";
 import {
   Button,
   ButtonVariant,
-  Card,
   ExpandableSection,
   Form,
   FormSelectOption,
-  Label,
-  LabelGroup,
   Modal,
   ModalBody,
   ModalFooter,
@@ -16,7 +13,6 @@ import {
   Radio,
   Stack,
   StackItem,
-  TextInput,
 } from "@patternfly/react-core";
 import { useForm } from "react-hook-form";
 
@@ -26,6 +22,7 @@ import {
   HookFormPFTextArea,
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
+import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -60,7 +57,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
 
   const [isAdvancedExpanded, setIsAdvancedExpanded] =
     React.useState<boolean>(false);
-  const [newLabel, setNewLabel] = React.useState<string>("");
 
   const {
     control,
@@ -119,7 +115,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             placeholder="Select parent group"
             helperText="Leave blank if this group does not have a parent"
           >
-            <FormSelectOption value="" label="No parent" />
             {parentGroups.map((groupName) => (
               <FormSelectOption
                 key={groupName}
@@ -180,85 +175,36 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             onToggle={(_event, val) => setIsAdvancedExpanded(val)}
             isExpanded={isAdvancedExpanded}
           >
-            <HookFormPFGroupController
+            <HookFormPFAddLabels
               control={control}
-              name={"labels"}
+              name="labels"
               fieldId="labels"
               label="Labels"
-              renderInput={({ field: { value, onChange } }) => {
-                const labels = (value ?? []) as string[];
-
-                const handleAdd = () => {
-                  const trimmed = newLabel.trim();
-                  if (!trimmed || labels.includes(trimmed)) {
-                    return;
-                  }
-                  onChange([...labels, trimmed]);
-                  setNewLabel("");
-                };
-
-                const handleDelete = (labelToRemove: string) => {
-                  onChange(labels.filter((l) => l !== labelToRemove));
-                };
-
-                return (
-                  <Stack hasGutter>
-                    <StackItem>Add metadata labels</StackItem>
-                    <StackItem>
-                      <Card>
-                        <LabelGroup numLabels={10} style={{ padding: 10 }}>
-                          {labels.map((label) => (
-                            <Label
-                              key={label}
-                              color="blue"
-                              onClose={() => handleDelete(label)}
-                            >
-                              {label}
-                            </Label>
-                          ))}
-                        </LabelGroup>
-                      </Card>
-                    </StackItem>
-                    <StackItem>
-                      <TextInput
-                        value={newLabel}
-                        aria-label="add-label-input"
-                        placeholder="Add label"
-                        onChange={(_event, value) => setNewLabel(value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            handleAdd();
-                          }
-                        }}
-                      />
-                    </StackItem>
-                  </Stack>
-                );
-              }}
+              restrictedLabels={["Product"]}
             />
           </ExpandableSection>
-          <ModalFooter>
-            <Button
-              type="submit"
-              aria-label={`${type} btn`}
-              variant={ButtonVariant.primary}
-              isDisabled={!isValid || isSubmitting || isValidating}
-            >
-              {type}
-            </Button>
-            <Button
-              type="button"
-              aria-label="Cancel"
-              variant={ButtonVariant.link}
-              isDisabled={isSubmitting || isValidating}
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
         </Form>
       </ModalBody>
+      <ModalFooter>
+        <Button
+          type="submit"
+          form="sbom-group-form"
+          aria-label={`${type} btn`}
+          variant={ButtonVariant.primary}
+          isDisabled={!isValid || isSubmitting || isValidating}
+        >
+          {type}
+        </Button>
+        <Button
+          type="button"
+          aria-label="Cancel"
+          variant={ButtonVariant.link}
+          isDisabled={isSubmitting || isValidating}
+          onClick={onClose}
+        >
+          Cancel
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };
