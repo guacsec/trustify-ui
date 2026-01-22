@@ -78,7 +78,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                     Upload SBOM
                   </DropdownItem>,
                   <DropdownItem
-                    key="upload-sbom"
+                    key="scan-sbom"
                     component="button"
                     onClick={() => navigate(Paths.sbomScan)}
                   >
