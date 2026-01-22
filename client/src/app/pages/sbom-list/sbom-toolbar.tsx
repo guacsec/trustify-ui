@@ -10,6 +10,7 @@ import {
 
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { SimplePagination } from "@app/components/SimplePagination";
+import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
 
 import { SbomSearchContext } from "./sbom-context";
@@ -25,7 +26,13 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { tableControls } = React.useContext(SbomSearchContext);
+  const {
+    tableControls,
+    bulkSelection: {
+      isEnabled: showBulkSelector,
+      controls: bulkSelectionControls,
+    },
+  } = React.useContext(SbomSearchContext);
 
   const {
     propHelpers: {
@@ -36,9 +43,16 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     },
   } = tableControls;
 
+  const {
+    propHelpers: { toolbarBulkSelectorProps },
+  } = bulkSelectionControls;
+
   return (
     <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
       <ToolbarContent>
+        {showBulkSelector && (
+          <ToolbarBulkSelector {...toolbarBulkSelectorProps} />
+        )}
         {showFilters && <FilterToolbar {...filterToolbarProps} />}
         {showActions && (
           <>
