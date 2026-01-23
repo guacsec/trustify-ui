@@ -30,14 +30,7 @@ export class AdvisoryListPage {
     return await Table.build(
       this._page,
       "advisory-table",
-      {
-        ID: { isSortable: true },
-        Title: { isSortable: false },
-        Type: { isSortable: false },
-        Labels: { isSortable: false },
-        Revision: { isSortable: true },
-        Vulnerabilities: { isSortable: false },
-      },
+      ["ID", "Title", "Type", "Labels", "Revision", "Vulnerabilities"],
       ["Edit labels", "Download", "Delete"],
     );
   }
