@@ -23,7 +23,7 @@ export class PackageListPage {
       "Filter text": "string",
       Type: "multiSelect",
       Architecture: "multiSelect",
-      License: "multiSelect",
+      License: "typeahead",
     });
   }
 
