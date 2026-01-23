@@ -49,7 +49,7 @@ export const GroupsTable: React.FC = () => {
 
   return (
     <>
-      <Table {...tableProps} aria-label="sbom-table">
+      <Table {...tableProps} aria-label="sbom-groups-table">
         <Thead>
           <Tr>
           </Tr>
@@ -89,7 +89,7 @@ export const GroupsTable: React.FC = () => {
                 {
                   item.children.map((childNode) => {
                     return (
-                      <Tbody>
+                      <Tbody key={childNode.id}>
                         <Tr
                           key={childNode.id}
                           {...getTrProps({ item: childNode })}
@@ -112,7 +112,7 @@ export const GroupsTable: React.FC = () => {
         </ConditionalTableBody >
       </Table >
       <SimplePagination
-        idPrefix="sbom-table"
+        idPrefix="sbom-groups-table"
         isTop={false}
         paginationProps={paginationProps}
       />
