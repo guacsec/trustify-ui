@@ -146,10 +146,10 @@ export type ITablePersistenceArgs<
    * Where to persist state for this table. Can either be a single target for all features or an object mapping individual features to different targets.
    */
   persistTo?:
-    | PersistTarget
-    | Partial<
-        Record<TableFeature, PersistTarget | PersistenceProvider<unknown>>
-      >;
+  | PersistTarget
+  | Partial<
+    Record<TableFeature, PersistTarget | PersistenceProvider<unknown>>
+  >;
 };
 
 /**
@@ -423,7 +423,7 @@ export type ITableControls<
      * @param args - `columnKey` is always required. If `isCompoundExpandToggle` is passed, `item` and `rowIndex` are also required.
      */
     getTdProps: (
-      args: { columnKey: TColumnKey } & DiscriminatedArgs<
+      args: { columnKey?: TColumnKey } & DiscriminatedArgs<
         "isCompoundExpandToggle",
         { item: TItem; rowIndex: number }
       >,
@@ -495,18 +495,18 @@ export type IUseLocalTableControlsArgs<
       TSortableColumnKey,
       TFilterCategoryKey
     > &
-      IUseTableControlPropsArgs<
-        TItem,
-        TColumnKey,
-        TSortableColumnKey,
-        TFilterCategoryKey
-      >,
+    IUseTableControlPropsArgs<
+      TItem,
+      TColumnKey,
+      TSortableColumnKey,
+      TFilterCategoryKey
+    >,
     | keyof ITableControlDerivedState<TItem>
     | keyof ITableControlState<
-        TItem,
-        TColumnKey,
-        TSortableColumnKey,
-        TFilterCategoryKey,
-        TPersistenceKeyPrefix
-      >
+      TItem,
+      TColumnKey,
+      TSortableColumnKey,
+      TFilterCategoryKey,
+      TPersistenceKeyPrefix
+    >
   >;
