@@ -112,7 +112,7 @@ export const GroupsTable: React.FC = () => {
         </ConditionalTableBody >
       </Table >
       <SimplePagination
-        idPrefix="sbom-groups-table"
+        idPrefix="sbom-table"
         isTop={false}
         paginationProps={paginationProps}
       />
