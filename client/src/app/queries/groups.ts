@@ -281,6 +281,15 @@ const dummyData: {
         scope: "poc",
       },
     },
+    {
+      id: "uuid-30",
+      parent: null,
+      name: "root-group-2",
+      labels: {
+        scope: "local",
+        owner: "forum",
+      },
+    },
   ],
 };
 
