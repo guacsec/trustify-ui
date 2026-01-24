@@ -1,20 +1,20 @@
-import { Stack, StackItem, Flex, FlexItem } from "@patternfly/react-core"
-import { NavLink } from "react-router-dom"
+import { Stack, StackItem, Flex, FlexItem } from "@patternfly/react-core";
+import { NavLink } from "react-router-dom";
 import type { TGroupTreeNode } from "@app/queries/groups";
-import { GroupLabels } from './group-labels';
+import { GroupLabels } from "./group-labels";
 export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
-
   return (
     <Stack hasGutter>
       <StackItem isFilled>
         <Flex
-          alignItems={{ default: 'alignItemsCenter' }}
-          gap={{ default: 'gapSm' }}
-          flexWrap={{ default: "wrap" }}>
+          alignItems={{ default: "alignItemsCenter" }}
+          gap={{ default: "gapSm" }}
+          flexWrap={{ default: "wrap" }}
+        >
           <FlexItem>
             <NavLink
               className="pf-v6-c-button pf-m-link pf-m-inline"
-              to={'https://example.com'}
+              to={"https://example.com"}
             >
               {item.name}
             </NavLink>
@@ -30,4 +30,4 @@ export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
       </StackItem>
     </Stack>
   );
-}
+};

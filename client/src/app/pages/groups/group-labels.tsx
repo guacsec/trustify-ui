@@ -1,4 +1,4 @@
-import { Label, LabelGroup } from '@patternfly/react-core';
+import { Label, LabelGroup } from "@patternfly/react-core";
 type Props = {
   labels?: Record<string, string>;
 };
@@ -11,13 +11,11 @@ export const GroupLabels = ({ labels }: Props) => {
 
   return (
     <LabelGroup>
-      {
-        Object.entries(labels).map(([key, value]) => (
-          <Label key={key} color='blue'>
-            {key}: {value}
-          </Label>
-        ))
-      }
+      {Object.entries(labels).map(([key, value]) => (
+        <Label key={key} color="blue">
+          {key}: {value}
+        </Label>
+      ))}
     </LabelGroup>
   );
-}
+};

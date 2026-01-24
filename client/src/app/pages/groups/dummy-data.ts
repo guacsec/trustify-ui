@@ -1,5 +1,5 @@
 // TODO: Delete this once there's actual data
-import { TGroupDD } from "@app/queries/groups";
+import type { TGroupDD } from "@app/queries/groups";
 export const dummyData: {
   total: number;
   items: TGroupDD[];
@@ -278,5 +278,3 @@ export const dummyData: {
     },
   ],
 };
-
-

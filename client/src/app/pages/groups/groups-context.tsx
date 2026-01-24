@@ -1,8 +1,11 @@
 import React from "react";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
 import { FilterType } from "@app/components/FilterToolbar";
-import { BulkSelectionValues, useBulkSelection } from "@app/hooks/selection";
+import {
+  type BulkSelectionValues,
+  useBulkSelection,
+} from "@app/hooks/selection";
 import {
   getHubRequestParams,
   type ITableControls,
@@ -10,7 +13,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
-import { useFetchGroups, TGroupTreeNode } from "@app/queries/groups";
+import { type TGroupTreeNode, useFetchGroups } from "@app/queries/groups";
 interface IGroupsContext {
   // TODO: Update once SBOM Group types are finalized...
   tableControls: ITableControls<
@@ -23,12 +26,13 @@ interface IGroupsContext {
     // Filter categories
     "" | "name",
     // Persistence key prefix...?
-    string>;
+    string
+  >;
 
   bulkSelection: {
     isEnabled: boolean;
     // TODO: Update once SBOM Group types are finalized...
-    controls: BulkSelectionValues<TGroupTreeNode>
+    controls: BulkSelectionValues<TGroupTreeNode>;
   };
 
   totalItemCount: number;
@@ -38,9 +42,8 @@ interface IGroupsContext {
 
 const contextDefaultValue = {} as IGroupsContext;
 
-export const GroupsContext = React.createContext<IGroupsContext>(
-  contextDefaultValue,
-);
+export const GroupsContext =
+  React.createContext<IGroupsContext>(contextDefaultValue);
 
 interface IGroupsProvider {
   isBulkSelectionEnabled?: boolean;
@@ -60,7 +63,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
-    sortableColumns: ['name'],
+    sortableColumns: ["name"],
     isFilterEnabled: true,
     filterCategories: [
       {
@@ -83,11 +86,10 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
-        name: 'name',
-      }
+        name: "name",
+      },
     }),
   );
-
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -114,7 +116,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
         bulkSelection: {
           isEnabled: !!isBulkSelectionEnabled,
           controls: bulkSelectionControls,
-        }
+        },
       }}
     >
       {children}
