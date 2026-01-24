@@ -17,9 +17,9 @@ interface IGroupsContext {
     // TODO: UPDATE - Item Type
     TGroupTreeNode,
     // Column keys
-    never,
+    "name",
     // Sortable column keys
-    never,
+    "name",
     // Filter categories
     "" | "name",
     // Persistence key prefix...?
@@ -55,7 +55,9 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     tableName: "groups",
     persistenceKeyPrefix: TablePersistenceKeyPrefixes.groups,
     persistTo: "urlParams",
-    columnNames: {},
+    columnNames: {
+      name: "name",
+    },
     isPaginationEnabled: true,
     isSortEnabled: false,
     isFilterEnabled: true,
