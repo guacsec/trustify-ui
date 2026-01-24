@@ -3,7 +3,6 @@ import {
   Table,
   Tbody,
   Td,
-  Thead,
   Tr,
 } from "@patternfly/react-table";
 import { GroupsContext } from './groups-context';
@@ -82,10 +81,6 @@ export const GroupsTable: React.FC = () => {
   return (
     <>
       <Table {...tableProps} aria-label="sbom-groups-table">
-        <Thead>
-          <Tr>
-          </Tr>
-        </Thead>
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
