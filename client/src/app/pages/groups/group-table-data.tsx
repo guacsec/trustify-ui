@@ -20,9 +20,7 @@ export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
             </NavLink>
           </FlexItem>
           <FlexItem>
-            <LabelGroup>
-              <GroupLabels labels={item.labels} />
-            </LabelGroup>
+            <GroupLabels labels={item.labels} />
           </FlexItem>
         </Flex>
       </StackItem>
