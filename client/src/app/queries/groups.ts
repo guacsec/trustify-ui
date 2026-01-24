@@ -293,6 +293,7 @@ const dummyData: {
   ],
 };
 
+// TODO: Make actual requests once backend is ready
 export const useFetchGroups = (
   params: HubRequestParams = {},
   disableQuery = false,
