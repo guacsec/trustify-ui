@@ -1,4 +1,4 @@
-import { Stack, StackItem, Flex, FlexItem, Label, LabelGroup } from "@patternfly/react-core"
+import { Stack, StackItem, Flex, FlexItem, LabelGroup } from "@patternfly/react-core"
 import { NavLink } from "react-router-dom"
 import type { TGroupTreeNode } from "@app/queries/groups";
 import { GroupLabels } from './group-labels';
