@@ -1,7 +1,8 @@
 import { Stack, StackItem, Flex, FlexItem, Label, LabelGroup } from "@patternfly/react-core"
 import { NavLink } from "react-router-dom"
+import type { TGroupTreeNode } from "@app/queries/groups";
 
-export const GroupTableData = ({ item }: { item: any }) => {
+export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
 
   return (
     <Stack hasGutter>
