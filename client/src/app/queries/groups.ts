@@ -1,9 +1,9 @@
-import { HubRequestParams } from "@app/api/models";
-import { AxiosError } from "axios";
+import type { HubRequestParams } from "@app/api/models";
+import type { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { dummyData } from "@app/pages/groups/dummy-data";
 
-export const GroupQueryKey = 'groups'
+export const GroupQueryKey = "groups";
 export type TGroupDD = {
   id: string;
   parent: string | null;
@@ -25,7 +25,7 @@ export const useFetchGroups = (
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [GroupQueryKey, params],
     queryFn: () => Promise.resolve(dummyData),
-    enabled: !disableQuery
+    enabled: !disableQuery,
   });
 
   const { roots } = buildGroupTree(data?.items || []);
@@ -38,8 +38,8 @@ export const useFetchGroups = (
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,
-  }
-}
+  };
+};
 
 /**
  * Generates a simple tree structure for groups

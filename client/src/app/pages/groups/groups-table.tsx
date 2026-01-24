@@ -1,18 +1,13 @@
-import React from 'react';
-import {
-  Table,
-  Tbody,
-  Td,
-  Tr,
-} from "@patternfly/react-table";
-import { GroupsContext } from './groups-context';
+import React from "react";
+import { Table, Tbody, Td, Tr } from "@patternfly/react-table";
+import { GroupsContext } from "./groups-context";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
-import { GroupTableData } from './group-table-data';
-import { TGroupTreeNode } from '@app/queries/groups';
+import { GroupTableData } from "./group-table-data";
+import type { TGroupTreeNode } from "@app/queries/groups";
 
 type FlattenedRow = {
   item: TGroupTreeNode;
@@ -59,12 +54,7 @@ export const GroupsTable: React.FC = () => {
   const {
     numRenderedColumns,
     currentPageItems,
-    propHelpers: {
-      paginationProps,
-      tableProps,
-      getTrProps,
-      getTdProps,
-    },
+    propHelpers: { paginationProps, tableProps, getTrProps, getTdProps },
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
 
@@ -105,28 +95,29 @@ export const GroupsTable: React.FC = () => {
                     <Td
                       modifier="breakWord"
                       {...getTdProps({
-                        columnKey: 'name',
+                        columnKey: "name",
                         isCompoundExpandToggle: true,
                         item: item,
                         rowIndex,
                       })}
-
-                      style={{ paddingLeft: `calc(${indentPx}px + var(--pf-v6-c-table--cell--PaddingLeft, 1rem))` }}
+                      style={{
+                        paddingLeft: `calc(${indentPx}px + var(--pf-v6-c-table--cell--PaddingLeft, 1rem))`,
+                      }}
                     >
                       <GroupTableData item={item} />
                     </Td>
                   </TableRowContentWithControls>
                 </Tr>
               </Tbody>
-            )
+            );
           })}
-        </ConditionalTableBody >
-      </Table >
+        </ConditionalTableBody>
+      </Table>
       <SimplePagination
         idPrefix="sbom-groups-table"
         isTop={false}
         paginationProps={paginationProps}
       />
     </>
-  )
-}
+  );
+};
