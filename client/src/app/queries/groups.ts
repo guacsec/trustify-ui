@@ -7,7 +7,7 @@ export type TGroupDD = {
   id: string;
   parent: string | null;
   name: string;
-  labels: Record<string, any>;
+  labels: Record<string, string>;
 };
 
 export type TGroupTreeNode = TGroupDD & {
