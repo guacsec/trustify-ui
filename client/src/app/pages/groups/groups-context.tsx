@@ -14,6 +14,22 @@ import {
 } from "@app/hooks/table-controls";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
 import { type TGroupTreeNode, useFetchGroups } from "@app/queries/groups";
+
+/**
+ * Recursively flatten all nodes in a tree structure.
+ * Unlike the table's flattenVisibleRows, this flattens ALL nodes regardless of expansion state.
+ */
+const flattenAllNodes = (nodes: TGroupTreeNode[]): TGroupTreeNode[] => {
+  const result: TGroupTreeNode[] = [];
+  for (const node of nodes) {
+    result.push(node);
+    if (node.children.length > 0) {
+      result.push(...flattenAllNodes(node.children));
+    }
+  }
+  return result;
+};
+
 interface IGroupsContext {
   // TODO: Update once SBOM Group types are finalized...
   tableControls: ITableControls<
@@ -100,10 +116,16 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     hasActionsColumn: true,
   });
 
+  const allFlattenedItems = React.useMemo(
+    () => flattenAllNodes(tableControls.currentPageItems),
+    [tableControls.currentPageItems],
+  );
+
+  // All tree nodes should have bulk selection enabled
   const bulkSelectionControls = useBulkSelection({
     isEqual: (a, b) => a.id === b.id,
-    filteredItems: tableControls.filteredItems,
-    currentPageItems: tableControls.currentPageItems,
+    filteredItems: allFlattenedItems,
+    currentPageItems: allFlattenedItems,
   });
 
   return (
