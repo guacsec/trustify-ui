@@ -5,7 +5,7 @@ type Props = {
 
 // TODO: Change color based on label type
 export const GroupLabels = ({ labels }: Props) => {
-  if (!labels || Object.keys(labels) === 0) {
+  if (!labels || Object.keys(labels).length === 0) {
     return null;
   }
 
