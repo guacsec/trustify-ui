@@ -110,6 +110,7 @@ export const GroupsTable: React.FC = () => {
                     <Td
                       modifier="breakWord"
                       {...getTdProps({
+                        columnKey: 'name',
                         isCompoundExpandToggle: true,
                         item: item,
                         rowIndex,
@@ -127,7 +128,7 @@ export const GroupsTable: React.FC = () => {
         </ConditionalTableBody >
       </Table >
       <SimplePagination
-        idPrefix="sbom-table"
+        idPrefix="sbom-groups-table"
         isTop={false}
         paginationProps={paginationProps}
       />
