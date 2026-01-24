@@ -91,7 +91,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     idProperty: "id",
     currentPageItems: groups,
     totalItemCount,
-    isLoading: false,
+    isLoading: !isFetching,
     hasActionsColumn: true,
   });
 
