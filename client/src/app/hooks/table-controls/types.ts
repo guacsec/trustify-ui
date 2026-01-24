@@ -423,7 +423,7 @@ export type ITableControls<
      * @param args - `columnKey` is always required. If `isCompoundExpandToggle` is passed, `item` and `rowIndex` are also required.
      */
     getTdProps: (
-      args: { columnKey?: TColumnKey } & DiscriminatedArgs<
+      args: { columnKey: TColumnKey } & DiscriminatedArgs<
         "isCompoundExpandToggle",
         { item: TItem; rowIndex: number }
       >,
