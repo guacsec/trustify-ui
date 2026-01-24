@@ -32,7 +32,7 @@ export const useFetchGroups = (
     result: {
       data: roots,
       // Use only top-level nodes for pagination
-      total: roots.length
+      total: roots.length,
     },
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
