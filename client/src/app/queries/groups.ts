@@ -301,7 +301,7 @@ export const useFetchGroups = (
   return {
     result: {
       data: roots,
-      total: roots.length
+      total: data?.total ?? 0,
     },
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
