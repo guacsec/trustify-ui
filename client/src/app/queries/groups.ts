@@ -20,8 +20,6 @@ export const useFetchGroups = (
   params: HubRequestParams = {},
   disableQuery = false,
 ) => {
-  //  const { q, ...rest } = requestParamsQuery((params));
-
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [GroupQueryKey, params],
     queryFn: () => Promise.resolve(dummyData),
@@ -33,7 +31,8 @@ export const useFetchGroups = (
   return {
     result: {
       data: roots,
-      total: data?.total ?? 0,
+      // Use only top-level nodes for pagination
+      total: roots.length
     },
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
