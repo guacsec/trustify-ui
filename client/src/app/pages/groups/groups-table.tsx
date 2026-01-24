@@ -32,11 +32,12 @@ function flattenVisibleRows(
   const rows: FlattenedRow[] = [];
 
   for (const node of nodes) {
+    // Add depth to tree node (used for indenting)
     rows.push({ item: node, depth });
 
     const children = node.children ?? [];
     if (children.length > 0 && isExpanded(node)) {
-      // Go down the tree
+      // Go down the tree...
       rows.push(...flattenVisibleRows(children, isExpanded, depth + 1));
     }
   }
