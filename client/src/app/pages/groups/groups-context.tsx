@@ -59,7 +59,8 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
       name: "name",
     },
     isPaginationEnabled: true,
-    isSortEnabled: false,
+    isSortEnabled: true,
+    sortableColumns: ['name'],
     isFilterEnabled: true,
     filterCategories: [
       {
