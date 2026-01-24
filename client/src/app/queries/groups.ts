@@ -72,7 +72,6 @@ const dummyData: { total: number, items: TGroupDD[], tree: Record<string, any> }
       labels: {}
     }
   ],
-  tree: {},
 };
 
 export const useFetchGroups = (
@@ -87,13 +86,12 @@ export const useFetchGroups = (
     enabled: !disableQuery
   });
 
-  const { roots } = buildGroupTree(dummyData.items);
+  const { roots } = buildGroupTree(data?.items || []);
 
   return {
     result: {
-      data: roots || [],
-      total: data?.total ?? 0,
-      tree: data?.tree,
+      data: roots,
+      total: roots.length
     },
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
