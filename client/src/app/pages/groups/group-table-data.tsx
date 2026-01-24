@@ -1,7 +1,7 @@
 import { Stack, StackItem, Flex, FlexItem, Label, LabelGroup } from "@patternfly/react-core"
 import { NavLink } from "react-router-dom"
 import type { TGroupTreeNode } from "@app/queries/groups";
-
+import { GroupLabels } from './group-labels';
 export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
 
   return (
@@ -21,10 +21,7 @@ export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
           </FlexItem>
           <FlexItem>
             <LabelGroup>
-              {/* TODO: Update this actual labels */}
-              <Label color="purple">Product</Label>
-              <Label color="blue">Label</Label>
-              <Label color="teal">Another label</Label>
+              <GroupLabels labels={item.labels} />
             </LabelGroup>
           </FlexItem>
         </Flex>
