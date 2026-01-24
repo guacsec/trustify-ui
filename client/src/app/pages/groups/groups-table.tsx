@@ -3,20 +3,47 @@ import {
   Table,
   Tbody,
   Td,
-  Th,
   Thead,
   Tr,
 } from "@patternfly/react-table";
 import { GroupsContext } from './groups-context';
-import { NavLink } from 'react-router-dom';
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
-  TableHeaderContentWithControls,
   TableRowContentWithControls,
 } from "@app/components/TableControls";
-import { LabelGroup, Label, Split, SplitItem, Stack, StackItem, Flex, FlexItem } from '@patternfly/react-core';
 import { GroupTableData } from './group-table-data';
+import { TGroupTreeNode } from '@app/queries/groups';
+
+type FlattenedRow = {
+  item: TGroupTreeNode;
+  depth: number;
+};
+
+/**
+ * Flatten a tree into a list of visible rows.
+ * Children are only included if `isExpanded(node)` is true.
+ */
+function flattenVisibleRows(
+  nodes: TGroupTreeNode[],
+  isExpanded: (node: TGroupTreeNode) => boolean,
+  depth = 0,
+): FlattenedRow[] {
+  const rows: FlattenedRow[] = [];
+
+  for (const node of nodes) {
+    rows.push({ item: node, depth });
+
+    const children = node.children ?? [];
+    if (children.length > 0 && isExpanded(node)) {
+      // Go down the tree
+      rows.push(...flattenVisibleRows(children, isExpanded, depth + 1));
+    }
+  }
+
+  return rows;
+}
+
 export const GroupsTable: React.FC = () => {
   const {
     isFetching,
@@ -46,6 +73,10 @@ export const GroupsTable: React.FC = () => {
     propHelpers: { getSelectCheckboxTdProps },
   } = bulkSelectionControls;
 
+  // Build the render list
+  const visibleRows = React.useMemo(() => {
+    return flattenVisibleRows(currentPageItems, isCellExpanded);
+  }, [currentPageItems, isCellExpanded]);
 
   return (
     <>
@@ -60,53 +91,36 @@ export const GroupsTable: React.FC = () => {
           isNoData={totalItemCount === 0}
           numRenderedColumns={numRenderedColumns}
         >
-          {currentPageItems.map((item, rowIndex) => {
-            return (
-              <>
-                <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
-                  <Tr {...getTrProps({ item })}>
-                    <TableRowContentWithControls
-                      {...tableControls}
-                      getSelectCheckboxTdProps={
-                        showBulkSelector ? getSelectCheckboxTdProps : undefined
-                      }
-                      item={item}
-                      rowIndex={rowIndex}
-                    >
-                      <Td
-                        modifier="breakWord"
-                        {...getTdProps({
-                          isCompoundExpandToggle: true,
-                          item: item,
-                          rowIndex,
-                        })}>
-                        <GroupTableData item={item} />
-                      </Td>
-                    </TableRowContentWithControls>
-                  </Tr>
+          {visibleRows.map(({ item, depth }, rowIndex) => {
+            // Indent child nodes
+            const indentPx = depth * 24;
 
-                </Tbody>
-                {
-                  item.children.map((childNode) => {
-                    return (
-                      <Tbody key={childNode.id}>
-                        <Tr
-                          key={childNode.id}
-                          {...getTrProps({ item: childNode })}
-                          isExpanded={isCellExpanded(item)}
-                        >
-                          <Td
-                            colSpan={numRenderedColumns}
-                            className="pf-v6-u-py-md pf-v6-u-border-bottom"
-                          >
-                            <GroupTableData item={childNode} />
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    )
-                  })
-                }
-              </>
+            return (
+              <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
+                <Tr {...getTrProps({ item })}>
+                  <TableRowContentWithControls
+                    {...tableControls}
+                    getSelectCheckboxTdProps={
+                      showBulkSelector ? getSelectCheckboxTdProps : undefined
+                    }
+                    item={item}
+                    rowIndex={rowIndex}
+                  >
+                    <Td
+                      modifier="breakWord"
+                      {...getTdProps({
+                        isCompoundExpandToggle: true,
+                        item: item,
+                        rowIndex,
+                      })}
+
+                      style={{ paddingLeft: `calc(${indentPx}px + var(--pf-v6-c-table--cell--PaddingLeft, 1rem))` }}
+                    >
+                      <GroupTableData item={item} />
+                    </Td>
+                  </TableRowContentWithControls>
+                </Tr>
+              </Tbody>
             )
           })}
         </ConditionalTableBody >
