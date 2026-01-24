@@ -238,7 +238,7 @@ The [Playwright MCP](https://github.com/microsoft/playwright-mcp) server can be 
 1. Install Playwright MCP server to the client
 2. Start Playwright MCP server (if needed)
 3. Update the `trustify` environment values like `PLAYWRIGHT_AUTH_URL`, `TRUSTIFY_API_URL`,`AUTH_REQUIRED` in the `.env` file
-4. Make sure to add the test scenario and the steps under relevant feature file exists under the directory `e2e/tests/**/features/**/*.feature`.
+4. Make sure to add the test scenario and the steps under relevant feature file exists under the directory `e2e/tests/ui/features/**/*.feature`.
 5. Toggle Agent plane on the IDE and pass the Scenario name for which the code to be generated
 6. Review the Agent prompts before accepting to execute commands
 7. Review the steps and step definitions added under `auto-generated.step.ts` located under relevant feature file directory

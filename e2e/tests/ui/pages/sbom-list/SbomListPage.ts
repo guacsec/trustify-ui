@@ -19,12 +19,20 @@ export class SbomListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "sbom-toolbar", {
-      "Filter text": "string",
-      "Created on": "dateRange",
-      Label: "typeahead",
-      License: "typeahead",
-    });
+    return await Toolbar.build(
+      this._page,
+      "sbom-toolbar",
+      {
+        "Filter text": "string",
+        "Created on": "dateRange",
+        Label: "typeahead",
+        License: "typeahead",
+      },
+      {
+        buttonAriaLabel: "SBOM actions",
+        actions: ["Upload SBOM", "Generate vulnerability report"],
+      },
+    );
   }
 
   async getTable() {

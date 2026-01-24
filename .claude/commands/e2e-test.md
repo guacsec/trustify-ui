@@ -27,7 +27,7 @@ Create E2E Playwright tests based on [summary] and following these guidelines:
 
 ```bash
 # Run a single e2e test file (ALWAYS use this format)
-SKIP_INGESTION=true TRUSTIFY_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ npm run e2e:test -- path/to/test.test.ts --workers=2
+SKIP_INGESTION=true TRUSTIFY_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ npm run e2e:test -- path/to/test.test.ts --workers=2 --trace on
 ```
 
 - Iterate to make the tests pass successfully when needed
