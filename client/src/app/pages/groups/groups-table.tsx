@@ -15,8 +15,34 @@ type FlattenedRow = {
 };
 
 /**
- * Flatten a tree into a list of visible rows.
- * Children are only included if `isExpanded(node)` is true.
+ * Flattens a tree into a list of rows that should be visible in the UI.
+ *
+ * Example:
+ *
+ * Tree:
+ *   A
+ *   |-B
+ *   | |--C
+ *   | |--D
+ *   |
+ *   |-E
+ *
+ *   Expanded: A, B
+ *   (Indentation in this diagram corresponds to the `depth` value.)
+ *
+ * Result:
+ * A (depth 0)
+ * B (depth 1)
+ * C (depth 2)
+ * D (depth 2)
+ * E (depth 1)
+ *
+ * Notes:
+ * - Traversal is depth-first, pre-order (parent before child nodes)
+ * - Only expanded nodes have their children included
+ *   - Collapsed nodes still appear in the UI, only their child nodes are hidden
+ * - The 'depth' value appended to each node is for easy visual indentation
+ *
  */
 function flattenVisibleRows(
   nodes: TGroupTreeNode[],
@@ -25,13 +51,13 @@ function flattenVisibleRows(
 ): FlattenedRow[] {
   const rows: FlattenedRow[] = [];
 
+  // Build the list in depth-first, pre-order: parent first, then visible
+  // child nodes.
   for (const node of nodes) {
-    // Add depth to tree node (used for indenting)
     rows.push({ item: node, depth });
 
     const children = node.children ?? [];
     if (children.length > 0 && isExpanded(node)) {
-      // Go down the tree...
       rows.push(...flattenVisibleRows(children, isExpanded, depth + 1));
     }
   }
@@ -63,7 +89,7 @@ export const GroupsTable: React.FC = () => {
     propHelpers: { getSelectCheckboxTdProps },
   } = bulkSelectionControls;
 
-  // Build the render list
+  // Build the render list from the generated tree.
   const visibleRows = React.useMemo(() => {
     return flattenVisibleRows(currentPageItems, isCellExpanded);
   }, [currentPageItems, isCellExpanded]);
