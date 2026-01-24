@@ -18,6 +18,7 @@ import { type TGroupTreeNode, useFetchGroups } from "@app/queries/groups";
 /**
  * Recursively flatten all nodes in a tree structure.
  * Unlike the table's flattenVisibleRows, this flattens ALL nodes regardless of expansion state.
+ * This allows us to set bulk selection controls on ALL nodes, regardless of expansion state.
  */
 const flattenAllNodes = (nodes: TGroupTreeNode[]): TGroupTreeNode[] => {
   const result: TGroupTreeNode[] = [];
