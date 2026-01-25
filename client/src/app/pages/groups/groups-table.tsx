@@ -36,7 +36,7 @@ export function buildGroupTree(items: TGroupDD[]) {
     if (parent) {
       parent.children.push(node);
     } else {
-      // orphan: parent id not found -> treat as root or handle however you want
+      // orphan: parent id not found -> treat as root.
       roots.push(node);
     }
   }
