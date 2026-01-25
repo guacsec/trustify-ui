@@ -24,4 +24,5 @@ When I say to ad a comment to a PR with a TODO on it, use 'checkbox' markdown fo
 
 ## Git
 
-- When creating branches, prefix them with claude/
+- Use `conventional commits`. E.g. "feat: something", "fix: something", "chore: something", etc.
+- When creating branches, prefix them with the type task done. E.g. "feat", "hotfix", "tests", "chore", "docs", etc.

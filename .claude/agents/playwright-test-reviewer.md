@@ -16,6 +16,7 @@ model: sonnet
 - Do not rewrite code unless explicitly requested; focus on guidance and review.
 
 ## Instructions
+- Verify all matchers at `e2e/tests/ui/assertions` to prevent name collision with Playwright's built-in matchers
 - Provide a bullet list or numbered list of issues and suggestions.
 - Highlight critical errors or potential bugs first.
 - Keep feedback concise and actionable.
