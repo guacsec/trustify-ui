@@ -13,29 +13,13 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
-import { type TGroupTreeNode, useFetchGroups } from "@app/queries/groups";
-
-/**
- * Recursively flatten all nodes in a tree structure.
- * Unlike the table's flattenVisibleRows, this flattens ALL nodes regardless of expansion state.
- * This allows us to set bulk selection controls on ALL nodes, regardless of expansion state.
- */
-const flattenAllNodes = (nodes: TGroupTreeNode[]): TGroupTreeNode[] => {
-  const result: TGroupTreeNode[] = [];
-  for (const node of nodes) {
-    result.push(node);
-    if (node.children.length > 0) {
-      result.push(...flattenAllNodes(node.children));
-    }
-  }
-  return result;
-};
+import { type TGroupDD, useFetchGroups } from "@app/queries/groups";
 
 interface IGroupsContext {
   // TODO: Update once SBOM Group types are finalized...
   tableControls: ITableControls<
     // TODO: UPDATE - Item Type
-    TGroupTreeNode,
+    TGroupDD,
     // Column keys
     "name",
     // Sortable column keys
@@ -49,7 +33,7 @@ interface IGroupsContext {
   bulkSelection: {
     isEnabled: boolean;
     // TODO: Update once SBOM Group types are finalized...
-    controls: BulkSelectionValues<TGroupTreeNode>;
+    controls: BulkSelectionValues<TGroupDD>;
   };
 
   totalItemCount: number;
@@ -117,16 +101,10 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     hasActionsColumn: true,
   });
 
-  const allFlattenedItems = React.useMemo(
-    () => flattenAllNodes(tableControls.currentPageItems),
-    [tableControls.currentPageItems],
-  );
-
-  // All tree nodes should have bulk selection enabled
   const bulkSelectionControls = useBulkSelection({
     isEqual: (a, b) => a.id === b.id,
-    filteredItems: allFlattenedItems,
-    currentPageItems: allFlattenedItems,
+    filteredItems: groups,
+    currentPageItems: groups,
   });
 
   return (

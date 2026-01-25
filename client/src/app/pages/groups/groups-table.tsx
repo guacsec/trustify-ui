@@ -7,10 +7,45 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { GroupTableData } from "./group-table-data";
-import type { TGroupTreeNode } from "@app/queries/groups";
+import type { TGroupDD } from "@app/queries/groups";
+
+export type TGroupTreeNode = TGroupDD & {
+  children: TGroupTreeNode[];
+};
+
+/**
+ * Generates a simple tree structure for groups
+ */
+export function buildGroupTree(items: TGroupDD[]) {
+  const byId = new Map<string, TGroupTreeNode>();
+  const roots: TGroupTreeNode[] = [];
+
+  // initialize nodes
+  for (const item of items) {
+    byId.set(item.id, { ...item, children: [] });
+  }
+
+  // wire up parent/child relationships
+  for (const node of byId.values()) {
+    if (!node.parent) {
+      roots.push(node);
+      continue;
+    }
+
+    const parent = byId.get(node.parent);
+    if (parent) {
+      parent.children.push(node);
+    } else {
+      // orphan: parent id not found -> treat as root or handle however you want
+      roots.push(node);
+    }
+  }
+
+  return { roots, byId };
+}
 
 type FlattenedRow = {
-  item: TGroupTreeNode;
+  item: TGroupDD;
   depth: number;
 };
 
@@ -91,7 +126,10 @@ export const GroupsTable: React.FC = () => {
 
   // Build the render list from the generated tree.
   const visibleRows = React.useMemo(() => {
-    return flattenVisibleRows(currentPageItems, isCellExpanded);
+    // Build the tree to determine node depths
+    const { roots } = buildGroupTree(currentPageItems);
+    // Flatten it!
+    return flattenVisibleRows(roots, isCellExpanded);
   }, [currentPageItems, isCellExpanded]);
 
   return (
