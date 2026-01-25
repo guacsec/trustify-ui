@@ -124,13 +124,15 @@ export const GroupsTable: React.FC = () => {
     propHelpers: { getSelectCheckboxTdProps },
   } = bulkSelectionControls;
 
-  // Build the render list from the generated tree.
+  // Build tree first so we can get node depths
+  const { roots } = React.useMemo(() => {
+    return buildGroupTree(currentPageItems);
+  }, [currentPageItems]);
+
+  // Build the render list from the generated tree
   const visibleRows = React.useMemo(() => {
-    // Build the tree to determine node depths
-    const { roots } = buildGroupTree(currentPageItems);
-    // Flatten it!
     return flattenVisibleRows(roots, isCellExpanded);
-  }, [currentPageItems, isCellExpanded]);
+  }, [roots, isCellExpanded]);
 
   return (
     <>
