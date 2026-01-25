@@ -14,7 +14,6 @@ import {
   ModalHeader,
   MultipleFileUpload,
   MultipleFileUploadMain,
-  type MultipleFileUploadProps,
   MultipleFileUploadStatus,
   MultipleFileUploadStatusItem,
   Spinner,
@@ -38,7 +37,6 @@ export interface IUploadFilesProps {
   handleRemoveUpload: (file: File) => void;
   extractSuccessMessage: (response: AxiosResponse) => string;
   extractErrorMessage: (error: AxiosError) => string;
-  props?: Omit<MultipleFileUploadProps, "onFileDrop" | "dropzoneProps">;
 }
 
 export const UploadFiles: React.FC<IUploadFilesProps> = ({
@@ -47,7 +45,6 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
   handleRemoveUpload,
   extractSuccessMessage,
   extractErrorMessage,
-  props,
 }) => {
   const [showStatus, setShowStatus] = React.useState(false);
   const [statusIcon, setStatusIcon] = React.useState<
@@ -102,7 +99,6 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
         onDropRejected: handleDropRejected,
         useFsAccessApi: false, // Required to make playwright work
       }}
-      {...props}
     >
       <MultipleFileUploadMain
         titleIcon={<UploadIcon />}

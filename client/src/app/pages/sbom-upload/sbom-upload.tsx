@@ -41,7 +41,6 @@ export const SbomUpload: React.FC = () => {
       </PageSection>
       <PageSection>
         <UploadFiles
-          props={{ "aria-label": "sbom-uploader" }}
           uploads={uploads}
           handleUpload={handleUpload}
           handleRemoveUpload={handleRemoveUpload}
