@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue view:*)",
+      "Bash(done)",
+      "Bash(npm run check:*)",
+      "Bash(npx biome:*)",
+      "Bash(npm run format:fix:*)",
+      "Bash(npx tsc:*)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "patternfly",
+    "playwright"
+  ]
+}
