@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import type { SbomSummary } from "@app/client";
 import { EditLabelsForm } from "@app/components/EditLabelsForm";
@@ -22,14 +23,7 @@ export const SBOMEditLabelsForm: React.FC<SBOMEditLabelsFormProps> = ({
   const { pushNotification } = React.useContext(NotificationsContext);
 
   const [inputValue, setInputValue] = React.useState("");
-  const [debouncedInputValue, setDebouncedInputValue] = React.useState("");
-
-  React.useEffect(() => {
-    const delayInputTimeoutId = setTimeout(() => {
-      setDebouncedInputValue(inputValue);
-    }, 400);
-    return () => clearTimeout(delayInputTimeoutId);
-  }, [inputValue]);
+  const [debouncedInputValue] = useDebounceValue(inputValue, 400);
 
   const { labels } = useFetchSBOMLabels(debouncedInputValue);
 
