@@ -4,14 +4,14 @@ export const dummyData: {
   total: number;
   items: TGroupDD[];
 } = {
-  total: 29,
+  total: 30,
   items: [
     {
       id: "uuid-1",
       parent: null,
       name: "root-group",
       labels: {
-        scope: "global",
+        Product: null,
         owner: "platform",
       },
     },
