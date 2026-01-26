@@ -8,7 +8,7 @@ export type TGroupDD = {
   id: string;
   parent: string | null;
   name: string;
-  labels: Record<string, string>;
+  labels: Record<string, string | null>;
 };
 
 // TODO: Make actual requests once backend is ready
