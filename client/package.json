@@ -70,7 +70,25 @@
       "last 1 safari version"
     ]
   },
-  "nyc": {},
+  "nyc": {
+    "include": [
+      "client/src/app/**/*.ts",
+      "client/src/app/**/*.tsx"
+    ],
+    "exclude": [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/__tests__/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "client/src/app/client/**",
+      "e2e/**"
+    ],
+    "all": false,
+    "exclude-after-remap": true
+  },
   "msw": {
     "workerDirectory": "public"
   }

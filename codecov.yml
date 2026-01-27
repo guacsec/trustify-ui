@@ -6,3 +6,21 @@ coverage:
     patch:
       default:
         informational: true
+
+ignore:
+  - "e2e/**/*"                    # E2E test workspace
+  - "**/node_modules/**"          # Dependencies
+  - "**/*.test.ts"                # Unit test files
+  - "**/*.test.tsx"               # Unit test React files
+  - "**/*.spec.ts"                # Spec test files
+  - "**/*.spec.tsx"               # Spec test React files
+  - "**/dist/**"                  # Build artifacts
+  - "**/coverage/**"              # Coverage reports
+  - "**/.nyc_output/**"           # NYC temp data
+  - "**/config/**"                # Configuration files
+  - "**/__tests__/**"             # Test directories
+  - "**/jest.config.ts"           # Jest config
+  - "**/playwright.config.ts"     # Playwright config
+  - "**/rsbuild.config.ts"        # Rsbuild config
+  - "**/openapi-ts.config.ts"     # OpenAPI generator config
+  - "crate/**"                    # Rust crate directory
