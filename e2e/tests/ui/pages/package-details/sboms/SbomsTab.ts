@@ -49,11 +49,7 @@ export class SbomsTab {
     return await Table.build(
       this._page,
       "SBOM table",
-      {
-        Name: { isSortable: true },
-        Version: { isSortable: false },
-        Supplier: { isSortable: false },
-      },
+      ["Name", "Version", "Supplier"],
       [],
     );
   }

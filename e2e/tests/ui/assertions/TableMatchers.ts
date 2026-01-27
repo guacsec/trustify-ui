@@ -1,18 +1,17 @@
 import { expect as baseExpect } from "@playwright/test";
-import type { Table, TColumnValue } from "../pages/Table";
+import type { Table } from "../pages/Table";
 import type { MatcherResult } from "./types";
 
 export interface TableMatchers<
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   _TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 > {
   toBeSortedBy(
-    columnName: TColumnName,
+    columnName: TColumns[number],
     order: "ascending" | "descending",
   ): Promise<MatcherResult>;
   toHaveColumnWithValue(
-    columnName: TColumnName,
+    columnName: TColumns[number],
     value: string,
     rowIndex?: number,
   ): Promise<MatcherResult>;
@@ -25,28 +24,22 @@ export interface TableMatchers<
 }
 
 type TableMatcherDefinitions = {
-  readonly [K in keyof TableMatchers<
-    Record<string, TColumnValue>,
-    [],
-    string
-  >]: <
-    TColumn extends Record<string, TColumnValue>,
+  readonly [K in keyof TableMatchers<readonly string[], readonly string[]>]: <
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    receiver: Table<TColumn, TActions, TColumnName>,
-    ...args: Parameters<TableMatchers<TColumn, TActions, TColumnName>[K]>
+    receiver: Table<TColumns, TActions>,
+    ...args: Parameters<TableMatchers<TColumns, TActions>[K]>
   ) => Promise<MatcherResult>;
 };
 
 export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
   toBeSortedBy: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
-    columnName: TColumnName,
+    table: Table<TColumns, TActions>,
+    columnName: TColumns[number],
     order: "ascending" | "descending",
   ) => {
     try {
@@ -65,12 +58,11 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveColumnWithValue: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
-    columnName: TColumnName,
+    table: Table<TColumns, TActions>,
+    columnName: TColumns[number],
     value: string,
     rowIndex?: number,
   ) => {
@@ -101,16 +93,15 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveNumberOfRows: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
+    table: Table<TColumns, TActions>,
     expectedRows: { equal?: number; greaterThan?: number; lessThan?: number },
   ) => {
     try {
       const rows = table._table.locator(
-        `td[data-label="${Object.keys(table._columns)[0]}"]`,
+        `td[data-label="${table._columns[0]}"]`,
       );
 
       if (expectedRows.equal) {
@@ -139,11 +130,10 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveEmptyState: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
+    table: Table<TColumns, TActions>,
   ): Promise<MatcherResult> => {
     try {
       await baseExpect(

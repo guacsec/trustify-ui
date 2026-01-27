@@ -31,14 +31,7 @@ export class PackagesTab {
     return await Table.build(
       this._page,
       "Package table",
-      {
-        Name: { isSortable: true },
-        Version: { isSortable: false },
-        Vulnerabilities: { isSortable: false },
-        Licenses: { isSortable: false },
-        PURLs: { isSortable: false },
-        CPEs: { isSortable: false },
-      },
+      ["Name", "Version", "Vulnerabilities", "Licenses", "PURLs", "CPEs"],
       [],
     );
   }

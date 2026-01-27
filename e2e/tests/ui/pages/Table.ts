@@ -1,28 +1,19 @@
 import { type Locator, type Page, expect } from "@playwright/test";
 
-export interface TColumnValue {
-  isSortable: boolean;
-}
-
 export class Table<
-  TColumn extends Record<string, TColumnValue>,
+  const TColumns extends readonly string[],
   const TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 > {
   private readonly _page: Page;
   readonly _table: Locator;
-  readonly _columns: TColumn;
+  readonly _columns: TColumns;
   // biome-ignore lint/correctness/noUnusedPrivateClassMembers: allowed
   private readonly _actions: TActions;
-
-  protected type!: {
-    ColumnName: Extract<keyof TColumn, string>;
-  };
 
   private constructor(
     page: Page,
     table: Locator,
-    columns: TColumn,
+    columns: TColumns,
     actions: TActions,
   ) {
     this._page = page;
@@ -37,9 +28,9 @@ export class Table<
    * @returns a new instance of a Toolbar
    */
   static async build<
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-  >(page: Page, tableAriaLabel: string, columns: TColumn, actions: TActions) {
+  >(page: Page, tableAriaLabel: string, columns: TColumns, actions: TActions) {
     const table = page.locator(`table[aria-label="${tableAriaLabel}"]`);
     await expect(table).toBeVisible();
 
@@ -62,7 +53,7 @@ export class Table<
     await expect.poll(() => rows.count()).toBeGreaterThanOrEqual(1);
   }
 
-  async clickSortBy(columnName: TColumnName) {
+  async clickSortBy(columnName: TColumns[number]) {
     await this._table
       .getByRole("button", { name: columnName, exact: true })
       .click();
@@ -78,7 +69,7 @@ export class Table<
     await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 
-  async expandCell(columnName: TColumnName, rowIndex: number) {
+  async expandCell(columnName: TColumns[number], rowIndex: number) {
     const column = await this.getColumn(columnName);
     await column.nth(rowIndex).click();
 
@@ -106,13 +97,13 @@ export class Table<
     return rows;
   }
 
-  async getColumn(columnName: TColumnName) {
+  async getColumn(columnName: TColumns[number]) {
     const column = this._table.locator(`td[data-label="${columnName}"]`);
     await expect(column.first()).toBeVisible();
     return column;
   }
 
-  async getColumnHeader(columnName: TColumnName) {
+  async getColumnHeader(columnName: TColumns[number]) {
     const columnHeader = this._table.getByRole("columnheader", {
       name: columnName,
       exact: true,
@@ -128,7 +119,7 @@ export class Table<
    * @returns The tooltip button locator
    */
   getColumnTooltipButton(
-    columnName: TColumnName,
+    columnName: TColumns[number],
     tooltipMessage: string,
   ): Locator {
     const columnHeader = this._table.getByRole("columnheader", {
@@ -151,13 +142,15 @@ export class Table<
    * const rows = table.getRowsByCellValue({ "Name": "curl", "Version": "7.29.0" });
    */
   async getRowsByCellValue(
-    cellValues: Partial<Record<TColumnName, string>>,
+    cellValues: Partial<Record<TColumns[number], string>>,
   ): Promise<Locator> {
     // Start with all table rows
     let rowLocator = this._table.locator("tbody tr");
 
     // Filter rows based on each column-value pair
-    for (const columnName of Object.keys(cellValues) as Array<TColumnName>) {
+    for (const columnName of Object.keys(cellValues) as Array<
+      TColumns[number]
+    >) {
       const value = cellValues[columnName];
       rowLocator = rowLocator.filter({
         has: this._page.locator(`td[data-label="${columnName}"]`, {

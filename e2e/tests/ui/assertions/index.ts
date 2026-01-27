@@ -1,6 +1,6 @@
 import { mergeExpects } from "@playwright/test";
 
-import type { Table, TColumnValue } from "../pages/Table";
+import type { Table } from "../pages/Table";
 import { tableAssertions, type TableMatchers } from "./TableMatchers";
 
 import type { Pagination } from "../pages/Pagination";
@@ -30,16 +30,15 @@ const merged = mergeExpects(
  * Overload from TableMatchers.ts
  */
 function typedExpect<
-  TColumn extends Record<string, TColumnValue>,
+  const TColumns extends readonly string[],
   const TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >(
-  value: Table<TColumn, TActions, TColumnName>,
+  value: Table<TColumns, TActions>,
 ): Omit<
-  ReturnType<typeof merged<Table<TColumn, TActions, TColumnName>>>,
-  keyof TableMatchers<TColumn, TActions, TColumnName>
+  ReturnType<typeof merged<Table<TColumns, TActions>>>,
+  keyof TableMatchers<TColumns, TActions>
 > &
-  TableMatchers<TColumn, TActions, TColumnName>;
+  TableMatchers<TColumns, TActions>;
 
 /**
  * Overload from PaginationMatchers.ts

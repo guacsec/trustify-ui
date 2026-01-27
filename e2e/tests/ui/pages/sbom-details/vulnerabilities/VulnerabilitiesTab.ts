@@ -41,14 +41,14 @@ export class VulnerabilitiesTab {
     return await Table.build(
       this._page,
       "Vulnerability table",
-      {
-        Id: { isSortable: true },
-        Description: { isSortable: false },
-        CVSS: { isSortable: true },
-        "Affected dependencies": { isSortable: true },
-        Published: { isSortable: true },
-        Updated: { isSortable: true },
-      },
+      [
+        "Id",
+        "Description",
+        "CVSS",
+        "Affected dependencies",
+        "Published",
+        "Updated",
+      ],
       [],
     );
   }
