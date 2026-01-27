@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { expect } from "../../assertions";
 import { test } from "../../fixtures";
-import type { Table, TColumnValue } from "../../pages/Table";
+import type { Table } from "../../pages/Table";
 import type { Toolbar } from "../../pages/Toolbar";
 import {
   isDateRangeFilter,
@@ -28,12 +28,11 @@ export interface FilterTestConfig<
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 > {
   toolbar: Toolbar<TFilter, TFilterName, TKebabActions>;
-  table: Table<TColumn, TActions, TColumnName>;
+  table: Table<TColumns, TActions>;
 }
 
 export const testFilterMatches = <
@@ -46,9 +45,8 @@ export const testFilterMatches = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >(
   testName: string,
   {
@@ -57,20 +55,17 @@ export const testFilterMatches = <
     getConfig,
   }: {
     filters: Partial<FilterValueType<TFilter>>;
-    assertions: { columnName: TColumnName; value: string; rowIndex?: number };
+    assertions: {
+      columnName: TColumns[number];
+      value: string;
+      rowIndex?: number;
+    };
     getConfig: ({
       page,
     }: {
       page: Page;
     }) => Promise<
-      FilterTestConfig<
-        TFilter,
-        TFilterName,
-        TKebabActions,
-        TColumn,
-        TActions,
-        TColumnName
-      >
+      FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
     >;
   },
 ) =>
@@ -101,9 +96,8 @@ export const testFilterShowsEmptyState = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >(
   testName: string,
   {
@@ -116,14 +110,7 @@ export const testFilterShowsEmptyState = <
     }: {
       page: Page;
     }) => Promise<
-      FilterTestConfig<
-        TFilter,
-        TFilterName,
-        TKebabActions,
-        TColumn,
-        TActions,
-        TColumnName
-      >
+      FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
     >;
   },
 ) =>
@@ -148,9 +135,8 @@ export const testClearAllFilters = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >({
   filters,
   getConfig,
@@ -161,14 +147,7 @@ export const testClearAllFilters = <
   }: {
     page: Page;
   }) => Promise<
-    FilterTestConfig<
-      TFilter,
-      TFilterName,
-      TKebabActions,
-      TColumn,
-      TActions,
-      TColumnName
-    >
+    FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
   >;
 }) =>
   test("Clear all filters button removes all applied filters", async ({
@@ -197,9 +176,8 @@ export const testRemovalOfFiltersFromToolbar = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >({
   filters,
   getConfig,
@@ -210,14 +188,7 @@ export const testRemovalOfFiltersFromToolbar = <
   }: {
     page: Page;
   }) => Promise<
-    FilterTestConfig<
-      TFilter,
-      TFilterName,
-      TKebabActions,
-      TColumn,
-      TActions,
-      TColumnName
-    >
+    FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
   >;
 }) =>
   test("Remove filters by clicking Toolbar should be possible", async ({
@@ -280,9 +251,8 @@ export const testUrlPersistence = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >({
   filters,
   getConfig,
@@ -293,14 +263,7 @@ export const testUrlPersistence = <
   }: {
     page: Page;
   }) => Promise<
-    FilterTestConfig<
-      TFilter,
-      TFilterName,
-      TKebabActions,
-      TColumn,
-      TActions,
-      TColumnName
-    >
+    FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
   >;
 }) =>
   test("Filters persist in URL and survive page reload", async ({ page }) => {
@@ -328,9 +291,8 @@ export const testBrowserNavigationBackAndForward = <
   /**
    * Table
    */
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >({
   filters,
   getConfig,
@@ -341,14 +303,7 @@ export const testBrowserNavigationBackAndForward = <
   }: {
     page: Page;
   }) => Promise<
-    FilterTestConfig<
-      TFilter,
-      TFilterName,
-      TKebabActions,
-      TColumn,
-      TActions,
-      TColumnName
-    >
+    FilterTestConfig<TFilter, TFilterName, TKebabActions, TColumns, TActions>
   >;
 }) =>
   test("Browser navigation (back/forward/goto) maintains filter state", async ({

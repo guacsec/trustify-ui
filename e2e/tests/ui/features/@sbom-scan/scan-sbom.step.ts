@@ -105,15 +105,15 @@ Then(
     const table = await Table.build(
       page,
       "Vulnerability table",
-      {
-        "Vulnerability ID": { isSortable: true },
-        Description: { isSortable: false },
-        Severity: { isSortable: true },
-        Status: { isSortable: false },
-        "Affected packages": { isSortable: true },
-        Published: { isSortable: true },
-        Updated: { isSortable: true },
-      },
+      [
+        "Vulnerability ID",
+        "Description",
+        "Severity",
+        "Status",
+        "Affected packages",
+        "Published",
+        "Updated",
+      ],
       [],
     );
     const tooltipButton = table.getColumnTooltipButton(column, tooltipMessage);
