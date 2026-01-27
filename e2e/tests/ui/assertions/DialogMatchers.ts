@@ -3,7 +3,7 @@ import type { DeletionConfirmDialog } from "../pages/ConfirmDialog";
 import type { MatcherResult } from "./types";
 
 export interface DialogMatchers {
-  toHaveTitle(expectedTitle: string): Promise<MatcherResult>;
+  toHaveDialogTitle(expectedTitle: string): Promise<MatcherResult>;
 }
 
 type DialogMatcherDefinitions = {
@@ -14,7 +14,7 @@ type DialogMatcherDefinitions = {
 };
 
 export const dialogAssertions = baseExpect.extend<DialogMatcherDefinitions>({
-  toHaveTitle: async (
+  toHaveDialogTitle: async (
     dialog: DeletionConfirmDialog,
     expectedTitle: string,
   ): Promise<MatcherResult> => {
