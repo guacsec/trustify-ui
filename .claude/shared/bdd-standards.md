@@ -4,7 +4,7 @@ This document contains BDD-specific validation rules and code quality standards 
 
 **Used by:**
 - `.claude/agents/bdd-test-reviewer.md`
-- `.claude/agents/e2e-test-generator.md`
+- `.claude/agents/bdd-test-generator.md`
 - `.github/chatmodes/playwright-tester.chatmode.md`
 
 **For core Playwright standards** (page objects, assertions, waits, test structure), see [playwright-standards.md](./playwright-standards.md).
