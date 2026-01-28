@@ -1,11 +1,13 @@
 import React from "react";
 
 import {
+  ActionsColumn,
   Table,
   Tbody,
   Td,
   type TdProps,
   TreeRowWrapper,
+  type IAction,
 } from "@patternfly/react-table";
 
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -14,31 +16,15 @@ import { ConditionalTableBody } from "@app/components/TableControls";
 import { GroupsContext, type TGroupTreeNode } from "./groups-context";
 import { GroupTableData } from "./group-table-data";
 
-const getDescendants = (node: TGroupTreeNode): TGroupTreeNode[] => {
-  if (!node.children || !node.children.length) {
-    return [node];
-  }
-  let children: TGroupTreeNode[] = [];
-  node.children.forEach((child) => {
-    children = [...children, ...getDescendants(child)];
-  });
-  return children;
-};
-
 export const GroupsTable: React.FC = () => {
   const {
     isFetching,
     fetchError,
     totalItemCount,
     tableControls,
-    treeExpansion: {
-      expandedNodeNames,
-      setExpandedNodeNames,
-      expandedDetailsNodeNames,
-      setExpandedDetailsNodeNames,
-    },
+    treeExpansion: { expandedNodeNames, setExpandedNodeNames },
     treeSelection: { selectedNodeNames, setSelectedNodeNames },
-    treeData: { roots },
+    treeData,
   } = React.useContext(GroupsContext);
 
   const {
@@ -46,20 +32,8 @@ export const GroupsTable: React.FC = () => {
     propHelpers: { paginationProps, tableProps },
   } = tableControls;
 
-  const areAllDescendantsSelected = (node: TGroupTreeNode) =>
-    getDescendants(node).every((n) => selectedNodeNames.includes(n.name));
-  const areSomeDescendantsSelected = (node: TGroupTreeNode) =>
-    getDescendants(node).some((n) => selectedNodeNames.includes(n.name));
-
-  const isNodeChecked = (node: TGroupTreeNode) => {
-    if (areAllDescendantsSelected(node)) {
-      return true;
-    }
-    if (areSomeDescendantsSelected(node)) {
-      return null;
-    }
-    return false;
-  };
+  const isNodeChecked = (node: TGroupTreeNode) =>
+    selectedNodeNames.includes(node.name);
 
   /**
     Recursive function which flattens the data into an array of flattened TreeRowWrapper components
@@ -81,7 +55,6 @@ export const GroupsTable: React.FC = () => {
       return [];
     }
     const isExpanded = expandedNodeNames.includes(node.name);
-    const isDetailsExpanded = expandedDetailsNodeNames.includes(node.name);
     const isChecked = isNodeChecked(node);
 
     const treeRow: TdProps["treeRow"] = {
@@ -95,31 +68,19 @@ export const GroupsTable: React.FC = () => {
             : [...otherExpandedNodeNames, node.name],
         );
       },
-      onToggleRowDetails: () => {
-        const otherDetailsExpandedNodeNames = expandedDetailsNodeNames.filter(
-          (name) => name !== node.name,
-        );
-        setExpandedDetailsNodeNames(
-          isDetailsExpanded
-            ? otherDetailsExpandedNodeNames
-            : [...otherDetailsExpandedNodeNames, node.name],
-        );
-      },
       onCheckChange: (_event, isChecking) => {
-        const nodeNamesToCheck = getDescendants(node).map((n) => n.name);
         setSelectedNodeNames((prevSelected) => {
           const otherSelectedNodeNames = prevSelected.filter(
-            (name) => !nodeNamesToCheck.includes(name),
+            (name) => name !== node.name,
           );
           return !isChecking
             ? otherSelectedNodeNames
-            : [...otherSelectedNodeNames, ...nodeNamesToCheck];
+            : [...otherSelectedNodeNames, node.name];
         });
       },
       rowIndex,
       props: {
         isExpanded,
-        isDetailsExpanded,
         isHidden,
         "aria-level": level,
         "aria-posinset": posinset,
@@ -139,11 +100,44 @@ export const GroupsTable: React.FC = () => {
         )
       : [];
 
+    // TODO: Update once the actions are mocked.
+    const lastRowActions = (node: TGroupTreeNode): IAction[] => [
+      {
+        title: "Some action",
+        onClick: () =>
+          console.log(`clicked on Some action, on row ${node.name}`),
+      },
+      {
+        title: <div>Another action</div>,
+        onClick: () =>
+          console.log(`clicked on Another action, on row ${node.name}`),
+      },
+      {
+        isSeparator: true,
+      },
+      {
+        title: "Third action",
+        onClick: () =>
+          console.log(`clicked on Third action, on row ${node.name}`),
+      },
+    ];
+
     return [
       <TreeRowWrapper key={node.name} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
           <GroupTableData item={node} />
         </Td>
+        {
+          // Only render for non-parent group nodes
+          !node.children.length && (
+            <Td isActionCell style={{ verticalAlign: "middle" }}>
+              <ActionsColumn
+                items={lastRowActions(node)}
+                isDisabled={false}
+              ></ActionsColumn>
+            </Td>
+          )
+        }
       </TreeRowWrapper>,
       ...childRows,
       ...renderRows(
@@ -165,7 +159,7 @@ export const GroupsTable: React.FC = () => {
           isNoData={totalItemCount === 0}
           numRenderedColumns={numRenderedColumns}
         >
-          <Tbody>{renderRows(roots)}</Tbody>
+          <Tbody>{renderRows(treeData)}</Tbody>
         </ConditionalTableBody>
       </Table>
       <SimplePagination
