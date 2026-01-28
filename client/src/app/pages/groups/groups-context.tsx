@@ -16,6 +16,7 @@ import { TablePersistenceKeyPrefixes } from "@app/Constants";
 import { usePersistentState } from "@app/hooks/usePersistentState";
 import type { TGroupDD } from "@app/queries/groups";
 import { useFetchGroups } from "@app/queries/groups";
+import { buildGroupTree } from "./utils";
 
 export type TGroupTreeNode = TGroupDD & {
   children: TGroupTreeNode[];
@@ -24,8 +25,6 @@ export type TGroupTreeNode = TGroupDD & {
 interface ITreeExpansionState {
   expandedNodeNames: string[];
   setExpandedNodeNames: React.Dispatch<React.SetStateAction<string[]>>;
-  expandedDetailsNodeNames: string[];
-  setExpandedDetailsNodeNames: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 interface ITreeSelectionState {
@@ -61,10 +60,7 @@ interface IGroupsContext {
   // Tree fields
   treeExpansion: ITreeExpansionState;
   treeSelection: ITreeSelectionState;
-  treeData: {
-    roots: TGroupTreeNode[];
-    byId: Map<string, TGroupTreeNode>;
-  };
+  treeData: TGroupTreeNode[];
 }
 
 const contextDefaultValue = {} as IGroupsContext;
@@ -75,37 +71,6 @@ export const GroupsContext =
 interface IGroupsProvider {
   isBulkSelectionEnabled?: boolean;
   children: React.ReactNode;
-}
-
-/**
- * Generates a simple tree structure for groups
- */
-export function buildGroupTree(items: TGroupDD[]) {
-  const byId = new Map<string, TGroupTreeNode>();
-  const roots: TGroupTreeNode[] = [];
-
-  // initialize nodes
-  for (const item of items) {
-    byId.set(item.id, { ...item, children: [] });
-  }
-
-  // wire up parent/child relationships
-  for (const node of byId.values()) {
-    if (!node.parent) {
-      roots.push(node);
-      continue;
-    }
-
-    const parent = byId.get(node.parent);
-    if (parent) {
-      parent.children.push(node);
-    } else {
-      // orphan: parent id not found -> treat as root.
-      roots.push(node);
-    }
-  }
-
-  return { roots, byId };
 }
 
 export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
@@ -136,6 +101,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     expandableVariant: "single",
   });
 
+  // State functionality
   const [expandedNodeNames, setExpandedNodeNamesInternal] = usePersistentState<
     string[],
     typeof TablePersistenceKeyPrefixes.groups,
@@ -153,19 +119,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
       expandedNodeNames ? expandedNodeNames.split(",") : [],
   });
 
-  const [expandedDetailsNodeNames, setExpandedDetailsNodeNamesInternal] =
-    usePersistentState<
-      string[],
-      typeof TablePersistenceKeyPrefixes.groups,
-      "expandedDetailsNodeNames"
-    >({
-      isEnabled: true,
-      defaultValue: [],
-      persistenceKeyPrefix: TablePersistenceKeyPrefixes.groups,
-      persistTo: "sessionStorage",
-      key: "expandedDetailsNodeNames",
-    });
-
   // Wrap setters to support functional updates
   const setExpandedNodeNames: React.Dispatch<React.SetStateAction<string[]>> =
     React.useCallback(
@@ -178,19 +131,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
       },
       [expandedNodeNames, setExpandedNodeNamesInternal],
     );
-
-  const setExpandedDetailsNodeNames: React.Dispatch<
-    React.SetStateAction<string[]>
-  > = React.useCallback(
-    (value) => {
-      if (typeof value === "function") {
-        setExpandedDetailsNodeNamesInternal(value(expandedDetailsNodeNames));
-      } else {
-        setExpandedDetailsNodeNamesInternal(value);
-      }
-    },
-    [expandedDetailsNodeNames, setExpandedDetailsNodeNamesInternal],
-  );
 
   // Tree selection state
   const [selectedNodeNames, setSelectedNodeNames] = React.useState<string[]>(
@@ -210,7 +150,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     }),
   );
 
-  const { roots, byId } = React.useMemo(() => {
+  const roots = React.useMemo(() => {
     return buildGroupTree(groups);
   }, [groups]);
 
@@ -256,14 +196,12 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
         treeExpansion: {
           expandedNodeNames,
           setExpandedNodeNames,
-          expandedDetailsNodeNames,
-          setExpandedDetailsNodeNames,
         },
         treeSelection: {
           selectedNodeNames,
           setSelectedNodeNames,
         },
-        treeData: { roots, byId },
+        treeData: roots,
       }}
     >
       {children}
