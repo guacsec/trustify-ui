@@ -37,7 +37,7 @@ BDD-specific validation rules for playwright-bdd tests (`.step.ts`) and Gherkin 
 
 **Used by:**
 - `.claude/agents/bdd-test-reviewer.md` - BDD test and feature file reviewer
-- `.claude/agents/e2e-test-generator.md` - BDD test generator
+- `.claude/agents/bdd-test-generator.md` - BDD test generator
 - `.github/chatmodes/playwright-tester.chatmode.md` - Test generator chatmode
 
 **Contents:**
@@ -172,7 +172,7 @@ When updating standards:
 1. Edit `bdd-standards.md` directly
 2. Changes automatically apply to:
    - `bdd-test-reviewer`
-   - `e2e-test-generator`
+   - `bdd-test-generator`
 3. Commit changes with clear description
 4. Update version number at bottom of file
 

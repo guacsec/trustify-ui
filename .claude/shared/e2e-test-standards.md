@@ -4,7 +4,7 @@ This document contains shared validation rules and code quality standards used a
 
 **Used by:**
 - `.claude/agents/e2e-test-reviewer.md`
-- `.claude/agents/e2e-test-generator.md`
+- `.claude/agents/bdd-test-generator.md`
 - `.github/chatmodes/playwright-reviewer.chatmode.md`
 - `.github/chatmodes/playwright-tester.chatmode.md`
 
