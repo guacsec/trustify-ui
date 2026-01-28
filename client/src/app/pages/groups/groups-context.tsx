@@ -3,10 +3,6 @@ import type { AxiosError } from "axios";
 import { FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
-  type BulkSelectionValues,
-  useBulkSelection,
-} from "@app/hooks/selection";
-import {
   getHubRequestParams,
   type ITableControls,
   useTableControlProps,
@@ -47,12 +43,6 @@ interface IGroupsContext {
     string
   >;
 
-  bulkSelection: {
-    isEnabled: boolean;
-    // TODO: Update once SBOM Group types are finalized...
-    controls: BulkSelectionValues<TGroupTreeNode>;
-  };
-
   totalItemCount: number;
   isFetching: boolean;
   fetchError: AxiosError | null;
@@ -69,12 +59,10 @@ export const GroupsContext =
   React.createContext<IGroupsContext>(contextDefaultValue);
 
 interface IGroupsProvider {
-  isBulkSelectionEnabled?: boolean;
   children: React.ReactNode;
 }
 
 export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
-  isBulkSelectionEnabled,
   children,
 }) => {
   const tableControlState = useTableControlState({
@@ -96,7 +84,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
         type: FilterType.search,
       },
     ],
-    isSelectionEnabled: isBulkSelectionEnabled,
     isExpansionEnabled: true,
     expandableVariant: "single",
   });
@@ -163,25 +150,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     hasActionsColumn: true,
   });
 
-  // Flatten the tree to get all nodes for bulk selection
-  const flattenedNodes = React.useMemo(() => {
-    const allNodes: TGroupTreeNode[] = [];
-    const flatten = (nodes: TGroupTreeNode[]) => {
-      for (const node of nodes) {
-        allNodes.push(node);
-        flatten(node.children);
-      }
-    };
-    flatten(roots);
-    return allNodes;
-  }, [roots]);
-
-  const bulkSelectionControls = useBulkSelection({
-    isEqual: (a, b) => a.id === b.id,
-    filteredItems: flattenedNodes,
-    currentPageItems: flattenedNodes,
-  });
-
   return (
     <GroupsContext.Provider
       value={{
@@ -189,10 +157,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
         isFetching,
         fetchError,
         totalItemCount,
-        bulkSelection: {
-          isEnabled: !!isBulkSelectionEnabled,
-          controls: bulkSelectionControls,
-        },
         treeExpansion: {
           expandedNodeNames,
           setExpandedNodeNames,

@@ -59,23 +59,17 @@ export const GroupsTable: React.FC = () => {
 
     const treeRow: TdProps["treeRow"] = {
       onCollapse: () => {
-        const otherExpandedNodeNames = expandedNodeNames.filter(
-          (name) => name !== node.name,
-        );
-        setExpandedNodeNames(
+        setExpandedNodeNames((prevNodes) =>
           isExpanded
-            ? otherExpandedNodeNames
-            : [...otherExpandedNodeNames, node.name],
+            ? prevNodes.filter((name) => name !== node.name)
+            : [...prevNodes, node.name],
         );
       },
       onCheckChange: (_event, isChecking) => {
-        setSelectedNodeNames((prevSelected) => {
-          const otherSelectedNodeNames = prevSelected.filter(
-            (name) => name !== node.name,
-          );
+        setSelectedNodeNames((prevNodes) => {
           return !isChecking
-            ? otherSelectedNodeNames
-            : [...otherSelectedNodeNames, node.name];
+            ? prevNodes.filter((name) => name !== node.name)
+            : [...prevNodes, node.name];
         });
       },
       rowIndex,
