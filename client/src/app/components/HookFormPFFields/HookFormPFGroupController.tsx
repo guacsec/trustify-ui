@@ -22,6 +22,14 @@ export interface BaseHookFormPFGroupControllerProps<
   TName extends Path<TFieldValues>,
 > {
   control: Control<TFieldValues>;
+  /**
+   * Extra props forwarded directly to react-hook-form's Controller
+   * (e.g. rules, defaultValue, shouldUnregister, disabled, etc.).
+   */
+  controllerProps?: Omit<
+    ControllerProps<TFieldValues, TName>,
+    "render" | "name" | "control"
+  >;
   label?: React.ReactNode;
   labelIcon?: React.ReactElement;
   name: TName;
@@ -45,6 +53,7 @@ export const HookFormPFGroupController = <
   TName extends Path<TFieldValues> = Path<TFieldValues>,
 >({
   control,
+  controllerProps,
   label,
   labelIcon,
   name,
@@ -59,6 +68,7 @@ export const HookFormPFGroupController = <
   <Controller<TFieldValues, TName>
     control={control}
     name={name}
+    {...controllerProps}
     render={({ field, fieldState, formState }) => {
       const { isDirty, isTouched, error } = fieldState;
       const shouldDisplayError =
@@ -107,6 +117,7 @@ export const extractGroupControllerProps = <
 } => {
   const {
     control,
+    controllerProps,
     label,
     labelIcon,
     name,
@@ -121,6 +132,7 @@ export const extractGroupControllerProps = <
   return {
     extractedProps: {
       control,
+      controllerProps,
       labelIcon,
       label,
       name,
