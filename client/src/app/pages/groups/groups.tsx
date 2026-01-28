@@ -19,7 +19,7 @@ export const Groups: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <GroupsProvider isBulkSelectionEnabled>
+          <GroupsProvider>
             <GroupsToolbar />
             <GroupsTable />
           </GroupsProvider>
