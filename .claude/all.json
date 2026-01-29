@@ -1,0 +1,62 @@
+{
+  "session_id": "fb6ebd42-492e-47cf-8cf7-4e918894fa68",
+  "transcript_path": "/home/cferiavi/.claude/projects/-home-cferiavi-git-trustification-trustify-ui/fb6ebd42-492e-47cf-8cf7-4e918894fa68.jsonl",
+  "cwd": "/home/cferiavi/git/trustification/trustify-ui",
+  "permission_mode": "default",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "/home/cferiavi/git/trustification/trustify-ui/e2e/tests/ui/pages/advisory-list/columns.spec.ts",
+    "old_string": "  test(\"Columns\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    // Full search\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    // ID\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n\n    // Title\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n\n    // Type\n    await expect(table).toHaveColumnWithValue(\"Type\", \"cve\");\n\n    // Labels\n    await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");\n  });\n});",
+    "new_string": "  test(\"Columns\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    // Full search\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    // ID\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n\n    // Title\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n\n    // Type\n    await expect(table).toHaveColumnWithValue(\"Type\", \"cve\");\n\n    // Labels\n    await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");\n  });\n\n  test(\"Verify ID column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n  });\n\n  test(\"Verify Title column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n  });\n});",
+    "replace_all": false
+  },
+  "tool_response": {
+    "filePath": "/home/cferiavi/git/trustification/trustify-ui/e2e/tests/ui/pages/advisory-list/columns.spec.ts",
+    "oldString": "  test(\"Columns\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    // Full search\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    // ID\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n\n    // Title\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n\n    // Type\n    await expect(table).toHaveColumnWithValue(\"Type\", \"cve\");\n\n    // Labels\n    await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");\n  });\n});",
+    "newString": "  test(\"Columns\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    // Full search\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    // ID\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n\n    // Title\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n\n    // Type\n    await expect(table).toHaveColumnWithValue(\"Type\", \"cve\");\n\n    // Labels\n    await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");\n  });\n\n  test(\"Verify ID column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n  });\n\n  test(\"Verify Title column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n  });\n});",
+    "originalFile": "// @ts-check\n\nimport { expect } from \"../../assertions\";\nimport { test } from \"../../fixtures\";\nimport { login } from \"../../helpers/Auth\";\nimport { AdvisoryListPage } from \"./AdvisoryListPage\";\n\ntest.describe(\"Columns validations\", { tag: \"@tier1\" }, () => {\n  test.beforeEach(async ({ page }) => {\n    await login(page);\n  });\n\n  test(\"Columns\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    // Full search\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    // ID\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n\n    // Title\n    await expect(table).toHaveColumnWithValue(\n      \"Title\",\n      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",\n    );\n\n    // Type\n    await expect(table).toHaveColumnWithValue(\"Type\", \"cve\");\n\n    // Labels\n    await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");\n  });\n});\n",
+    "structuredPatch": [
+      {
+        "oldStart": 34,
+        "oldLines": 4,
+        "newStart": 34,
+        "newLines": 29,
+        "lines": [
+          "     // Labels",
+          "     await expect(table).toHaveColumnWithValue(\"Labels\", \"type=cve\");",
+          "   });",
+          "+",
+          "+  test(\"Verify ID column value after filtering\", async ({ page }) => {",
+          "+    const listPage = await AdvisoryListPage.build(page);",
+          "+",
+          "+    const toolbar = await listPage.getToolbar();",
+          "+    const table = await listPage.getTable();",
+          "+",
+          "+    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });",
+          "+",
+          "+    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");",
+          "+  });",
+          "+",
+          "+  test(\"Verify Title column value after filtering\", async ({ page }) => {",
+          "+    const listPage = await AdvisoryListPage.build(page);",
+          "+",
+          "+    const toolbar = await listPage.getToolbar();",
+          "+    const table = await listPage.getTable();",
+          "+",
+          "+    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });",
+          "+",
+          "+    await expect(table).toHaveColumnWithValue(",
+          "+      \"Title\",",
+          "+      \"Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file\",",
+          "+    );",
+          "+  });",
+          " });"
+        ]
+      }
+    ],
+    "userModified": false,
+    "replaceAll": false
+  },
+  "tool_use_id": "toolu_vrtx_01U1CJsBy4FRRqU8wH7PzAFX"
+}

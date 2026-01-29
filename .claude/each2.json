@@ -1,0 +1,20 @@
+{
+  "session_id": "fb6ebd42-492e-47cf-8cf7-4e918894fa68",
+  "transcript_path": "/home/cferiavi/.claude/projects/-home-cferiavi-git-trustification-trustify-ui/fb6ebd42-492e-47cf-8cf7-4e918894fa68.jsonl",
+  "cwd": "/home/cferiavi/git/trustification/trustify-ui",
+  "permission_mode": "default",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/home/cferiavi/git/trustification/trustify-ui/e2e/tests/ui/pages/advisory-list/columns-id.spec.ts",
+    "content": "// @ts-check\n\nimport { expect } from \"../../assertions\";\nimport { test } from \"../../fixtures\";\nimport { login } from \"../../helpers/Auth\";\nimport { AdvisoryListPage } from \"./AdvisoryListPage\";\n\ntest.describe(\"ID column validation\", { tag: \"@tier1\" }, () => {\n  test.beforeEach(async ({ page }) => {\n    await login(page);\n  });\n\n  test(\"Verify ID column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n  });\n});\n"
+  },
+  "tool_response": {
+    "type": "create",
+    "filePath": "/home/cferiavi/git/trustification/trustify-ui/e2e/tests/ui/pages/advisory-list/columns-id.spec.ts",
+    "content": "// @ts-check\n\nimport { expect } from \"../../assertions\";\nimport { test } from \"../../fixtures\";\nimport { login } from \"../../helpers/Auth\";\nimport { AdvisoryListPage } from \"./AdvisoryListPage\";\n\ntest.describe(\"ID column validation\", { tag: \"@tier1\" }, () => {\n  test.beforeEach(async ({ page }) => {\n    await login(page);\n  });\n\n  test(\"Verify ID column value after filtering\", async ({ page }) => {\n    const listPage = await AdvisoryListPage.build(page);\n\n    const toolbar = await listPage.getToolbar();\n    const table = await listPage.getTable();\n\n    await toolbar.applyFilter({ \"Filter text\": \"CVE-2024-26308\" });\n\n    await expect(table).toHaveColumnWithValue(\"ID\", \"CVE-2024-26308\");\n  });\n});\n",
+    "structuredPatch": [],
+    "originalFile": null
+  },
+  "tool_use_id": "toolu_vrtx_01JFUw5sWwGsu7eYYZkAKpRp"
+}
