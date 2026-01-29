@@ -8,12 +8,12 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
+import { useSelectionState } from "@app/hooks/useSelectionState";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
 import { usePersistentState } from "@app/hooks/usePersistentState";
 import type { TGroupDD } from "@app/queries/groups";
 import { useFetchGroups } from "@app/queries/groups";
 import { buildGroupTree } from "./utils";
-
 export type TGroupTreeNode = TGroupDD & {
   children: TGroupTreeNode[];
 };
@@ -24,8 +24,12 @@ interface ITreeExpansionState {
 }
 
 interface ITreeSelectionState {
-  selectedNodeNames: string[];
-  setSelectedNodeNames: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedNodes: TGroupDD[];
+  isNodeSelected(node: TGroupTreeNode): boolean;
+  areAllSelected: boolean;
+  selectNodes: (nodes: TGroupTreeNode[], isSelected: boolean) => void;
+  selectOnlyNodes: (nodes: TGroupTreeNode[]) => void;
+  selectAllNodes: (isSelected: boolean) => void;
 }
 
 interface IGroupsContext {
@@ -119,11 +123,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
       [expandedNodeNames, setExpandedNodeNamesInternal],
     );
 
-  // Tree selection state
-  const [selectedNodeNames, setSelectedNodeNames] = React.useState<string[]>(
-    [],
-  );
-
   const {
     result: { data: groups, total: totalItemCount },
     isFetching,
@@ -140,6 +139,18 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
   const roots = React.useMemo(() => {
     return buildGroupTree(groups);
   }, [groups]);
+
+  const {
+    selectedItems: selectedNodes,
+    isItemSelected: isNodeSelected,
+    areAllSelected,
+    selectItems: selectNodes,
+    selectOnly: selectOnlyNodes,
+    selectAll: selectAllNodes,
+  } = useSelectionState({
+    items: groups, // Flat tree is passed so all nodes can be used
+    isEqual: (a, b) => a.id === b.id, // Use ID for equality
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -162,8 +173,12 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
           setExpandedNodeNames,
         },
         treeSelection: {
-          selectedNodeNames,
-          setSelectedNodeNames,
+          selectedNodes,
+          isNodeSelected,
+          areAllSelected,
+          selectNodes,
+          selectOnlyNodes,
+          selectAllNodes,
         },
         treeData: roots,
       }}
