@@ -4,16 +4,16 @@ type Props = {
 };
 
 type FormattedLabel = {
-  format: string;
+  text: string;
   color: "purple" | "blue";
 };
 
 function formatLabel(key: string, value: string | null): FormattedLabel {
-  const format = value ? `${key}: ${value}` : `${key}`;
+  const text = value ? `${key}: ${value}` : `${key}`;
   const color = key === "Product" ? "purple" : "blue";
-  return { color, format };
+  return { color, text };
 }
-// TODO: Change color based on label type
+
 export const GroupLabels = ({ labels }: Props) => {
   if (!labels || Object.keys(labels).length === 0) {
     return null;
@@ -22,10 +22,10 @@ export const GroupLabels = ({ labels }: Props) => {
   return (
     <LabelGroup>
       {Object.entries(labels).map(([key, value]) => {
-        const { color, format } = formatLabel(key, value);
+        const { color, text } = formatLabel(key, value);
         return (
           <Label key={key} color={`${color}`}>
-            {format}
+            {text}
           </Label>
         );
       })}
