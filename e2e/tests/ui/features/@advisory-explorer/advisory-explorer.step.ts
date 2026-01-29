@@ -6,7 +6,6 @@ import { expect } from "../../assertions";
 
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
-import { DetailsPage } from "../../helpers/DetailsPage";
 
 import { AdvisoryDetailsPage } from "../../pages/advisory-details/AdvisoryDetailsPage";
 import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
@@ -175,16 +174,6 @@ When(
     const table = await listPage.getTable();
     const rowToDelete = 0;
     await table.clickAction("Delete", rowToDelete);
-  },
-);
-
-When(
-<<<<<<< HEAD
-=======
-  "User Clicks on Actions button and Selects Delete option from the drop down",
-  async ({ page }) => {
-    const details = new DetailsPage(page);
-    await details.clickOnPageAction("Delete");
   },
 );
 

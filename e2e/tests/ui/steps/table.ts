@@ -1,7 +1,8 @@
 import { createBdd } from "playwright-bdd";
-import { ToolbarTable } from "../helpers/ToolbarTable";
 
 import { test } from "../fixtures";
+
+import { ToolbarTable } from "../helpers/ToolbarTable";
 
 export const { Given, When, Then } = createBdd(test);
 

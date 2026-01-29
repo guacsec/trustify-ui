@@ -1,16 +1,15 @@
 import { createBdd } from "playwright-bdd";
 
 import { test } from "../../fixtures";
-import { DetailsPage } from "../../helpers/DetailsPage";
-import { ToolbarTable } from "../../helpers/ToolbarTable";
+
 import { expect } from "../../assertions";
+
+import { DetailsPage } from "../../helpers/DetailsPage";
 
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { LabelsModal } from "../../pages/LabelsModal";
 
 export const { Given, When, Then } = createBdd(test);
-
-const SBOM_TABLE_NAME = "sbom-table";
 
 Given(
   "An ingested SBOM {string} containing Vulnerabilities",
@@ -31,7 +30,7 @@ Given(
 When(
   "User Adds Labels {string} to {string} SBOM from List Page",
   async ({ page }, labelList, sbomName) => {
-    const listPage = await SbomListPage.fromCurrentPage(page);
+    const listPage = await SbomListPage.build(page);
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 

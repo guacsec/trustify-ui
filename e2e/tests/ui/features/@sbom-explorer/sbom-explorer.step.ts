@@ -177,10 +177,10 @@ When(
 );
 
 Then(
-  "The Label list {string} is visible on the Explorer Page for SBOM {string}",
+  "The Label list {string} added to the SBOM {string} on Explorer Page",
   async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
-    await detailsPage.selectTab(`Info`);
+    await detailsPage.selectTab("Info");
     const infoSection = page.locator("#info-tab-section");
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
@@ -189,14 +189,6 @@ Then(
           (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName, infoSection);
-  },
-);
-
-When(
-  "User Clicks on Actions button and Selects Delete option from the drop down",
-  async ({ page }) => {
-    const details = new DetailsPage(page);
-    await details.clickOnPageAction("Delete");
   },
 );
 
@@ -224,9 +216,8 @@ When(
 );
 
 Then("Application Navigates to SBOM list page", async ({ page }) => {
-  await expect(
-    page.getByRole("heading", { level: 1, name: "SBOMs" }),
-  ).toBeVisible();
+  const heading = page.getByRole("heading", { level: 1, name: "SBOMs" });
+  await expect(heading).toBeVisible();
 });
 
 Then(
@@ -262,9 +253,11 @@ Given(
 When(
   "User clicks on the vulnerability row with ID {string}",
   async ({ page }, vulnerabilityID: string) => {
-    await page
-      .getByRole("link", { name: vulnerabilityID, exact: true })
-      .click();
+    const vulnerabilityLink = page.getByRole("link", {
+      name: vulnerabilityID,
+      exact: true,
+    });
+    await vulnerabilityLink.click();
   },
 );
 
@@ -314,9 +307,12 @@ Given(
 When(
   "User clicks on Affected dependencies count button of the {string}",
   async ({ page }, vulnerabilityID: string) => {
-    const vulnerabilityRow = page.locator(
-      `table[aria-label="Vulnerability table"] tbody:has(a:text-is("${vulnerabilityID}"))`,
+    const vulnerabilityTable = page.locator(
+      `table[aria-label="Vulnerability table"]`,
     );
+    const vulnerabilityRow = vulnerabilityTable.locator("tbody").filter({
+      has: page.getByRole("link", { name: vulnerabilityID, exact: true }),
+    });
     const affectedDepsButton = vulnerabilityRow
       .first()
       .locator('td[data-label="Affected dependencies"] button');
@@ -327,8 +323,11 @@ When(
 When(
   "User clicks on the package name {string} link on the expanded table",
   async ({ page }, packageName: string) => {
-    const innerTable = page.locator(
-      'table[aria-label="Vulnerability table"] td[data-label="Affected dependencies"] table',
+    const vulnerabilityTable = page.locator(
+      'table[aria-label="Vulnerability table"]',
+    );
+    const innerTable = vulnerabilityTable.locator(
+      'td[data-label="Affected dependencies"] table',
     );
     const packageLink = innerTable.getByRole("link", {
       name: packageName,
