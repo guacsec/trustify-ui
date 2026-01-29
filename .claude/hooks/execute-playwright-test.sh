@@ -162,7 +162,7 @@ get_test_command() {
 
     case "$tool_name" in
         Write)
-            echo "npx playwright test $file_path"
+            echo "npm run e2e:test:ui -- $file_path"
             ;;
         Edit)
             case "$test_type" in
@@ -175,9 +175,9 @@ get_test_command() {
                     grep_pattern=$(build_grep_pattern "$test_names")
 
                     if [[ -n "$grep_pattern" ]]; then
-                        echo "npx playwright test $file_path --grep \"$grep_pattern\""
+                        echo "npm run e2e:test:ui -- $file_path --grep \"$grep_pattern\""
                     else
-                        echo "npx playwright test $file_path"
+                        echo "npm run e2e:test:ui -- $file_path"
                     fi
                     ;;
                 api)
@@ -260,6 +260,12 @@ EOF
 # ============================================================================
 
 main() {
+    # Exit gracefully if no input is piped (stdin is a terminal)
+    if [ -t 0 ]; then
+        log_debug "No input provided, exiting"
+        exit 0
+    fi
+
     local input
     input=$(cat)
 
@@ -301,7 +307,6 @@ main() {
     # Get tracking file
     local tracking_file
     tracking_file=$(get_tracking_file "$session_id")
-
     # Check if already tested
     if is_already_tested "$abs_file_path" "$tracking_file"; then
         log_debug "File already tested in this session, skipping"
@@ -329,7 +334,7 @@ main() {
     local test_output
     local exit_code
 
-    if test_output=$(run_tests "$file_path" "PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ $test_command"); then
+    if test_output=$(run_tests "$file_path" "PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ SKIP_INGESTION=true $test_command --workers 2"); then
         exit_code=0
     else
         exit_code=$?
