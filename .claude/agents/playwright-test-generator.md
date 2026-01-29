@@ -24,5 +24,4 @@ skills:
 
 ## Verify results
 
-- If the hook ``
 - Short summary of coverage and potential gaps.
