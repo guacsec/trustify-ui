@@ -43,7 +43,7 @@ Input: Scenario Name
 
 ### Phase 1: Initialization
 
-1. **Validate Input**: Ensure scenario name is provided in format "Scenario Outline: scenario name"
+1. **Validate Input**: Ensure scenario name is provided in format "Scenario Outline: scenario name" or a feature file contanining scenarios with prefix "Scenario" or "Scenario Outline". In case of feature files, iterate over scenarios one by one.
 2. **Set Iteration Counter**: Initialize iteration = 1, max_iterations = 3
 3. **Prepare Context**: Set up working directory and environment
 

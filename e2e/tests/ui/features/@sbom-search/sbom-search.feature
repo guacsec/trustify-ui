@@ -10,10 +10,11 @@ Feature: SBOM Search Page
             | sbomName    |
             | quarkus-bom |
 
-     Scenario Outline: Add Labels to SBOM from SBOM List Page
+    Scenario Outline: Add Labels to SBOM from SBOM List Page
         Given An ingested SBOM "<sbomName>" is available
         When User Adds Labels "<Labels>" to "<sbomName>" SBOM from List Page
         Then The Label list "<Labels>" added to the SBOM "<sbomName>" on List Page
+
         Examples:
-        | sbomName    |     Labels    |
-        | quarkus-bom | RANDOM_LABELS |
+            | sbomName    | Labels        |
+            | quarkus-bom | RANDOM_LABELS |
