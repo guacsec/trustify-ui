@@ -23,7 +23,7 @@ export const GroupsTable: React.FC = () => {
     totalItemCount,
     tableControls,
     treeExpansion: { expandedNodeNames, setExpandedNodeNames },
-    treeSelection: { selectedNodeNames, setSelectedNodeNames },
+    treeSelection: { isNodeSelected, selectNodes },
     treeData,
   } = React.useContext(GroupsContext);
 
@@ -31,9 +31,6 @@ export const GroupsTable: React.FC = () => {
     numRenderedColumns,
     propHelpers: { paginationProps, tableProps },
   } = tableControls;
-
-  const isNodeChecked = (node: TGroupTreeNode) =>
-    selectedNodeNames.includes(node.name);
 
   /**
     Recursive function which flattens the data into an array of flattened TreeRowWrapper components
@@ -55,7 +52,6 @@ export const GroupsTable: React.FC = () => {
       return [];
     }
     const isExpanded = expandedNodeNames.includes(node.name);
-    const isChecked = isNodeChecked(node);
 
     const treeRow: TdProps["treeRow"] = {
       onCollapse: () => {
@@ -66,11 +62,7 @@ export const GroupsTable: React.FC = () => {
         );
       },
       onCheckChange: (_event, isChecking) => {
-        setSelectedNodeNames((prevNodes) => {
-          return !isChecking
-            ? prevNodes.filter((name) => name !== node.name)
-            : [...prevNodes, node.name];
-        });
+        selectNodes([node], isChecking);
       },
       rowIndex,
       props: {
@@ -79,7 +71,7 @@ export const GroupsTable: React.FC = () => {
         "aria-level": level,
         "aria-posinset": posinset,
         "aria-setsize": node.children ? node.children.length : 0,
-        isChecked,
+        isChecked: isNodeSelected(node),
         checkboxId: `checkbox_id_${node.name.toLowerCase().replace(/\s+/g, "_")}`,
       },
     };
