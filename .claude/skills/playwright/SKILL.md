@@ -2,7 +2,7 @@
 name: playwright
 description: Playwright code
 argument-hint: [ message ]
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Playwright

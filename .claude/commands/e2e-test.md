@@ -1,36 +1,29 @@
 ---
-description: Create E2E test in e2e/tests/ui
-argument-hint: Test summary
+name: e2e-test
+description: Generates Playwright E2E tests
+argument-hint: [ message ]
 ---
 
-## Context
+# E2E Test
 
-Parse $ARGUMENTS to get the following values:
+Generate Playwright tests for given requirement defined by $ARGUMENTS
 
-- [summary]: Test summary from $ARGUMENTS
+## Phase 1: Gather context
 
-## Task
+- Explore `client/src/app/` to gather information of the code that generates the
+  page we want to test
+  - Make a list of relevant files and write them at /home/cferiavi/git/trustification/trustify-ui/.claude/explore1.txt
+- Explore `e2e/tests/ui/` to gather common patterns
+  - Make a list of relevant files and write them at /home/cferiavi/git/trustification/trustify-ui/.claude/explore2.txt
+- Spawn a `playwright-test-planner` sub-agent to gather information
+  - Make a list of relevant findings at /home/cferiavi/git/trustification/trustify-ui/.claude/explore3.txt
 
-Create E2E Playwright tests based on [summary] and following these guidelines:
+## Phase 2: Take action
 
-- Tests are written under `e2e/tests/ui`
+- Spawn a `playwright-test-generator` sub-agent to write the tests
 
-## Review the work
+## Phase 3: Verify results
 
-- **Invoke the e2e-test-reviewer subagent** to review your work and implement
-  suggestions where needed
-- Iterate on the review process when needed
-
-## Execute the work
-
-- Execute the generated tests using the command below:
-
-```bash
-# Run a single e2e test file (ALWAYS use this format)
-SKIP_INGESTION=true TRUSTIFY_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ npm run e2e:test -- path/to/test.test.ts --workers=2 --trace on
-```
-
-- Iterate to make the tests pass successfully when needed
-  - Limit to 2-3 iterations maximum. Let the developer do the refinement manually
-    when needed. Always suggest possible polishing actions so the human can take
-    action
+- Spawn a `playwright-test-healer` sub-agent to fix failing tests
+- Short summary of coverage and potential gaps.
+- **Finish with a funny joke** to lighten the mood
