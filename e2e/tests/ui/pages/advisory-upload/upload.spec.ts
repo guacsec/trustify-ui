@@ -10,6 +10,22 @@ import {
 } from "../common/upload-test-helpers";
 import { AdvisoryUploadPage } from "./AdvisoryUploadPage";
 
+const TEST_FILES = {
+  CVE_2022_45787: path.join(
+    __dirname,
+    "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
+  ),
+  CVE_2023_0044: path.join(
+    __dirname,
+    "../../../common/dataset/advisory/csaf/cve-2023-0044.json.bz2",
+  ),
+  INVALID_JSON: path.join(
+    __dirname,
+    "../../../common/assets/invalid-file.json",
+  ),
+  INVALID_TXT: path.join(__dirname, "../../../common/assets/invalid-file.txt"),
+};
+
 test.describe("File Upload", { tag: ["@upload"] }, () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
@@ -18,10 +34,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("CSAF file (.bz2)", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2022_45787,
         status: "success",
       },
     ],
@@ -35,7 +48,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("Invalid file", {
     files: [
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
@@ -49,17 +62,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("additional files after initial completes", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2022_45787,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2023-0044.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2023_0044,
         status: "success",
       },
     ],
@@ -73,17 +80,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesParallel("multiple files simultaneously", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2022_45787,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2023-0044.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2023_0044,
         status: "success",
       },
     ],
@@ -97,21 +98,15 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesParallel("mix of success and failed uploads", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2022_45787,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2023-0044.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2023_0044,
         status: "success",
       },
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
@@ -125,21 +120,15 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testRemoveFiles({
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2022-45787.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2022_45787,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/advisory/csaf/cve-2023-0044.json.bz2",
-        ),
+        path: TEST_FILES.CVE_2023_0044,
         status: "success",
       },
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
@@ -151,9 +140,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   });
 
   testInvalidFileExtensions({
-    filesPaths: [
-      path.join(__dirname, "../../../common/assets/invalid-file.txt"),
-    ],
+    filesPaths: [TEST_FILES.INVALID_TXT],
     getConfig: async ({ page }) => {
       const uploadPage = await AdvisoryUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();

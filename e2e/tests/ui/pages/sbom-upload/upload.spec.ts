@@ -10,18 +10,31 @@ import {
 } from "../common/upload-test-helpers";
 import { SBOMUploadPage } from "./SBOMUploadPage";
 
+const TEST_FILES = {
+  QUARKUS_BOM: path.join(
+    __dirname,
+    "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
+  ),
+  UBI9_MINIMAL: path.join(
+    __dirname,
+    "../../../common/dataset/sbom/ubi9-minimal-9.3-1361.json.bz2",
+  ),
+  INVALID_JSON: path.join(
+    __dirname,
+    "../../../common/assets/invalid-file.json",
+  ),
+  INVALID_TXT: path.join(__dirname, "../../../common/assets/invalid-file.txt"),
+};
+
 test.describe("File Upload", { tag: ["@upload"] }, () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
 
-  testUploadFilesSequentially("CSAF file (.bz2)", {
+  testUploadFilesSequentially("SBOM file (.bz2)", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
-        ),
+        path: TEST_FILES.QUARKUS_BOM,
         status: "success",
       },
     ],
@@ -35,7 +48,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("Invalid file", {
     files: [
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_TXT,
         status: "danger",
       },
     ],
@@ -49,17 +62,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("additional files after initial completes", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
-        ),
+        path: TEST_FILES.QUARKUS_BOM,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/ubi9-minimal-9.3-1361.json.bz2",
-        ),
+        path: TEST_FILES.UBI9_MINIMAL,
         status: "success",
       },
     ],
@@ -73,17 +80,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesParallel("multiple files simultaneously", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
-        ),
+        path: TEST_FILES.QUARKUS_BOM,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/ubi9-minimal-9.3-1361.json.bz2",
-        ),
+        path: TEST_FILES.UBI9_MINIMAL,
         status: "success",
       },
     ],
@@ -97,21 +98,15 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesParallel("mix of success and failed uploads", {
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
-        ),
+        path: TEST_FILES.QUARKUS_BOM,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/ubi9-minimal-9.3-1361.json.bz2",
-        ),
+        path: TEST_FILES.UBI9_MINIMAL,
         status: "success",
       },
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
@@ -125,21 +120,15 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testRemoveFiles({
     files: [
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/quarkus-bom-2.13.8.Final-redhat-00004.json.bz2",
-        ),
+        path: TEST_FILES.QUARKUS_BOM,
         status: "success",
       },
       {
-        path: path.join(
-          __dirname,
-          "../../../common/dataset/sbom/ubi9-minimal-9.3-1361.json.bz2",
-        ),
+        path: TEST_FILES.UBI9_MINIMAL,
         status: "success",
       },
       {
-        path: path.join(__dirname, "../../../common/assets/invalid-file.json"),
+        path: TEST_FILES.INVALID_TXT,
         status: "danger",
       },
     ],
@@ -151,9 +140,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   });
 
   testInvalidFileExtensions({
-    filesPaths: [
-      path.join(__dirname, "../../../common/assets/invalid-file.txt"),
-    ],
+    filesPaths: [TEST_FILES.INVALID_TXT],
     getConfig: async ({ page }) => {
       const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();
