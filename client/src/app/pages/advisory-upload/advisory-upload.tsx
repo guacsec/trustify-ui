@@ -37,6 +37,7 @@ export const AdvisoryUpload: React.FC = () => {
       </PageSection>
       <PageSection>
         <UploadFiles
+          fileUploadProps={{ "aria-label": "advisory-uploader" }}
           uploads={uploads}
           handleUpload={handleUpload}
           handleRemoveUpload={handleRemoveUpload}
