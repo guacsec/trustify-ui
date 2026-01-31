@@ -48,7 +48,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadFilesSequentially("Invalid file", {
     files: [
       {
-        path: TEST_FILES.INVALID_TXT,
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
@@ -128,7 +128,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
         status: "success",
       },
       {
-        path: TEST_FILES.INVALID_TXT,
+        path: TEST_FILES.INVALID_JSON,
         status: "danger",
       },
     ],
