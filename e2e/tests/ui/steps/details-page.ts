@@ -1,8 +1,12 @@
 import { createBdd } from "playwright-bdd";
-import { DetailsPage } from "../helpers/DetailsPage";
-import { expect } from "@playwright/test";
 
-export const { Given, When, Then } = createBdd();
+import { test } from "../fixtures";
+
+import { expect } from "../assertions";
+
+import { DetailsPage } from "../helpers/DetailsPage";
+
+export const { Given, When, Then } = createBdd(test);
 
 Then("The page title is {string}", async ({ page }, title) => {
   const pageWithTabs = new DetailsPage(page);
@@ -68,3 +72,11 @@ When("User clicks the {string} button", async ({ page }, buttonName) => {
   const detailsPage = new DetailsPage(page);
   await detailsPage.clickOnPageButton(buttonName);
 });
+
+When(
+  "User Clicks on Actions button and Selects Delete option from the drop down",
+  async ({ page }) => {
+    const detailsPage = new DetailsPage(page);
+    await detailsPage.clickOnPageAction("Delete");
+  },
+);

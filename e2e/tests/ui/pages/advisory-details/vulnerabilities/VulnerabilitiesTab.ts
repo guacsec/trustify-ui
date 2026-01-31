@@ -46,14 +46,7 @@ export class VulnerabilitiesTab {
     return await Table.build(
       this._page,
       "vulnerability table",
-      {
-        ID: { isSortable: true },
-        Title: { isSortable: false },
-        Discovery: { isSortable: false },
-        Release: { isSortable: false },
-        Score: { isSortable: false },
-        CWE: { isSortable: false },
-      },
+      ["ID", "Title", "Discovery", "Release", "Score", "CWE"],
       [],
     );
   }

@@ -1,11 +1,14 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
 
 import { test } from "../../fixtures";
+
+import { expect } from "../../assertions";
+
+import { ToolbarTable } from "../../helpers/ToolbarTable";
+
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { SbomScanPage } from "../../pages/sbom-scan/SbomScanPage";
 import { Table } from "../../pages/Table";
-import { ToolbarTable } from "../../helpers/ToolbarTable";
 import {
   clickAndVerifyDownload,
   verifyChildElementsText,
@@ -27,11 +30,10 @@ Then(
   "The Application should navigate to Generate Vulnerability Report screen",
   async ({ page }) => {
     await expect(page).toHaveURL(/\/sboms\/scan$/);
-    await expect(
-      page.locator(
-        `xpath=//h1[contains(text(),'Generate vulnerability report')]`,
-      ),
-    ).toBeVisible();
+    const scanPage = await SbomScanPage.build(page);
+    await expect(scanPage.heading).toContainText(
+      "Generate vulnerability report",
+    );
   },
 );
 
@@ -39,9 +41,8 @@ Then(
   "The Page should contain Browse files option and instruction to Drag and drop files",
   async ({ page }) => {
     // From UploadFileForAnalysis.tsx browseButtonText="Browse Files" and titleText="Drag and drop files here"
-    await expect(
-      page.getByRole("button", { name: "Browse Files" }),
-    ).toBeVisible();
+    const scanPage = await SbomScanPage.build(page);
+    await expect(scanPage.browseFilesButton).toBeVisible();
     await expect(page.getByText("Drag and drop files here")).toBeVisible();
   },
 );
@@ -58,7 +59,8 @@ Given(
 );
 
 When("User Clicks on Browse files Button", async ({ page }) => {
-  await page.getByRole("button", { name: "Browse Files" }).click();
+  const scanPage = await SbomScanPage.build(page);
+  await scanPage.browseFilesButton.click();
 });
 
 When(
@@ -105,20 +107,23 @@ Then(
     const table = await Table.build(
       page,
       "Vulnerability table",
-      {
-        "Vulnerability ID": { isSortable: true },
-        Description: { isSortable: false },
-        Severity: { isSortable: true },
-        Status: { isSortable: false },
-        "Affected packages": { isSortable: true },
-        Published: { isSortable: true },
-        Updated: { isSortable: true },
-      },
+      [
+        "Vulnerability ID",
+        "Description",
+        "Severity",
+        "Status",
+        "Affected packages",
+        "Published",
+        "Updated",
+      ],
       [],
     );
     const tooltipButton = table.getColumnTooltipButton(column, tooltipMessage);
     await tooltipButton.hover();
-    await page.waitForTimeout(500);
+    // Wait for the specific tooltip with expected message to become visible
+    await expect(
+      page.getByRole("tooltip", { name: tooltipMessage }),
+    ).toBeVisible();
   },
 );
 
@@ -164,11 +169,10 @@ Then(
   "Application navigates to Generate Vulnerability Report screen",
   async ({ page }) => {
     await expect(page).toHaveURL(/\/sboms\/scan$/);
-    await expect(
-      page.locator(
-        `xpath=//h1[contains(text(),'Generate vulnerability report')]`,
-      ),
-    ).toBeVisible();
+    const scanPage = await SbomScanPage.build(page);
+    await expect(scanPage.heading).toContainText(
+      "Generate vulnerability report",
+    );
   },
 );
 
@@ -224,11 +228,11 @@ Then(
     }
 
     // Verify each expected ID is present at least once
-    for (const id of expectedIds) {
-      await expect
-        .soft(collectedIds, `Missing expected id: ${id}`)
-        .toContain(id);
-    }
+    const missingIds = expectedIds.filter((id) => !collectedIds.includes(id));
+    expect(
+      missingIds.length,
+      `Missing expected IDs: ${missingIds.join(", ")}. Found: ${collectedIds.join(", ")}`,
+    ).toBe(0);
   },
 );
 
@@ -327,11 +331,9 @@ When(
 );
 
 Then("Affected Package table should expand", async ({ page }) => {
-  // Wait for the expanded content to appear
-  await page.waitForTimeout(500);
   // Look for the nested grid with column headers Type, Namespace, etc.
-  // The expanded table has columnheader elements
-  const typeHeader = page.locator('role=columnheader[name="Type"]');
+  // The expanded table has columnheader elements - Playwright auto-waits for visibility
+  const typeHeader = page.getByRole("columnheader", { name: "Type" });
   await expect(typeHeader).toBeVisible();
 });
 
@@ -414,10 +416,8 @@ Then(
 Then(
   "A modal window should open with {string} message",
   async ({ page }, message: string) => {
-    // Wait for modal dialog to appear
-    await page.waitForTimeout(500);
-    // Check for modal with the message
-    const modal = page.locator('[role="dialog"]');
+    // Check for modal with the message - Playwright auto-waits for visibility
+    const modal = page.getByRole("dialog");
     await expect(modal).toBeVisible();
     await expect(modal.getByText(message)).toBeVisible();
   },
@@ -426,8 +426,7 @@ Then(
 When(
   "User Clicks on {string} button from the modal window",
   async ({ page }, buttonName: string) => {
-    const modal = page.locator('[role="dialog"]');
-    // Just click for non-download actions
+    const modal = page.getByRole("dialog");
     await modal.getByRole("button", { name: buttonName }).click();
   },
 );
@@ -435,13 +434,13 @@ When(
 When(
   "User Downloads CSV with default filename {string} and Leaves by clicking on {string} button from the modal window",
   async ({ page }, fileName: string, buttonName: string) => {
-    const modal = page.locator('[role="dialog"]');
+    const modal = page.getByRole("dialog");
     // Use the reusable helper for click + download verification
     const downloadedFileName = await clickAndVerifyDownload(page, () =>
       modal.getByRole("button", { name: buttonName }).click(),
     );
-    await expect(downloadedFileName).toContain(fileName);
-    await expect(downloadedFileName.endsWith(".csv")).toBeTruthy();
+    expect(downloadedFileName).toContain(fileName);
+    expect(downloadedFileName.endsWith(".csv")).toBeTruthy();
   },
 );
 

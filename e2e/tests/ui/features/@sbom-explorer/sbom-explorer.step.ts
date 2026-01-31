@@ -1,7 +1,12 @@
 import { createBdd } from "playwright-bdd";
 
+import { test } from "../../fixtures";
+
+import { expect } from "../../assertions";
+
 import { DetailsPage } from "../../helpers/DetailsPage";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
+
 import { VulnerabilitiesTab } from "../../pages/sbom-details/vulnerabilities/VulnerabilitiesTab";
 import { VulnerabilityDetailsPage } from "../../pages/vulnerability-details/VulnerabilityDetailsPage";
 import { SbomsTab } from "../../pages/vulnerability-details/sboms/SbomsTab";
@@ -10,8 +15,7 @@ import { VulnerabilitiesTab as PackageVulnerabilitiesTab } from "../../pages/pac
 import { SbomsTab as PackageSbomsTab } from "../../pages/package-details/sboms/SbomsTab";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
-import { test } from "../../fixtures";
-import { expect } from "../../assertions";
+import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -20,31 +24,40 @@ const VULN_TABLE_NAME = "Vulnerability table";
 
 When(
   "User visits SBOM details Page of {string}",
-  async ({ page }, sbomName) => {
-    await page.getByRole("link", { name: sbomName, exact: true }).click();
+  async ({ page }, sbomName: string) => {
+    // Click the SBOM link from the list page
+    const link = page.getByRole("link", { name: sbomName, exact: true });
+    await link.click();
+    // Wait for details page to load and verify
+    const sbomDetailsPage = await SbomDetailsPage.fromCurrentPage(
+      page,
+      sbomName,
+    );
+    await sbomDetailsPage._layout.verifyPageHeader(sbomName);
   },
 );
 
-Then("{string} is visible", async ({ page }, fieldName) => {
-  await expect(page.locator(`[aria-label="${fieldName}"]`)).toBeVisible();
+Then("{string} is visible", async ({ page }, fieldName: string) => {
+  const field = page.locator(`[aria-label="${fieldName}"]`);
+  await expect(field).toBeVisible();
 });
 
 Then(
   "The Package table is sorted by {string}",
-  async ({ page }, columnName) => {
+  async ({ page }, columnName: string) => {
     const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
     await toolbarTable.verifyTableIsSortedBy(columnName);
   },
 );
 
-Then("Search by FilterText {string}", async ({ page }, filterText) => {
+Then("Search by FilterText {string}", async ({ page }, filterText: string) => {
   const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
   await toolbarTable.filterByText(filterText);
 });
 
 Then(
   "The Package table total results is {int}",
-  async ({ page }, totalResults) => {
+  async ({ page }, totalResults: number) => {
     const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
     await toolbarTable.verifyPaginationHasTotalResults(totalResults);
   },
@@ -52,7 +65,7 @@ Then(
 
 Then(
   "The Package table total results is greather than {int}",
-  async ({ page }, totalResults) => {
+  async ({ page }, totalResults: number) => {
     const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
     await toolbarTable.verifyPaginationHasTotalResultsGreatherThan(
       totalResults,
@@ -62,18 +75,20 @@ Then(
 
 Then(
   "The {string} column of the Package table table contains {string}",
-  async ({ page }, columnName, expectedValue) => {
+  async ({ page }, columnName: string, expectedValue: string) => {
     const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
     await toolbarTable.verifyColumnContainsText(columnName, expectedValue);
   },
 );
 
 When("User Clicks on Vulnerabilities Tab Action", async ({ page }) => {
-  await page.getByLabel("Tab action").click();
+  const tabActionButton = page.getByLabel("Tab action");
+  await tabActionButton.click();
 });
 
 Then("Vulnerability Popup menu appears with message", async ({ page }) => {
-  await page.getByText("Any found vulnerabilities").isVisible();
+  const popupMessage = page.getByText("Any found vulnerabilities");
+  await expect(popupMessage).toBeVisible();
   await page.getByLabel("Close").click();
 });
 
@@ -113,16 +128,16 @@ Then("SBOM Version should be visible inside the tab", async ({ page }) => {
 Then(
   "SBOM Creation date should be visible inside the tab",
   async ({ page }) => {
-    const panelSBOMVersion = await page.locator(
+    const panelSBOMCreationDate = await page.locator(
       `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Creation date')]/following-sibling::dd`,
     );
-    await panelSBOMVersion.isVisible();
+    await panelSBOMCreationDate.isVisible();
   },
 );
 
 Then(
   "List of related Vulnerabilities should be sorted by {string} in ascending order",
-  async ({ page }, columnName) => {
+  async ({ page }, columnName: string) => {
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyTableIsSortedBy(columnName, true);
   },
@@ -130,7 +145,7 @@ Then(
 
 Then(
   "List of Vulnerabilities has column {string}",
-  async ({ page }, columnHeader) => {
+  async ({ page }, columnHeader: string) => {
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyTableHeaderContains(columnHeader);
   },
@@ -138,7 +153,7 @@ Then(
 
 Then(
   "Table column {string} is not sortable",
-  async ({ page }, columnHeader) => {
+  async ({ page }, columnHeader: string) => {
     const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
     await toolbarTable.verifyColumnIsNotSortable(columnHeader);
   },
@@ -146,7 +161,7 @@ Then(
 
 When(
   "User Adds Labels {string} to {string} SBOM from Explorer Page",
-  async ({ page }, labelList, _sbomName) => {
+  async ({ page }, labelList: string, _sbomName: string) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.editLabelsDetailsPage();
     const labelsToAdd =
@@ -163,9 +178,9 @@ When(
 
 Then(
   "The Label list {string} added to the SBOM {string} on Explorer Page",
-  async ({ page }, labelList, sbomName) => {
+  async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
-    await detailsPage.selectTab(`Info`);
+    await detailsPage.selectTab("Info");
     const infoSection = page.locator("#info-tab-section");
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
@@ -178,25 +193,19 @@ Then(
 );
 
 When(
-  "User Clicks on Actions button and Selects Delete option from the drop down",
-  async ({ page }) => {
-    const details = new DetailsPage(page);
-    await details.clickOnPageAction("Delete");
-  },
-);
-
-When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
-    await expect(dialog).toHaveTitle("Warning alert:Permanently delete SBOM?");
+    await expect(dialog).toHaveDialogTitle(
+      "Warning alert:Permanently delete SBOM?",
+    );
     await dialog.clickConfirm();
   },
 );
 
 When(
   "User Deletes {string} using the toggle option from SBOM List Page",
-  async ({ page }, sbomName) => {
+  async ({ page }, sbomName: string) => {
     const listPage = await SbomListPage.build(page);
     const toolbar = await listPage.getToolbar();
     await toolbar.applyFilter({ "Filter text": sbomName });
@@ -207,9 +216,8 @@ When(
 );
 
 Then("Application Navigates to SBOM list page", async ({ page }) => {
-  await expect(
-    page.getByRole("heading", { level: 1, name: "SBOMs" }),
-  ).toBeVisible();
+  const heading = page.getByRole("heading", { level: 1, name: "SBOMs" });
+  await expect(heading).toBeVisible();
 });
 
 Then(
@@ -245,9 +253,11 @@ Given(
 When(
   "User clicks on the vulnerability row with ID {string}",
   async ({ page }, vulnerabilityID: string) => {
-    await page
-      .getByRole("link", { name: vulnerabilityID, exact: true })
-      .click();
+    const vulnerabilityLink = page.getByRole("link", {
+      name: vulnerabilityID,
+      exact: true,
+    });
+    await vulnerabilityLink.click();
   },
 );
 
@@ -285,7 +295,9 @@ Then(
   },
 );
 
-When(
+// Shared step - navigates to vulnerability details page
+// Also defined in @vulnerability-explorer/vulnerability-explorer.step.ts
+Given(
   "User visits Vulnerability details Page of {string}",
   async ({ page }, vulnerabilityID: string) => {
     await VulnerabilityDetailsPage.build(page, vulnerabilityID);
@@ -295,9 +307,12 @@ When(
 When(
   "User clicks on Affected dependencies count button of the {string}",
   async ({ page }, vulnerabilityID: string) => {
-    const vulnerabilityRow = page.locator(
-      `table[aria-label="Vulnerability table"] tbody:has(a:text-is("${vulnerabilityID}"))`,
+    const vulnerabilityTable = page.locator(
+      `table[aria-label="Vulnerability table"]`,
     );
+    const vulnerabilityRow = vulnerabilityTable.locator("tbody").filter({
+      has: page.getByRole("link", { name: vulnerabilityID, exact: true }),
+    });
     const affectedDepsButton = vulnerabilityRow
       .first()
       .locator('td[data-label="Affected dependencies"] button');
@@ -308,8 +323,11 @@ When(
 When(
   "User clicks on the package name {string} link on the expanded table",
   async ({ page }, packageName: string) => {
-    const innerTable = page.locator(
-      'table[aria-label="Vulnerability table"] td[data-label="Affected dependencies"] table',
+    const vulnerabilityTable = page.locator(
+      'table[aria-label="Vulnerability table"]',
+    );
+    const innerTable = vulnerabilityTable.locator(
+      'td[data-label="Affected dependencies"] table',
     );
     const packageLink = innerTable.getByRole("link", {
       name: packageName,
