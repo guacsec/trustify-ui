@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh $CLAUDE_PROJECT_DIR/.claude/hooks/execute-playwright-test.sh"
+            "command": "sh $CLAUDE_PROJECT_DIR/.claude/hooks/lint-and-format.sh"
           }
         ]
       }

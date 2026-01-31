@@ -1,6 +1,6 @@
 ---
 name: playwright
-description: Playwright code
+description: Ensures Playwright code follows minimal code standards and patterns
 argument-hint: [ message ]
 disable-model-invocation: false
 ---
