@@ -1,6 +1,6 @@
 ---
 name: playwright-test-executor
-description: Execute Playwright tests with server lifecycle management and structured feedback
+description: Execute Playwright tests
 tools: Bash, Read, Grep, Glob
 model: sonnet
 color: purple
@@ -11,7 +11,7 @@ color: purple
 - `file_path` (required): Test file path
 - `test_names` (optional): Array of test names to run
 - `session_id` (optional): Server isolation ID (default: Claude session)
-- `keep_server_running` (optional): Keep server after run (default: true)
+- `keep_server_running` (optional): Keep server after run (default: false)
 
 ## Workflow
 
@@ -37,16 +37,28 @@ color: purple
 Base structure:
 ```bash
 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ SKIP_INGESTION=true \
-  npm run e2e:test:ui -- <file_path> \
-  [--grep "test1|test2"] --workers 2
+npm run e2e:test:ui \
+-- <file_path> \
+--grep <test_names> \
+--workers 2
 ```
 
-- Escape regex chars in test names: `sed 's/[.[\*^$()+?{|]/\\&/g'`
+Example:
+```bash
+PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ SKIP_INGESTION=true \
+npm run e2e:test:ui \
+-- path/to/test.test.ts \
+--grep "test1|test2" \
+--workers 2
+```
+
+- Escape regex chars in <test_names>: `sed 's/[.[\*^$()+?{|]/\\&/g'`
 - Single test: `--grep "exact name"`
 - Multiple: `--grep "test1|test2|test3"` (regex OR)
 
 ### Step 4: Execute
 
+- Print the exact command to be executed
 - Run: `timeout 300 bash -c "<cmd>"` (5min timeout, capture stdout/stderr)
 - Exit codes: 0=pass, non-zero=fail/timeout
 - Parse: test counts, errors, duration
