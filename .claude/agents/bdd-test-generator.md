@@ -1,5 +1,5 @@
 ---
-name: e2e-test-generator
+name: bdd-test-generator
 description: |
   Use this agent to generate Playwright BDD test step definitions for Trustify UI scenarios.
 
