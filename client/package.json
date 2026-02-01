@@ -21,10 +21,10 @@
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "@patternfly/patternfly": "^6.4.0",
-    "@patternfly/react-charts": "^8.4.0",
-    "@patternfly/react-core": "^6.4.0",
+    "@patternfly/react-charts": "^8.4.1",
+    "@patternfly/react-core": "^6.4.1",
     "@patternfly/react-log-viewer": "^6.3.0",
-    "@patternfly/react-table": "^6.4.0",
+    "@patternfly/react-table": "^6.4.1",
     "@patternfly/react-tokens": "^6.4.0",
     "@tanstack/react-query": "^5.90.11",
     "@tanstack/react-query-devtools": "^5.61.0",
