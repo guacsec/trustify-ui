@@ -6,7 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh $CLAUDE_PROJECT_DIR/.claude/hooks/lint-and-format.sh"
+            "command": "sh $CLAUDE_PROJECT_DIR/.claude/hooks/lint-and-format.sh",
+            "timeout": 15,
+            "statusMessage": "Formatting, linting, and type checking..."
           }
         ]
       }
