@@ -16,11 +16,18 @@ import { toolbarAssertions, type ToolbarMatchers } from "./ToolbarMatchers";
 import type { DeletionConfirmDialog } from "../pages/ConfirmDialog";
 import { dialogAssertions, type DialogMatchers } from "./DialogMatchers";
 
+import type { FileUpload } from "../pages/FileUpload";
+import {
+  fileUploadAssertions,
+  type FileUploadMatchers,
+} from "./FileUploadMatchers";
+
 const merged = mergeExpects(
   tableAssertions,
   paginationAssertions,
   toolbarAssertions,
   dialogAssertions,
+  fileUploadAssertions,
   // Add more custom assertions here
 );
 
@@ -73,6 +80,14 @@ function typedExpect(
   keyof DialogMatchers
 > &
   DialogMatchers;
+
+/**
+ * Overload from FileUploadMatchers.ts
+ */
+function typedExpect(
+  value: FileUpload,
+): Omit<ReturnType<typeof merged<FileUpload>>, keyof FileUploadMatchers> &
+  FileUploadMatchers;
 
 // Default overload
 function typedExpect<T>(value: T): ReturnType<typeof merged<T>>;
