@@ -22,6 +22,7 @@ export class Navigation {
       | "Vulnerabilities"
       | "Packages"
       | "Advisories"
+      | "Licenses"
       | "Importers",
   ) {
     // By default, we do not initialize navigation at "/"" where the Dashboard is located
