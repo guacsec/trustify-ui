@@ -1,36 +1,35 @@
 ---
-description: Create E2E test in e2e/tests/ui
-argument-hint: Test summary
+name: e2e-test
+description: Generates Playwright E2E tests
+argument-hint: [ message ]
 ---
 
-## Context
+# E2E Test
 
-Parse $ARGUMENTS to get the following values:
+Generate Playwright tests for given requirement defined by $ARGUMENTS
 
-- [summary]: Test summary from $ARGUMENTS
+## Phase 1: Gather context
 
-## Task
+Gather context information and be extremelly concise and sacrifice grammar for the sake of concision:
 
-Create E2E Playwright tests based on [summary] and following these guidelines:
+- Explore `client/src/app/` to gather information of the code that generates the page we want to test
+- Explore `e2e/tests/ui/` to gather common patterns
 
-- Tests are written under `e2e/tests/ui`
+## Phase 2: Take action
 
-## Review the work
+- First: Spawn a `playwright-test-planner` sub-agent to draft a plan. Provide the data gathered at "Phase 1" to enrich plan.
+  - Ask questions if needed to clarify plan
+  - The plan should be extremelly concise and sacrifice grammar for the sake of concision.
+- Second: Spawn a `playwright-test-generator` and use the plan from the previous step
 
-- **Invoke the e2e-test-reviewer subagent** to review your work and implement
-  suggestions where needed
-- Iterate on the review process when needed
+## Phase 3: Verify results
 
-## Execute the work
-
-- Execute the generated tests using the command below:
-
-```bash
-# Run a single e2e test file (ALWAYS use this format)
-SKIP_INGESTION=true TRUSTIFY_UI_URL=http://localhost:3000 PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ npm run e2e:test -- path/to/test.test.ts --workers=2 --trace on
-```
-
-- Iterate to make the tests pass successfully when needed
-  - Limit to 2-3 iterations maximum. Let the developer do the refinement manually
-    when needed. Always suggest possible polishing actions so the human can take
-    action
+- First: Spawn a `playwright-test-healer` sub-agent against the new tests
+- Second: Spawn `playwright-test-executor` for executing the tests; provide the generated test file paths and test names as input
+  - Execute only new or edited tests. Do not execute untouched tests
+  - Verify all tests pass successfully
+  - Report final status with test coverage summary
+- Third: Final output:
+  - Short summary of coverage and potential gaps
+  - List of generated test files with pass/fail status
+  - Recommendations for additional test scenarios if needed
