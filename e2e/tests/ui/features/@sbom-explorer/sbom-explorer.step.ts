@@ -177,7 +177,7 @@ When(
 );
 
 Then(
-  "The Label list {string} added to the SBOM {string} on Explorer Page",
+  "The Label list {string} is visible on the Explorer Page for SBOM {string}",
   async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab("Info");
@@ -277,8 +277,12 @@ Then(
   async ({ page }, sbomName: string, status: string) => {
     const sbomsTab = await SbomsTab.fromCurrentPage(page);
     const table = await sbomsTab.getTable();
-    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
-    await expect(table).toHaveColumnWithValue("Status", status, 0);
+    await expect(table).toHaveColumnWithValue("Name", sbomName, {
+      rowIndex: 0,
+    });
+    await expect(table).toHaveColumnWithValue("Status", status, {
+      rowIndex: 0,
+    });
   },
 );
 
@@ -362,6 +366,8 @@ Then(
   async ({ page }, sbomName: string) => {
     const sbomsTab = await PackageSbomsTab.fromCurrentPage(page);
     const table = await sbomsTab.getTable();
-    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
+    await expect(table).toHaveColumnWithValue("Name", sbomName, {
+      rowIndex: 0,
+    });
   },
 );

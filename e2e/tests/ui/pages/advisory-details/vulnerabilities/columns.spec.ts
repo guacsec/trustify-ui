@@ -24,16 +24,20 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     expect(idIndex).not.toBe(-1);
 
     // ID
-    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308", idIndex);
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2024-26308", {
+      rowIndex: idIndex,
+    });
 
     // Title
     await expect(table).toHaveColumnWithValue(
       "Title",
       "Apache Commons Compress: OutOfMemoryError unpacking broken Pack200 file",
-      idIndex,
+      { rowIndex: idIndex },
     );
 
     // CWE
-    await expect(table).toHaveColumnWithValue("CWE", "CWE-770", idIndex);
+    await expect(table).toHaveColumnWithValue("CWE", "CWE-770", {
+      rowIndex: idIndex,
+    });
   });
 });

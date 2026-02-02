@@ -67,14 +67,32 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     rowIndex?: number,
   ) => {
     try {
+      // Set default value for matchingCondition
+      const matchingCondition = options?.matchingCondition ?? "any";
+      const rowIndex = options?.rowIndex ?? undefined;
       if (rowIndex === undefined) {
-        await baseExpect(
-          table._table
-            .locator(`td[data-label="${columnName}"]`, {
-              hasText: value,
-            })
-            .first(),
-        ).toBeVisible();
+        if (matchingCondition === "all") {
+          const rows = table._table.locator(
+            `td[data-label="${table._columns[0]}"]`,
+          );
+          await baseExpect.poll(() => rows.count()).toBeGreaterThan(0);
+
+          // Verify all rows in the specified column contain the expected value
+          const column = await table.getColumn(columnName);
+          const allRows = await column.all();
+
+          for (const row of allRows) {
+            await baseExpect(row).toContainText(value);
+          }
+        } else if (matchingCondition === "any") {
+          await baseExpect(
+            table._table
+              .locator(`td[data-label="${columnName}"]`, {
+                hasText: value,
+              })
+              .first(),
+          ).toBeVisible();
+        }
       } else {
         await baseExpect(
           table._table.locator(`td[data-label="${columnName}"]`).nth(rowIndex),
@@ -83,7 +101,10 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
 
       return {
         pass: true,
-        message: () => `Table contains ${value} in column ${columnName}`,
+        message: () =>
+          rowIndex === undefined
+            ? `All rows in column "${columnName}" contain value "${value}"`
+            : `Row ${rowIndex} contains ${value} in column ${columnName}`,
       };
     } catch (error) {
       return {
