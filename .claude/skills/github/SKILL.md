@@ -3,7 +3,12 @@ name: github
 description: Create and manage GitHub issues, pull requests, and interact with repositories. Use when creating issues, PRs, viewing GitHub resources, managing labels, or checking CI status.
 argument-hint: [ message ]
 disable-model-invocation: true
-allowed-tools: Bash(gh *)
+allowed-tools:
+    - Bash(gh issue create *)                                                                                                                                                                                                                                                             
+    - Bash(gh issue list *)                                                                                                                                                                                                                                                               
+    - Bash(gh pr create *)                                                                                                                                                                                                                                                                
+    - Bash(gh pr view *)                                                                                                                                                                                                                                                                  
+    - Bash(gh pr comment *)      
 ---
 
 # GitHub Assistant
