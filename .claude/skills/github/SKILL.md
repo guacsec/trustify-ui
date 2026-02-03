@@ -4,11 +4,12 @@ description: Create and manage GitHub issues, pull requests, and interact with r
 argument-hint: [ message ]
 disable-model-invocation: true
 allowed-tools:
-    - Bash(gh issue create *)                                                                                                                                                                                                                                                             
-    - Bash(gh issue list *)                                                                                                                                                                                                                                                               
-    - Bash(gh pr create *)                                                                                                                                                                                                                                                                
-    - Bash(gh pr view *)                                                                                                                                                                                                                                                                  
-    - Bash(gh pr comment *)      
+  - Bash(gh issue view *)
+  - Bash(gh issue create *)
+  - Bash(gh issue list *)
+  - Bash(gh pr view *)
+  - Bash(gh pr create *)
+  - Bash(gh pr comment *)
 ---
 
 # GitHub Assistant
