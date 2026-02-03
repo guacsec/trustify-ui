@@ -99,8 +99,6 @@ Then(
     const table = await listPage.getTable();
     const toolbar = await listPage.getToolbar();
     await expect(toolbar).toHaveLabels({ Label: [labelValue] });
-    await expect(table).toHaveColumnWithValue("Labels", labelValue, {
-      matchingCondition: "all",
-    });
+    await expect(table).toHaveColumnWithValue("Labels", labelValue, "all");
   },
 );

@@ -24,13 +24,9 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     expect(idIndex).not.toBe(-1);
 
     // ID
-    await expect(table).toHaveColumnWithValue("ID", "CVE-2023-1664", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue("ID", "CVE-2023-1664", idIndex);
 
     // CVSS
-    await expect(table).toHaveColumnWithValue("CVSS", "Medium(6.5)", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue("CVSS", "Medium(6.5)", idIndex);
   });
 });

@@ -24,22 +24,20 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     expect(idIndex).not.toBe(-1);
 
     // Name
-    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue("Name", "quarkus-bom", idIndex);
 
     // Version
     await expect(table).toHaveColumnWithValue(
       "Version",
       "2.13.8.Final-redhat-00004",
-      { rowIndex: idIndex },
+      idIndex,
     );
 
     // Supplier
     await expect(table).toHaveColumnWithValue(
       "Supplier",
       "Organization: Red Hat",
-      { rowIndex: idIndex },
+      idIndex,
     );
   });
 });

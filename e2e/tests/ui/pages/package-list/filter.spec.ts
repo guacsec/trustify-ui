@@ -161,8 +161,14 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
     assertions: { columnName: "Name", value: "accordion" },
     getConfig: async ({ page }) => {
       const listPage = await PackageListPage.build(page);
+      // const pagination = await listPage.getPagination();
+      // await pagination.selectItemsPerPage(20);
       const toolbar = await listPage.getToolbar();
       const table = await listPage.getTable();
+      const rows = table._table.locator(
+        `td[data-label="${table._columns[0]}"]`,
+      );
+      console.log("Row value", await rows.allTextContents());
       return {
         toolbar,
         table,

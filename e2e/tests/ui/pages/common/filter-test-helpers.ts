@@ -82,7 +82,7 @@ export const testFilterMatches = <
     await expect(table).toHaveColumnWithValue(
       assertions.columnName,
       assertions.value,
-      { rowIndex: assertions.rowIndex },
+      assertions.rowIndex,
     );
   });
 

@@ -25,26 +25,24 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     expect(idIndex).not.toBe(-1);
 
     // Id
-    await expect(table).toHaveColumnWithValue("Id", "CVE-2023-4853", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue("Id", "CVE-2023-4853", idIndex);
 
     // Description
     await expect(table).toHaveColumnWithValue(
       "Description",
       "quarkus: HTTP security policy bypass",
-      { rowIndex: idIndex },
+      idIndex,
     );
 
     // CVSS
-    await expect(table).toHaveColumnWithValue("CVSS", "High(8.1)", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue("CVSS", "High(8.1)", idIndex);
 
     // Affected dependencies
-    await expect(table).toHaveColumnWithValue("Affected dependencies", "3", {
-      rowIndex: idIndex,
-    });
+    await expect(table).toHaveColumnWithValue(
+      "Affected dependencies",
+      "3",
+      idIndex,
+    );
 
     const expandedCell = await table.expandCell(
       "Affected dependencies",

@@ -12,8 +12,8 @@ export interface TableMatchers<
   ): Promise<MatcherResult>;
   toHaveColumnWithValue(
     columnName: TColumns[number],
-    value: string | RegExp,
-    rowIndex?: number,
+    value: string,
+    rowIndex?: number | "all",
   ): Promise<MatcherResult>;
   toHaveNumberOfRows(expectedRows: {
     equal?: number;
@@ -63,37 +63,32 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
   >(
     table: Table<TColumns, TActions>,
     columnName: TColumns[number],
-    value: string | RegExp,
-    rowIndex?: number,
+    value: string,
+    rowIndex?: number | "all",
   ) => {
     try {
-      // Set default value for matchingCondition
-      const matchingCondition = options?.matchingCondition ?? "any";
-      const rowIndex = options?.rowIndex ?? undefined;
       if (rowIndex === undefined) {
-        if (matchingCondition === "all") {
-          const rows = table._table.locator(
-            `td[data-label="${table._columns[0]}"]`,
-          );
-          await baseExpect.poll(() => rows.count()).toBeGreaterThan(0);
+        await baseExpect(
+          table._table
+            .locator(`td[data-label="${columnName}"]`, {
+              hasText: value,
+            })
+            .first(),
+        ).toBeVisible();
+      } else if (rowIndex === "all") {
+        const rows = table._table.locator(
+          `td[data-label="${table._columns[0]}"]`,
+        );
+        await baseExpect.poll(() => rows.count()).toBeGreaterThan(0);
 
-          // Verify all rows in the specified column contain the expected value
-          const column = await table.getColumn(columnName);
-          const allRows = await column.all();
+        // Verify all rows in the specified column contain the expected value
+        const column = await table.getColumn(columnName);
+        const allRows = await column.all();
 
-          for (const row of allRows) {
-            await baseExpect(row).toContainText(value);
-          }
-        } else if (matchingCondition === "any") {
-          await baseExpect(
-            table._table
-              .locator(`td[data-label="${columnName}"]`, {
-                hasText: value,
-              })
-              .first(),
-          ).toBeVisible();
+        for (const row of allRows) {
+          await baseExpect(row).toContainText(value);
         }
-      } else {
+      } else if (typeof rowIndex === "number") {
         await baseExpect(
           table._table.locator(`td[data-label="${columnName}"]`).nth(rowIndex),
         ).toContainText(value);

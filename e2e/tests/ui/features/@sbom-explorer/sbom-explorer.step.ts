@@ -277,12 +277,8 @@ Then(
   async ({ page }, sbomName: string, status: string) => {
     const sbomsTab = await SbomsTab.fromCurrentPage(page);
     const table = await sbomsTab.getTable();
-    await expect(table).toHaveColumnWithValue("Name", sbomName, {
-      rowIndex: 0,
-    });
-    await expect(table).toHaveColumnWithValue("Status", status, {
-      rowIndex: 0,
-    });
+    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
+    await expect(table).toHaveColumnWithValue("Status", status, 0);
   },
 );
 
@@ -366,8 +362,6 @@ Then(
   async ({ page }, sbomName: string) => {
     const sbomsTab = await PackageSbomsTab.fromCurrentPage(page);
     const table = await sbomsTab.getTable();
-    await expect(table).toHaveColumnWithValue("Name", sbomName, {
-      rowIndex: 0,
-    });
+    await expect(table).toHaveColumnWithValue("Name", sbomName, 0);
   },
 );
