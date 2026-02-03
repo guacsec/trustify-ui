@@ -1,6 +1,5 @@
 // @ts-check
 
-import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import {
@@ -13,7 +12,7 @@ import {
 } from "../common/filter-test-helpers";
 import { LicenseListPage } from "./LicenseListPage";
 
-test.describe("Filter validations", { tag: "@tier1" }, () => {
+test.describe("Filter validations", { tag: "@filtering" }, () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
@@ -95,6 +94,34 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
     await login(page);
   });
 
+  testFilterMatches("Whitespace variations", {
+    filters: { Name: "  Apache  " },
+    assertions: { columnName: "Name", value: "Apache" },
+    getConfig: async ({ page }) => {
+      const listPage = await LicenseListPage.build(page);
+      const toolbar = await listPage.getToolbar();
+      const table = await listPage.getTable();
+      return {
+        toolbar,
+        table,
+      };
+    },
+  });
+
+  testFilterMatches("Empty filter input is handled", {
+    filters: { Name: "" },
+    assertions: { columnName: "Name", value: "Abstyles License" },
+    getConfig: async ({ page }) => {
+      const listPage = await LicenseListPage.build(page);
+      const toolbar = await listPage.getToolbar();
+      const table = await listPage.getTable();
+      return {
+        toolbar,
+        table,
+      };
+    },
+  });
+
   testFilterShowsEmptyState("Filter with special characters", {
     filters: {
       Name: "Apache*",
@@ -114,20 +141,6 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
     filters: {
       Name: "Apache-".repeat(100),
     },
-    getConfig: async ({ page }) => {
-      const listPage = await LicenseListPage.build(page);
-      const toolbar = await listPage.getToolbar();
-      const table = await listPage.getTable();
-      return {
-        toolbar,
-        table,
-      };
-    },
-  });
-
-  testFilterMatches("Whitespace variations", {
-    filters: { Name: "  Apache  " },
-    assertions: { columnName: "Name", value: "Apache" },
     getConfig: async ({ page }) => {
       const listPage = await LicenseListPage.build(page);
       const toolbar = await listPage.getToolbar();

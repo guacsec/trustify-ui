@@ -5,7 +5,7 @@ import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
 import { LicenseListPage } from "./LicenseListPage";
 
-test.describe("Sort validations", { tag: "@tier1" }, () => {
+test.describe("Sort validations", { tag: "@sorting" }, () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
