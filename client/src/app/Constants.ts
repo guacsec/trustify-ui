@@ -15,6 +15,7 @@ export const TablePersistenceKeyPrefixes = {
   advisories: "ad",
   vulnerabilities: "vn",
   sboms: "sb",
+  groups: "sbg",
   sboms_by_package: "sbk",
   packages: "pk",
   licenses: "li",
