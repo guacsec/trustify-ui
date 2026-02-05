@@ -129,7 +129,7 @@ Feature: SBOM Explorer - View SBOM details
         Given An ingested SBOM "<sbomName>" is available
         When User visits SBOM details Page of "<sbomName>"
         When User Adds Labels "<Labels>" to "<sbomName>" SBOM from Explorer Page
-        Then The Label list "<Labels>" added to the SBOM "<sbomName>" on Explorer Page
+        Then The Label list "<Labels>" is visible on the Explorer Page for SBOM "<sbomName>"
 
         Examples:
             | sbomName               | Labels        |
@@ -190,3 +190,21 @@ Feature: SBOM Explorer - View SBOM details
         Examples:
             | sbomName    | vulnerabilityID | packageName        |
             | quarkus-bom | CVE-2023-0044   | quarkus-vertx-http |
+
+    Scenario Outline: Verify Labels of CBOM on SBOM Explorer Page
+        Given An ingested SBOM "<sbomName>" is available
+        When User visits SBOM details Page of "<sbomName>"
+        Then The Label list "<Labels>" is visible on the Explorer Page for SBOM "<sbomName>"
+
+        Examples:
+            | sbomName | Labels    |
+            | liboqs   | kind=cbom |
+
+    Scenario Outline: Verify Labels of AIBOM on SBOM Explorer Page
+        Given An ingested SBOM "<sbomName>" is available
+        When User visits SBOM details Page of "<sbomName>"
+        Then The Label list "<Labels>" is visible on the Explorer Page for SBOM "<sbomName>"
+
+        Examples:
+            | sbomName       | Labels     |
+            | claude-4-opus  | kind=aibom |

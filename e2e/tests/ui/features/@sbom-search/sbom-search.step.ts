@@ -30,7 +30,7 @@ Given(
 When(
   "User Adds Labels {string} to {string} SBOM from List Page",
   async ({ page }, labelList, sbomName) => {
-    const listPage = await SbomListPage.build(page);
+    const listPage = await SbomListPage.fromCurrentPage(page);
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
