@@ -12,7 +12,7 @@ export interface TableMatchers<
   ): Promise<MatcherResult>;
   toHaveColumnWithValue(
     columnName: TColumns[number],
-    value: string,
+    value: string | RegExp,
     rowIndex?: number | "all",
   ): Promise<MatcherResult>;
   toHaveNumberOfRows(expectedRows: {
@@ -63,7 +63,7 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
   >(
     table: Table<TColumns, TActions>,
     columnName: TColumns[number],
-    value: string,
+    value: string | RegExp,
     rowIndex?: number | "all",
   ) => {
     try {
