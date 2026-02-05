@@ -128,13 +128,8 @@ Then("SBOM Version should be visible inside the tab", async ({ page }) => {
 Then(
   "SBOM Creation date should be visible inside the tab",
   async ({ page }) => {
-<<<<<<< HEAD
-    const panelSBOMVersion = await page.locator(
-      `xpath=//section[@id='refVulnerabilitiesSection']//dt[contains(.,'Creation date')]/following-sibling::dd`,
-=======
     const panelSBOMCreationDate = await page.locator(
       `xpath=//section[@id='vulnerabilities-tab-section']//dt[contains(.,'Creation date')]/following-sibling::dd`,
->>>>>>> 7a128d7 (chore: Optimize and clean up existing tests and step definitions (#902))
     );
     await panelSBOMCreationDate.isVisible();
   },
@@ -182,7 +177,7 @@ When(
 );
 
 Then(
-  "The Label list {string} added to the SBOM {string} on Explorer Page",
+  "The Label list {string} is visible on the Explorer Page for SBOM {string}",
   async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab("Info");

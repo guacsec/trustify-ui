@@ -1,5 +1,4 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
 
 import { test } from "../../fixtures";
 
@@ -31,7 +30,7 @@ Given(
 When(
   "User Adds Labels {string} to {string} SBOM from List Page",
   async ({ page }, labelList, sbomName) => {
-    const listPage = await SbomListPage.build(page);
+    const listPage = await SbomListPage.fromCurrentPage(page);
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
@@ -62,7 +61,7 @@ When(
 );
 
 Then(
-  "The Label list {string} added to the SBOM {string} on List Page",
+  "The Label list {string} is visible on the List Page for SBOM {string}",
   async ({ page }, labelList, sbomName) => {
     const detailsPage = new DetailsPage(page);
 
@@ -73,5 +72,33 @@ Then(
           (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName);
+  },
+);
+
+When(
+  "User applies {string} filter with {string} on the SBOM List Page",
+  async ({ page }, filterName: string, filterValue: string) => {
+    const listPage = await SbomListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+    if (filterName === "Label") {
+      await toolbar.applyFilter({ Label: [filterValue] });
+    } else if (filterName === "Filter text") {
+      await toolbar.applyFilter({ "Filter text": filterValue });
+    } else if (filterName === "License") {
+      await toolbar.applyFilter({ License: [filterValue] });
+    }
+    await table.waitUntilDataIsLoaded();
+  },
+);
+
+Then(
+  "The SBOM List Page shows only SBOMs with label {string}",
+  async ({ page }, labelValue: string) => {
+    const listPage = await SbomListPage.fromCurrentPage(page);
+    const table = await listPage.getTable();
+    const toolbar = await listPage.getToolbar();
+    await expect(toolbar).toHaveLabels({ Label: [labelValue] });
+    await expect(table).toHaveColumnWithValue("Labels", labelValue, "all");
   },
 );

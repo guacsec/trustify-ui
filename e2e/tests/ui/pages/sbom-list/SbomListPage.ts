@@ -13,8 +13,11 @@ export class SbomListPage {
 
   static async build(page: Page) {
     const navigation = await Navigation.build(page);
-    await navigation.goToSidebar("SBOMs");
+    await navigation.goToSidebar("All SBOMs");
+    return new SbomListPage(page);
+  }
 
+  static async fromCurrentPage(page: Page) {
     return new SbomListPage(page);
   }
 
