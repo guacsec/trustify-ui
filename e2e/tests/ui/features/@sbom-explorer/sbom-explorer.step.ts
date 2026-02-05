@@ -177,7 +177,7 @@ When(
 );
 
 Then(
-  "The Label list {string} added to the SBOM {string} on Explorer Page",
+  "The Label list {string} is visible on the Explorer Page for SBOM {string}",
   async ({ page }, labelList: string, sbomName: string) => {
     const detailsPage = new DetailsPage(page);
     await detailsPage.selectTab("Info");
