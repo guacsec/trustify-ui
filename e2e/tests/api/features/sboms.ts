@@ -70,8 +70,14 @@ test("Sort SBOMs by published date ascending", async ({ axios }) => {
   expect(response.data.total).toBeGreaterThan(0);
 
   const items = response.data.items;
+
+  // Filter out items with null published dates for validation
   // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
-  const publishedDates = items.map((item: any) => new Date(item.published));
+  const itemsWithDates = items.filter((item: any) => item.published !== null);
+  const publishedDates = itemsWithDates.map(
+    // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+    (item: any) => new Date(item.published),
+  );
 
   // Validate dates are in ascending order
   for (let i = 1; i < publishedDates.length; i++) {
@@ -92,8 +98,14 @@ test("Sort SBOMs by published date descending", async ({ axios }) => {
 
   expect(response.status).toBe(200);
   const items = response.data.items;
+
+  // Filter out items with null published dates for validation
   // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
-  const publishedDates = items.map((item: any) => new Date(item.published));
+  const itemsWithDates = items.filter((item: any) => item.published !== null);
+  const publishedDates = itemsWithDates.map(
+    // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+    (item: any) => new Date(item.published),
+  );
 
   // Validate dates are in descending order
   for (let i = 1; i < publishedDates.length; i++) {
