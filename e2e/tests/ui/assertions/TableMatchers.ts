@@ -88,7 +88,7 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
         for (const row of allRows) {
           await baseExpect(row).toContainText(value);
         }
-      } else if (typeof rowIndex === "number") {
+      } else {
         await baseExpect(
           table._table.locator(`td[data-label="${columnName}"]`).nth(rowIndex),
         ).toContainText(value);
@@ -96,10 +96,15 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
 
       return {
         pass: true,
-        message: () =>
-          rowIndex === undefined
-            ? `All rows in column "${columnName}" contain value "${value}"`
-            : `Row ${rowIndex} contains ${value} in column ${columnName}`,
+        message: () => {
+          if (rowIndex === undefined) {
+            return `Column "${columnName}" contains value "${value}"`;
+          } else if (rowIndex === "all") {
+            return `All rows in column "${columnName}" contain value "${value}"`;
+          } else {
+            return `Row ${rowIndex} contains "${value}" in column "${columnName}"`;
+          }
+        },
       };
     } catch (error) {
       return {
