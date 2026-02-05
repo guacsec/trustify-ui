@@ -10,3 +10,95 @@ test.skip("List first 10 sboms by name - vanilla", async ({ axios }) => {
     }),
   );
 });
+
+test("Sort SBOMs by name ascending", async ({ axios }) => {
+  const response = await axios.get("/api/v2/sbom", {
+    params: {
+      offset: 0,
+      limit: 100,
+      sort: "name:asc",
+    },
+  });
+
+  expect(response.status).toBe(200);
+  expect(response.data.total).toBeGreaterThan(0);
+
+  const items = response.data.items;
+  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  const names = items.map((item: any) => item.name);
+
+  // Validate that names are actually sorted in ascending order
+  const sortedNames = [...names].sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" }),
+  );
+
+  expect(names).toEqual(sortedNames);
+});
+
+test("Sort SBOMs by name descending", async ({ axios }) => {
+  const response = await axios.get("/api/v2/sbom", {
+    params: {
+      offset: 0,
+      limit: 100,
+      sort: "name:desc",
+    },
+  });
+
+  expect(response.status).toBe(200);
+  const items = response.data.items;
+  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  const names = items.map((item: any) => item.name);
+
+  // Validate that names are sorted in descending order
+  const sortedNames = [...names].sort((a, b) =>
+    b.localeCompare(a, undefined, { sensitivity: "base" }),
+  );
+
+  expect(names).toEqual(sortedNames);
+});
+
+test("Sort SBOMs by published date ascending", async ({ axios }) => {
+  const response = await axios.get("/api/v2/sbom", {
+    params: {
+      offset: 0,
+      limit: 100,
+      sort: "published:asc",
+    },
+  });
+
+  expect(response.status).toBe(200);
+  expect(response.data.total).toBeGreaterThan(0);
+
+  const items = response.data.items;
+  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  const publishedDates = items.map((item: any) => new Date(item.published));
+
+  // Validate dates are in ascending order
+  for (let i = 1; i < publishedDates.length; i++) {
+    expect(publishedDates[i].getTime()).toBeGreaterThanOrEqual(
+      publishedDates[i - 1].getTime(),
+    );
+  }
+});
+
+test("Sort SBOMs by published date descending", async ({ axios }) => {
+  const response = await axios.get("/api/v2/sbom", {
+    params: {
+      offset: 0,
+      limit: 100,
+      sort: "published:desc",
+    },
+  });
+
+  expect(response.status).toBe(200);
+  const items = response.data.items;
+  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  const publishedDates = items.map((item: any) => new Date(item.published));
+
+  // Validate dates are in descending order
+  for (let i = 1; i < publishedDates.length; i++) {
+    expect(publishedDates[i].getTime()).toBeLessThanOrEqual(
+      publishedDates[i - 1].getTime(),
+    );
+  }
+});
