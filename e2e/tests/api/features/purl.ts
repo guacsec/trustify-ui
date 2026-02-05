@@ -1,4 +1,8 @@
 import { expect, test } from "../fixtures";
+import {
+  testBasicSort,
+  validateSortDirectionDiffers,
+} from "../helpers/sorting-helpers";
 
 test.skip("Purl by alias - vanilla", async ({ axios }) => {
   const vanillaResponse = await axios.get(
@@ -39,155 +43,49 @@ test.skip("Purl by alias - vanilla", async ({ axios }) => {
 
 test.describe("PURL sorting validation", () => {
   test("Sort PURLs by name ascending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "name:asc",
-      },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify the sort parameter is accepted and returns data
-    // Note: We don't validate exact sort order because database collation
-    // may differ from JavaScript's string comparison
+    await testBasicSort(axios, "/api/v2/purl", "name", "asc");
   });
 
   test("Sort PURLs by name descending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "name:desc",
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "name",
+      (item) => {
+        // Extract name from purl string
+        const match = item.purl.match(/pkg:[^/]+\/(?:[^/]+\/)?([^@?]+)/);
+        return match ? match[1] : item.purl;
       },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify results are different from ascending sort
-    const ascResponse = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "name:asc",
-      },
-    });
-
-    // Extract names from purl strings
-    const getName = (purl: string) => {
-      // PURL format: pkg:type/namespace/name@version?qualifiers
-      const match = purl.match(/pkg:[^/]+\/(?:[^/]+\/)?([^@?]+)/);
-      return match ? match[1] : purl;
-    };
-
-    const descFirst = getName(response.data.items[0].purl);
-    const ascFirst = getName(ascResponse.data.items[0].purl);
-
-    // First item should be different between asc and desc
-    expect(descFirst).not.toEqual(ascFirst);
+    );
   });
 
   test("Sort PURLs by namespace ascending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "namespace:asc",
-      },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify the sort parameter is accepted and returns data
+    await testBasicSort(axios, "/api/v2/purl", "namespace", "asc");
   });
 
   test("Sort PURLs by namespace descending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "namespace:desc",
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "namespace",
+      (item) => {
+        // Extract namespace from purl string
+        const match = item.purl.match(/pkg:[^/]+\/([^/]+)/);
+        return match ? match[1] : null;
       },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify results are different from ascending sort
-    const ascResponse = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "namespace:asc",
-      },
-    });
-
-    // Extract namespace from purl strings
-    const getNamespace = (purl: string) => {
-      // PURL format: pkg:type/namespace/name@version?qualifiers
-      const match = purl.match(/pkg:[^/]+\/([^/]+)/);
-      return match ? match[1] : null;
-    };
-
-    const descFirst = getNamespace(response.data.items[0].purl);
-    const ascFirst = getNamespace(ascResponse.data.items[0].purl);
-
-    if (descFirst && ascFirst) {
-      // First item should be different between asc and desc
-      expect(descFirst).not.toEqual(ascFirst);
-    }
+    );
   });
 
   test("Sort PURLs by version ascending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "version:asc",
-      },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify the sort parameter is accepted and returns data
+    await testBasicSort(axios, "/api/v2/purl", "version", "asc");
   });
 
   test("Sort PURLs by version descending", async ({ axios }) => {
-    const response = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "version:desc",
-      },
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.data.total).toBeGreaterThan(0);
-    expect(response.data.items.length).toBeGreaterThan(0);
-
-    // Verify results are different from ascending sort
-    const ascResponse = await axios.get("/api/v2/purl", {
-      params: {
-        offset: 0,
-        limit: 100,
-        sort: "version:asc",
-      },
-    });
-
-    const descFirst = response.data.items[0].version.version;
-    const ascFirst = ascResponse.data.items[0].version.version;
-
-    // First item should be different between asc and desc
-    expect(descFirst).not.toEqual(ascFirst);
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "version",
+      (item) => item.version.version,
+    );
   });
 });
