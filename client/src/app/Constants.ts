@@ -3,6 +3,7 @@ import type { AdvisorySummary, SbomSummary } from "./client";
 import ENV from "./env";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
+export const FILTER_NULL_VALUE = "\0";
 
 export const RENDER_DATE_FORMAT = "MMM DD, YYYY";
 export const RENDER_DATETIME_FORMAT = "MMM DD, YYYY | HH:mm:ss";
