@@ -100,7 +100,21 @@ export class Toolbar<
   }
 
   private async applyTextFilter(_filterName: TFilterName, filterValue: string) {
-    await this._toolbar.getByRole("textbox").fill(filterValue);
+    // Try to find textbox within toolbar first (should work for both modes)
+    const textbox = this._toolbar.getByRole("textbox");
+    const textboxCount = await textbox.count();
+
+    if (textboxCount === 1) {
+      // Only one textbox, use it
+      await textbox.fill(filterValue);
+    } else if (textboxCount > 1) {
+      // Multiple textboxes (side-by-side filters), use the first visible one
+      await textbox.first().fill(filterValue);
+    } else {
+      // Fallback: search anywhere on the page
+      await this._page.getByRole("textbox").fill(filterValue);
+    }
+
     await this._page.keyboard.press("Enter");
   }
 
@@ -159,10 +173,19 @@ export class Toolbar<
    * @param filterName the name of the filter as rendered in the UI
    */
   private async selectFilter(filterName: TFilterName) {
-    await this._toolbar
-      .locator(".pf-m-toggle-group button.pf-v6-c-menu-toggle")
-      .click();
-    await this._page.getByRole("menuitem", { name: filterName }).click();
+    // Check if filter toggle exists (filters not shown side-by-side)
+    const filterToggle = this._toolbar.locator(
+      ".pf-m-toggle-group button.pf-v6-c-menu-toggle",
+    );
+    const hasToggle = (await filterToggle.count()) > 0;
+
+    if (hasToggle) {
+      // Traditional filter selection with dropdown
+      await filterToggle.click();
+      await this._page.getByRole("menuitem", { name: filterName }).click();
+    }
+    // If no toggle exists, filters are shown side-by-side and already visible
+    // No need to select a filter - just proceed to apply the filter value
   }
 
   /**
