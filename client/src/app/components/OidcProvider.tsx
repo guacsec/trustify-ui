@@ -29,8 +29,17 @@ export const OidcProvider: React.FC<IOidcProviderProps> = ({ children }) => {
       automaticSilentRenew={true}
       onSigninCallback={() => {
         const params = new URLSearchParams(window.location.search);
-        const relativePath = params.get("state")?.split(";")?.[1];
-        AppRoutes.navigate(relativePath ?? "/", { replace: true });
+        const fullPath = params.get("state")?.split(";")?.[1] ?? "/";
+
+        // Parse pathname and search from the preserved full URL
+        const [pathname, search] = fullPath.includes("?")
+          ? fullPath.split("?", 2)
+          : [fullPath, ""];
+
+        AppRoutes.navigate(
+          { pathname, search: search ? `?${search}` : "" },
+          { replace: true },
+        );
       }}
     >
       <AuthEnabledOidcProvider>{children}</AuthEnabledOidcProvider>
@@ -46,7 +55,7 @@ const AuthEnabledOidcProvider: React.FC<IOidcProviderProps> = ({
   React.useEffect(() => {
     if (!auth.isAuthenticated && !auth.isLoading && !auth.error) {
       auth.signinRedirect({
-        url_state: window.location.pathname,
+        url_state: window.location.pathname + window.location.search,
       });
     }
   }, [auth.isAuthenticated, auth.isLoading, auth.error, auth.signinRedirect]);
