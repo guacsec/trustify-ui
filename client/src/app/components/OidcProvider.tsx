@@ -38,7 +38,7 @@ export const OidcProvider: React.FC<IOidcProviderProps> = ({ children }) => {
 
         AppRoutes.navigate(
           { pathname, search: search ? `?${search}` : "" },
-          { replace: true }
+          { replace: true },
         );
       }}
     >
