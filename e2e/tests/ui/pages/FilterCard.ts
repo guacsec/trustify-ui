@@ -2,11 +2,15 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 export class FilterCard {
   private readonly _page: Page;
-  private readonly _card: Locator;
+  readonly _filterCard: Locator;
 
   private constructor(page: Page, card: Locator) {
     this._page = page;
-    this._card = card;
+    this._filterCard = card;
+  }
+
+  private get _card() {
+    return this._filterCard;
   }
 
   /**
@@ -20,6 +24,11 @@ export class FilterCard {
     return new FilterCard(page, card);
   }
 
+  static async buildFromLocator(page: Page, cardLocator: Locator) {
+    await expect(cardLocator).toBeVisible();
+    return new FilterCard(page, cardLocator);
+  }
+
   /**
    * Clears all filters inside the filter card
    */
@@ -31,13 +40,17 @@ export class FilterCard {
    * Applies a date range filter (Created on, Revision, etc.)
    */
   async applyDateRangeFilter(fromDate: string, toDate: string) {
-    await this._card.locator("input[aria-label='Interval start']").fill(fromDate);
+    await this._card
+      .locator("input[aria-label='Interval start']")
+      .fill(fromDate);
     const toInput = this._card.locator("input[aria-label='Interval end']");
     if (await toInput.isEnabled()) {
       await toInput.fill(toDate);
     }
     // Verify values
-    await expect(this._card.locator("input[aria-label='Interval start']")).toHaveValue(fromDate);
+    await expect(
+      this._card.locator("input[aria-label='Interval start']"),
+    ).toHaveValue(fromDate);
     if (await toInput.isEnabled()) {
       await expect(toInput).toHaveValue(toDate);
     }
@@ -50,9 +63,18 @@ export class FilterCard {
     const section = this._card.locator("h4", { hasText: sectionName });
     await expect(section).toBeVisible();
     for (const option of options) {
-      const checkbox = section.locator(`xpath=..`).locator(`label:has-text("${option}") input[type="checkbox"]`);
-      await checkbox.check();
-      await expect(checkbox).toBeChecked();
+      // Find the checkbox by its label text
+      const checkboxLabel = this._card.getByRole("checkbox", { name: option });
+      await expect(checkboxLabel).toBeVisible();
+
+      // Check if not already checked
+      const isChecked = await checkboxLabel.isChecked();
+      if (!isChecked) {
+        await checkboxLabel.click();
+        // Wait for the checkbox state to update
+        await this._page.waitForTimeout(300);
+        await expect(checkboxLabel).toBeChecked();
+      }
     }
   }
 
@@ -60,7 +82,9 @@ export class FilterCard {
    * Applies a label filter (autocomplete input)
    */
   async applyLabelFilter(labels: string[]) {
-    const input = this._card.getByRole("combobox", { name: "select-autocomplete-listbox" });
+    const input = this._card.getByRole("combobox", {
+      name: "select-autocomplete-listbox",
+    });
     for (const label of labels) {
       await input.fill(label);
       const option = this._page.getByRole("option", { name: label });

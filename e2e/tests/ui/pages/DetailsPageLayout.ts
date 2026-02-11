@@ -24,7 +24,9 @@ export class DetailsPageLayout {
   }
 
   async verifyPageHeader(header: string) {
-    await expect(this._page.getByRole("heading")).toContainText(header);
+    await expect(this._page.getByRole("heading", { level: 1 })).toContainText(
+      header,
+    );
   }
 
   async verifyTabIsSelected(tabName: string) {
