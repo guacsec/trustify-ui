@@ -356,12 +356,11 @@ export class ToolbarTable {
     if (index < 0) {
       fail("Given header not found");
     }
-    // Find the first row that has a non-empty value in the target column
-    const firstNonEmptyRowIndex = dataRow.findIndex(
-      (r) => r && r[index] !== undefined && r[index] !== "",
-    );
-    if (firstNonEmptyRowIndex !== -1) {
-      row = firstNonEmptyRowIndex;
+    for (const data of dataRow) {
+      if (data[index] != null && data[index] !== ``) {
+        break;
+      }
+      row += 1;
     }
     // Safely detect the type from the discovered row (if any)
     const sampleValue = dataRow[row] ? dataRow[row][index] : "";
@@ -491,7 +490,7 @@ export class ToolbarTable {
         return true;
       } else {
         await headerElem.getByRole("button", { name: columnHeader }).click();
-        await this._page.waitForTimeout(100);
+        await this.waitForTableContent();
       }
     }
     return false;

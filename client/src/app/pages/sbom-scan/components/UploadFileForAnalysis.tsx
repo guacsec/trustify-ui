@@ -15,10 +15,11 @@ import {
   ModalHeader,
   MultipleFileUpload,
   MultipleFileUploadMain,
+  Spinner,
 } from "@patternfly/react-core";
 
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
-import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
+import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 import UploadIcon from "@patternfly/react-icons/dist/esm/icons/upload-icon";
 
 import type { ExtractResult } from "@app/client";
@@ -105,19 +106,18 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
               );
             }
 
-            console.log(upload.error);
             return (
               <EmptyState
                 key={`${file.name}-${index}-error`}
                 status="danger"
                 headingLevel="h4"
-                titleText={`Error ${upload.error.status ?? upload.error.code}: Upload failed`}
+                titleText={"Report failed"}
                 icon={ExclamationCircleIcon}
                 variant={EmptyStateVariant.sm}
               >
                 <EmptyStateBody>
-                  The file could not be analyzed. The file might be corrupted or
-                  an unsupported format.
+                  The {file.name} file could not be analyzed. The file might be
+                  corrupted or an unsupported format.
                   {upload.error.response?.data.message && (
                     <ExpandableSection toggleText="Show details">
                       {upload.error.response?.data.message}
@@ -142,8 +142,8 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
             <EmptyState
               key={`${file.name}-${index}-progress`}
               headingLevel="h4"
-              titleText={`Uploading SBOM ${upload.progress}%`}
-              icon={InProgressIcon}
+              titleText={"Analyzing SBOM"}
+              icon={Spinner}
               variant={EmptyStateVariant.sm}
             >
               <EmptyStateBody>
@@ -155,8 +155,9 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
                   <Button
                     variant="link"
                     onClick={() => handleCancelUpload(file)}
+                    icon={<TimesIcon />}
                   >
-                    Cancel upload
+                    Cancel Upload
                   </Button>
                 </EmptyStateActions>
               </EmptyStateFooter>

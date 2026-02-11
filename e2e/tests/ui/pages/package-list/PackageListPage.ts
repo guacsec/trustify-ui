@@ -19,11 +19,30 @@ export class PackageListPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "package-toolbar");
+    return await Toolbar.build(this._page, "package-toolbar", {
+      "Filter text": "string",
+      Type: "multiSelect",
+      Architecture: "multiSelect",
+      License: "typeahead",
+    });
   }
 
   async getTable() {
-    return await Table.build(this._page, "Package table");
+    return await Table.build(
+      this._page,
+      "Package table",
+      [
+        "Name",
+        "Namespace",
+        "Version",
+        "Type",
+        "Licenses",
+        "Path",
+        "Qualifiers",
+        "Vulnerabilities",
+      ],
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

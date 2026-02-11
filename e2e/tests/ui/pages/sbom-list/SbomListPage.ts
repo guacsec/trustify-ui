@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
 import { Navigation } from "../Navigation";
-import { Toolbar } from "../Toolbar";
-import { Table } from "../Table";
 import { Pagination } from "../Pagination";
+import { Table } from "../Table";
+import { Toolbar } from "../Toolbar";
 
 export class SbomListPage {
   private readonly _page: Page;
@@ -13,17 +13,46 @@ export class SbomListPage {
 
   static async build(page: Page) {
     const navigation = await Navigation.build(page);
-    await navigation.goToSidebar("SBOMs");
+    await navigation.goToSidebar("All SBOMs");
+    return new SbomListPage(page);
+  }
 
+  static async fromCurrentPage(page: Page) {
     return new SbomListPage(page);
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "sbom-toolbar");
+    return await Toolbar.build(
+      this._page,
+      "sbom-toolbar",
+      {
+        "Filter text": "string",
+        "Created on": "dateRange",
+        Label: "typeahead",
+        License: "typeahead",
+      },
+      {
+        buttonAriaLabel: "SBOM actions",
+        actions: ["Upload SBOM", "Generate vulnerability report"],
+      },
+    );
   }
 
   async getTable() {
-    return await Table.build(this._page, "sbom-table");
+    return await Table.build(
+      this._page,
+      "sbom-table",
+      [
+        "Name",
+        "Version",
+        "Supplier",
+        "Labels",
+        "Created on",
+        "Dependencies",
+        "Vulnerabilities",
+      ],
+      ["Edit labels", "Download SBOM", "Download License Report", "Delete"],
+    );
   }
 
   async getPagination(top: boolean = true) {

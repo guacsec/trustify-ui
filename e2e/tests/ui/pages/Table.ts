@@ -1,12 +1,25 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page, expect } from "@playwright/test";
 
-export class Table {
+export class Table<
+  const TColumns extends readonly string[],
+  const TActions extends readonly string[],
+> {
   private readonly _page: Page;
-  _table: Locator;
+  readonly _table: Locator;
+  readonly _columns: TColumns;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: allowed
+  private readonly _actions: TActions;
 
-  private constructor(page: Page, table: Locator) {
+  private constructor(
+    page: Page,
+    table: Locator,
+    columns: TColumns,
+    actions: TActions,
+  ) {
     this._page = page;
     this._table = table;
+    this._columns = columns;
+    this._actions = actions;
   }
 
   /**
@@ -14,11 +27,14 @@ export class Table {
    * @param tableAriaLabel the unique aria-label that corresponds to the DOM element that contains the Table. E.g. <table aria-label="identifier"></table>
    * @returns a new instance of a Toolbar
    */
-  static async build(page: Page, tableAriaLabel: string) {
+  static async build<
+    const TColumns extends readonly string[],
+    const TActions extends readonly string[],
+  >(page: Page, tableAriaLabel: string, columns: TColumns, actions: TActions) {
     const table = page.locator(`table[aria-label="${tableAriaLabel}"]`);
     await expect(table).toBeVisible();
 
-    const result = new Table(page, table);
+    const result = new Table(page, table, columns, actions);
     await result.waitUntilDataIsLoaded();
     return result;
   }
@@ -26,7 +42,7 @@ export class Table {
   /**
    * @param waitMs - Optional. Milliseconds to wait before checking table data.
    */
-  async waitUntilDataIsLoaded(waitMs: number = 500) {
+  public async waitUntilDataIsLoaded(waitMs = 500) {
     await this._page.waitForTimeout(waitMs);
 
     const rows = this._table.locator(
@@ -37,14 +53,14 @@ export class Table {
     await expect.poll(() => rows.count()).toBeGreaterThanOrEqual(1);
   }
 
-  async clickSortBy(columnName: string) {
+  async clickSortBy(columnName: TColumns[number]) {
     await this._table
       .getByRole("button", { name: columnName, exact: true })
       .click();
     await this.waitUntilDataIsLoaded();
   }
 
-  async clickAction(actionName: string, rowIndex: number) {
+  async clickAction(actionName: TActions[number], rowIndex: number) {
     await this._table
       .locator(`button[aria-label="Kebab toggle"]`)
       .nth(rowIndex)
@@ -53,46 +69,97 @@ export class Table {
     await this._page.getByRole("menuitem", { name: actionName }).click();
   }
 
-  async verifyTableIsSortedBy(columnName: string, asc: boolean = true) {
-    await expect(
-      this._table.getByRole("columnheader", { name: columnName }),
-    ).toHaveAttribute("aria-sort", asc ? "ascending" : "descending");
+  async expandCell(columnName: TColumns[number], rowIndex: number) {
+    const column = await this.getColumn(columnName);
+    await column.nth(rowIndex).click();
+
+    const expandedCell = column.nth(rowIndex + 1);
+    await expect(expandedCell).toBeVisible();
+    return expandedCell;
   }
 
-  async verifyColumnContainsText(columnName: string, expectedValue: string) {
-    await expect(
-      this._table.locator(`td[data-label="${columnName}"]`, {
-        hasText: expectedValue,
-      }),
-    ).toBeVisible();
+  async expandRow(rowIndex: number) {
+    const rows = await this.getRows();
+    const row = rows.nth(rowIndex);
+
+    const toggleButton = row.getByRole("button", { name: "Details" });
+    await expect(toggleButton).toBeVisible();
+    await toggleButton.click();
+
+    const expandedArea = row.locator(".pf-m-expanded");
+    await expect(expandedArea).toBeVisible();
+    return expandedArea;
   }
 
-  async verifyTableHasNoData() {
-    await expect(
-      this._table.locator(`tbody[aria-label="Table empty"]`),
-    ).toBeVisible();
+  async getRows() {
+    const rows = this._table.locator("tbody");
+    await expect(rows).toBeVisible();
+    return rows;
   }
 
-  async validateNumberOfRows(
-    expectedRows: {
-      equal?: number;
-      greaterThan?: number;
-      lessThan?: number;
-    },
-    columnName: string,
-  ) {
-    const rows = this._table.locator(`td[data-label="${columnName}"]`);
+  async getColumn(columnName: TColumns[number]) {
+    const column = this._table.locator(`td[data-label="${columnName}"]`);
+    await expect(column.first()).toBeVisible();
+    return column;
+  }
 
-    if (expectedRows.equal) {
-      await expect.poll(() => rows.count()).toBe(expectedRows.equal);
+  async getColumnHeader(columnName: TColumns[number]) {
+    const columnHeader = this._table.getByRole("columnheader", {
+      name: columnName,
+      exact: true,
+    });
+    await expect(columnHeader).toBeVisible();
+    return columnHeader;
+  }
+
+  /**
+   * Gets the tooltip button for a column header
+   * @param columnName The name of the column
+   * @param tooltipMessage The tooltip text (used as the accessible name of the button)
+   * @returns The tooltip button locator
+   */
+  getColumnTooltipButton(
+    columnName: TColumns[number],
+    tooltipMessage: string,
+  ): Locator {
+    const columnHeader = this._table.getByRole("columnheader", {
+      name: new RegExp(columnName),
+    });
+    return columnHeader.getByRole("button", {
+      name: tooltipMessage,
+    });
+  }
+
+  /**
+   * Gets table rows that match specific cell value(s)
+   * @param cellValues An object mapping column names to expected values
+   * @returns A locator for all matching rows
+   * @example
+   * // Get rows where Name column contains "curl"
+   * const rows = table.getRowsByCellValue({ "Name": "curl" });
+   *
+   * // Get rows matching multiple criteria
+   * const rows = table.getRowsByCellValue({ "Name": "curl", "Version": "7.29.0" });
+   */
+  async getRowsByCellValue(
+    cellValues: Partial<Record<TColumns[number], string>>,
+  ): Promise<Locator> {
+    // Start with all table rows
+    let rowLocator = this._table.locator("tbody tr");
+
+    // Filter rows based on each column-value pair
+    for (const columnName of Object.keys(cellValues) as Array<
+      TColumns[number]
+    >) {
+      const value = cellValues[columnName];
+      rowLocator = rowLocator.filter({
+        has: this._page.locator(`td[data-label="${columnName}"]`, {
+          hasText: value,
+        }),
+      });
     }
-    if (expectedRows.greaterThan) {
-      await expect
-        .poll(() => rows.count())
-        .toBeGreaterThan(expectedRows.greaterThan);
-    }
-    if (expectedRows.lessThan) {
-      await expect.poll(() => rows.count()).toBeLessThan(expectedRows.lessThan);
-    }
+
+    await expect(rowLocator.first()).toBeVisible();
+    return rowLocator;
   }
 }

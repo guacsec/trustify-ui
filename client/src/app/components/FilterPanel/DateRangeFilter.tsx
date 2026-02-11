@@ -4,7 +4,7 @@ import {
   DatePicker,
   Form,
   FormGroup,
-  isValidDate as isValidJSDate,
+  isValidDate,
 } from "@patternfly/react-core";
 
 import {
@@ -72,6 +72,11 @@ export const DateRangeFilter = <TItem,>({
     }
   };
 
+  const toValidator = (date: Date) =>
+    from && isValidDate(from) && date >= from
+      ? ""
+      : 'The "to" date must be after the "from" date';
+
   return (
     <Form>
       <FormGroup role="group" isInline label="From">
@@ -82,8 +87,7 @@ export const DateRangeFilter = <TItem,>({
           onChange={onFromDateChange}
           aria-label="Interval start"
           placeholder="MM/DD/YYYY"
-          // disable error text (no space in toolbar scenario)
-          invalidFormatText={""}
+          invalidFormatText={"Invalid date"}
           // default value ("parent") creates collision with sticky table header
           appendTo={document.body}
           isDisabled={isDisabled}
@@ -93,12 +97,12 @@ export const DateRangeFilter = <TItem,>({
         <DatePicker
           value={to ? americanDateFormat(to) : ""}
           onChange={onToDateChange}
-          isDisabled={isDisabled || !isValidJSDate(from)}
+          isDisabled={isDisabled || !isValidDate(from)}
           dateFormat={americanDateFormat}
           dateParse={parseAmericanDate}
-          // disable error text (no space in toolbar scenario)
-          invalidFormatText={""}
+          invalidFormatText={"Invalid date"}
           rangeStart={from}
+          validators={[toValidator]}
           aria-label="Interval end"
           placeholder="MM/DD/YYYY"
           appendTo={document.body}

@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { PackageDetailsPage } from "../PackageDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { PackageDetailsPage } from "../PackageDetailsPage";
 
 export class SbomsTab {
   private readonly _page: Page;
@@ -13,8 +13,29 @@ export class SbomsTab {
     this._detailsPage = layout;
   }
 
-  static async build(page: Page, packageName: string) {
-    const detailsPage = await PackageDetailsPage.build(page, packageName);
+  /**
+   * Build the tab by navigating to the package details page and selecting the tab.
+   */
+  static async build(page: Page, packageDetail: Record<string, string>) {
+    const detailsPage = await PackageDetailsPage.build(page, {
+      Name: packageDetail.Name,
+      Version: packageDetail.Version,
+    });
+    await detailsPage._layout.selectTab("SBOMs using package");
+
+    return new SbomsTab(page, detailsPage);
+  }
+
+  /**
+   * Build the tab from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param packageName - Optional package name to verify the page header
+   */
+  static async fromCurrentPage(page: Page, packageName?: string) {
+    const detailsPage = await PackageDetailsPage.fromCurrentPage(
+      page,
+      packageName,
+    );
     await detailsPage._layout.selectTab("SBOMs using package");
 
     return new SbomsTab(page, detailsPage);
@@ -25,7 +46,12 @@ export class SbomsTab {
   }
 
   async getTable() {
-    return await Table.build(this._page, "SBOM table");
+    return await Table.build(
+      this._page,
+      "SBOM table",
+      ["Name", "Version", "Supplier"],
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

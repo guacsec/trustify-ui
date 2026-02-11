@@ -131,10 +131,12 @@ export class DetailsPage {
     for (const element of elements) {
       const innerText = await element.textContent();
       const labelArr = await innerText?.split(delimiter);
-      vulnLabelCount[labelArr[0].trim().toString()] = parseInt(
-        labelArr[1].trim(),
-        10,
-      );
+      if (labelArr) {
+        vulnLabelCount[labelArr[0].trim().toString()] = parseInt(
+          labelArr[1].trim(),
+          10,
+        );
+      }
     }
     return vulnLabelCount;
   }
@@ -155,11 +157,11 @@ export class DetailsPage {
       Critical: 0,
     };
     const nextButton = await this.page.locator(
-      `xpath=(//section[@id='refVulnerabilitiesSection']//button[@data-action='next'])[1]`,
+      `xpath=(//section[@id='vulnerabilities-tab-section']//button[@data-action='next'])[1]`,
     );
 
     const noOfRows = await this.page.locator(
-      `xpath=//section[@id="refVulnerabilitiesSection"]//button[@id="pagination-id-top-toggle"]`,
+      `xpath=//section[@id="vulnerabilities-tab-section"]//button[@id="pagination-id-top-toggle"]`,
     );
     if (await noOfRows.isEnabled()) {
       noOfRows.click();
@@ -238,7 +240,6 @@ export class DetailsPage {
     if (!parentElem) {
       parentElem = this.page.locator(`xpath=//td[.='${entity}']/parent::tr/td`);
     }
-
     const moreElem = parentElem.getByRole("button", { name: "more" });
     if (await moreElem.isVisible({ timeout: 2000 })) {
       await moreElem.click();

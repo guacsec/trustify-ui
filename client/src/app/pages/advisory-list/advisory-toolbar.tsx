@@ -17,10 +17,12 @@ import { AdvisorySearchContext } from "./advisory-context";
 
 interface AdvisoryToolbarProps {
   showFilters?: boolean;
+  showActions?: boolean;
 }
 
 export const AdvisoryToolbar: React.FC<AdvisoryToolbarProps> = ({
   showFilters,
+  showActions,
 }) => {
   const navigate = useNavigate();
 
@@ -39,14 +41,16 @@ export const AdvisoryToolbar: React.FC<AdvisoryToolbarProps> = ({
     <Toolbar {...toolbarProps} aria-label="advisory-toolbar">
       <ToolbarContent>
         {showFilters && <FilterToolbar {...filterToolbarProps} />}
-        <ToolbarItem>
-          <Button
-            variant="primary"
-            onClick={() => navigate(Paths.advisoryUpload)}
-          >
-            Upload Advisory
-          </Button>
-        </ToolbarItem>
+        {showActions && (
+          <ToolbarItem>
+            <Button
+              variant="primary"
+              onClick={() => navigate(Paths.advisoryUpload)}
+            >
+              Upload Advisory
+            </Button>
+          </ToolbarItem>
+        )}
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination
             idPrefix="advisory-table"

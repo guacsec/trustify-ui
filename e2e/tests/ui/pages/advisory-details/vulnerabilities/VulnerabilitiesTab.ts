@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import { AdvisoryDetailsPage } from "../AdvisoryDetailsPage";
-import { Toolbar } from "../../Toolbar";
-import { Table } from "../../Table";
 import { Pagination } from "../../Pagination";
+import { Table } from "../../Table";
+import { Toolbar } from "../../Toolbar";
+import { AdvisoryDetailsPage } from "../AdvisoryDetailsPage";
 
 export class VulnerabilitiesTab {
   private readonly _page: Page;
@@ -13,8 +13,26 @@ export class VulnerabilitiesTab {
     this._detailsPage = layout;
   }
 
-  static async build(page: Page, packageName: string) {
-    const detailsPage = await AdvisoryDetailsPage.build(page, packageName);
+  /**
+   * Build the tab by navigating to the advisory details page and selecting the tab.
+   */
+  static async build(page: Page, advisoryID: string) {
+    const detailsPage = await AdvisoryDetailsPage.build(page, advisoryID);
+    await detailsPage._layout.selectTab("Vulnerabilities");
+
+    return new VulnerabilitiesTab(page, detailsPage);
+  }
+
+  /**
+   * Build the tab from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param advisoryID - Optional advisory ID to verify the page header
+   */
+  static async fromCurrentPage(page: Page, advisoryID?: string) {
+    const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(
+      page,
+      advisoryID,
+    );
     await detailsPage._layout.selectTab("Vulnerabilities");
 
     return new VulnerabilitiesTab(page, detailsPage);
@@ -25,7 +43,12 @@ export class VulnerabilitiesTab {
   }
 
   async getTable() {
-    return await Table.build(this._page, "vulnerability table");
+    return await Table.build(
+      this._page,
+      "vulnerability table",
+      ["ID", "Title", "Discovery", "Release", "Score", "CWE"],
+      [],
+    );
   }
 
   async getPagination(location: "top" | "bottom" = "top") {

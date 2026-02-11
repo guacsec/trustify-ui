@@ -22,6 +22,7 @@ import {
   ModalFooter,
   ModalHeader,
   PageSection,
+  Spinner,
   Split,
   SplitItem,
   type MenuToggleElement,
@@ -30,7 +31,7 @@ import {
 import CheckCircleIcon from "@patternfly/react-icons/dist/esm/icons/check-circle-icon";
 import DownloadIcon from "@patternfly/react-icons/dist/esm/icons/download-icon";
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
-import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
+import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 
 import type { ExtractResult } from "@app/client";
 import { useUploadAndAnalyzeSBOM } from "@app/queries/sboms-analysis";
@@ -40,6 +41,7 @@ import { UploadFileForAnalysis } from "./components/UploadFileForAnalysis";
 import { VulnerabilityTable } from "./components/VulnerabilityTable";
 import { useVulnerabilitiesOfSbomByPurls } from "./hooks/useVulnerabilitiesOfSbom";
 import { convertToCSV } from "./scan-utils";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const SbomScan: React.FC = () => {
   // Actions dropdown
@@ -116,6 +118,7 @@ export const SbomScan: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title="Scan SBOM" />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
@@ -177,7 +180,7 @@ export const SbomScan: React.FC = () => {
                     key="download-report"
                     onClick={handleDownloadCSV}
                   >
-                    Download CSV
+                    Download as CSV
                   </DropdownItem>
                 </DropdownList>
               </Dropdown>
@@ -195,18 +198,22 @@ export const SbomScan: React.FC = () => {
           />
         ) : isFetching ? (
           <EmptyState
-            titleText="Generating SBOM report"
+            titleText="Generating vulnerability report"
             headingLevel="h4"
-            icon={InProgressIcon}
+            icon={Spinner}
           >
             <EmptyStateBody>
-              Analyzing your SBOM for security vulnerabilities, license issues
-              and dependency details.
+              Analyzing your SBOM for security vulnerabilities and package
+              details.
             </EmptyStateBody>
             <EmptyStateFooter>
               <EmptyStateActions>
-                <Button variant="link" onClick={scanAnotherFile}>
-                  Cancel scan
+                <Button
+                  variant="link"
+                  onClick={scanAnotherFile}
+                  icon={<TimesIcon />}
+                >
+                  Cancel Report
                 </Button>
               </EmptyStateActions>
             </EmptyStateFooter>
@@ -220,8 +227,8 @@ export const SbomScan: React.FC = () => {
             variant={EmptyStateVariant.sm}
           >
             <EmptyStateBody>
-              The file could not be analyzed. The file might be corrupted or an
-              unsupported format.
+              The {joinedFileName} file could not be analyzed. The file might be
+              corrupted or an unsupported format.
             </EmptyStateBody>
             <EmptyStateFooter>
               <EmptyStateActions>

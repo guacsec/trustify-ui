@@ -1,9 +1,9 @@
 import type React from "react";
 import { NavLink } from "react-router-dom";
-
 import {
   Icon,
   Nav,
+  NavExpandable,
   NavItem,
   NavList,
   PageSidebar,
@@ -43,16 +43,18 @@ export const SidebarApp: React.FC = () => {
               Search
             </NavLink>
           </li>
-          <li className={nav.navItem}>
-            <NavLink
-              to={Paths.sboms}
-              className={({ isActive }) => {
-                return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
-              }}
-            >
-              SBOMs
-            </NavLink>
-          </li>
+          <NavExpandable title="SBOMs" isExpanded>
+            <li className={nav.navItem}>
+              <NavLink
+                to={Paths.sboms}
+                className={({ isActive }) => {
+                  return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
+                }}
+              >
+                All SBOMs
+              </NavLink>
+            </li>
+          </NavExpandable>
           <li className={nav.navItem}>
             <NavLink
               to={Paths.vulnerabilities}
@@ -71,6 +73,16 @@ export const SidebarApp: React.FC = () => {
               }}
             >
               Packages
+            </NavLink>
+          </li>
+          <li className={nav.navItem}>
+            <NavLink
+              to={Paths.licenses}
+              className={({ isActive }) => {
+                return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
+              }}
+            >
+              Licenses
             </NavLink>
           </li>
           <li className={nav.navItem}>

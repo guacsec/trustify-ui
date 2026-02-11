@@ -14,7 +14,7 @@
     "test:ui:host": "npx bddgen && npx playwright test --ui-host 127.0.0.1",
     "test:bdd": "npx bddgen && npx playwright test --project='bdd'",
     "test:bdd:trace": "npx bddgen && npx playwright test --project='bdd' --trace on",
-    "check": "biome check --error-on-warnings .",
+    "check": "biome check --error-on-warnings . && npx tsc --noEmit",
     "check:write": "biome check --write .",
     "format": "biome format .",
     "format:fix": "biome format --write ."
@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
+    "@playwright/test": "^1.57.0",
     "axios": "^1.11.0",
     "playwright-bdd": "^8.3.1"
   }

@@ -13,8 +13,8 @@ interface IWatchedSbomsContext {
   sboms?: WatchedSboms;
   isFetching: boolean;
   fetchError: AxiosError | null;
-
-  patch: (key: string, value: string) => void;
+  mutatingKeys: ReadonlySet<string>;
+  patch: (key: string, value: string | null) => void;
 }
 
 const contextDefaultValue = {} as IWatchedSbomsContext;
@@ -30,7 +30,9 @@ export const WatchedSbomsProvider: React.FunctionComponent<
   IWatchedSbomsProvider
 > = ({ children }) => {
   const { pushNotification } = React.useContext(NotificationsContext);
-
+  const [mutatingKeys, setMutatingKeys] = React.useState<ReadonlySet<string>>(
+    new Set(),
+  );
   const { sboms, isFetching, fetchError } = useFetchWatchedSboms();
 
   const onUpdateSuccess = () => {};
@@ -46,10 +48,26 @@ export const WatchedSbomsProvider: React.FunctionComponent<
     onUpdateError,
   );
 
-  const patch = (key: string, value: string) => {
-    const newSboms = { ...sboms, [key]: value };
-    updateSboms(newSboms as WatchedSboms);
-  };
+  const patch = React.useCallback(
+    (key: string, value: string | null) => {
+      setMutatingKeys((prev) => {
+        const set = new Set(prev);
+        set.add(key);
+        return set;
+      });
+      const newSboms = { ...sboms, [key]: value };
+      updateSboms(newSboms as WatchedSboms, {
+        onSettled: () => {
+          setMutatingKeys((prev) => {
+            const set = new Set(prev);
+            set.delete(key);
+            return set;
+          });
+        },
+      });
+    },
+    [sboms, updateSboms],
+  );
 
   return (
     <WatchedSbomsContext.Provider
@@ -58,6 +76,7 @@ export const WatchedSbomsProvider: React.FunctionComponent<
         isFetching,
         fetchError,
         patch,
+        mutatingKeys,
       }}
     >
       {children}

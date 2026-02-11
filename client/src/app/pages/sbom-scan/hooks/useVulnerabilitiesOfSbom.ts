@@ -211,7 +211,6 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
 
         const prevVulnStatusValue = prev.vulnerabilityStatus[vulnStatus];
 
-        // biome-ignore lint/performance/noAccumulatingSpread: allowed
         const result: VulnerabilityOfSbomSummary = Object.assign(prev, {
           vulnerabilityStatus: {
             ...prev.vulnerabilityStatus,

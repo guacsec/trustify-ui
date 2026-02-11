@@ -1,8 +1,15 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "playwright/test";
+
+import { test } from "../../fixtures";
+
+import { expect } from "../../assertions";
+
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
-import { test } from "../../fixtures";
+
+import { AdvisoryDetailsPage } from "../../pages/advisory-details/AdvisoryDetailsPage";
+import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
+import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -11,19 +18,23 @@ const VULN_TABLE_NAME = "vulnerability table";
 Given(
   "User visits Advisory details Page of {string}",
   async ({ page }, advisoryID) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryID);
-    await page.getByRole("link", { name: advisoryID, exact: true }).click();
+    await AdvisoryDetailsPage.build(page, advisoryID);
   },
 );
 
 Given(
   "User visits Advisory details Page of {string} with type {string}",
   async ({ page }, advisoryName, advisoryType) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryName);
-    const advisory = `xpath=//tr[contains(.,'${advisoryName}') and contains(.,'${advisoryType}')]/td/a`;
-    await page.locator(advisory).click();
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+
+    await toolbar.applyFilter({ "Filter text": advisoryName });
+    const rows = await table.getRowsByCellValue({
+      ID: advisoryName,
+      Type: advisoryType,
+    });
+    await rows.getByRole("link", { name: advisoryName, exact: true }).click();
   },
 );
 
@@ -39,8 +50,9 @@ When(
 When(
   "User searches for {string} in the dedicated search bar",
   async ({ page }, advisoryID) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryID);
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
   },
 );
 
@@ -83,15 +95,10 @@ Then(
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
   async ({ page }) => {
-    await page.getByRole("tab", { name: "Vulnerabilities" }).click();
+    const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(page);
+    await detailsPage._layout.selectTab("Vulnerabilities");
   },
 );
-
-Then("Pagination of Vulnerabilities list works", async ({ page }) => {
-  const toolbarTable = new ToolbarTable(page, VULN_TABLE_NAME);
-  const vulnTableTopPagination = `xpath=//div[@id="vulnerability-table-pagination-top"]`;
-  await toolbarTable.verifyPagination(vulnTableTopPagination);
-});
 
 Then(
   "A list of all active vulnerabilites tied to the advisory should display",
@@ -157,3 +164,50 @@ Then(
     ).toBeVisible();
   },
 );
+
+When(
+  "User Deletes {string} using the toggle option from Advisory List Page",
+  async ({ page }, advisoryID) => {
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    const table = await listPage.getTable();
+    const rowToDelete = 0;
+    await table.clickAction("Delete", rowToDelete);
+  },
+);
+
+When(
+  "User select Delete button from the Permanently delete Advisory model window",
+  async ({ page }) => {
+    const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
+    await expect(dialog).toHaveDialogTitle(
+      "Warning alert:Permanently delete Advisory?",
+    );
+    await dialog.clickConfirm();
+  },
+);
+
+Then(
+  "The {string} should not be present on Advisory list page as it is deleted",
+  async ({ page }, advisoryID: string) => {
+    const list = await AdvisoryListPage.build(page);
+    const toolbar = await list.getToolbar();
+    const table = await list.getTable();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
+    await expect(table).toHaveEmptyState();
+  },
+);
+
+Then("Application Navigates to Advisory list page", async ({ page }) => {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Advisories" }),
+  ).toBeVisible();
+});
+
+Then("The Advisory deleted message is displayed", async ({ page }) => {
+  const alertHeading = page.getByRole("heading", { level: 4 }).filter({
+    hasText: /The Advisory .+ was deleted/,
+  });
+  await expect(alertHeading).toBeVisible({ timeout: 10000 });
+});

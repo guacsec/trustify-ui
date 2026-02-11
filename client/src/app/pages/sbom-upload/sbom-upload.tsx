@@ -13,12 +13,14 @@ import {
 import { UploadFiles } from "@app/components/UploadFiles";
 import { useUploadSBOM } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const SbomUpload: React.FC = () => {
   const { uploads, handleUpload, handleRemoveUpload } = useUploadSBOM();
 
   return (
     <>
+      <DocumentMetadata title="Upload SBOM" />
       <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
@@ -39,6 +41,7 @@ export const SbomUpload: React.FC = () => {
       </PageSection>
       <PageSection>
         <UploadFiles
+          fileUploadProps={{ "aria-label": "sbom-uploader" }}
           uploads={uploads}
           handleUpload={handleUpload}
           handleRemoveUpload={handleRemoveUpload}

@@ -21,11 +21,19 @@ export class PackagesTab {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "Package toolbar");
+    return await Toolbar.build(this._page, "Package toolbar", {
+      "Filter text": "string",
+      License: "multiSelect",
+    });
   }
 
   async getTable() {
-    return await Table.build(this._page, "Package table");
+    return await Table.build(
+      this._page,
+      "Package table",
+      ["Name", "Version", "Vulnerabilities", "Licenses", "PURLs", "CPEs"],
+      [],
+    );
   }
 
   async getPagination(top: boolean = true) {

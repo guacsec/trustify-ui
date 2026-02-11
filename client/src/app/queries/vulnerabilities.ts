@@ -34,7 +34,7 @@ export const useFetchVulnerabilities = (
       params: params,
     },
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
     refetch,
   };
 };
@@ -68,7 +68,7 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
     }),
   });
 
-  const isFetching = userQueries.some(({ isLoading }) => isLoading);
+  const isFetching = userQueries.some(({ isFetching }) => isFetching);
   const fetchError = userQueries.find(({ error }) => !!error);
 
   const analysisResponse: AnalysisResponse = {};
@@ -88,14 +88,18 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
   };
 };
 
+export const vulnerabilityByIdQueryOptions = (id: string) => ({
+  queryKey: [VulnerabilitiesQueryKey, id],
+  queryFn: () => getVulnerability({ client, path: { id } }),
+});
+
 export const useFetchVulnerabilityById = (id: string) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: [VulnerabilitiesQueryKey, id],
-    queryFn: () => getVulnerability({ client, path: { id } }),
-  });
+  const { data, isLoading, error } = useQuery(
+    vulnerabilityByIdQueryOptions(id),
+  );
   return {
     vulnerability: data?.data,
     isFetching: isLoading,
-    fetchError: error as AxiosError,
+    fetchError: error as AxiosError | null,
   };
 };

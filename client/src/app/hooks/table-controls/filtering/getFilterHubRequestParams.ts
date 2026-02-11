@@ -112,28 +112,43 @@ export const getFilterHubRequestParams = <
       if (filterCategory.type === "numsearch" && serverFilterValue[0]) {
         pushOrMergeFilter(filters, {
           field: serverFilterField,
-          operator: filterCategory.operator ?? "=",
+          operator:
+            filterCategory.operator ??
+            filterCategory.getOperator?.(serverFilterValue) ??
+            "=",
           value: Number(serverFilterValue[0]),
         });
       }
       if (filterCategory.type === "search" && serverFilterValue[0]) {
         pushOrMergeFilter(filters, {
           field: serverFilterField,
-          operator: filterCategory.operator ?? "~",
+          operator:
+            filterCategory.operator ??
+            filterCategory.getOperator?.(serverFilterValue) ??
+            "~",
           value: serverFilterValue[0],
         });
       }
       if (filterCategory.type === "select") {
         pushOrMergeFilter(filters, {
           field: serverFilterField,
-          operator: filterCategory.operator ?? "=",
+          operator:
+            filterCategory.operator ??
+            filterCategory.getOperator?.(serverFilterValue) ??
+            "=",
           value: serverFilterValue[0],
         });
       }
-      if (filterCategory.type === "multiselect") {
+      if (
+        filterCategory.type === "multiselect" ||
+        filterCategory.type === "asyncMultiselect"
+      ) {
         pushOrMergeFilter(filters, {
           field: serverFilterField,
-          operator: filterCategory.operator ?? "=",
+          operator:
+            filterCategory.operator ??
+            filterCategory.getOperator?.(serverFilterValue) ??
+            "=",
           value: {
             list: serverFilterValue,
             operator: getFilterLogicOperator(filterCategory, "OR"),
@@ -160,6 +175,16 @@ export const getFilterHubRequestParams = <
       if (filterCategory.type === "autocompleteLabel") {
         // Do nothing as labels do not follow the pattern {field}{operator}{value}
         // It is expected for the app to add manually those fields to the REST API
+      }
+      if (filterCategory.type === "toggle") {
+        pushOrMergeFilter(filters, {
+          field: serverFilterField,
+          operator:
+            filterCategory.operator ??
+            filterCategory.getOperator?.(serverFilterValue) ??
+            "=",
+          value: serverFilterValue[0],
+        });
       }
     }
   }

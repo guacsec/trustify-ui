@@ -64,6 +64,7 @@ import { useLocalTableControls } from "@app/hooks/table-controls";
 import { ANSICOLOR } from "@app/Constants";
 import { ImporterProgress } from "./components/importer-progress";
 import { ImporterStatusIcon } from "./components/importer-status-icon";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 type ImporterStatus = "disabled" | "scheduled" | "running";
 
@@ -276,6 +277,7 @@ export const ImporterList: React.FC = () => {
 
   return (
     <>
+      <DocumentMetadata title="Importers" />
       <PageSection hasBodyWrapper={false}>
         <Content>
           <Content component="h1">Importers</Content>
@@ -657,7 +659,6 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            // biome-ignore lint/correctness/noNestedComponentDefinitions: allowed as Patternfly requires id
             const LogButton = ({ children }: { children: React.ReactNode }) => {
               if (item.messages) {
                 return (

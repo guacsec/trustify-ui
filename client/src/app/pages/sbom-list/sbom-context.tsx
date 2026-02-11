@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { AxiosError } from "axios";
+import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
@@ -10,14 +11,24 @@ import {
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
-import type { SbomSummary } from "@app/client";
+import type {
+  SbomHead,
+  SbomPackage,
+  SbomSummary,
+  SourceDocument,
+} from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
+import {
+  type BulkSelectionValues,
+  useBulkSelection,
+} from "@app/hooks/selection";
 import {
   type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
+import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 
 interface ISbomSearchContext {
@@ -31,13 +42,23 @@ interface ISbomSearchContext {
     | "labels"
     | "vulnerabilities",
     "name" | "published",
-    "" | "published" | "labels",
+    "" | "published" | "labels" | "license",
     string
   >;
 
+  bulkSelection: {
+    isEnabled: boolean;
+    controls: BulkSelectionValues<
+      SbomHead &
+        SourceDocument & {
+          described_by: Array<SbomPackage>;
+        }
+    >;
+  };
+
   totalItemCount: number;
   isFetching: boolean;
-  fetchError: AxiosError;
+  fetchError: AxiosError | null;
 }
 
 const contextDefaultValue = {} as ISbomSearchContext;
@@ -46,23 +67,33 @@ export const SbomSearchContext =
   React.createContext<ISbomSearchContext>(contextDefaultValue);
 
 interface ISbomProvider {
+  isBulkSelectionEnabled?: boolean;
   children: React.ReactNode;
 }
 
 export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
+  isBulkSelectionEnabled,
   children,
 }) => {
-  const [inputValue, setInputValue] = React.useState("");
-  const [debouncedInputValue, setDebouncedInputValue] = React.useState("");
+  const [inputValueLabel, setInputValueLabel] = React.useState("");
+  const [debouncedInputValueLabel] = useDebounceValue(inputValueLabel, 400);
+  const { labels } = useFetchSBOMLabels(debouncedInputValueLabel);
 
-  React.useEffect(() => {
-    const delayInputTimeoutId = setTimeout(() => {
-      setDebouncedInputValue(inputValue);
-    }, 400);
-    return () => clearTimeout(delayInputTimeoutId);
-  }, [inputValue]);
-
-  const { labels } = useFetchSBOMLabels(debouncedInputValue);
+  const [inputValueLicense, setInputValueLicense] = React.useState("");
+  const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
+  const {
+    result: { data: licenses },
+  } = useFetchLicenses({
+    filters: [
+      {
+        field: FILTER_TEXT_CATEGORY_KEY,
+        operator: "~",
+        value: debouncedInputValueLicense,
+      },
+    ],
+    sort: { field: "license", direction: "asc" },
+    page: { pageNumber: 1, itemsPerPage: 10 },
+  });
 
   const tableControlState = useTableControlState({
     tableName: "sbom",
@@ -105,10 +136,24 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
             label: keyValue,
           };
         }),
-        onInputValueChange: setInputValue,
+        onInputValueChange: setInputValueLabel,
+      },
+      {
+        categoryKey: "license",
+        title: "License",
+        type: FilterType.asyncMultiselect,
+        placeholderText: "Filter results by license",
+        selectOptions: licenses.map((e) => {
+          return {
+            value: e.license,
+            label: e.license,
+          };
+        }),
+        onInputValueChange: setInputValueLicense,
       },
     ],
     isExpansionEnabled: false,
+    isSelectionEnabled: isBulkSelectionEnabled,
   });
 
   const {
@@ -136,9 +181,24 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     isLoading: isFetching,
   });
 
+  const bulkSelectionControls = useBulkSelection({
+    isEqual: (a, b) => a.id === b.id,
+    filteredItems: tableControls.filteredItems,
+    currentPageItems: tableControls.currentPageItems,
+  });
+
   return (
     <SbomSearchContext.Provider
-      value={{ totalItemCount, isFetching, fetchError, tableControls }}
+      value={{
+        totalItemCount,
+        isFetching,
+        fetchError,
+        tableControls,
+        bulkSelection: {
+          isEnabled: !!isBulkSelectionEnabled,
+          controls: bulkSelectionControls,
+        },
+      }}
     >
       {children}
     </SbomSearchContext.Provider>

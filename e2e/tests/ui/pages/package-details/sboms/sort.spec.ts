@@ -1,9 +1,9 @@
 // @ts-check
 
+import { expect } from "../../../assertions";
 import { test } from "../../../fixtures";
 import { login } from "../../../helpers/Auth";
 import { SbomsTab } from "./SbomsTab";
-import { expectSort } from "../../Helpers";
 
 test.describe("Sort validations", { tag: "@tier1" }, () => {
   test.beforeEach(async ({ page }) => {
@@ -11,17 +11,16 @@ test.describe("Sort validations", { tag: "@tier1" }, () => {
   });
 
   test("Sort", async ({ page }) => {
-    const sbomTab = await SbomsTab.build(page, "keycloak-core");
+    const sbomTab = await SbomsTab.build(page, {
+      Name: "keycloak-core",
+      Version: "18.0.6.redhat-00001",
+    });
     const table = await sbomTab.getTable();
 
-    const columnNameSelector = table._table.locator(`td[data-label="Name"]`);
-
-    const ascList = await columnNameSelector.allInnerTexts();
-    expectSort(ascList, true);
+    await expect(table).toBeSortedBy("Name", "ascending");
 
     // Reverse sorting
     await table.clickSortBy("Name");
-    const descList = await columnNameSelector.allInnerTexts();
-    expectSort(descList, false);
+    await expect(table).toBeSortedBy("Name", "descending");
   });
 });

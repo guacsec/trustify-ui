@@ -104,7 +104,7 @@ export const MonitoringSection: React.FC = () => {
               }
               fetchError={
                 fetchErrorBarchartSboms ||
-                fetchErrorBarchartSbomsVulnerabilities.some((e) => !!e)
+                fetchErrorBarchartSbomsVulnerabilities.find((e) => !!e)
               }
             >
               <Stack hasGutter>
@@ -142,7 +142,7 @@ export const MonitoringSection: React.FC = () => {
                             x={200}
                             colorScale={LEGENDS.map((legend) => {
                               const severity = severityList[legend.severity];
-                              return severity.color.value;
+                              return severity.color.var;
                             })}
                           />
                         }
@@ -196,7 +196,7 @@ export const MonitoringSection: React.FC = () => {
                           horizontal
                           colorScale={LEGENDS.map((legend) => {
                             const severity = severityList[legend.severity];
-                            return severity.color.value;
+                            return severity.color.var;
                           })}
                         >
                           {LEGENDS.map((legend) => {

@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
@@ -125,7 +125,7 @@ jobs:
     steps:
       - name: Download artifact
         if: "${{ inputs.artifact != '' }}"
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact }}
           path: /tmp
@@ -135,8 +135,8 @@ jobs:
           docker load --input /tmp/${{ inputs.artifact }}.tar
 
       - name: Checkout ui repo
-        uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+        uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: "npm"
@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload Playwright artifacts
         if: failure() # only upload if tests failed
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-artifacts
           path: |
