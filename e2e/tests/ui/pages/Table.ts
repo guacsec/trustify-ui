@@ -206,4 +206,24 @@ export class Table<
         throw new Error(`Unknown type: ${type}`);
     }
   }
+
+  /**
+   * Converts plural entity type to singular form
+   * @param pluralType Plural entity type (e.g., "SBOMs", "Packages", "Vulnerabilities", "Advisories")
+   * @returns Singular form of the entity type
+   */
+  static toSingular(pluralType: string): string {
+    switch (pluralType) {
+      case "SBOMs":
+        return "SBOM";
+      case "Packages":
+        return "Package";
+      case "Vulnerabilities":
+        return "CVE";
+      case "Advisories":
+        return "Advisory";
+      default:
+        throw new Error(`Unknown plural type: ${pluralType}`);
+    }
+  }
 }

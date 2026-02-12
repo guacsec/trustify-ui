@@ -144,7 +144,9 @@ Then(
 
 Then(
   "user clicks on the {string} {string} link",
-  async ({ page }, arg: string, type: string) => {
+  async ({ page }, arg: string, types: string) => {
+    // Convert plural to singular for comparison
+    const type = Table.toSingular(types);
     currentType = type;
     const table = await Page.getTable();
     await table.waitUntilDataIsLoaded();

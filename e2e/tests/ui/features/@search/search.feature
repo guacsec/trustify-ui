@@ -53,19 +53,19 @@ Scenario: Search bar should not preview anything when no matches are found
 	And user starts typing a "non-existent name" in the search bar
 	Then The autofill drop down should not show any values
 
-Scenario Outline: User searches for a specific "<type>"
+Scenario Outline: User searches for a specific "<types>"
  	When user types a "<type-instance>" in the search bar
  	And user presses Enter
-	And User selects the Tab "<types>" 
+	And User selects the Tab "<types>"
  	Then the "<types>" list should display the specific "<type-instance>"
 	And the list should be limited to 10 items or less
- 	And the user should be able to filter "<types>" 
- 	And user clicks on the "<type-instance>" "<type>" link
- 	And the user should be navigated to the specific "<type-instance>" page 
+ 	And the user should be able to filter "<types>"
+ 	And user clicks on the "<type-instance>" "<types>" link
+ 	And the user should be navigated to the specific "<type-instance>" page
 
 	Examples:
-	|type|types|type-instance|
-	|SBOM|SBOMs|quarkus-bom|
-	|CVE|Vulnerabilities|CVE-2022-45787|
-	|Package|Packages|quarkus|
-	|Advisory|Advisories|CVE-2022-45787|
+	|types|type-instance|
+	|SBOMs|quarkus-bom|
+	|Vulnerabilities|CVE-2022-45787|
+	|Packages|quarkus|
+	|Advisories|CVE-2022-45787|
