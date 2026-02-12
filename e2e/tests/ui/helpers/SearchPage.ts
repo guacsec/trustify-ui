@@ -4,10 +4,12 @@ import { DetailsPage } from "./DetailsPage";
 export class SearchPage {
   page: Page;
   menu: string;
+
   constructor(page: Page, menu: string) {
     this.page = page;
     this.menu = menu;
   }
+
   /**
    * Searches for an item from the Search view
    * @param type Type of item to search for, corresponds with the tabs in the Search view (SBOMs, Packages, Vulnerabilities, Advisories)
@@ -36,6 +38,7 @@ export class SearchPage {
       .press("Enter");
     await detailsPage.selectTab(type);
   }
+
   /**
    * Navigates to given menu option and filters data
    * @deprecated

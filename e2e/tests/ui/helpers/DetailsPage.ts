@@ -27,9 +27,7 @@ export class DetailsPage {
   }
 
   async verifyPageHeader(header: string) {
-    await expect(this.page.locator("h1")).toContainText(header, {
-      timeout: 30000,
-    });
+    await expect(this.page.getByRole("heading")).toContainText(header);
   }
 
   async verifyActionIsAvailable(actionName: string) {
