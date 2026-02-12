@@ -3,6 +3,7 @@ import { expect } from "@playwright/test";
 import { SearchPage, type Tabs } from "../../pages/search-page/SearchPage";
 import { SearchPageTabs } from "../../pages/SearchPageTabs";
 import { DetailsPageLayout } from "../../pages/DetailsPageLayout";
+import { Table } from "../../pages/Table";
 
 export const { Given, When, Then } = createBdd();
 
@@ -11,44 +12,6 @@ let currentType = "";
 
 // Store API responses captured during page load
 const apiResponses: Map<string, number> = new Map();
-
-/**
- * This function returns table identifier and column names based on the type
- * @param type Category of the data
- */
-function getTableInfo(type: string): { columnKey: string; columnName: string } {
-  switch (type) {
-    case "SBOMs":
-    case "SBOM":
-      return { columnKey: "name", columnName: "Name" };
-    case "Advisories":
-    case "Advisory":
-      return { columnKey: "identifier", columnName: "ID" };
-    case "Vulnerabilities":
-    case "CVE":
-      return { columnKey: "identifier", columnName: "ID" };
-    case "Packages":
-    case "Package":
-      return { columnKey: "name", columnName: "Name" };
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-}
-
-function getSortableColumns(type: string): string[] {
-  switch (type) {
-    case "Vulnerabilities":
-      return ["ID", "CVSS", "Date published"];
-    case "Advisories":
-      return ["ID", "Revision"];
-    case "Packages":
-      return ["Name", "Namespace", "Version"];
-    case "SBOMs":
-      return ["Name", "Created on"];
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-}
 
 Given("User is on the Search page", async ({ page }) => {
   // Clear previous responses
@@ -150,7 +113,7 @@ Then(
       expect(found).toBe(true);
     } else {
       // For other types, look in the specific column
-      const { columnName } = getTableInfo(type);
+      const { columnName } = Table.getTableInfo(type);
       const column = await table.getColumn(columnName);
 
       // Check if any of the visible items contain the search term (case-insensitive)
@@ -208,7 +171,7 @@ Then(
       throw new Error(`No package row found containing "${arg}"`);
     } else {
       // For other types, look in the specific column
-      const { columnName } = getTableInfo(type);
+      const { columnName } = Table.getTableInfo(type);
       const column = await table.getColumn(columnName);
       const link = column.getByRole("link").filter({ hasText: arg }).first();
       await expect(link).toBeVisible();
@@ -326,7 +289,7 @@ Then(
 Then("the {string} list should be sortable", async ({ page }, arg: string) => {
   await Page.switchTo(arg as Tabs);
   const table = await Page.getTable();
-  const columns = getSortableColumns(arg);
+  const columns = Table.getSortableColumns(arg);
 
   // Test sorting on the first sortable column
   const firstColumn = columns[0];
@@ -400,7 +363,7 @@ Then(
   async ({ page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const table = await Page.getTable();
-    const { columnName } = getTableInfo(arg);
+    const { columnName } = Table.getTableInfo(arg);
     const column = await table.getColumn(columnName);
     const firstLink = column.first().getByRole("link");
     await expect(firstLink).toBeVisible();

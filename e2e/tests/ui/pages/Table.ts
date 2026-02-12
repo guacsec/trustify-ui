@@ -162,4 +162,48 @@ export class Table<
     await expect(rowLocator.first()).toBeVisible();
     return rowLocator;
   }
+
+  /**
+   * Returns table column information based on entity type
+   * @param type Category of the data (e.g., "SBOMs", "Packages", "Vulnerabilities", "Advisories")
+   * @returns Object containing columnKey and columnName for the entity type
+   */
+  static getTableInfo(type: string): { columnKey: string; columnName: string } {
+    switch (type) {
+      case "SBOMs":
+      case "SBOM":
+        return { columnKey: "name", columnName: "Name" };
+      case "Advisories":
+      case "Advisory":
+        return { columnKey: "identifier", columnName: "ID" };
+      case "Vulnerabilities":
+      case "CVE":
+        return { columnKey: "identifier", columnName: "ID" };
+      case "Packages":
+      case "Package":
+        return { columnKey: "name", columnName: "Name" };
+      default:
+        throw new Error(`Unknown type: ${type}`);
+    }
+  }
+
+  /**
+   * Returns sortable column names for a given entity type
+   * @param type Category of the data (e.g., "SBOMs", "Packages", "Vulnerabilities", "Advisories")
+   * @returns Array of sortable column names for the entity type
+   */
+  static getSortableColumns(type: string): string[] {
+    switch (type) {
+      case "Vulnerabilities":
+        return ["ID", "CVSS", "Date published"];
+      case "Advisories":
+        return ["ID", "Revision"];
+      case "Packages":
+        return ["Name", "Namespace", "Version"];
+      case "SBOMs":
+        return ["Name", "Created on"];
+      default:
+        throw new Error(`Unknown type: ${type}`);
+    }
+  }
 }
