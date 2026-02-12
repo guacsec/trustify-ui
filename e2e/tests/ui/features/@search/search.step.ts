@@ -256,33 +256,20 @@ Then(
 );
 
 Then(
-  "the {string} list should have specific filter set",
-  async ({ page }, arg: string) => {
-    await Page.switchTo(arg as Tabs);
+  "the {string} list should have the {string} filter set",
+  async ({ page }, tabType: string, filters: string) => {
+    await Page.switchTo(tabType as Tabs);
     const filterCard = await Page.getFilterCard();
 
-    // Look for h4 headings in the filter panel
-    if (arg === "Vulnerabilities") {
+    // Parse comma-separated filters
+    const filterList = filters.split(",").map((f) => f.trim());
+
+    // Verify each filter heading is visible in the filter panel
+    for (const filterName of filterList) {
+      // Use regex for exact match to avoid matching "Published" in "Published only"
+      const exactMatch = new RegExp(`^${filterName}$`);
       await expect(
-        filterCard._filterCard.locator("h4").filter({ hasText: /^CVSS$/ }),
-      ).toBeVisible();
-      await expect(
-        filterCard._filterCard.locator("h4").filter({ hasText: /^Published$/ }),
-      ).toBeVisible();
-    } else if (arg === "Advisories") {
-      await expect(
-        filterCard._filterCard.locator("h4", { hasText: "Revision" }),
-      ).toBeVisible();
-    } else if (arg === "Packages") {
-      await expect(
-        filterCard._filterCard.locator("h4", { hasText: "Type" }),
-      ).toBeVisible();
-      await expect(
-        filterCard._filterCard.locator("h4", { hasText: "Architecture" }),
-      ).toBeVisible();
-    } else if (arg === "SBOMs") {
-      await expect(
-        filterCard._filterCard.locator("h4", { hasText: "Created on" }),
+        filterCard._filterCard.locator("h4").filter({ hasText: exactMatch }),
       ).toBeVisible();
     }
   },

@@ -13,8 +13,8 @@ Scenario: User visits search page without filling anything
 	And a total number of "Advisories" should be visible in the tab
 
 Scenario Outline: User toggles the "<types>" list and manipulates the list
- 	When User selects the Tab "<types>" 
-	Then the "<types>" list should have specific filter set
+ 	When User selects the Tab "<types>"
+	Then the "<types>" list should have the "<filters>" filter set
 	And the "<types>" list should be sortable
 	And the "<types>" list should be limited to 10 items
 	And the user should be able to switch to next "<types>" items
@@ -22,11 +22,11 @@ Scenario Outline: User toggles the "<types>" list and manipulates the list
 	And First column on the search results should have the link to "<types>" explorer pages
 
 	Examples:
-	|types|
-	|SBOMs|
-	|Packages|
-	|Vulnerabilities|
-	|Advisories|
+	|types|filters|
+	|SBOMs|Created on|
+	|Packages|Type, Architecture|
+	|Vulnerabilities|CVSS, Published|
+	|Advisories|Revision|
 
 Scenario Outline: Download Links on the "<types>" Search Result list
 	When User selects the Tab "<types>" 
