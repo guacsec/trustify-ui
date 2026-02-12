@@ -9,6 +9,9 @@ export const { Given, When, Then } = createBdd();
 let Page!: SearchPage;
 let currentType = "";
 
+// Store API responses captured during page load
+const apiResponses: Map<string, number> = new Map();
+
 /**
  * This function returns table identifier and column names based on the type
  * @param type Category of the data
@@ -48,6 +51,33 @@ function getSortableColumns(type: string): string[] {
 }
 
 Given("User is on the Search page", async ({ page }) => {
+  // Clear previous responses
+  apiResponses.clear();
+
+  // Set up listeners for all API endpoints before navigating
+  const endpoints = [
+    { name: "SBOMs", path: "/api/v2/sbom" },
+    { name: "Packages", path: "/api/v2/purl" },
+    { name: "Vulnerabilities", path: "/api/v2/vulnerability" },
+    { name: "Advisories", path: "/api/v2/advisory" },
+  ];
+
+  // Capture responses as they arrive
+  page.on("response", async (response) => {
+    for (const endpoint of endpoints) {
+      if (response.url().includes(endpoint.path) && response.status() === 200) {
+        try {
+          const body = await response.json();
+          if (body.total !== undefined) {
+            apiResponses.set(endpoint.name, body.total);
+          }
+        } catch (e) {
+          // Ignore JSON parse errors
+        }
+      }
+    }
+  });
+
   Page = await SearchPage.build(page);
   await page.waitForLoadState("networkidle");
 });
@@ -378,11 +408,28 @@ Then(
 );
 
 Then(
-  "a total number of {int} {string} should be visible in the tab",
-  async ({ page }, count: number, arg: string) => {
-    await Page.switchTo(arg as Tabs);
-    const tab = await SearchPageTabs.build(page, arg);
-    await tab.verifyTabHasAtLeastResults(arg, count);
+  "a total number of {string} should be visible in the tab",
+  async ({ page }, tabType: string) => {
+    // Get the API total from captured responses
+    const apiTotal = apiResponses.get(tabType);
+    if (apiTotal === undefined) {
+      throw new Error(
+        `No API response captured for ${tabType}. Available: ${Array.from(apiResponses.keys()).join(", ")}`,
+      );
+    }
+
+    // Switch to the tab to ensure badge is visible
+    await Page.switchTo(tabType as Tabs);
+
+    // Verify the badge displays the same count as the API
+    const tab = await SearchPageTabs.build(page, tabType);
+    const badge = tab._tab.locator(".pf-v6-c-badge");
+    await expect(badge).toHaveText(/[\d]/, { timeout: 10000 });
+
+    const badgeText = await badge.textContent();
+    const badgeCount = parseInt(badgeText?.match(/\d+/)?.[0] || "0", 10);
+
+    expect(badgeCount).toBe(apiTotal);
   },
 );
 

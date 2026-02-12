@@ -7,10 +7,10 @@ Background:
 	And User is on the Search page
 
 Scenario: User visits search page without filling anything
-	Then a total number of 17 "SBOMs" should be visible in the tab
-	And a total number of 5537 "Packages" should be visible in the tab
-	And a total number of 29 "Vulnerabilities" should be visible in the tab
-	And a total number of 57 "Advisories" should be visible in the tab
+	Then a total number of "SBOMs" should be visible in the tab
+	And a total number of "Packages" should be visible in the tab
+	And a total number of "Vulnerabilities" should be visible in the tab
+	And a total number of "Advisories" should be visible in the tab
 
 Scenario Outline: User toggles the "<types>" list and manipulates the list
  	When User selects the Tab "<types>" 
