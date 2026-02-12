@@ -34,7 +34,7 @@ Given("User is on the Search page", async ({ page }) => {
           if (body.total !== undefined) {
             apiResponses.set(endpoint.name, body.total);
           }
-        } catch (e) {
+        } catch (_e) {
           // Ignore JSON parse errors
         }
       }
@@ -45,9 +45,12 @@ Given("User is on the Search page", async ({ page }) => {
   await page.waitForLoadState("networkidle");
 });
 
-When("User selects the Tab {string}", async ({ page }, tabName: string) => {
-  await Page.switchTo(tabName as Tabs);
-});
+When(
+  "User selects the Tab {string}",
+  async ({ page: _page }, tabName: string) => {
+    await Page.switchTo(tabName as Tabs);
+  },
+);
 
 Then("Tab {string} is visible", async ({ page }, tabName: string) => {
   const tab = await SearchPageTabs.build(page, tabName);
@@ -56,7 +59,7 @@ Then("Tab {string} is visible", async ({ page }, tabName: string) => {
 
 Then(
   "Download link should be available for the {string} list",
-  async ({ page }, type: string) => {
+  async ({ page: _page }, type: string) => {
     await Page.switchTo(type as Tabs);
     const table = await Page.getTable();
 
@@ -94,7 +97,7 @@ When("user presses Enter", async ({ page }) => {
 
 Then(
   "the {string} list should display the specific {string}",
-  async ({ page }, type: string, name: string) => {
+  async ({ page: _page }, type: string, name: string) => {
     await Page.switchTo(type as Tabs);
     const table = await Page.getTable();
 
@@ -114,6 +117,7 @@ Then(
     } else {
       // For other types, look in the specific column
       const { columnName } = Table.getTableInfo(type);
+      // @ts-expect-error - columnName is dynamically determined from type, TypeScript can't verify it matches table columns
       const column = await table.getColumn(columnName);
 
       // Check if any of the visible items contain the search term (case-insensitive)
@@ -133,7 +137,7 @@ Then(
 
 Then(
   "the list should be limited to {int} items or less",
-  async ({ page }, count: number) => {
+  async ({ page: _page }, count: number) => {
     const table = await Page.getTable();
     // Count only data rows, not expanded rows
     const rows = table._table.locator("tbody:not(.pf-m-expanded) tr");
@@ -144,7 +148,7 @@ Then(
 
 Then(
   "user clicks on the {string} {string} link",
-  async ({ page }, arg: string, types: string) => {
+  async ({ page: _page }, arg: string, types: string) => {
     // Convert plural to singular for comparison
     const type = Table.toSingular(types);
     currentType = type;
@@ -174,6 +178,7 @@ Then(
     } else {
       // For other types, look in the specific column
       const { columnName } = Table.getTableInfo(type);
+      // @ts-expect-error - columnName is dynamically determined from type, TypeScript can't verify it matches table columns
       const column = await table.getColumn(columnName);
       const link = column.getByRole("link").filter({ hasText: arg }).first();
       await expect(link).toBeVisible();
@@ -201,7 +206,7 @@ Then(
 
 Then(
   "the user should be able to filter {string}",
-  async ({ page }, arg: string) => {
+  async ({ page: _page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const filterCard = await Page.getFilterCard();
     const table = await Page.getTable();
@@ -211,8 +216,6 @@ Then(
       const rows = table._table.locator("tbody:not(.pf-m-expanded) tr");
       return await rows.count();
     };
-
-    const initialCount = await getRowCount();
 
     if (arg === "SBOMs") {
       await filterCard.applyDateRangeFilter("12/22/2025", "12/22/2025");
@@ -257,7 +260,7 @@ Then(
 
 Then(
   "the {string} list should have the {string} filter set",
-  async ({ page }, tabType: string, filters: string) => {
+  async ({ page: _page }, tabType: string, filters: string) => {
     await Page.switchTo(tabType as Tabs);
     const filterCard = await Page.getFilterCard();
 
@@ -275,38 +278,43 @@ Then(
   },
 );
 
-Then("the {string} list should be sortable", async ({ page }, arg: string) => {
-  await Page.switchTo(arg as Tabs);
-  const table = await Page.getTable();
+Then(
+  "the {string} list should be sortable",
+  async ({ page: _page }, arg: string) => {
+    await Page.switchTo(arg as Tabs);
+    const table = await Page.getTable();
 
-  // Get the default sort configuration for this entity type
-  const defaultSort = Table.getDefaultSort(arg);
+    // Get the default sort configuration for this entity type
+    const defaultSort = Table.getDefaultSort(arg);
 
-  // Verify the default sort is applied when the tab loads
-  const defaultColumnHeader = await table.getColumnHeader(defaultSort.column);
-  const defaultAriaSortValue =
-    await defaultColumnHeader.getAttribute("aria-sort");
-  expect(defaultAriaSortValue).toBe(defaultSort.direction);
+    // Verify the default sort is applied when the tab loads
+    // @ts-expect-error - defaultSort.column is dynamically determined from arg, TypeScript can't verify it matches table columns
+    const defaultColumnHeader = await table.getColumnHeader(defaultSort.column);
+    const defaultAriaSortValue =
+      await defaultColumnHeader.getAttribute("aria-sort");
+    expect(defaultAriaSortValue).toBe(defaultSort.direction);
 
-  // Click the default column to toggle the sort
-  await table.clickSortBy(defaultSort.column);
-  await table.waitUntilDataIsLoaded();
+    // Click the default column to toggle the sort
+    // @ts-expect-error - defaultSort.column is dynamically determined from arg, TypeScript can't verify it matches table columns
+    await table.clickSortBy(defaultSort.column);
+    await table.waitUntilDataIsLoaded();
 
-  // Verify the sort direction toggled (ascending -> descending or descending -> ascending)
-  const toggledAriaSortValue =
-    await defaultColumnHeader.getAttribute("aria-sort");
-  const expectedToggledDirection =
-    defaultSort.direction === "ascending" ? "descending" : "ascending";
-  expect(toggledAriaSortValue).toBe(expectedToggledDirection);
+    // Verify the sort direction toggled (ascending -> descending or descending -> ascending)
+    const toggledAriaSortValue =
+      await defaultColumnHeader.getAttribute("aria-sort");
+    const expectedToggledDirection =
+      defaultSort.direction === "ascending" ? "descending" : "ascending";
+    expect(toggledAriaSortValue).toBe(expectedToggledDirection);
 
-  // Verify table has data after sorting
-  const rows = table._table.locator("tbody tr").first();
-  await expect(rows).toBeVisible();
-});
+    // Verify table has data after sorting
+    const rows = table._table.locator("tbody tr").first();
+    await expect(rows).toBeVisible();
+  },
+);
 
 Then(
   "the {string} list should be limited to {int} items",
-  async ({ page }, type: string, count: number) => {
+  async ({ page: _page }, type: string, count: number) => {
     await Page.switchTo(type as Tabs);
     const pagination = await Page.getPagination(true);
     await pagination.selectItemsPerPage(10);
@@ -322,7 +330,7 @@ Then(
 
 Then(
   "the user should be able to switch to next {string} items",
-  async ({ page }, arg: string) => {
+  async ({ page: _page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const pagination = await Page.getPagination(true);
 
@@ -338,7 +346,7 @@ Then(
 
 Then(
   "the user should be able to increase pagination for the {string}",
-  async ({ page }, arg: string) => {
+  async ({ page: _page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const pagination = await Page.getPagination(true);
 
@@ -363,10 +371,11 @@ Then(
 
 Then(
   "First column on the search results should have the link to {string} explorer pages",
-  async ({ page }, arg: string) => {
+  async ({ page: _page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const table = await Page.getTable();
     const { columnName } = Table.getTableInfo(arg);
+    // @ts-expect-error - columnName is dynamically determined from arg, TypeScript can't verify it matches table columns
     const column = await table.getColumn(columnName);
     const firstLink = column.first().getByRole("link");
     await expect(firstLink).toBeVisible();

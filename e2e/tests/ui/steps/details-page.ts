@@ -5,7 +5,6 @@ import { test } from "../fixtures";
 import { expect } from "../assertions";
 
 import { DetailsPage } from "../helpers/DetailsPage";
-import { DetailsPageLayout } from "../pages/DetailsPageLayout";
 
 export const { Given, When, Then } = createBdd(test);
 

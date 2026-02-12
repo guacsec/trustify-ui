@@ -235,7 +235,7 @@ export class SearchPage {
     }
 
     // Each category should have at most 'limit' items
-    for (const [category, count] of Object.entries(categoryCount)) {
+    for (const [_category, count] of Object.entries(categoryCount)) {
       expect(count).toBeLessThanOrEqual(limit);
     }
   }
