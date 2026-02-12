@@ -24,7 +24,7 @@ Scenario Outline: User toggles the "<types>" list and manipulates the list
 	Examples:
 	|types|
 	|SBOMs|
-	# |Packages|
+	|Packages|
 	|Vulnerabilities|
 	|Advisories|
 
