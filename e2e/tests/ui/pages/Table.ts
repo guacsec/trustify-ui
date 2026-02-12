@@ -195,7 +195,7 @@ export class Table<
   static getSortableColumns(type: string): string[] {
     switch (type) {
       case "Vulnerabilities":
-        return ["ID", "CVSS", "Date published"];
+        return ["ID", "CVSS", "Published"];
       case "Advisories":
         return ["ID", "Revision"];
       case "Packages":
@@ -224,6 +224,29 @@ export class Table<
         return "Advisory";
       default:
         throw new Error(`Unknown plural type: ${pluralType}`);
+    }
+  }
+
+  /**
+   * Returns the default sort configuration for a given entity type
+   * @param type Category of the data (e.g., "SBOMs", "Packages", "Vulnerabilities", "Advisories")
+   * @returns Object containing the default sort column name and direction
+   */
+  static getDefaultSort(type: string): {
+    column: string;
+    direction: "ascending" | "descending";
+  } {
+    switch (type) {
+      case "SBOMs":
+        return { column: "Name", direction: "ascending" };
+      case "Packages":
+        return { column: "Name", direction: "ascending" };
+      case "Vulnerabilities":
+        return { column: "Published", direction: "descending" };
+      case "Advisories":
+        return { column: "Revision", direction: "descending" };
+      default:
+        throw new Error(`Unknown type: ${type}`);
     }
   }
 }

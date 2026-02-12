@@ -129,7 +129,7 @@ export class SearchPage {
         return await Table.build(
           this._page,
           "Vulnerability table",
-          ["ID", "Title", "CVSS", "Date published", "SBOMs"],
+          ["ID", "Title", "CVSS", "Published", "SBOMs"],
           [],
         );
       case "advisory":

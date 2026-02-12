@@ -291,12 +291,26 @@ Then(
 Then("the {string} list should be sortable", async ({ page }, arg: string) => {
   await Page.switchTo(arg as Tabs);
   const table = await Page.getTable();
-  const columns = Table.getSortableColumns(arg);
 
-  // Test sorting on the first sortable column
-  const firstColumn = columns[0];
-  await table.clickSortBy(firstColumn);
+  // Get the default sort configuration for this entity type
+  const defaultSort = Table.getDefaultSort(arg);
+
+  // Verify the default sort is applied when the tab loads
+  const defaultColumnHeader = await table.getColumnHeader(defaultSort.column);
+  const defaultAriaSortValue =
+    await defaultColumnHeader.getAttribute("aria-sort");
+  expect(defaultAriaSortValue).toBe(defaultSort.direction);
+
+  // Click the default column to toggle the sort
+  await table.clickSortBy(defaultSort.column);
   await table.waitUntilDataIsLoaded();
+
+  // Verify the sort direction toggled (ascending -> descending or descending -> ascending)
+  const toggledAriaSortValue =
+    await defaultColumnHeader.getAttribute("aria-sort");
+  const expectedToggledDirection =
+    defaultSort.direction === "ascending" ? "descending" : "ascending";
+  expect(toggledAriaSortValue).toBe(expectedToggledDirection);
 
   // Verify table has data after sorting
   const rows = table._table.locator("tbody tr").first();
