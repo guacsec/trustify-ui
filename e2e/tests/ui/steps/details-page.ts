@@ -5,6 +5,7 @@ import { test } from "../fixtures";
 import { expect } from "../assertions";
 
 import { DetailsPage } from "../helpers/DetailsPage";
+import { DetailsPageLayout } from "../pages/DetailsPageLayout";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -44,22 +45,22 @@ Then("The {string} panel is visible", async ({ page }, panelName) => {
 });
 
 Then("Tab {string} is selected", async ({ page }, tabName) => {
-  const pageWithTabs = new Tabs(page);
+  const pageWithTabs = new DetailsPage(page);
   await pageWithTabs.verifyTabIsSelected(tabName);
 });
 
 Then("Tab {string} is visible", async ({ page }, tabName) => {
-  const pageWithTabs = new Tabs(page);
+  const pageWithTabs = new DetailsPage(page);
   await pageWithTabs.verifyTabIsVisible(tabName);
 });
 
 Then("Tab {string} is not visible", async ({ page }, tabName) => {
-  const pageWithTabs = new Tabs(page);
+  const pageWithTabs = new DetailsPage(page);
   await pageWithTabs.verifyTabIsNotVisible(tabName);
 });
 
 When("User selects the Tab {string}", async ({ page }, tabName) => {
-  const detailsPage = new Tabs(page);
+  const detailsPage = new DetailsPage(page);
   await detailsPage.selectTab(tabName);
 });
 
