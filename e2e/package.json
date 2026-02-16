@@ -24,7 +24,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "axios": "^1.11.0",
+    "axios": "^1.13.5",
     "playwright-bdd": "^8.3.1"
   }
 }
