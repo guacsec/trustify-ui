@@ -15,6 +15,13 @@
         "@playwright/mcp@latest"
       ],
       "env": {}
+    },
+    "playwright-test": {
+      "command": "npx",
+      "args": [
+        "playwright",
+        "run-test-mcp-server"
+      ]
     }
   }
 }
