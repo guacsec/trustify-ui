@@ -1,6 +1,6 @@
 /**
- * Utility functions for search entity types (SBOMs, Packages, Vulnerabilities, Advisories)
- * These functions contain domain-specific logic for the Search page
+ * Utility functions for entity types (SBOMs, Packages, Vulnerabilities, Advisories)
+ * These functions contain domain-specific logic for working with different entity types
  */
 
 /**

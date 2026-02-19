@@ -7,7 +7,7 @@ import {
   getTableInfo,
   toSingular,
   getDefaultSort,
-} from "./search-entity-utils";
+} from "../../utils/entity-utils";
 
 export const { Given, When, Then } = createBdd();
 
