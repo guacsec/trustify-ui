@@ -22,7 +22,7 @@ export const GroupsTable: React.FC = () => {
     fetchError,
     totalItemCount,
     tableControls,
-    treeExpansion: { expandedNodeNames, setExpandedNodeNames },
+    treeExpansion: { expandedNodeIds, setExpandedNodeIds },
     treeSelection: { isNodeSelected, selectNodes },
     treeData,
   } = React.useContext(GroupsContext);
@@ -51,14 +51,14 @@ export const GroupsTable: React.FC = () => {
     if (!node) {
       return [];
     }
-    const isExpanded = expandedNodeNames.includes(node.name);
+    const isExpanded = expandedNodeIds.includes(node.id);
 
     const treeRow: TdProps["treeRow"] = {
       onCollapse: () => {
-        setExpandedNodeNames((prevNodes) =>
+        setExpandedNodeIds((prevIds) =>
           isExpanded
-            ? prevNodes.filter((name) => name !== node.name)
-            : [...prevNodes, node.name],
+            ? prevIds.filter((id) => id !== node.id)
+            : [...prevIds, node.id],
         );
       },
       onCheckChange: (_event, isChecking) => {
@@ -70,7 +70,7 @@ export const GroupsTable: React.FC = () => {
         isHidden,
         "aria-level": level,
         "aria-posinset": posinset,
-        "aria-setsize": node.children ? node.children.length : 0,
+        "aria-setsize": node.children.length || node.number_of_groups || 0,
         isChecked: isNodeSelected(node),
         checkboxId: `checkbox_id_${node.name.toLowerCase().replace(/\s+/g, "_")}`,
       },

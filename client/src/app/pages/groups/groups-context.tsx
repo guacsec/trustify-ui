@@ -12,15 +12,15 @@ import { useSelectionState } from "@app/hooks/useSelectionState";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
 import { usePersistentState } from "@app/hooks/usePersistentState";
 import type { TGroupDD } from "@app/queries/groups";
-import { useFetchGroups } from "@app/queries/groups";
+import { useFetchGroupChildren, useFetchGroups } from "@app/queries/groups";
 import { buildGroupTree } from "./utils";
 export type TGroupTreeNode = TGroupDD & {
   children: TGroupTreeNode[];
 };
 
 interface ITreeExpansionState {
-  expandedNodeNames: string[];
-  setExpandedNodeNames: React.Dispatch<React.SetStateAction<string[]>>;
+  expandedNodeIds: string[];
+  setExpandedNodeIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 interface ITreeSelectionState {
@@ -33,9 +33,7 @@ interface ITreeSelectionState {
 }
 
 interface IGroupsContext {
-  // TODO: Update once SBOM Group types are finalized...
   tableControls: ITableControls<
-    // TODO: UPDATE - Item Type
     TGroupTreeNode,
     // Column keys
     "name",
@@ -43,7 +41,7 @@ interface IGroupsContext {
     "name",
     // Filter categories
     "",
-    // Persistence key prefix...?
+    // Persistence key prefix
     string
   >;
 
@@ -92,40 +90,41 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     expandableVariant: "single",
   });
 
-  // State functionality
-  const [expandedNodeNames, setExpandedNodeNamesInternal] = usePersistentState<
+  // Expansion state persisted to URL params (stores group IDs)
+  const [expandedNodeIds, setExpandedNodeIdsInternal] = usePersistentState<
     string[],
     typeof TablePersistenceKeyPrefixes.groups,
-    "expandedNodeNames"
+    "expandedNodes"
   >({
     isEnabled: true,
     defaultValue: [],
     persistenceKeyPrefix: TablePersistenceKeyPrefixes.groups,
     persistTo: "urlParams",
-    keys: ["expandedNodeNames"],
-    serialize: (names) => ({
-      expandedNodeNames: names.length > 0 ? names.join(",") : null,
+    keys: ["expandedNodes"],
+    serialize: (ids) => ({
+      expandedNodes: ids.length > 0 ? ids.join(",") : null,
     }),
-    deserialize: ({ expandedNodeNames }) =>
-      expandedNodeNames ? expandedNodeNames.split(",") : [],
+    deserialize: ({ expandedNodes }) =>
+      expandedNodes ? expandedNodes.split(",") : [],
   });
 
-  // Wrap setters to support functional updates
-  const setExpandedNodeNames: React.Dispatch<React.SetStateAction<string[]>> =
+  // Wrap setter to support functional updates
+  const setExpandedNodeIds: React.Dispatch<React.SetStateAction<string[]>> =
     React.useCallback(
       (value) => {
         if (typeof value === "function") {
-          setExpandedNodeNamesInternal(value(expandedNodeNames));
+          setExpandedNodeIdsInternal(value(expandedNodeIds));
         } else {
-          setExpandedNodeNamesInternal(value);
+          setExpandedNodeIdsInternal(value);
         }
       },
-      [expandedNodeNames, setExpandedNodeNamesInternal],
+      [expandedNodeIds, setExpandedNodeIdsInternal],
     );
 
+  // Fetch paginated root groups (parent IS NULL)
   const {
-    result: { data: groups, total: totalItemCount },
-    isFetching,
+    result: { data: rootGroups, total: totalItemCount },
+    isFetching: isRootsFetching,
     fetchError,
   } = useFetchGroups(
     getHubRequestParams({
@@ -136,9 +135,21 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     }),
   );
 
+  // Fetch children for all expanded groups
+  const { data: childGroups, isFetching: isChildrenFetching } =
+    useFetchGroupChildren(expandedNodeIds);
+
+  // Merge root groups + children into a flat list, then build tree
+  const allGroups = React.useMemo(
+    () => [...rootGroups, ...childGroups],
+    [rootGroups, childGroups],
+  );
+
   const roots = React.useMemo(() => {
-    return buildGroupTree(groups);
-  }, [groups]);
+    return buildGroupTree(allGroups);
+  }, [allGroups]);
+
+  const isFetching = isRootsFetching || isChildrenFetching;
 
   const {
     selectedItems: selectedNodes,
@@ -148,8 +159,8 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     selectOnly: selectOnlyNodes,
     selectAll: selectAllNodes,
   } = useSelectionState({
-    items: groups, // Flat tree is passed so all nodes can be used
-    isEqual: (a, b) => a.id === b.id, // Use ID for equality
+    items: allGroups,
+    isEqual: (a, b) => a.id === b.id,
   });
 
   const tableControls = useTableControlProps({
@@ -169,8 +180,8 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
         fetchError,
         totalItemCount,
         treeExpansion: {
-          expandedNodeNames,
-          setExpandedNodeNames,
+          expandedNodeIds,
+          setExpandedNodeIds,
         },
         treeSelection: {
           selectedNodes,
