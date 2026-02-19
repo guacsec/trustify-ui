@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { Navigation } from "../Navigation";
 import { FilterCard } from "../FilterCard";
 import { Table } from "../Table";
@@ -25,7 +25,7 @@ export class SearchPage {
 
   async switchTo(category: Tabs) {
     const tab = await SearchPageTabs.build(this._page, category);
-    await tab.clickTab(category);
+    await tab.click();
     if (category === "SBOMs") {
       this._category = "sbom";
     } else if (category === "Packages") {
@@ -170,73 +170,19 @@ export class SearchPage {
     await this._page.waitForTimeout(600);
   }
 
-  async autoFillIsNotVisible() {
-    const menu = this._page.locator("ul[role='menu']");
-    await expect(menu).not.toBeVisible();
+  getAutoFillMenu() {
+    return this._page.locator("ul[role='menu']");
   }
 
-  async autoFillHasRelevantResults(searchText: string) {
-    const menu = this._page.locator("ul[role='menu']");
-    await expect(menu).toBeVisible();
+  getAutoFillMenuItems() {
+    return this.getAutoFillMenu().locator("li[role='none']");
+  }
 
-    const menuItems = menu.locator("li[role='none']");
-    const count = await menuItems.count();
-
-    expect(count).toBeGreaterThan(0);
-
-    // Check that at least one menu item contains the search text
-    const searchTextLower = searchText.toLowerCase();
-    let foundMatch = false;
-
-    for (let i = 0; i < count; i++) {
-      const item = menuItems.nth(i);
-      const text = await item.textContent();
-      if (text?.toLowerCase().includes(searchTextLower)) {
-        foundMatch = true;
-        break;
-      }
-    }
-
-    expect(foundMatch).toBe(true);
+  getAutoFillMenuLinks() {
+    return this.getAutoFillMenu().locator("li[role='none'] a");
   }
 
   async totalAutoFillResults(): Promise<number> {
-    const menu = this._page.locator("ul[role='menu']");
-    const menuItems = menu.locator("li[role='none']");
-    return await menuItems.count();
-  }
-
-  async expectCategoriesWithinLimitByHref(limit: number) {
-    const menu = this._page.locator("ul[role='menu']");
-    const menuItems = menu.locator("li[role='none'] a");
-
-    const categoryCount: Record<string, number> = {
-      advisories: 0,
-      packages: 0,
-      sboms: 0,
-      vulnerabilities: 0,
-    };
-
-    const count = await menuItems.count();
-
-    for (let i = 0; i < count; i++) {
-      const link = menuItems.nth(i);
-      const href = await link.getAttribute("href");
-
-      if (href?.includes("/advisories/")) {
-        categoryCount.advisories++;
-      } else if (href?.includes("/packages/")) {
-        categoryCount.packages++;
-      } else if (href?.includes("/sboms/")) {
-        categoryCount.sboms++;
-      } else if (href?.includes("/vulnerabilities/")) {
-        categoryCount.vulnerabilities++;
-      }
-    }
-
-    // Each category should have at most 'limit' items
-    for (const [_category, count] of Object.entries(categoryCount)) {
-      expect(count).toBeLessThanOrEqual(limit);
-    }
+    return await this.getAutoFillMenuItems().count();
   }
 }

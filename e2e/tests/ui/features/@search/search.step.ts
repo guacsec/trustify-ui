@@ -1,9 +1,13 @@
 import { createBdd } from "playwright-bdd";
-import { expect } from "@playwright/test";
+import { expect } from "../../assertions";
 import { SearchPage, type Tabs } from "../../pages/search-page/SearchPage";
 import { SearchPageTabs } from "../../pages/SearchPageTabs";
 import { DetailsPageLayout } from "../../pages/DetailsPageLayout";
-import { Table } from "../../pages/Table";
+import {
+  getTableInfo,
+  toSingular,
+  getDefaultSort,
+} from "./search-entity-utils";
 
 export const { Given, When, Then } = createBdd();
 
@@ -80,7 +84,7 @@ When(
 
 Then("The autofill drop down should not show any values", async ({ page }) => {
   const searchPage = new SearchPage(page);
-  await searchPage.autoFillIsNotVisible();
+  await expect(searchPage).toHaveAutoFillHidden();
 });
 
 When(
@@ -116,7 +120,7 @@ Then(
       expect(found).toBe(true);
     } else {
       // For other types, look in the specific column
-      const { columnName } = Table.getTableInfo(type);
+      const { columnName } = getTableInfo(type);
       // @ts-expect-error - columnName is dynamically determined from type, TypeScript can't verify it matches table columns
       const column = await table.getColumn(columnName);
 
@@ -150,7 +154,7 @@ Then(
   "user clicks on the {string} {string} link",
   async ({ page: _page }, arg: string, types: string) => {
     // Convert plural to singular for comparison
-    const type = Table.toSingular(types);
+    const type = toSingular(types);
     currentType = type;
     const table = await Page.getTable();
     await table.waitUntilDataIsLoaded();
@@ -177,7 +181,7 @@ Then(
       throw new Error(`No package row found containing "${arg}"`);
     } else {
       // For other types, look in the specific column
-      const { columnName } = Table.getTableInfo(type);
+      const { columnName } = getTableInfo(type);
       // @ts-expect-error - columnName is dynamically determined from type, TypeScript can't verify it matches table columns
       const column = await table.getColumn(columnName);
       const link = column.getByRole("link").filter({ hasText: arg }).first();
@@ -285,7 +289,7 @@ Then(
     const table = await Page.getTable();
 
     // Get the default sort configuration for this entity type
-    const defaultSort = Table.getDefaultSort(arg);
+    const defaultSort = getDefaultSort(arg);
 
     // Verify the default sort is applied when the tab loads
     // @ts-expect-error - defaultSort.column is dynamically determined from arg, TypeScript can't verify it matches table columns
@@ -374,7 +378,7 @@ Then(
   async ({ page: _page }, arg: string) => {
     await Page.switchTo(arg as Tabs);
     const table = await Page.getTable();
-    const { columnName } = Table.getTableInfo(arg);
+    const { columnName } = getTableInfo(arg);
     // @ts-expect-error - columnName is dynamically determined from arg, TypeScript can't verify it matches table columns
     const column = await table.getColumn(columnName);
     const firstLink = column.first().getByRole("link");
@@ -412,7 +416,7 @@ Then(
   "the autofill dropdown should display items matching the {string}",
   async ({ page }, arg: string) => {
     const searchPage = new SearchPage(page);
-    await searchPage.autoFillHasRelevantResults(arg);
+    await expect(searchPage).toHaveRelevantAutoFillResults(arg);
   },
 );
 
@@ -422,6 +426,6 @@ Then(
     const searchPage = new SearchPage(page);
     const totalResults = await searchPage.totalAutoFillResults();
     expect(totalResults).toBeLessThanOrEqual(arg * 4);
-    await searchPage.expectCategoriesWithinLimitByHref(arg);
+    await expect(searchPage).toHaveAutoFillCategoriesWithinLimit(arg);
   },
 );
