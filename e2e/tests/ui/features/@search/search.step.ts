@@ -3,11 +3,7 @@ import { expect } from "../../assertions";
 import { SearchPage, type Tabs } from "../../pages/search-page/SearchPage";
 import { SearchPageTabs } from "../../pages/SearchPageTabs";
 import { DetailsPageLayout } from "../../pages/DetailsPageLayout";
-import {
-  getTableInfo,
-  toSingular,
-  getDefaultSort,
-} from "../../utils/entity-utils";
+import { getTableInfo, toSingular, getDefaultSort } from "../../pages/utils";
 
 export const { Given, When, Then } = createBdd();
 
