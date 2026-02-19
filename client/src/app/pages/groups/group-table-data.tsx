@@ -1,4 +1,10 @@
-import { Stack, StackItem, Flex, FlexItem } from "@patternfly/react-core";
+import {
+  Stack,
+  StackItem,
+  Flex,
+  FlexItem,
+  Content,
+} from "@patternfly/react-core";
 import { NavLink } from "react-router-dom";
 import { GroupLabels } from "./group-labels";
 import type { TGroupTreeNode } from "./groups-context";
@@ -25,8 +31,7 @@ export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
         </Flex>
       </StackItem>
       <StackItem>
-        {/*TODO: Update this with an actual description */}
-        Page description goes here
+        <Content component="p">{item.description ?? ""}</Content>
       </StackItem>
     </Stack>
   );

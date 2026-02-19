@@ -12,6 +12,7 @@ export type TGroupDD = {
   id: string;
   parent?: string | null;
   name: string;
+  description?: string | null;
   labels?: Record<string, string | null>;
   number_of_groups?: number | null;
   number_of_sboms?: number | null;
