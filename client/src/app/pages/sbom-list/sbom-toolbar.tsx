@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+
+import type { AxiosError } from "axios";
 
 import {
   Button,
@@ -9,10 +11,13 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 
+import type { GroupRequest, Labels } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
+import { NotificationsContext } from "@app/components/NotificationsContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
+import { useCreateSBOMGroupMutation } from "@app/queries/sbom-groups";
 import { Paths } from "@app/Routes";
 
 import { SbomSearchContext } from "./sbom-context";
@@ -28,10 +33,31 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
+  const { pushNotification } = useContext(NotificationsContext);
 
   const [createGroupOpened, setCreateGroupOpened] =
     React.useState<boolean>(false);
   const closeCreateGroup = () => setCreateGroupOpened(false);
+
+  const onCreateSuccess = () => {
+    pushNotification({
+      title: "Group created successfully",
+      variant: "success",
+    });
+    closeCreateGroup();
+  };
+
+  const onCreateError = (_error: AxiosError) => {
+    pushNotification({
+      title: "Error while creating the group",
+      variant: "danger",
+    });
+  };
+
+  const createGroupMutation = useCreateSBOMGroupMutation(
+    onCreateSuccess,
+    onCreateError,
+  );
 
   const {
     tableControls,
@@ -53,6 +79,34 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   const {
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
+
+  const handleCreateGroup = async (values: {
+    name: string;
+    parentGroup?: string;
+    isProduct: "yes" | "no";
+    description?: string;
+    labels: string[];
+  }) => {
+    // Convert labels array to Labels object
+    const labelsObj: Labels = {};
+    for (const label of values.labels) {
+      labelsObj[label] = "";
+    }
+
+    // Add Product label if isProduct is "yes"
+    if (values.isProduct === "yes") {
+      labelsObj.Product = "true";
+    }
+
+    const body: GroupRequest = {
+      name: values.name,
+      description: values.description || null,
+      parent: values.parentGroup || null,
+      labels: Object.keys(labelsObj).length > 0 ? labelsObj : undefined,
+    };
+
+    await createGroupMutation.mutateAsync(body);
+  };
 
   return (
     <>
@@ -112,7 +166,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
       <SBOMGroupFormModal
         isOpen={createGroupOpened}
         onClose={closeCreateGroup}
-        onSubmit={(val) => console.log(val)}
+        onSubmit={handleCreateGroup}
       />
     </>
   );

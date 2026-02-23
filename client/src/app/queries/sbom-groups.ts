@@ -1,8 +1,13 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
-import { listSbomGroups } from "@app/client";
-import type { Group, ListSbomGroupsData } from "@app/client";
+import { createSbomGroup, listSbomGroups } from "@app/client";
+import type { Group, GroupRequest, ListSbomGroupsData } from "@app/client";
 
 export interface SBOMGroup {
   id: string;
@@ -104,4 +109,22 @@ export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
     fetchError: error as AxiosError | null,
     refetch,
   };
+};
+
+export const useCreateSBOMGroupMutation = (
+  onSuccess: () => void,
+  onError: (err: AxiosError) => void,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: GroupRequest) => {
+      const response = await createSbomGroup({ body });
+      return response.data;
+    },
+    onSuccess: async () => {
+      onSuccess();
+      await queryClient.invalidateQueries({ queryKey: [SBOMGroupsQueryKey] });
+    },
+    onError: onError,
+  });
 };
