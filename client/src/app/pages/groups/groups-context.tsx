@@ -1,6 +1,9 @@
 import React from "react";
 import type { AxiosError } from "axios";
-import { FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
+import {
+  FILTER_TEXT_CATEGORY_KEY,
+  TablePersistenceKeyPrefixes,
+} from "@app/Constants";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   getHubRequestParams,
@@ -9,7 +12,6 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useSelectionState } from "@app/hooks/useSelectionState";
-import { TablePersistenceKeyPrefixes } from "@app/Constants";
 
 import type { TGroupDD } from "@app/queries/groups";
 import { useFetchGroupChildren, useFetchGroups } from "@app/queries/groups";
