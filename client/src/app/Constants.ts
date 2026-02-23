@@ -1,7 +1,6 @@
 import type { AxiosError } from "axios";
 import type { AdvisorySummary, SbomSummary } from "./client";
 import ENV from "./env";
-import { TGroupTreeNode } from "./pages/groups/groups-context";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
 export const FILTER_NULL_VALUE = "\0";
@@ -66,7 +65,7 @@ export const advisoryDeleteDialogProps = (
 });
 
 export const childGroupDeleteDialogProps = (
-  childGroup?: TGroupTreeNode | null,
+  childGroup?: { name?: string } | null,
 ) => ({
   title: "Permanently delete Group?",
   message: `This action permanently deletes the ${childGroup?.name} group.`,

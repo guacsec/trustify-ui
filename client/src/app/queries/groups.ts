@@ -100,12 +100,12 @@ export const useFetchGroupChildren = (parentIds: string[]) => {
 };
 
 export const useDeleteGroupMutation = (
-  onSuccess: (payload: TGroupTreeNode) => void,
+  onSuccess: (payload: TGroupDD) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: TGroupTreeNode) => {
+    mutationFn: async (payload: TGroupDD) => {
       const { id, name } = payload;
       // NOTE: At the time of this writing this body data
       // is not actually used by the backend.
