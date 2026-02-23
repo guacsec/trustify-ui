@@ -125,7 +125,7 @@ export const GroupsTable: React.FC = () => {
 
     const isChildNodeOnly = !node.number_of_groups;
     return [
-      <TreeRowWrapper key={node.name} row={{ props: treeRow.props }}>
+      <TreeRowWrapper key={node.id} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
           <GroupTableData item={node} />
         </Td>
