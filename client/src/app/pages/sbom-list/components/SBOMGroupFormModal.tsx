@@ -15,7 +15,6 @@ import {
 } from "@patternfly/react-core";
 import { useForm } from "react-hook-form";
 
-import { listSbomGroups } from "@app/client";
 import {
   HookFormPFGroupController,
   HookFormPFGroupSelect,
@@ -23,6 +22,7 @@ import {
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
+import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -62,8 +62,10 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { isSubmitting, isValid, isValidating },
   } = useForm<SBOMGroupFormValues>({
+    mode: "onBlur",
     defaultValues: {
       ...defaultValues,
       ...initialValues,
@@ -93,6 +95,15 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
       <ModalHeader title={`${type} group`} />
       <ModalBody>
         <Form id="sbom-group-form" onSubmit={handleSubmit(onSubmitHandler)}>
+          <HookFormPFGroupSelect
+            control={control}
+            name="parentGroup"
+            label="Parent group"
+            fieldId="parent-group"
+            placeholderText="Select parent group"
+            helperText="Leave blank if this group does not have a parent"
+            limit={0}
+          />
           <HookFormPFTextInput
             control={control}
             controllerProps={{
@@ -104,9 +115,18 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
                     return true;
                   }
 
-                  // Check if name is unique
-                  const isNameExists = await checkGroupNameUniqueness(value);
-                  return !isNameExists || `${value} already exists`;
+                  // Get current parent group value
+                  const parentGroup = getValues("parentGroup");
+
+                  // Check if name is unique (within parent context if parent is selected)
+                  const isNameExists = await checkGroupNameUniqueness(
+                    value,
+                    parentGroup || undefined,
+                  );
+                  return (
+                    isNameExists ||
+                    `${value} already exists${parentGroup ? ` in ${parentGroup}` : ""}`
+                  );
                 },
               },
             }}
@@ -116,17 +136,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             isRequired
             placeholder="Enter group name"
           />
-
-          <HookFormPFGroupSelect
-            control={control}
-            name="parentGroup"
-            label="Parent group"
-            fieldId="parent-group"
-            placeholderText="Select parent group"
-            helperText="Leave blank if this group does not have a parent"
-            limit={5}
-          />
-
           <HookFormPFGroupController
             control={control}
             name="isProduct"
@@ -195,6 +204,9 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
           aria-label={`${type} btn`}
           variant={ButtonVariant.primary}
           isDisabled={!isValid || isSubmitting || isValidating}
+          isLoading={isSubmitting || isValidating}
+          spinnerAriaLabel="Loading"
+          spinnerAriaValueText="Loading"
         >
           {type}
         </Button>
@@ -210,26 +222,4 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
       </ModalFooter>
     </Modal>
   );
-};
-
-// API function to check if group name is unique
-// Returns array of group names that match (empty array means name is available)
-export const checkGroupNameUniqueness = async (
-  name: string,
-): Promise<boolean> => {
-  try {
-    // Use exact name filter to find groups with matching names
-    const response = await listSbomGroups({
-      query: {
-        q: `name=${name}`,
-        limit: 1,
-      },
-    });
-
-    return !response.data?.items || response.data?.items.length === 0;
-  } catch (error) {
-    // On error, assume name is available (fail open for better UX)
-    console.error("Failed to check group name uniqueness:", error);
-    return true;
-  }
 };

@@ -142,6 +142,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       setBreadcrumbs([]);
       setCurrentGroups(groups);
     } else if (breadcrumbs.length === 0) {
+      
       setCurrentGroups(groups);
     } else {
       // Navigate to the current breadcrumb level
@@ -260,7 +261,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
           onSelect(selection);
         }
       }}
-      onOpenChange={(isOpen) => setIsOpen(isOpen)}
+      onOpenChange={setIsOpen}
       toggle={toggle}
     >
       <SelectList>
@@ -314,11 +315,6 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
             <SelectOption
               key={group.id}
               value={group.id}
-              description={
-                breadcrumbs.length > 0
-                  ? `Child of ${breadcrumbs[breadcrumbs.length - 1].name}`
-                  : undefined
-              }
             >
               <div
                 style={{
