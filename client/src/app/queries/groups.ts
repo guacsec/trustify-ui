@@ -1,10 +1,16 @@
 import type { HubRequestParams } from "@app/api/models";
 import type { AxiosError } from "axios";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import {
+  useQueries,
+  useQuery,
+  useQueryClient,
+  useMutation,
+} from "@tanstack/react-query";
 
 import { client } from "@app/axios-config/apiInit";
-import { listSbomGroups } from "@app/client";
+import { deleteSbomGroup, GroupRequest, listSbomGroups } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
+import { TGroupTreeNode } from "@app/pages/groups/groups-context";
 
 export const GroupQueryKey = "groups";
 
@@ -91,4 +97,33 @@ export const useFetchGroupChildren = (parentIds: string[]) => {
     isFetching: results.some((r) => r.isLoading),
     isError: results.some((r) => r.isError),
   };
+};
+
+export const useDeleteGroupMutation = (
+  onSuccess: (payload: TGroupTreeNode) => void,
+  onError: (err: AxiosError) => void,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: TGroupTreeNode) => {
+      const { id, name } = payload;
+      // NOTE: At the time of this writing this body data
+      // is not actually used by the backend.
+      // According to the OpenAPI spec it is required,
+      // so it's included here for that reason.
+      const body: GroupRequest = {
+        name,
+      };
+
+      await deleteSbomGroup({ client, body, path: { id } });
+    },
+    onSuccess: async (_res, payload) => {
+      onSuccess(payload);
+      await queryClient.invalidateQueries({ queryKey: [GroupQueryKey] });
+    },
+    onError: async (err: AxiosError) => {
+      onError(err);
+      await queryClient.invalidateQueries({ queryKey: [GroupQueryKey] });
+    },
+  });
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { ButtonVariant } from "@patternfly/react-core";
 
 import {
   ActionsColumn,
@@ -9,14 +10,19 @@ import {
   TreeRowWrapper,
   type IAction,
 } from "@patternfly/react-table";
-
+import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
+import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ConditionalTableBody } from "@app/components/TableControls";
 
 import { GroupsContext, type TGroupTreeNode } from "./groups-context";
 import { GroupTableData } from "./group-table-data";
+import { AxiosError } from "axios";
+import { useDeleteGroupMutation } from "@app/queries/groups";
+import { childGroupDeleteDialogProps } from "@app/Constants";
 
 export const GroupsTable: React.FC = () => {
+  const { pushNotification } = React.useContext(NotificationsContext);
   const {
     isFetching,
     fetchError,
@@ -31,6 +37,28 @@ export const GroupsTable: React.FC = () => {
     numRenderedColumns,
     propHelpers: { paginationProps, tableProps },
   } = tableControls;
+
+  // Delete action
+  // NOTE: only applies to child groups, not parent groups.
+  const [childGroupToDelete, setChildGroupToDelete] =
+    React.useState<TGroupTreeNode | null>(null);
+  const onDeleteChildGroupSuccess = (group: TGroupTreeNode) => {
+    setChildGroupToDelete(null);
+    pushNotification({
+      title: `The child group ${group.name} was deleted`,
+      variant: "success",
+    });
+  };
+
+  const onDeleteChildGroupError = (_error: AxiosError) => {
+    pushNotification({
+      title: "Error occur while deleting child group",
+      variant: "danger",
+    });
+  };
+
+  const { mutate: deleteChildGroup, isPending: isDeletingChildGroup } =
+    useDeleteGroupMutation(onDeleteChildGroupSuccess, onDeleteChildGroupError);
 
   /**
     Recursive function which flattens the data into an array of flattened TreeRowWrapper components
@@ -86,28 +114,16 @@ export const GroupsTable: React.FC = () => {
         )
       : [];
 
-    // TODO: Update once the actions are mocked.
     const lastRowActions = (node: TGroupTreeNode): IAction[] => [
       {
-        title: "Some action",
-        onClick: () =>
-          console.log(`clicked on Some action, on row ${node.name}`),
-      },
-      {
-        title: <div>Another action</div>,
-        onClick: () =>
-          console.log(`clicked on Another action, on row ${node.name}`),
-      },
-      {
-        isSeparator: true,
-      },
-      {
-        title: "Third action",
-        onClick: () =>
-          console.log(`clicked on Third action, on row ${node.name}`),
+        title: "Delete",
+        onClick: () => {
+          setChildGroupToDelete(node);
+        },
       },
     ];
 
+    const isChildNodeOnly = !node.number_of_groups;
     return [
       <TreeRowWrapper key={node.name} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
@@ -115,7 +131,7 @@ export const GroupsTable: React.FC = () => {
         </Td>
         {
           // Only render for non-parent group nodes
-          !node.children.length && (
+          isChildNodeOnly && (
             <Td isActionCell style={{ verticalAlign: "middle" }}>
               <ActionsColumn
                 items={lastRowActions(node)}
@@ -152,6 +168,23 @@ export const GroupsTable: React.FC = () => {
         idPrefix="sbom-groups-table"
         isTop={false}
         paginationProps={paginationProps}
+      />
+
+      <ConfirmDialog
+        {...childGroupDeleteDialogProps(childGroupToDelete)}
+        inProgress={isDeletingChildGroup}
+        titleIconVariant="warning"
+        isOpen={!!childGroupToDelete}
+        confirmBtnVariant={ButtonVariant.danger}
+        confirmBtnLabel="Delete"
+        cancelBtnLabel="Cancel"
+        onCancel={() => setChildGroupToDelete(null)}
+        onClose={() => setChildGroupToDelete(null)}
+        onConfirm={() => {
+          if (childGroupToDelete) {
+            deleteChildGroup(childGroupToDelete);
+          }
+        }}
       />
     </>
   );
