@@ -16,7 +16,7 @@ import { SimplePagination } from "@app/components/SimplePagination";
 import { ConditionalTableBody } from "@app/components/TableControls";
 import { GroupsContext, type TGroupTreeNode } from "./groups-context";
 import { GroupTableData } from "./group-table-data";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { useDeleteGroupMutation, type TGroupDD } from "@app/queries/groups";
 import { childGroupDeleteDialogProps } from "@app/Constants";
 
@@ -99,7 +99,7 @@ export const GroupsTable: React.FC = () => {
         "aria-posinset": posinset,
         "aria-setsize": node.children.length || node.number_of_groups || 0,
         isChecked: isNodeSelected(node),
-        checkboxId: `checkbox_id_${node.name.toLowerCase().replace(/\s+/g, "_")}`,
+        checkboxId: `checkbox_id_${node.id}`,
       },
     };
 
@@ -153,7 +153,7 @@ export const GroupsTable: React.FC = () => {
 
   return (
     <>
-      <Table {...tableProps} isTreeTable aria-label="sbom-groups-table">
+      <Table {...tableProps} isTreeTable aria-label="groups-table">
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
@@ -164,7 +164,7 @@ export const GroupsTable: React.FC = () => {
         </ConditionalTableBody>
       </Table>
       <SimplePagination
-        idPrefix="sbom-groups-table"
+        idPrefix="groups-table"
         isTop={false}
         paginationProps={paginationProps}
       />

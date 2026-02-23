@@ -29,7 +29,12 @@ export const GroupsToolbar: React.FC = () => {
       <ToolbarContent>
         <FilterToolbar {...filterToolbarProps} />
         <ToolbarItem>
-          <Button variant="primary" onClick={() => {}}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              alert("TODO");
+            }}
+          >
             Create group
           </Button>
         </ToolbarItem>
