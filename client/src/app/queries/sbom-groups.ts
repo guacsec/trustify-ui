@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import { listSbomGroups } from "@app/client";
-import type { Group } from "@app/client";
+import type { Group, ListSbomGroupsData } from "@app/client";
 
 export interface SBOMGroup {
   id: string;
@@ -11,10 +11,7 @@ export interface SBOMGroup {
   children?: SBOMGroup[];
 }
 
-export interface FetchSBOMGroupsParams {
-  query?: string;
-  limit?: number;
-}
+export type FetchSBOMGroupsParams = ListSbomGroupsData["query"];
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
@@ -78,16 +75,10 @@ const buildHierarchy = (groups: Group[]): SBOMGroup[] => {
 
 // API function to fetch SBOM groups
 export const fetchSBOMGroupsAPI = async (
-  params: FetchSBOMGroupsParams,
+  params?: FetchSBOMGroupsParams,
 ): Promise<SBOMGroup[]> => {
-  const { query = "", limit = 100 } = params;
-
   const response = await listSbomGroups({
-    query: {
-      q: query || undefined,
-      limit,
-      offset: 0,
-    },
+    query: params,
   });
 
   if (!response.data) {
@@ -100,7 +91,7 @@ export const fetchSBOMGroupsAPI = async (
   return buildHierarchy(groups);
 };
 
-export const useFetchSBOMGroups = (params: FetchSBOMGroupsParams) => {
+export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMGroupsQueryKey, params],
     queryFn: () => fetchSBOMGroupsAPI(params),

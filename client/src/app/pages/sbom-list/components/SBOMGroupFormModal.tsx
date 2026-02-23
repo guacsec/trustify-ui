@@ -106,9 +106,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
 
                   // Check if name is unique
                   const isNameExists = await checkGroupNameUniqueness(value);
-                  return (
-                    !isNameExists || `${value} already exists`
-                  );
+                  return !isNameExists || `${value} already exists`;
                 },
               },
             }}
@@ -228,7 +226,7 @@ export const checkGroupNameUniqueness = async (
       },
     });
 
-    return !response.data?.items || response.data?.items.length === 0 
+    return !response.data?.items || response.data?.items.length === 0;
   } catch (error) {
     // On error, assume name is available (fail open for better UX)
     console.error("Failed to check group name uniqueness:", error);
