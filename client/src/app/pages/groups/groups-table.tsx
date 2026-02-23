@@ -14,11 +14,10 @@ import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ConditionalTableBody } from "@app/components/TableControls";
-
 import { GroupsContext, type TGroupTreeNode } from "./groups-context";
 import { GroupTableData } from "./group-table-data";
 import { AxiosError } from "axios";
-import { useDeleteGroupMutation } from "@app/queries/groups";
+import { useDeleteGroupMutation, type TGroupDD } from "@app/queries/groups";
 import { childGroupDeleteDialogProps } from "@app/Constants";
 
 export const GroupsTable: React.FC = () => {
@@ -42,7 +41,7 @@ export const GroupsTable: React.FC = () => {
   // NOTE: only applies to child groups, not parent groups.
   const [childGroupToDelete, setChildGroupToDelete] =
     React.useState<TGroupTreeNode | null>(null);
-  const onDeleteChildGroupSuccess = (group: TGroupTreeNode) => {
+  const onDeleteChildGroupSuccess = (group: TGroupDD) => {
     setChildGroupToDelete(null);
     pushNotification({
       title: `The child group ${group.name} was deleted`,
@@ -52,7 +51,7 @@ export const GroupsTable: React.FC = () => {
 
   const onDeleteChildGroupError = (_error: AxiosError) => {
     pushNotification({
-      title: "Error occur while deleting child group",
+      title: "Error occurred while deleting child group",
       variant: "danger",
     });
   };
