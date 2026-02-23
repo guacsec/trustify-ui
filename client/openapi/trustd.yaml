@@ -857,7 +857,11 @@ paths:
         description: return the parent chain
         required: false
         schema:
-          type: boolean
+          type: string
+          enum:
+          - skip
+          - id
+          - resolve
       - name: offset
         in: query
         description: |-
@@ -960,7 +964,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedResults_GroupDetails'
+                $ref: '#/components/schemas/GroupListResult'
         '400':
           description: The request was not valid
         '401':
@@ -998,6 +1002,90 @@ paths:
           description: The user authenticated, but not authorized for this operation
         '409':
           description: The name of the group is not unique within the parent
+  /api/v2/group/sbom-assignment:
+    put:
+      tags:
+      - sbomGroup
+      summary: Bulk update SBOM group assignments
+      operationId: bulkUpdateSbomGroupAssignments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkAssignmentRequest'
+        required: true
+      responses:
+        '204':
+          description: The SBOM assignments were updated
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+  /api/v2/group/sbom-assignment/{id}:
+    get:
+      tags:
+      - sbomGroup
+      summary: Get SBOM group assignments
+      operationId: readSbomGroupAssignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the SBOM
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The SBOM was found and assignments returned
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '404':
+          description: The SBOM was not found
+    put:
+      tags:
+      - sbomGroup
+      summary: Update SBOM group assignments
+      operationId: updateSbomGroupAssignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the SBOM to update
+        required: true
+        schema:
+          type: string
+      - name: if-match
+        in: header
+        description: The revision of the SBOM assignments
+        required: false
+        schema:
+          type:
+          - string
+          - 'null'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        '204':
+          description: The SBOM assignments were updated
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '412':
+          description: The requested revision is not the current revision
   /api/v2/group/sbom/{id}:
     get:
       tags:
@@ -1103,6 +1191,8 @@ paths:
           description: The user was not authenticated
         '403':
           description: The user authenticated, but not authorized for this operation
+        '409':
+          description: The group has child groups and cannot be deleted
         '412':
           description: The requested revision is not the current revision of the group
   /api/v2/importer:
@@ -2326,6 +2416,16 @@ paths:
           type: integer
           format: int64
           minimum: 0
+      - name: group
+        in: path
+        description: |-
+          Filter by group IDs. Only SBOMs assigned to any of the provided groups will be returned.
+          Can be specified multiple times. Malformed IDs are silently ignored.
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
       responses:
         '200':
           description: Matching SBOMs
@@ -2340,7 +2440,7 @@ paths:
       operationId: uploadSbom
       parameters:
       - name: labels
-        in: query
+        in: path
         description: |-
           Optional labels.
 
@@ -2349,9 +2449,9 @@ paths:
         schema:
           $ref: '#/components/schemas/Labels'
       - name: format
-        in: query
+        in: path
         description: The format of the uploaded document.
-        required: false
+        required: true
         schema:
           type: string
           enum:
@@ -2367,15 +2467,27 @@ paths:
           - sbom
           - unknown
       - name: cache
-        in: query
+        in: path
         description: Await loading the document into the analysis graph cache
-        required: false
+        required: true
         schema:
           type: string
           enum:
           - skip
           - queue
           - wait
+      - name: group
+        in: path
+        description: |-
+          Optional group IDs to assign the SBOM to after ingestion.
+
+          If one or more group IDs are invalid, the upload will fail with 400 Bad Request
+          and the SBOM will not be ingested.
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
       requestBody:
         content:
           application/octet-stream:
@@ -2394,7 +2506,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IngestResult'
         '400':
-          description: The file could not be parsed as an SBOM
+          description: One or more group IDs are invalid or do not exist
   /api/v2/sbom-labels:
     get:
       tags:
@@ -3798,6 +3910,23 @@ components:
           type: string
     BinaryByteSize:
       type: string
+    BulkAssignmentRequest:
+      type: object
+      description: Request to assign multiple SBOMs to the same set of groups.
+      required:
+      - sbom_ids
+      - group_ids
+      properties:
+        group_ids:
+          type: array
+          items:
+            type: string
+          description: The group IDs to assign to each SBOM (replaces existing assignments).
+        sbom_ids:
+          type: array
+          items:
+            type: string
+          description: The IDs of the SBOMs to update.
     ByteSizeDef:
       type: string
     CacheStatusDetails:
@@ -4057,6 +4186,11 @@ components:
       - id
       - name
       properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: A user friendly description
         id:
           type: string
           description: The ID of the group
@@ -4070,57 +4204,44 @@ components:
           type:
           - string
           - 'null'
-          description: The parent of this group
-    GroupDetails:
+          description: The direct parent of this group
+    GroupListResult:
       allOf:
-      - $ref: '#/components/schemas/Group'
+      - $ref: '#/components/schemas/PaginatedResults_GroupDetails'
       - type: object
         properties:
-          number_of_groups:
-            type:
-            - integer
-            - 'null'
-            format: int64
-            description: |-
-              The number of groups owned directly by this group
-
-              This information is only present when requested.
-            minimum: 0
-          number_of_sboms:
-            type:
-            - integer
-            - 'null'
-            format: int64
-            description: |-
-              The number of SBOMs directly assigned to this group
-
-              This information is only present when requested.
-            minimum: 0
-          parents:
+          referenced:
             type:
             - array
             - 'null'
             items:
-              type: string
+              $ref: '#/components/schemas/Group'
             description: |-
-              The path, of IDs, from the root to this group
+              Groups referenced by parent chains but not present in the primary result set.
 
-              This information is only present when requested.
-      description: Detailed group information, extends [`Group`]
+              Only present when `parents=resolve` is requested.
+      description: Result of listing SBOM groups, with optional resolved parent references.
     GroupRequest:
       type: object
       description: Mutable properties of a [`Group`].
       required:
       - name
       properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: A user provided description
         labels:
           $ref: '#/components/schemas/Labels'
         name:
           type: string
+          description: The name of the group.
         parent:
           type:
           - string
           - 'null'
+          description: The ID of the group's parent.
     Id:
       type: string
       description: |-
@@ -5322,6 +5443,11 @@ components:
           - id
           - name
           properties:
+            description:
+              type:
+              - string
+              - 'null'
+              description: A user friendly description
             id:
               type: string
               description: The ID of the group
@@ -5335,7 +5461,7 @@ components:
               type:
               - string
               - 'null'
-              description: The parent of this group
+              description: The direct parent of this group
     Revisioned_Importer:
       type: object
       description: |-
