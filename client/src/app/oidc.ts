@@ -10,7 +10,6 @@ export const OIDC_CLIENT_ID = ENV.OIDC_CLIENT_ID || "frontend";
 
 // Cognito requires client_id + logout_uri.
 // Keycloak ignores both (uses id_token_hint + post_logout_redirect_uri added by oidc-client-ts instead) and follows the OIDC RP-Initiated Logout spec.
-
 export const oidcSignoutArgs = {
   extraQueryParams: {
     client_id: OIDC_CLIENT_ID,
