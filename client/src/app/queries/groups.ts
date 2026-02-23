@@ -8,9 +8,12 @@ import {
 } from "@tanstack/react-query";
 
 import { client } from "@app/axios-config/apiInit";
-import { deleteSbomGroup, GroupRequest, listSbomGroups } from "@app/client";
+import {
+  deleteSbomGroup,
+  type GroupRequest,
+  listSbomGroups,
+} from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
-import { TGroupTreeNode } from "@app/pages/groups/groups-context";
 
 export const GroupQueryKey = "groups";
 
