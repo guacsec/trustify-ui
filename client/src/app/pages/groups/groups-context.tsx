@@ -10,7 +10,7 @@ import {
 } from "@app/hooks/table-controls";
 import { useSelectionState } from "@app/hooks/useSelectionState";
 import { TablePersistenceKeyPrefixes } from "@app/Constants";
-import { usePersistentState } from "@app/hooks/usePersistentState";
+
 import type { TGroupDD } from "@app/queries/groups";
 import { useFetchGroupChildren, useFetchGroups } from "@app/queries/groups";
 import { buildGroupTree } from "./utils";
@@ -90,36 +90,8 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     expandableVariant: "single",
   });
 
-  // Expansion state persisted to URL params (stores group IDs)
-  const [expandedNodeIds, setExpandedNodeIdsInternal] = usePersistentState<
-    string[],
-    typeof TablePersistenceKeyPrefixes.groups,
-    "expandedNodes"
-  >({
-    isEnabled: true,
-    defaultValue: [],
-    persistenceKeyPrefix: TablePersistenceKeyPrefixes.groups,
-    persistTo: "urlParams",
-    keys: ["expandedNodes"],
-    serialize: (ids) => ({
-      expandedNodes: ids.length > 0 ? ids.join(",") : null,
-    }),
-    deserialize: ({ expandedNodes }) =>
-      expandedNodes ? expandedNodes.split(",") : [],
-  });
-
-  // Wrap setter to support functional updates
-  const setExpandedNodeIds: React.Dispatch<React.SetStateAction<string[]>> =
-    React.useCallback(
-      (value) => {
-        if (typeof value === "function") {
-          setExpandedNodeIdsInternal(value(expandedNodeIds));
-        } else {
-          setExpandedNodeIdsInternal(value);
-        }
-      },
-      [expandedNodeIds, setExpandedNodeIdsInternal],
-    );
+  // Expansion state stored in React state (transient UI state, not URL-worthy)
+  const [expandedNodeIds, setExpandedNodeIds] = React.useState<string[]>([]);
 
   // Fetch paginated root groups (parent IS NULL)
   const {
@@ -136,8 +108,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
   );
 
   // Fetch children for all expanded groups
-  const { data: childGroups, isFetching: isChildrenFetching } =
-    useFetchGroupChildren(expandedNodeIds);
+  const { data: childGroups } = useFetchGroupChildren(expandedNodeIds);
 
   // Merge root groups + children into a flat list, then build tree
   const allGroups = React.useMemo(
@@ -149,7 +120,8 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     return buildGroupTree(allGroups);
   }, [allGroups]);
 
-  const isFetching = isRootsFetching || isChildrenFetching;
+  // Only use root-fetching for the table loading state.
+  const isFetching = isRootsFetching;
 
   const {
     selectedItems: selectedNodes,
