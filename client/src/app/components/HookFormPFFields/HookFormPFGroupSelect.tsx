@@ -114,7 +114,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
 
   // Fetch groups with search query
   const { groups, isFetching } = useFetchSBOMGroups({
-    q: searchQuery,
+    ...(searchQuery && { q: `name~${searchQuery}` }),
     limit,
   });
 
