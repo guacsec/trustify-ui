@@ -76,7 +76,7 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
   const {
     isFetching: isFetchingSBOMs,
     result: { data: sboms },
-  } = useFetchSBOMs({ ...params }, [], disableSearch);
+  } = useFetchSBOMs(undefined, { ...params }, [], disableSearch);
 
   const {
     isFetching: isFetchingVulnerabilities,
