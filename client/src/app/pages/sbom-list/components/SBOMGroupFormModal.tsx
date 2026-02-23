@@ -5,7 +5,6 @@ import {
   ButtonVariant,
   ExpandableSection,
   Form,
-  FormSelectOption,
   Modal,
   ModalBody,
   ModalFooter,
@@ -16,9 +15,10 @@ import {
 } from "@patternfly/react-core";
 import { useForm } from "react-hook-form";
 
+import { listSbomGroups } from "@app/client";
 import {
   HookFormPFGroupController,
-  HookFormPFSelect,
+  HookFormPFGroupSelect,
   HookFormPFTextArea,
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
@@ -83,8 +83,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     onSubmit(values);
   };
 
-  const parentGroups: string[] = [];
-
   return (
     <Modal
       variant="small"
@@ -98,7 +96,21 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
           <HookFormPFTextInput
             control={control}
             controllerProps={{
-              rules: { required: "This field is required" },
+              rules: {
+                required: "This field is required",
+                validate: async (value: string) => {
+                  // Skip uniqueness check if editing and name hasn't changed
+                  if (type === "Edit" && value === initialValues?.name) {
+                    return true;
+                  }
+
+                  // Check if name is unique
+                  const isNameExists = await checkGroupNameUniqueness(value);
+                  return (
+                    !isNameExists || `${value} already exists`
+                  );
+                },
+              },
             }}
             name="name"
             label="Group name"
@@ -107,22 +119,15 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             placeholder="Enter group name"
           />
 
-          <HookFormPFSelect
+          <HookFormPFGroupSelect
             control={control}
             name="parentGroup"
             label="Parent group"
             fieldId="parent-group"
-            placeholder="Select parent group"
+            placeholderText="Select parent group"
             helperText="Leave blank if this group does not have a parent"
-          >
-            {parentGroups.map((groupName) => (
-              <FormSelectOption
-                key={groupName}
-                value={groupName}
-                label={groupName}
-              />
-            ))}
-          </HookFormPFSelect>
+            limit={5}
+          />
 
           <HookFormPFGroupController
             control={control}
@@ -199,7 +204,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
           type="button"
           aria-label="Cancel"
           variant={ButtonVariant.link}
-          isDisabled={isSubmitting || isValidating}
+          isDisabled={isSubmitting}
           onClick={onClose}
         >
           Cancel
@@ -207,4 +212,26 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
       </ModalFooter>
     </Modal>
   );
+};
+
+// API function to check if group name is unique
+// Returns array of group names that match (empty array means name is available)
+export const checkGroupNameUniqueness = async (
+  name: string,
+): Promise<boolean> => {
+  try {
+    // Use exact name filter to find groups with matching names
+    const response = await listSbomGroups({
+      query: {
+        q: `name=${name}`,
+        limit: 1,
+      },
+    });
+
+    return !response.data?.items || response.data?.items.length === 0 
+  } catch (error) {
+    // On error, assume name is available (fail open for better UX)
+    console.error("Failed to check group name uniqueness:", error);
+    return true;
+  }
 };
