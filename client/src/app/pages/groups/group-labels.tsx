@@ -24,7 +24,7 @@ export const GroupLabels = ({ labels }: Props) => {
       {Object.entries(labels).map(([key, value]) => {
         const { color, text } = formatLabel(key, value);
         return (
-          <Label key={key} color={`${color}`}>
+          <Label key={key} color={color}>
             {text}
           </Label>
         );
