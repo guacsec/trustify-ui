@@ -1,20 +1,19 @@
 import { expect as baseExpect } from "@playwright/test";
-import type { Table, TColumnValue } from "../pages/Table";
+import type { Table } from "../pages/Table";
 import type { MatcherResult } from "./types";
 
 export interface TableMatchers<
-  TColumn extends Record<string, TColumnValue>,
+  TColumns extends readonly string[],
   _TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 > {
   toBeSortedBy(
-    columnName: TColumnName,
+    columnName: TColumns[number],
     order: "ascending" | "descending",
   ): Promise<MatcherResult>;
   toHaveColumnWithValue(
-    columnName: TColumnName,
-    value: string,
-    rowIndex?: number,
+    columnName: TColumns[number],
+    value: string | RegExp,
+    rowIndex?: number | "all",
   ): Promise<MatcherResult>;
   toHaveNumberOfRows(expectedRows: {
     equal?: number;
@@ -25,28 +24,22 @@ export interface TableMatchers<
 }
 
 type TableMatcherDefinitions = {
-  readonly [K in keyof TableMatchers<
-    Record<string, TColumnValue>,
-    [],
-    string
-  >]: <
-    TColumn extends Record<string, TColumnValue>,
+  readonly [K in keyof TableMatchers<readonly string[], readonly string[]>]: <
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    receiver: Table<TColumn, TActions, TColumnName>,
-    ...args: Parameters<TableMatchers<TColumn, TActions, TColumnName>[K]>
+    receiver: Table<TColumns, TActions>,
+    ...args: Parameters<TableMatchers<TColumns, TActions>[K]>
   ) => Promise<MatcherResult>;
 };
 
 export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
   toBeSortedBy: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
-    columnName: TColumnName,
+    table: Table<TColumns, TActions>,
+    columnName: TColumns[number],
     order: "ascending" | "descending",
   ) => {
     try {
@@ -65,14 +58,13 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveColumnWithValue: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
-    columnName: TColumnName,
-    value: string,
-    rowIndex?: number,
+    table: Table<TColumns, TActions>,
+    columnName: TColumns[number],
+    value: string | RegExp,
+    rowIndex?: number | "all",
   ) => {
     try {
       if (rowIndex === undefined) {
@@ -83,6 +75,19 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
             })
             .first(),
         ).toBeVisible();
+      } else if (rowIndex === "all") {
+        const rows = table._table.locator(
+          `td[data-label="${table._columns[0]}"]`,
+        );
+        await baseExpect.poll(() => rows.count()).toBeGreaterThan(0);
+
+        // Verify all rows in the specified column contain the expected value
+        const column = await table.getColumn(columnName);
+        const allRows = await column.all();
+
+        for (const row of allRows) {
+          await baseExpect(row).toContainText(value);
+        }
       } else {
         await baseExpect(
           table._table.locator(`td[data-label="${columnName}"]`).nth(rowIndex),
@@ -91,7 +96,15 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
 
       return {
         pass: true,
-        message: () => `Table contains ${value} in column ${columnName}`,
+        message: () => {
+          if (rowIndex === undefined) {
+            return `Column "${columnName}" contains value "${value}"`;
+          } else if (rowIndex === "all") {
+            return `All rows in column "${columnName}" contain value "${value}"`;
+          } else {
+            return `Row ${rowIndex} contains "${value}" in column "${columnName}"`;
+          }
+        },
       };
     } catch (error) {
       return {
@@ -101,16 +114,15 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveNumberOfRows: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
+    table: Table<TColumns, TActions>,
     expectedRows: { equal?: number; greaterThan?: number; lessThan?: number },
   ) => {
     try {
       const rows = table._table.locator(
-        `td[data-label="${Object.keys(table._columns)[0]}"]`,
+        `td[data-label="${table._columns[0]}"]`,
       );
 
       if (expectedRows.equal) {
@@ -139,11 +151,10 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
     }
   },
   toHaveEmptyState: async <
-    TColumn extends Record<string, TColumnValue>,
+    const TColumns extends readonly string[],
     const TActions extends readonly string[],
-    TColumnName extends Extract<keyof TColumn, string>,
   >(
-    table: Table<TColumn, TActions, TColumnName>,
+    table: Table<TColumns, TActions>,
   ): Promise<MatcherResult> => {
     try {
       await baseExpect(

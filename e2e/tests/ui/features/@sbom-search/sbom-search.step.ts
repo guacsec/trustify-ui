@@ -1,37 +1,54 @@
 import { createBdd } from "playwright-bdd";
 
 import { test } from "../../fixtures";
-import { DetailsPage } from "../../helpers/DetailsPage";
-import { ToolbarTable } from "../../helpers/ToolbarTable";
+
 import { expect } from "../../assertions";
 
-export const { Given, When, Then } = createBdd(test);
+import { DetailsPage } from "../../helpers/DetailsPage";
 
-const SBOM_TABLE_NAME = "sbom-table";
+import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
+import { LabelsModal } from "../../pages/LabelsModal";
+
+export const { Given, When, Then } = createBdd(test);
 
 Given(
   "An ingested SBOM {string} containing Vulnerabilities",
   async ({ page }, sbomName) => {
-    const element = page.locator(
-      `xpath=(//tr[contains(.,'${sbomName}')]/td[@data-label='Vulnerabilities']/div)[1]`,
-    );
-    await expect(element, "SBOM have no vulnerabilities").toHaveText(
-      /^(?!0$).+/,
-    );
+    const listPage = await SbomListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+
+    await toolbar.applyFilter({ "Filter text": sbomName });
+    await expect(table).toHaveColumnWithValue("Name", sbomName);
+
+    // Check vulnerabilities column has non-zero value
+    const vulnColumn = await table.getColumn("Vulnerabilities");
+    await expect(vulnColumn.first()).not.toHaveText("0");
   },
 );
 
 When(
   "User Adds Labels {string} to {string} SBOM from List Page",
   async ({ page }, labelList, sbomName) => {
-    const toolbarTable = new ToolbarTable(page, SBOM_TABLE_NAME);
-    await toolbarTable.editLabelsListPage(sbomName);
+    const listPage = await SbomListPage.fromCurrentPage(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+
+    await toolbar.applyFilter({ "Filter text": sbomName });
+    await expect(table).toHaveColumnWithValue("Name", sbomName);
+
+    await table.clickAction("Edit labels", 0);
+
+    const labelsModal = await LabelsModal.build(page);
     const detailsPage = new DetailsPage(page);
 
     // Generate random labels if placeholder is used
     const labelsToAdd =
       labelList === "RANDOM_LABELS" ? detailsPage.generateLabels() : labelList;
-    await detailsPage.addLabels(labelsToAdd);
+    const labelsArray = labelsToAdd.split(",").map((l: string) => l.trim());
+
+    await labelsModal.addLabels(labelsArray);
+    await labelsModal.clickSave();
 
     // Store generated labels for verification
     // biome-ignore lint/suspicious/noExplicitAny: allowed
@@ -44,7 +61,7 @@ When(
 );
 
 Then(
-  "The Label list {string} added to the SBOM {string} on List Page",
+  "The Label list {string} is visible on the List Page for SBOM {string}",
   async ({ page }, labelList, sbomName) => {
     const detailsPage = new DetailsPage(page);
 
@@ -55,5 +72,33 @@ Then(
           (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName);
+  },
+);
+
+When(
+  "User applies {string} filter with {string} on the SBOM List Page",
+  async ({ page }, filterName: string, filterValue: string) => {
+    const listPage = await SbomListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+    if (filterName === "Label") {
+      await toolbar.applyFilter({ Label: [filterValue] });
+    } else if (filterName === "Filter text") {
+      await toolbar.applyFilter({ "Filter text": filterValue });
+    } else if (filterName === "License") {
+      await toolbar.applyFilter({ License: [filterValue] });
+    }
+    await table.waitUntilDataIsLoaded();
+  },
+);
+
+Then(
+  "The SBOM List Page shows only SBOMs with label {string}",
+  async ({ page }, labelValue: string) => {
+    const listPage = await SbomListPage.fromCurrentPage(page);
+    const table = await listPage.getTable();
+    const toolbar = await listPage.getToolbar();
+    await expect(toolbar).toHaveLabels({ Label: [labelValue] });
+    await expect(table).toHaveColumnWithValue("Labels", labelValue, "all");
   },
 );

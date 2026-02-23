@@ -1,6 +1,6 @@
 import { mergeExpects } from "@playwright/test";
 
-import type { Table, TColumnValue } from "../pages/Table";
+import type { Table } from "../pages/Table";
 import { tableAssertions, type TableMatchers } from "./TableMatchers";
 
 import type { Pagination } from "../pages/Pagination";
@@ -16,11 +16,18 @@ import { toolbarAssertions, type ToolbarMatchers } from "./ToolbarMatchers";
 import type { DeletionConfirmDialog } from "../pages/ConfirmDialog";
 import { dialogAssertions, type DialogMatchers } from "./DialogMatchers";
 
+import type { FileUpload } from "../pages/FileUpload";
+import {
+  fileUploadAssertions,
+  type FileUploadMatchers,
+} from "./FileUploadMatchers";
+
 const merged = mergeExpects(
   tableAssertions,
   paginationAssertions,
   toolbarAssertions,
   dialogAssertions,
+  fileUploadAssertions,
   // Add more custom assertions here
 );
 
@@ -30,16 +37,15 @@ const merged = mergeExpects(
  * Overload from TableMatchers.ts
  */
 function typedExpect<
-  TColumn extends Record<string, TColumnValue>,
+  const TColumns extends readonly string[],
   const TActions extends readonly string[],
-  TColumnName extends Extract<keyof TColumn, string>,
 >(
-  value: Table<TColumn, TActions, TColumnName>,
+  value: Table<TColumns, TActions>,
 ): Omit<
-  ReturnType<typeof merged<Table<TColumn, TActions, TColumnName>>>,
-  keyof TableMatchers<TColumn, TActions, TColumnName>
+  ReturnType<typeof merged<Table<TColumns, TActions>>>,
+  keyof TableMatchers<TColumns, TActions>
 > &
-  TableMatchers<TColumn, TActions, TColumnName>;
+  TableMatchers<TColumns, TActions>;
 
 /**
  * Overload from PaginationMatchers.ts
@@ -74,6 +80,14 @@ function typedExpect(
   keyof DialogMatchers
 > &
   DialogMatchers;
+
+/**
+ * Overload from FileUploadMatchers.ts
+ */
+function typedExpect(
+  value: FileUpload,
+): Omit<ReturnType<typeof merged<FileUpload>>, keyof FileUploadMatchers> &
+  FileUploadMatchers;
 
 // Default overload
 function typedExpect<T>(value: T): ReturnType<typeof merged<T>>;

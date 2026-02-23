@@ -61,7 +61,7 @@ export const MonitoringSection: React.FC = () => {
     result: { data: barchartSboms, total: totalSboms },
     isFetching: isFetchingBarchartSboms,
     fetchError: fetchErrorBarchartSboms,
-  } = useFetchSBOMs({
+  } = useFetchSBOMs(undefined, {
     page: { pageNumber: 1, itemsPerPage: 10 },
     sort: { field: "ingested", direction: "desc" },
   });

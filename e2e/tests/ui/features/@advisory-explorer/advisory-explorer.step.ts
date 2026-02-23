@@ -1,11 +1,15 @@
 import { createBdd } from "playwright-bdd";
+
+import { test } from "../../fixtures";
+
 import { expect } from "../../assertions";
+
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 import { SearchPage } from "../../helpers/SearchPage";
+
+import { AdvisoryDetailsPage } from "../../pages/advisory-details/AdvisoryDetailsPage";
 import { AdvisoryListPage } from "../../pages/advisory-list/AdvisoryListPage";
-import { test } from "../../fixtures";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
-import { DetailsPage } from "../../helpers/DetailsPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -14,19 +18,23 @@ const VULN_TABLE_NAME = "vulnerability table";
 Given(
   "User visits Advisory details Page of {string}",
   async ({ page }, advisoryID) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryID);
-    await page.getByRole("link", { name: advisoryID, exact: true }).click();
+    await AdvisoryDetailsPage.build(page, advisoryID);
   },
 );
 
 Given(
   "User visits Advisory details Page of {string} with type {string}",
   async ({ page }, advisoryName, advisoryType) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryName);
-    const advisory = `xpath=//tr[contains(.,'${advisoryName}') and contains(.,'${advisoryType}')]/td/a`;
-    await page.locator(advisory).click();
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    const table = await listPage.getTable();
+
+    await toolbar.applyFilter({ "Filter text": advisoryName });
+    const rows = await table.getRowsByCellValue({
+      ID: advisoryName,
+      Type: advisoryType,
+    });
+    await rows.getByRole("link", { name: advisoryName, exact: true }).click();
   },
 );
 
@@ -42,8 +50,9 @@ When(
 When(
   "User searches for {string} in the dedicated search bar",
   async ({ page }, advisoryID) => {
-    const searchPage = new SearchPage(page, "Advisories");
-    await searchPage.dedicatedSearch(advisoryID);
+    const listPage = await AdvisoryListPage.build(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ "Filter text": advisoryID });
   },
 );
 
@@ -86,7 +95,8 @@ Then(
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
   async ({ page }) => {
-    await page.getByRole("tab", { name: "Vulnerabilities" }).click();
+    const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(page);
+    await detailsPage._layout.selectTab("Vulnerabilities");
   },
 );
 
@@ -168,18 +178,10 @@ When(
 );
 
 When(
-  "User Clicks on Actions button and Selects Delete option from the drop down",
-  async ({ page }) => {
-    const details = new DetailsPage(page);
-    await details.clickOnPageAction("Delete");
-  },
-);
-
-When(
   "User select Delete button from the Permanently delete Advisory model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
-    await expect(dialog).toHaveTitle(
+    await expect(dialog).toHaveDialogTitle(
       "Warning alert:Permanently delete Advisory?",
     );
     await dialog.clickConfirm();

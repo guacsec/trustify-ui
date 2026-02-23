@@ -21,7 +21,6 @@ The layout of the `e2e` repository looks like follows:
 └── tests
     ├── api
     │   ├── fixtures.ts
-    │   ├── client
     │   ├── dependencies
     │   ├── features
     │   └── helpers
@@ -47,34 +46,17 @@ The layout of the `e2e` repository looks like follows:
 - `playwright.config.ts` - a configuration for [Playwright](https://playwright.dev/docs/intro)
   and [Playwright-BDD](https://vitalets.github.io/playwright-bdd/#/)
 
-- `config` contains configuration files that are common for the repository;
-  currently it contains
-
-  - `openapi.yaml` - a file with the [Trustify](https://github.com/guacsec/trustify)
-    API definition; every time the file changes on the [Trustify](https://github.com/guacsec/trustify)
-    side it should be also updated here
-
-  - `openapi-ts.config.ts` - a configuration for `@hey-api/openapi-ts` telling
-    it how to generate the content of `tests/api/client`; whenever this or
-    `openapi.yaml` file changes `npm run openapi` should be executed to update
-    the content of `tests/api/client`
-
 - `etc` contains auxiliary files such as Podman/Docker compose files to start
   a Playwright container
 
 - `tests/api` contains API tests organized as follows
 
-  - `fixtures.ts` - API tests fixtures written in TypeScript
-
-  - `client` contains a TypeScript interface to [Trustify](https://github.com/guacsec/trustify)
-    API generated from `config/openapi.yaml` by `npm run openapi`
+  - `fixtures.ts` - Configures authenticated axios instance for API testing
 
   - `dependencies` contains setup and tear down routines which are run before
     the start and after the end of the API test suite, respectively
 
-  - `features` contains API tests itself; `_openapi_client_examples.ts` shows
-    how to use generated TypeScript interface to [Trustify](https://github.com/guacsec/trustify)
-    in API tests
+  - `features` contains API tests that use axios to call Trustify endpoints
 
   - `helpers` contains auxiliary utilities used by API tests
 
@@ -238,7 +220,7 @@ The [Playwright MCP](https://github.com/microsoft/playwright-mcp) server can be 
 1. Install Playwright MCP server to the client
 2. Start Playwright MCP server (if needed)
 3. Update the `trustify` environment values like `PLAYWRIGHT_AUTH_URL`, `TRUSTIFY_API_URL`,`AUTH_REQUIRED` in the `.env` file
-4. Make sure to add the test scenario and the steps under relevant feature file exists under the directory `e2e/tests/**/features/**/*.feature`.
+4. Make sure to add the test scenario and the steps under relevant feature file exists under the directory `e2e/tests/ui/features/**/*.feature`.
 5. Toggle Agent plane on the IDE and pass the Scenario name for which the code to be generated
 6. Review the Agent prompts before accepting to execute commands
 7. Review the steps and step definitions added under `auto-generated.step.ts` located under relevant feature file directory

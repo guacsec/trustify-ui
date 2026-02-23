@@ -23,7 +23,7 @@ export class Navigation {
       | "Packages"
       | "Advisories"
       | "Importers"
-      | "Upload",
+      | "Licenses",
   ) {
     // By default, we do not initialize navigation at "/"" where the Dashboard is located
     // This should help us to save some time loading pages as the Dashboard fetches too much data

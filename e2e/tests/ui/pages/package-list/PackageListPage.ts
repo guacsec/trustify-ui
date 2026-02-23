@@ -23,7 +23,7 @@ export class PackageListPage {
       "Filter text": "string",
       Type: "multiSelect",
       Architecture: "multiSelect",
-      License: "multiSelect",
+      License: "typeahead",
     });
   }
 
@@ -31,16 +31,16 @@ export class PackageListPage {
     return await Table.build(
       this._page,
       "Package table",
-      {
-        Name: { isSortable: true },
-        Namespace: { isSortable: true },
-        Version: { isSortable: true },
-        Type: { isSortable: false },
-        Licenses: { isSortable: false },
-        Path: { isSortable: false },
-        Qualifiers: { isSortable: false },
-        Vulnerabilities: { isSortable: false },
-      },
+      [
+        "Name",
+        "Namespace",
+        "Version",
+        "Type",
+        "Licenses",
+        "Path",
+        "Qualifiers",
+        "Vulnerabilities",
+      ],
       [],
     );
   }
