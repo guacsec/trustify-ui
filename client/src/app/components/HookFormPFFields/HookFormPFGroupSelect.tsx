@@ -3,20 +3,11 @@ import type { FieldValues, Path } from "react-hook-form";
 
 import {
   Button,
-  Divider,
-  Icon,
   MenuToggle,
-  SearchInput,
   Select,
   SelectList,
-  SelectOption,
-  TextInputGroup,
-  TextInputGroupMain,
-  TextInputGroupUtilities,
 } from "@patternfly/react-core";
 import {
-  AngleLeftIcon,
-  AngleRightIcon,
   TimesIcon,
 } from "@patternfly/react-icons";
 
@@ -29,6 +20,7 @@ import {
   HookFormPFGroupController,
   extractGroupControllerProps,
 } from "./HookFormPFGroupController";
+import { MenuWithDrilldown } from "../WithDrillDownMenu";
 
 export type HookFormPFGroupSelectProps<
   TFieldValues extends FieldValues,
@@ -92,11 +84,6 @@ interface GroupSelectTypeaheadProps {
   validated?: "success" | "warning" | "error" | "default";
 }
 
-interface BreadcrumbItem {
-  id: string;
-  name: string;
-}
-
 const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
   fieldId,
   value,
@@ -105,16 +92,14 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
   limit,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState("");
-  const [breadcrumbs, setBreadcrumbs] = React.useState<BreadcrumbItem[]>([]);
-  const [currentGroups, setCurrentGroups] = React.useState<SBOMGroup[]>([]);
 
   // Debounced search query
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Fetch groups with search query
-  const { groups, isFetching } = useFetchSBOMGroups({
+  const { groups } = useFetchSBOMGroups({
     ...(searchQuery && { q: `name~${searchQuery}` }),
+    parents: "resolve",
     limit,
   });
 
@@ -135,34 +120,6 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     [],
   );
 
-  // Update current groups when fetched groups change
-  React.useEffect(() => {
-    // If user is searching, reset breadcrumbs and show all matching groups
-    if (searchQuery) {
-      setBreadcrumbs([]);
-      setCurrentGroups(groups);
-    } else if (breadcrumbs.length === 0) {
-      
-      setCurrentGroups(groups);
-    } else {
-      // Navigate to the current breadcrumb level
-      const currentGroup = findGroupById(
-        groups,
-        breadcrumbs[breadcrumbs.length - 1].id,
-      );
-      setCurrentGroups(currentGroup?.children || []);
-    }
-  }, [groups, breadcrumbs, searchQuery, findGroupById]);
-
-  // Debounce search input
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(inputValue);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [inputValue]);
-
   // Find group name by ID
   const findGroupNameById = (id: string): string => {
     const group = findGroupById(groups, id);
@@ -173,38 +130,10 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const onSelect = (groupId: string) => {
-    onChange(groupId);
-    setInputValue("");
+  const onSelect = (group: SBOMGroup) => {
+    onChange(group.id);
     setSearchQuery("");
     setIsOpen(false);
-    setBreadcrumbs([]);
-  };
-
-  const onClear = () => {
-    setInputValue("");
-    setSearchQuery("");
-  };
-
-  const onNavigateToChildren = (event: React.MouseEvent, group: SBOMGroup) => {
-    event.stopPropagation();
-    setBreadcrumbs([...breadcrumbs, { id: group.id, name: group.name }]);
-    setCurrentGroups(group.children || []);
-  };
-
-  const onNavigateBack = () => {
-    const newBreadcrumbs = breadcrumbs.slice(0, -1);
-    setBreadcrumbs(newBreadcrumbs);
-
-    if (newBreadcrumbs.length === 0) {
-      setCurrentGroups(groups);
-    } else {
-      const parentGroup = findGroupById(
-        groups,
-        newBreadcrumbs[newBreadcrumbs.length - 1].id,
-      );
-      setCurrentGroups(parentGroup?.children || []);
-    }
   };
 
   const toggle = (toggleRef: React.Ref<HTMLButtonElement>) => (
@@ -213,130 +142,32 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       onClick={onToggle}
       isExpanded={isOpen}
       isFullWidth
-      variant="typeahead"
+      icon={(!!value) && <Button
+        variant="plain"
+        onClick={(e) => {
+          e.stopPropagation();
+            onChange("");
+        }}
+        aria-label="Clear chosen value"
+      >
+        <TimesIcon />
+      </Button>}
     >
-      <TextInputGroup isPlain>
-        <TextInputGroupMain
-          value={inputValue}
-          onClick={onToggle}
-          onChange={(_event, val) => setInputValue(val)}
-          id={fieldId}
-          autoComplete="off"
-          placeholder={value ? findGroupNameById(value) : placeholderText}
-        />
-        {(!!inputValue || !!value) && (
-          <TextInputGroupUtilities>
-            <Button
-              variant="plain"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (inputValue) {
-                  onClear();
-                } else {
-                  onChange("");
-                }
-              }}
-              aria-label="Clear input value"
-            >
-              <TimesIcon />
-            </Button>
-          </TextInputGroupUtilities>
-        )}
-      </TextInputGroup>
+      {value ? findGroupNameById(value) : placeholderText}
     </MenuToggle>
   );
-
-  // Get parent group name for back button
-  const getParentGroupName = (): string => {
-    return breadcrumbs[breadcrumbs.length - 1].name;
-  };
 
   return (
     <Select
       id={`${fieldId}-select`}
       isOpen={isOpen}
       selected={undefined}
-      onSelect={(_event, selection) => {
-        if (typeof selection === "string") {
-          onSelect(selection);
-        }
-      }}
       onOpenChange={setIsOpen}
       toggle={toggle}
     >
       <SelectList>
-        {breadcrumbs.length < 1 && (
-          <>
-            <div style={{ padding: "8px" }}>
-              <SearchInput
-                placeholder="Search groups"
-                value={inputValue}
-                onChange={(_event, val) => setInputValue(val)}
-                onClear={() => {
-                  setInputValue("");
-                  setSearchQuery("");
-                }}
-              />
-            </div>
-            <Divider />
-          </>
-        )}
-        {breadcrumbs.length > 0 && (
-          <>
-            <SelectOption key="back" onClick={onNavigateBack}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                <Icon>
-                  <AngleLeftIcon />
-                </Icon>
-                <span>{getParentGroupName()}</span>
-              </div>
-            </SelectOption>
-            <Divider />
-          </>
-        )}
-        {isFetching && (
-          <SelectOption key="loading" isDisabled>
-            Loading...
-          </SelectOption>
-        )}
-        {!isFetching && currentGroups.length === 0 && (
-          <SelectOption key="no-results" isDisabled>
-            No results found
-          </SelectOption>
-        )}
-        {!isFetching &&
-          currentGroups.map((group) => (
-            <SelectOption
-              key={group.id}
-              value={group.id}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <span>{group.name}</span>
-                {group.children && group.children.length > 0 && (
-                  <Icon
-                    onClick={(e) => onNavigateToChildren(e, group)}
-                    style={{ cursor: "pointer", marginLeft: "auto" }}
-                  >
-                    <AngleRightIcon />
-                  </Icon>
-                )}
-              </div>
-            </SelectOption>
-          ))}
-      </SelectList>
+        <MenuWithDrilldown options={groups} onSelect={onSelect} onInputChange={setSearchQuery} />
+      </SelectList> 
     </Select>
   );
 };

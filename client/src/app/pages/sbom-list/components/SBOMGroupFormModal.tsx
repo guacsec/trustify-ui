@@ -121,12 +121,9 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
                   // Check if name is unique (within parent context if parent is selected)
                   const isNameExists = await checkGroupNameUniqueness(
                     value,
-                    parentGroup || undefined,
+                    parentGroup || undefined
                   );
-                  return (
-                    isNameExists ||
-                    `${value} already exists${parentGroup ? ` in ${parentGroup}` : ""}`
-                  );
+                  return isNameExists || `${value} already exists${parentGroup ? ` in ${parentGroup}`: ''}`;
                 },
               },
             }}
