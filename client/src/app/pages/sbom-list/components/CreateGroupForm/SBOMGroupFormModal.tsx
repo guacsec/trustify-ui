@@ -56,7 +56,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   initialValues,
   type = "Create",
 }) => {
-
   const [isAdvancedExpanded, setIsAdvancedExpanded] =
     React.useState<boolean>(false);
 

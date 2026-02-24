@@ -26,7 +26,7 @@ export const checkGroupNameUniqueness = async (
     const response = await listSbomGroups({
       client,
       query: {
-        q: `parent=${parentId || ""}&name=${name}`,
+        q: `parent=${parentId || "\0"}&name=${name}`,
         limit: 1,
       },
     });
