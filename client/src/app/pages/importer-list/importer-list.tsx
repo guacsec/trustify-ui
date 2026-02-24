@@ -285,7 +285,7 @@ export const ImporterList: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <Toolbar {...toolbarProps}>
+          <Toolbar {...toolbarProps} aria-label="importer-toolbar">
             <ToolbarContent>
               <FilterToolbar showFiltersSideBySide {...filterToolbarProps} />
               <ToolbarItem {...paginationToolbarItemProps}>
