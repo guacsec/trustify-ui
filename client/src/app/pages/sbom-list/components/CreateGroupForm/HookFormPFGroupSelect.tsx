@@ -1,7 +1,7 @@
 import React from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
-import { MenuToggle, Select, SelectList } from "@patternfly/react-core";
+import { Button, MenuToggle, Select, SelectList } from "@patternfly/react-core";
 import { TimesIcon } from "@patternfly/react-icons";
 
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
@@ -125,9 +125,14 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       isFullWidth
       icon={
         !!value && (
-          <span onClick={onClear} aria-label="Clear chosen value">
+          <Button
+            size="sm"
+            variant="plain"
+            onClick={onClear}
+            aria-label="Clear chosen value"
+          >
             <TimesIcon />
-          </span>
+          </Button>
         )
       }
     >

@@ -92,6 +92,7 @@ export const MenuWithDrilldown: React.FunctionComponent<
     setActiveMenu(toMenuId);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: options is intentionally a dependency to re-trigger menu height
   useEffect(() => {
     setMenuHeights({});
   }, [options]);
