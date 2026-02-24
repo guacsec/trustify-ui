@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Menu,
   MenuContent,
@@ -23,6 +23,7 @@ interface MenuWithDrilldownProps {
   options: SelectOption[];
   onSelect?: (option: SelectOption) => void;
   onInputChange?: (value: string) => void;
+  inputValue?: string;
 }
 
 const TOGGLE_ICON_CLASS = "pf-v6-c-menu__item-toggle-icon";
@@ -44,9 +45,8 @@ function buildOptionMap(
 
 export const MenuWithDrilldown: React.FunctionComponent<
   MenuWithDrilldownProps
-> = ({ options, onSelect, onInputChange }) => {
+> = ({ options, onSelect, onInputChange, inputValue }) => {
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
-  const [input, setInput] = useState("");
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
   const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
   const [activeMenu, setActiveMenu] = useState<string>("drilldown-rootMenu");
@@ -77,7 +77,6 @@ export const MenuWithDrilldown: React.FunctionComponent<
   };
 
   const handleInputChange = debounce((value: string) => {
-    setInput(value);
     setMenuDrilledIn([]);
     setDrilldownPath([]);
     setActiveMenu("drilldown-rootMenu");
@@ -92,6 +91,10 @@ export const MenuWithDrilldown: React.FunctionComponent<
     setDrilldownPath((prev) => prev.slice(0, -1));
     setActiveMenu(toMenuId);
   };
+
+  useEffect(() => {
+    setMenuHeights({});
+  }, [options]);
 
   const setHeight = (menuId: string, height: number) => {
     if (
@@ -116,7 +119,7 @@ export const MenuWithDrilldown: React.FunctionComponent<
       <MenuSearch>
         <MenuSearchInput>
           <SearchInput
-            value={input}
+            value={inputValue}
             aria-label="Filter menu items"
             onChange={(_event, value) => handleInputChange(value)}
             onClear={() => handleInputChange("")}

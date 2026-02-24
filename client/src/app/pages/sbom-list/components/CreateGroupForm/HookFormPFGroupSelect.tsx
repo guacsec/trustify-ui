@@ -1,7 +1,7 @@
 import React from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
-import { Button, MenuToggle, Select, SelectList } from "@patternfly/react-core";
+import { MenuToggle, Select, SelectList } from "@patternfly/react-core";
 import { TimesIcon } from "@patternfly/react-icons";
 
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
@@ -105,6 +105,12 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     setIsOpen(!isOpen);
   };
 
+  const onClear = (_event: React.SyntheticEvent) => {
+    _event.stopPropagation();
+    onChange(undefined);
+    setSearchQuery("");
+  };
+
   const onSelect = (group: Group) => {
     onChange(group);
     setSearchQuery("");
@@ -119,16 +125,9 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       isFullWidth
       icon={
         !!value && (
-          <Button
-            variant="plain"
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange(undefined);
-            }}
-            aria-label="Clear chosen value"
-          >
+          <span onClick={onClear} aria-label="Clear chosen value">
             <TimesIcon />
-          </Button>
+          </span>
         )
       }
     >
@@ -152,6 +151,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
           }))}
           onSelect={onSelect}
           onInputChange={setSearchQuery}
+          inputValue={searchQuery}
         />
       </SelectList>
     </Select>

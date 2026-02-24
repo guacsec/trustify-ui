@@ -17,13 +17,13 @@ import { useForm } from "react-hook-form";
 
 import {
   HookFormPFGroupController,
-  HookFormPFGroupSelect,
   HookFormPFTextArea,
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
 import type { Group } from "@app/client";
+import { HookFormPFGroupSelect } from "./HookFormPFGroupSelect";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -87,6 +87,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   }, [isOpen, initialValues, reset]);
 
   // Re-validate name when parentGroup changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: parentGroup is intentionally a dependency to re-trigger validation
   React.useEffect(() => {
     const name = getValues("name");
     if (name) {
