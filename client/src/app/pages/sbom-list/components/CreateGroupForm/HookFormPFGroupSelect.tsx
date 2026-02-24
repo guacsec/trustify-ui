@@ -104,7 +104,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     limit,
   });
 
-  const mappedGroups = groups?.data ? buildHierarchy(groups?.data) : [];
+  const mappedGroups = groups?.data ? buildHierarchy(groups?.data, searchQuery.length < 1) : [];
 
   const onToggle = () => {
     setIsOpen(!isOpen);

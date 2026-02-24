@@ -104,9 +104,13 @@ export const MenuWithDrilldown: React.FunctionComponent<MenuWithDrilldownProps> 
             <Divider />
             <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
                 <MenuList>
-                    {options.map((option) => (
-                        <DrilldownMenuItem key={option.id} option={option} onSelect={onSelect} />
-                    ))}
+                    {options.length ? (
+                        options.map((option) => (
+                            <DrilldownMenuItem key={option.id} option={option} onSelect={onSelect} />
+                        ))
+                    ) : (
+                        <MenuItem isDisabled>No results</MenuItem>
+                    )}
                 </MenuList>
             </MenuContent>
         </Menu>

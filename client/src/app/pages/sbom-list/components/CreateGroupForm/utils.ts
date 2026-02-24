@@ -11,7 +11,7 @@ export interface SBOMGroup {
 /**
  * Convert flat list of groups with parent references to hierarchical structure
  */
-export const buildHierarchy = (groups: GroupListResult): SBOMGroup[] => {
+export const buildHierarchy = (groups: GroupListResult, shouldBeNested: boolean = true): SBOMGroup[] => {
   const groupMap = new Map<string, SBOMGroup>();
   const rootGroups: SBOMGroup[] = [];
 
@@ -39,13 +39,17 @@ export const buildHierarchy = (groups: GroupListResult): SBOMGroup[] => {
     });
   }
 
+  if (!shouldBeNested) {
+    // Flat list: return all groups without nesting, strip children
+    return Array.from(groupMap.values()).map(({ children, ...rest }) => rest);
+  }
+
   // Second pass: Build parent-child relationships
   for (const group of groups?.items) {
     const sbomGroup = groupMap.get(group.id);
     if (!sbomGroup) continue;
 
     if (group.parent) {
-      // Add to parent's children
       const parent = groupMap.get(group.parent);
       if (parent) {
         if (!parent.children) {
@@ -53,11 +57,9 @@ export const buildHierarchy = (groups: GroupListResult): SBOMGroup[] => {
         }
         parent.children.push(sbomGroup);
       } else {
-        // Parent not in current result set, treat as root
         rootGroups.push(sbomGroup);
       }
     } else {
-      // No parent, this is a root group
       rootGroups.push(sbomGroup);
     }
   }
