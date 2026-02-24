@@ -77,9 +77,8 @@ When(
     const scanPage = await SbomScanPage.build(page);
 
     // Block all API requests to keep the page in processing state long enough to click cancel
-    // This is acceptable since the cancel button aborts the operation anyway
     await page.route("**/api/**", async (route) => {
-      // Delay the response for 10 seconds - more than enough time to click cancel
+      // Delay the response for 10 seconds - hopefully more than enough time to click cancel
       await new Promise((resolve) => setTimeout(resolve, 10000));
       await route.continue();
     });
