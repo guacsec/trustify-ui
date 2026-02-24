@@ -10,22 +10,13 @@ import {
 import { client } from "@app/axios-config/apiInit";
 import {
   deleteSbomGroup,
+  type Group,
   type GroupRequest,
   listSbomGroups,
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
 
 export const GroupQueryKey = "groups";
-
-export type TGroupDD = {
-  id: string;
-  parent?: string | null;
-  name: string;
-  description?: string | null;
-  labels?: Record<string, string | null>;
-  number_of_groups?: number | null;
-  number_of_sboms?: number | null;
-};
 
 /**
  * Prepend a parent filter to an existing q value.
@@ -64,7 +55,7 @@ export const useFetchGroups = (
 
   return {
     result: {
-      data: (data?.data?.items as TGroupDD[]) ?? [],
+      data: (data?.data?.items as Group[]) ?? [],
       total: data?.data?.total ?? 0,
     },
     isFetching: isLoading,
@@ -96,19 +87,19 @@ export const useFetchGroupChildren = (parentIds: string[]) => {
   });
 
   return {
-    data: results.flatMap((r) => (r.data?.data?.items as TGroupDD[]) ?? []),
+    data: results.flatMap((r) => (r.data?.data?.items as Group[]) ?? []),
     isFetching: results.some((r) => r.isLoading),
     isError: results.some((r) => r.isError),
   };
 };
 
 export const useDeleteGroupMutation = (
-  onSuccess: (payload: TGroupDD) => void,
+  onSuccess: (payload: Group) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: TGroupDD) => {
+    mutationFn: async (payload: Group) => {
       const { id, name } = payload;
       // NOTE: At the time of this writing this body data
       // is not actually used by the backend.

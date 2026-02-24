@@ -13,11 +13,14 @@ import {
 } from "@app/hooks/table-controls";
 import { useSelectionState } from "@app/hooks/useSelectionState";
 
-import type { TGroupDD } from "@app/queries/groups";
+import type { PaginatedResultsGroupDetails } from "@app/client";
 import { useFetchGroupChildren, useFetchGroups } from "@app/queries/groups";
 import { buildGroupTree } from "./utils";
-export type TGroupTreeNode = TGroupDD & {
-  children: TGroupTreeNode[];
+
+export type GroupItem = PaginatedResultsGroupDetails["items"][number];
+
+export type GroupTreeNode = GroupItem & {
+  children: GroupTreeNode[];
 };
 
 interface ITreeExpansionState {
@@ -26,17 +29,17 @@ interface ITreeExpansionState {
 }
 
 interface ITreeSelectionState {
-  selectedNodes: TGroupDD[];
-  isNodeSelected(node: TGroupTreeNode): boolean;
+  selectedNodes: GroupItem[];
+  isNodeSelected(node: GroupTreeNode): boolean;
   areAllSelected: boolean;
-  selectNodes: (nodes: TGroupTreeNode[], isSelected: boolean) => void;
-  selectOnlyNodes: (nodes: TGroupTreeNode[]) => void;
+  selectNodes: (nodes: GroupTreeNode[], isSelected: boolean) => void;
+  selectOnlyNodes: (nodes: GroupTreeNode[]) => void;
   selectAllNodes: (isSelected: boolean) => void;
 }
 
 interface IGroupsContext {
   tableControls: ITableControls<
-    TGroupTreeNode,
+    GroupTreeNode,
     // Column keys
     "name",
     // Sortable column keys
@@ -54,7 +57,7 @@ interface IGroupsContext {
   // Tree fields
   treeExpansion: ITreeExpansionState;
   treeSelection: ITreeSelectionState;
-  treeData: TGroupTreeNode[];
+  treeData: GroupTreeNode[];
 }
 
 const contextDefaultValue = {} as IGroupsContext;

@@ -14,10 +14,11 @@ import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ConditionalTableBody } from "@app/components/TableControls";
-import { GroupsContext, type TGroupTreeNode } from "./groups-context";
+import type { Group } from "@app/client";
+import { GroupsContext, type GroupTreeNode } from "./groups-context";
 import { GroupTableData } from "./group-table-data";
 import type { AxiosError } from "axios";
-import { useDeleteGroupMutation, type TGroupDD } from "@app/queries/groups";
+import { useDeleteGroupMutation } from "@app/queries/groups";
 import { childGroupDeleteDialogProps } from "@app/Constants";
 
 export const GroupsTable: React.FC = () => {
@@ -40,8 +41,8 @@ export const GroupsTable: React.FC = () => {
   // Delete action
   // NOTE: only applies to child groups, not parent groups.
   const [childGroupToDelete, setChildGroupToDelete] =
-    React.useState<TGroupTreeNode | null>(null);
-  const onDeleteChildGroupSuccess = (group: TGroupDD) => {
+    React.useState<GroupTreeNode | null>(null);
+  const onDeleteChildGroupSuccess = (group: Group) => {
     setChildGroupToDelete(null);
     pushNotification({
       title: `The child group ${group.name} was deleted`,
@@ -69,7 +70,7 @@ export const GroupsTable: React.FC = () => {
       - isHidden - defaults to false, true if this row's parent is expanded
   */
   const renderRows = (
-    [node, ...remainingNodes]: TGroupTreeNode[],
+    [node, ...remainingNodes]: GroupTreeNode[],
     level = 1,
     posinset = 1,
     rowIndex = 0,
@@ -113,7 +114,7 @@ export const GroupsTable: React.FC = () => {
         )
       : [];
 
-    const lastRowActions = (node: TGroupTreeNode): IAction[] => [
+    const lastRowActions = (node: GroupTreeNode): IAction[] => [
       {
         title: "Delete",
         onClick: () => {

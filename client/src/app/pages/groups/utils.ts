@@ -1,12 +1,11 @@
-import type { TGroupTreeNode } from "./groups-context";
-import type { TGroupDD } from "@app/queries/groups";
+import type { GroupItem, GroupTreeNode } from "./groups-context";
 
 /**
  * Generates a simple tree structure for groups
  */
-export function buildGroupTree(items: TGroupDD[]): TGroupTreeNode[] {
-  const byId = new Map<string, TGroupTreeNode>();
-  const roots: TGroupTreeNode[] = [];
+export function buildGroupTree(items: GroupItem[]): GroupTreeNode[] {
+  const byId = new Map<string, GroupTreeNode>();
+  const roots: GroupTreeNode[] = [];
 
   // initialize nodes
   for (const item of items) {
