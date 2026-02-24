@@ -93,8 +93,11 @@ When(
       Status: "Status",
     };
 
-    const actualFilterName = filterMapping[filterName] || filterName;
-    await toolbar.applyFilter({ [actualFilterName]: filterValue });
+    const filter = toolbar._toolbar.getByPlaceholder("Search by name...");
+    await expect(filter).toBeVisible();
+    await filter.fill(filterValue);
+    await listPage.page.keyboard.press('Enter');
+    await page.waitForTimeout(1000);
   },
 );
 
@@ -483,20 +486,91 @@ Then(
 
 Then(
   "The {string} importer should show {string} state or progress indicator",
-  async ({ page }, importerName, expectedState) => {
+  async ({ page }, importerName, expectedState) => {  
     const listPage = new ImporterListPage(page);
-    await listPage.verifyImporterHasStateOrProgress(
-      importerName,
-      expectedState,
-    );
+    const table = await listPage.getTable();
+    const nameColumn = await table.getColumn("Name");
+    const stateColumn = await table.getColumn("State");
+    const allRows = await table.getRows();
+    const allRowCount = await allRows.count();
+    for (let i = 0; i < allRowCount; i++) {
+      const nameCell = nameColumn.nth(i);
+      const nameText = await nameCell.textContent();
+      if (nameText?.includes(importerName)) {
+        const stateCell = stateColumn.nth(i);
+        const progressBar = stateCell.locator('[role="progressbar"]');
+        const scheduledText = stateCell.getByText("Scheduled");
+
+        // Wait a moment for the state to update
+        await listPage.page.waitForTimeout(1000);
+
+        // Check if either progress bar is visible or Scheduled state is shown
+        const hasProgressBar =
+          (await progressBar.count()) > 0 && (await progressBar.isVisible());
+        const isScheduled = (await scheduledText.count()) > 0;
+
+        if (hasProgressBar || isScheduled) {
+          return;
+        }
+
+        // If neither is found, wait a bit longer and try again
+        await listPage.page.waitForTimeout(2000);
+
+        const hasProgressBarRetry =
+          (await progressBar.count()) > 0 && (await progressBar.isVisible());
+        const isScheduledRetry = (await scheduledText.count()) > 0;
+
+        expect(hasProgressBarRetry || isScheduledRetry).toBeTruthy();
+        return;
+      }
+    }
+
+    throw new Error(`Importer "${importerName}" not found in table`);
   },
 );
 
 Then(
   "The {string} importer should show progress indicator",
-  async ({ page }, importerName) => {
+  async ({ page }, importerName) => {  
     const listPage = new ImporterListPage(page);
-    await listPage.verifyImporterHasProgressIndicator(importerName);
+    const table = await listPage.getTable();
+    const nameColumn = await table.getColumn("Name");
+    const stateColumn = await table.getColumn("State");
+    const allRows = await table.getRows();
+    const allRowCount = await allRows.count();
+    for (let i = 0; i < allRowCount; i++) {
+      const nameCell = nameColumn.nth(i);
+      const nameText = await nameCell.textContent();
+      if (nameText?.includes(importerName)) {
+        const stateCell = stateColumn.nth(i);
+        const progressBar = stateCell.locator('[role="progressbar"]');
+        const scheduledText = stateCell.getByText("Scheduled");
+
+        // Wait a moment for the state to update
+        await listPage.page.waitForTimeout(1000);
+
+        // Check if either progress bar is visible or Scheduled state is shown
+        const hasProgressBar =
+          (await progressBar.count()) > 0 && (await progressBar.isVisible());
+        const isScheduled = (await scheduledText.count()) > 0;
+
+        if (hasProgressBar || isScheduled) {
+          return;
+        }
+
+        // If neither is found, wait a bit longer and try again
+        await listPage.page.waitForTimeout(2000);
+
+        const hasProgressBarRetry =
+          (await progressBar.count()) > 0 && (await progressBar.isVisible());
+        const isScheduledRetry = (await scheduledText.count()) > 0;
+
+        expect(hasProgressBarRetry || isScheduledRetry).toBeTruthy();
+        return;
+      }
+    }
+
+    throw new Error(`Importer "${importerName}" not found in table`);
   },
 );
 

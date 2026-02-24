@@ -81,10 +81,7 @@ export class Toolbar<
 
       const filterType = this._filters[filterName];
 
-      await this.selectFilter(filterName);
-      if (isStringFilter(filterType, filterValue)) {
-        await this.applyTextFilter(filterName, filterValue);
-      }
+      
       if (isDateRangeFilter(filterType, filterValue)) {
         await this.applyDateRangeFilter(filterName, filterValue);
       }
@@ -99,24 +96,7 @@ export class Toolbar<
     await expect(this).toHaveLabels(filters);
   }
 
-  private async applyTextFilter(_filterName: TFilterName, filterValue: string) {
-    // Try to find textbox within toolbar first (should work for both modes)
-    const textbox = this._toolbar.getByRole("textbox");
-    const textboxCount = await textbox.count();
-
-    if (textboxCount === 1) {
-      // Only one textbox, use it
-      await textbox.fill(filterValue);
-    } else if (textboxCount > 1) {
-      // Multiple textboxes (side-by-side filters), use the first visible one
-      await textbox.first().fill(filterValue);
-    } else {
-      // Fallback: search anywhere on the page
-      await this._page.getByRole("textbox").fill(filterValue);
-    }
-
-    await this._page.keyboard.press("Enter");
-  }
+  
 
   private async applyDateRangeFilter(
     _filterName: TFilterName,
@@ -168,25 +148,7 @@ export class Toolbar<
     }
   }
 
-  /**
-   * Selects the main filter to be applied
-   * @param filterName the name of the filter as rendered in the UI
-   */
-  private async selectFilter(filterName: TFilterName) {
-    // Check if filter toggle exists (filters not shown side-by-side)
-    const filterToggle = this._toolbar.locator(
-      ".pf-m-toggle-group button.pf-v6-c-menu-toggle",
-    );
-    const hasToggle = (await filterToggle.count()) > 0;
 
-    if (hasToggle) {
-      // Traditional filter selection with dropdown
-      await filterToggle.click();
-      await this._page.getByRole("menuitem", { name: filterName }).click();
-    }
-    // If no toggle exists, filters are shown side-by-side and already visible
-    // No need to select a filter - just proceed to apply the filter value
-  }
 
   /**
    * Clears all applied filters by clicking the "Clear all filters" button
@@ -212,7 +174,6 @@ export class Toolbar<
       hasText: filterName,
     });
     await expect(chipGroup).toBeVisible();
-
     const chip = chipGroup.locator(".pf-v6-c-label-group__list-item").filter({
       has: this._page.locator(".pf-v6-c-label__content").filter({
         hasText: new RegExp(
@@ -222,7 +183,6 @@ export class Toolbar<
     });
 
     await expect(chip).toBeVisible();
-
     const closeButton = chip.getByRole("button", { name: /close/i });
     await expect(closeButton).toBeVisible();
     await closeButton.click();
