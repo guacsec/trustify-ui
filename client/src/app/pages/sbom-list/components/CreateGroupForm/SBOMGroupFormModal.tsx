@@ -65,6 +65,8 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     handleSubmit,
     reset,
     getValues,
+    watch,
+    trigger,
     formState: { isSubmitting, isValid, isValidating },
   } = useForm<SBOMGroupFormValues>({
     mode: "onBlur",
@@ -74,6 +76,8 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     },
   });
 
+  const parentGroup = watch("parentGroup");
+
   React.useEffect(() => {
     if (isOpen) {
       reset({
@@ -82,6 +86,14 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
       });
     }
   }, [isOpen, initialValues, reset]);
+
+  // Re-validate name when parentGroup changes
+  React.useEffect(() => {
+    const name = getValues("name");
+    if (name) {
+      trigger("name");
+    }
+  }, [parentGroup, trigger, getValues]);
 
   const onSubmitHandler = (values: SBOMGroupFormValues) => {
     onSubmit(values);
@@ -112,22 +124,24 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
               rules: {
                 required: "This field is required",
                 validate: async (value: string) => {
-                  // Skip uniqueness check if editing and name hasn't changed
-                  if (type === "Edit" && value === initialValues?.name) {
+                  const currentParent = getValues("parentGroup");
+
+                  // Skip uniqueness check if editing and neither name nor parent changed
+                  if (
+                    type === "Edit" &&
+                    value === initialValues?.name &&
+                    currentParent?.id === initialValues?.parentGroup?.id
+                  ) {
                     return true;
                   }
 
-                  // Get current parent group value
-                  const parentGroup = getValues("parentGroup");
-
-                  // Check if name is unique (within parent context if parent is selected)
-                  const isNameExists = await checkGroupNameUniqueness(
+                  const isUnique = await checkGroupNameUniqueness(
                     value,
-                    parentGroup?.id || undefined,
+                    currentParent?.id || undefined,
                   );
                   return (
-                    isNameExists ||
-                    `${value} already exists${parentGroup ? ` in ${parentGroup?.name}` : ""}`
+                    isUnique ||
+                    `${value} already exists${currentParent ? ` in ${currentParent.name}` : ""}`
                   );
                 },
               },
