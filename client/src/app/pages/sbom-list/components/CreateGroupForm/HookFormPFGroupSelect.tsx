@@ -11,7 +11,6 @@ import {
   TimesIcon,
 } from "@patternfly/react-icons";
 
-import type { SBOMGroup } from "@app/queries/sbom-groups";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 import { getValidatedFromErrors } from "@app/utils/utils";
 
@@ -19,8 +18,10 @@ import {
   type BaseHookFormPFGroupControllerProps,
   HookFormPFGroupController,
   extractGroupControllerProps,
-} from "./HookFormPFGroupController";
-import { MenuWithDrilldown } from "../WithDrillDownMenu";
+} from "../../../../components/HookFormPFFields/HookFormPFGroupController";
+import { MenuWithDrilldown } from "../../../../components/WithDrillDownMenu";
+import { buildHierarchy } from "./utils";
+import { Group } from "@app/client";
 
 export type HookFormPFGroupSelectProps<
   TFieldValues extends FieldValues,
@@ -75,8 +76,8 @@ export const HookFormPFGroupSelect = <
 interface GroupSelectTypeaheadProps {
   fieldId: string;
   name: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: Group;
+  onChange: (value: Group | undefined) => void;
   placeholderText: string;
   limit: number;
   helperText?: React.ReactNode;
@@ -103,35 +104,14 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     limit,
   });
 
-  // Find group by ID recursively
-  const findGroupById = React.useCallback(
-    (groupList: SBOMGroup[], id: string): SBOMGroup | undefined => {
-      for (const group of groupList) {
-        if (group.id === id) {
-          return group;
-        }
-        if (group.children) {
-          const found = findGroupById(group.children, id);
-          if (found) return found;
-        }
-      }
-      return undefined;
-    },
-    [],
-  );
-
-  // Find group name by ID
-  const findGroupNameById = (id: string): string => {
-    const group = findGroupById(groups, id);
-    return group?.name || id;
-  };
+  const mappedGroups = groups?.data ? buildHierarchy(groups?.data) : [];
 
   const onToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const onSelect = (group: SBOMGroup) => {
-    onChange(group.id);
+  const onSelect = (group: Group) => {
+    onChange(group);
     setSearchQuery("");
     setIsOpen(false);
   };
@@ -146,14 +126,14 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
         variant="plain"
         onClick={(e) => {
           e.stopPropagation();
-            onChange("");
+            onChange(undefined);
         }}
         aria-label="Clear chosen value"
       >
         <TimesIcon />
       </Button>}
     >
-      {value ? findGroupNameById(value) : placeholderText}
+      {value?.name || placeholderText}
     </MenuToggle>
   );
 
@@ -166,7 +146,7 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       toggle={toggle}
     >
       <SelectList>
-        <MenuWithDrilldown options={groups} onSelect={onSelect} onInputChange={setSearchQuery} />
+        <MenuWithDrilldown options={mappedGroups.map((gr)=>({...gr, description: gr.parentsNames}))} onSelect={onSelect} onInputChange={setSearchQuery} />
       </SelectList> 
     </Select>
   );

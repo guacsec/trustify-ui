@@ -11,7 +11,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 
-import type { GroupRequest, Labels } from "@app/client";
+import type { Group, GroupRequest, Labels } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -21,7 +21,7 @@ import { useCreateSBOMGroupMutation } from "@app/queries/sbom-groups";
 import { Paths } from "@app/Routes";
 
 import { SbomSearchContext } from "./sbom-context";
-import { SBOMGroupFormModal } from "./components/SBOMGroupFormModal";
+import { SBOMGroupFormModal } from "./components/CreateGroupForm/SBOMGroupFormModal";
 
 interface SbomToolbarProps {
   showFilters?: boolean;
@@ -82,7 +82,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 
   const handleCreateGroup = async (values: {
     name: string;
-    parentGroup?: string;
+    parentGroup?: Group;
     isProduct: "yes" | "no";
     description?: string;
     labels: string[];
@@ -101,7 +101,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     const body: GroupRequest = {
       name: values.name,
       description: values.description || null,
-      parent: values.parentGroup || null,
+      parent: values.parentGroup?.id || null,
       labels: Object.keys(labelsObj).length > 0 ? labelsObj : undefined,
     };
 

@@ -23,10 +23,11 @@ import {
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
+import { Group } from "@app/client";
 
 type SBOMGroupFormValues = {
   name: string;
-  parentGroup?: string;
+  parentGroup?: Group;
   isProduct: "yes" | "no";
   description?: string;
   labels: string[];
@@ -49,7 +50,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
 }) => {
   const defaultValues: SBOMGroupFormValues = {
     name: "",
-    parentGroup: "",
+    parentGroup: undefined,
     isProduct: "no",
     description: "",
     labels: [],
@@ -121,9 +122,9 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
                   // Check if name is unique (within parent context if parent is selected)
                   const isNameExists = await checkGroupNameUniqueness(
                     value,
-                    parentGroup || undefined
+                    parentGroup?.id || undefined
                   );
-                  return isNameExists || `${value} already exists${parentGroup ? ` in ${parentGroup}`: ''}`;
+                  return isNameExists || `${value} already exists${parentGroup ? ` in ${parentGroup?.name}`: ''}`;
                 },
               },
             }}

@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Menu, MenuContent, MenuList, MenuItem, Divider, DrilldownMenu, MenuSearchInput, SearchInput, MenuSearch, debounce } from '@patternfly/react-core';
-import { SBOMGroup } from '@app/queries/sbom-groups';
 
-type SelectOption = SBOMGroup;
+type SelectOption = {
+    id: string;
+    name: string;
+    description?: string | null;
+    children?: SelectOption[];
+};
 
 interface MenuWithDrilldownProps {
     options: SelectOption[];
@@ -58,6 +62,9 @@ export const MenuWithDrilldown: React.FunctionComponent<MenuWithDrilldownProps> 
 
     const handleInputChange = debounce((value:string) => {
         setInput(value);
+        setMenuDrilledIn([]);
+        setDrilldownPath([]);
+        setActiveMenu('drilldown-rootMenu');
         onInputChange?.(value);
     }, 300)
 
