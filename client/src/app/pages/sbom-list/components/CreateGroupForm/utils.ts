@@ -5,13 +5,16 @@ export interface SBOMGroup {
   name: string;
   description?: string | null;
   children?: SBOMGroup[];
-  parentsNames?: string,
+  parentsNames?: string;
 }
 
 /**
  * Convert flat list of groups with parent references to hierarchical structure
  */
-export const buildHierarchy = (groups: GroupListResult, shouldBeNested: boolean = true): SBOMGroup[] => {
+export const buildHierarchy = (
+  groups: GroupListResult,
+  shouldBeNested: boolean = true,
+): SBOMGroup[] => {
   const groupMap = new Map<string, SBOMGroup>();
   const rootGroups: SBOMGroup[] = [];
 

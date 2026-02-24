@@ -1,15 +1,8 @@
 import React from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
-import {
-  Button,
-  MenuToggle,
-  Select,
-  SelectList,
-} from "@patternfly/react-core";
-import {
-  TimesIcon,
-} from "@patternfly/react-icons";
+import { Button, MenuToggle, Select, SelectList } from "@patternfly/react-core";
+import { TimesIcon } from "@patternfly/react-icons";
 
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 import { getValidatedFromErrors } from "@app/utils/utils";
@@ -104,7 +97,9 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     limit,
   });
 
-  const mappedGroups = groups?.data ? buildHierarchy(groups?.data, searchQuery.length < 1) : [];
+  const mappedGroups = groups?.data
+    ? buildHierarchy(groups?.data, searchQuery.length < 1)
+    : [];
 
   const onToggle = () => {
     setIsOpen(!isOpen);
@@ -122,16 +117,20 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       onClick={onToggle}
       isExpanded={isOpen}
       isFullWidth
-      icon={(!!value) && <Button
-        variant="plain"
-        onClick={(e) => {
-          e.stopPropagation();
-            onChange(undefined);
-        }}
-        aria-label="Clear chosen value"
-      >
-        <TimesIcon />
-      </Button>}
+      icon={
+        !!value && (
+          <Button
+            variant="plain"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(undefined);
+            }}
+            aria-label="Clear chosen value"
+          >
+            <TimesIcon />
+          </Button>
+        )
+      }
     >
       {value?.name || placeholderText}
     </MenuToggle>
@@ -146,8 +145,15 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
       toggle={toggle}
     >
       <SelectList>
-        <MenuWithDrilldown options={mappedGroups.map((gr)=>({...gr, description: gr.parentsNames}))} onSelect={onSelect} onInputChange={setSearchQuery} />
-      </SelectList> 
+        <MenuWithDrilldown
+          options={mappedGroups.map((gr) => ({
+            ...gr,
+            description: gr.parentsNames,
+          }))}
+          onSelect={onSelect}
+          onInputChange={setSearchQuery}
+        />
+      </SelectList>
     </Select>
   );
 };

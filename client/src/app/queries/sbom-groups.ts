@@ -14,7 +14,6 @@ export type FetchSBOMGroupsParams = ListSbomGroupsData["query"];
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
-
 // API function to check if group name is unique
 // Returns boolean
 export const checkGroupNameUniqueness = async (
@@ -43,10 +42,11 @@ export const checkGroupNameUniqueness = async (
 export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMGroupsQueryKey, params],
-    queryFn: () => listSbomGroups({
-    client,
-    query: params,
-  }),
+    queryFn: () =>
+      listSbomGroups({
+        client,
+        query: params,
+      }),
     placeholderData: keepPreviousData,
   });
 
