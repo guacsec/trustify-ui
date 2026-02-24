@@ -175,7 +175,7 @@ function DrilldownMenuItem({
             {option.name}
           </MenuItem>
           <Divider component="li" />
-          {option.children!.map((child) => (
+          {option.children?.map((child) => (
             <DrilldownMenuItem
               key={child.id}
               option={child}

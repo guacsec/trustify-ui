@@ -23,7 +23,7 @@ import {
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
-import { Group } from "@app/client";
+import type { Group } from "@app/client";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -41,6 +41,14 @@ export interface SBOMGroupFormModalProps {
   type?: "Create" | "Edit";
 }
 
+const defaultValues: SBOMGroupFormValues = {
+  name: "",
+  parentGroup: undefined,
+  isProduct: "no",
+  description: "",
+  labels: [],
+};
+
 export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   isOpen,
   onClose,
@@ -48,13 +56,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   initialValues,
   type = "Create",
 }) => {
-  const defaultValues: SBOMGroupFormValues = {
-    name: "",
-    parentGroup: undefined,
-    isProduct: "no",
-    description: "",
-    labels: [],
-  };
 
   const [isAdvancedExpanded, setIsAdvancedExpanded] =
     React.useState<boolean>(false);

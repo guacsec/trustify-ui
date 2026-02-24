@@ -14,7 +14,7 @@ import {
 } from "../../../../components/HookFormPFFields/HookFormPFGroupController";
 import { MenuWithDrilldown } from "../../../../components/WithDrillDownMenu";
 import { buildHierarchy } from "./utils";
-import { Group } from "@app/client";
+import type { Group } from "@app/client";
 
 export type HookFormPFGroupSelectProps<
   TFieldValues extends FieldValues,

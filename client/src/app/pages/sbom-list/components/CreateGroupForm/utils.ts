@@ -1,4 +1,4 @@
-import { GroupListResult } from "@app/client";
+import type { GroupListResult } from "@app/client";
 
 export interface SBOMGroup {
   id: string;
@@ -20,7 +20,7 @@ export const buildHierarchy = (
 
   // Build a name lookup from both items and referenced groups
   const nameLookup = new Map<string, string>();
-  for (const group of groups?.items) {
+  for (const group of groups.items) {
     nameLookup.set(group.id, group.name);
   }
   for (const ref of groups?.referenced ?? []) {
@@ -28,7 +28,7 @@ export const buildHierarchy = (
   }
 
   // First pass: Create all group objects
-  for (const group of groups?.items) {
+  for (const group of groups.items) {
     const parentsNames = group.parents?.length
       ? group.parents.map((id) => nameLookup.get(id) ?? id).join(" > ")
       : undefined;
@@ -48,7 +48,7 @@ export const buildHierarchy = (
   }
 
   // Second pass: Build parent-child relationships
-  for (const group of groups?.items) {
+  for (const group of groups.items) {
     const sbomGroup = groupMap.get(group.id);
     if (!sbomGroup) continue;
 
