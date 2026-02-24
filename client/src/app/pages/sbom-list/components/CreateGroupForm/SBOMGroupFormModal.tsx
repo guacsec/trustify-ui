@@ -116,7 +116,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             fieldId="parent-group"
             placeholderText="Select parent group"
             helperText="Leave blank if this group does not have a parent"
-            limit={0}
+            limit={10}
           />
           <HookFormPFTextInput
             control={control}
