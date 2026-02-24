@@ -30,9 +30,16 @@ export const GroupTableData = ({ item }: { item: TGroupTreeNode }) => {
           </FlexItem>
         </Flex>
       </StackItem>
-      <StackItem>
-        <Content component="p">{item.description ?? ""}</Content>
-      </StackItem>
+      {item.description && (
+        <StackItem>
+          <Content component="p">{item.description}</Content>
+        </StackItem>
+      )}
+      {item.number_of_sboms != null && item.number_of_sboms > 0 && (
+        <StackItem>
+          <Content component="small">{item.number_of_sboms} SBOMs</Content>
+        </StackItem>
+      )}
     </Stack>
   );
 };
