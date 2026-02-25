@@ -1,4 +1,9 @@
 import { expect, test } from "../fixtures";
+import {
+  testBasicSort,
+  validateDateSorting,
+  validateStringSorting,
+} from "../helpers/sorting-helpers";
 
 test.skip("List first 10 sboms by name - vanilla", async ({ axios }) => {
   const vanillaResponse = await axios.get(
@@ -9,4 +14,24 @@ test.skip("List first 10 sboms by name - vanilla", async ({ axios }) => {
       total: 6,
     }),
   );
+});
+
+test("Sort SBOMs by name ascending", async ({ axios }) => {
+  const items = await testBasicSort(axios, "/api/v2/sbom", "name", "asc");
+  validateStringSorting(items, "name", "ascending");
+});
+
+test("Sort SBOMs by name descending", async ({ axios }) => {
+  const items = await testBasicSort(axios, "/api/v2/sbom", "name", "desc");
+  validateStringSorting(items, "name", "descending");
+});
+
+test("Sort SBOMs by published date ascending", async ({ axios }) => {
+  const items = await testBasicSort(axios, "/api/v2/sbom", "published", "asc");
+  validateDateSorting(items, "published", "ascending");
+});
+
+test("Sort SBOMs by published date descending", async ({ axios }) => {
+  const items = await testBasicSort(axios, "/api/v2/sbom", "published", "desc");
+  validateDateSorting(items, "published", "descending");
 });
