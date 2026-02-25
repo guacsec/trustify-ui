@@ -20,6 +20,8 @@ import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { useCreateSBOMGroupMutation } from "@app/queries/sbom-groups";
 import { Paths } from "@app/Routes";
 
+import { splitStringAsKeyValue } from "@app/api/model-utils";
+
 import { SbomSearchContext } from "./sbom-context";
 import { SBOMGroupFormModal } from "./components/CreateGroupForm/SBOMGroupFormModal";
 
@@ -90,12 +92,13 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     // Convert labels array to Labels object
     const labelsObj: Labels = {};
     for (const label of values.labels) {
-      labelsObj[label] = "";
+      const { key, value } = splitStringAsKeyValue(label);
+      labelsObj[key] = value ?? "";
     }
 
     // Add Product label if isProduct is "yes"
     if (values.isProduct === "yes") {
-      labelsObj.Product = "true";
+      labelsObj.Product = "";
     }
 
     const body: GroupRequest = {

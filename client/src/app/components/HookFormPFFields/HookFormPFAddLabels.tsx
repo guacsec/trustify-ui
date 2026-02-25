@@ -19,6 +19,13 @@ import {
   extractGroupControllerProps,
 } from "./HookFormPFGroupController";
 
+export interface RestrictedLabelPattern {
+  pattern: string | RegExp;
+  errorMessage: string;
+}
+
+export type RestrictedLabel = string | RestrictedLabelPattern;
+
 export type HookFormPFAddLabelsProps<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
@@ -32,9 +39,16 @@ export type HookFormPFAddLabelsProps<
    */
   inputAriaLabel?: string;
   /**
-   * Restricted labels for adding, f.e Product inside SBOM create group form.
+   * Restricted labels for adding.
+   * Accepts strings (exact match, default error) or objects with pattern + errorMessage.
+   *
+   * @example
+   * // exact match with default error
+   * "Product"
+   * // pattern match with custom error
+   * { pattern: /^type=/, errorMessage: "Groups designated as products cannot have additional 'type' labels" }
    */
-  restrictedLabels?: string[];
+  restrictedLabels?: RestrictedLabel[];
 };
 
 export const HookFormPFAddLabels = <
@@ -56,7 +70,7 @@ export const HookFormPFAddLabels = <
   } = remainingProps as {
     inputPlaceholder?: string;
     inputAriaLabel?: string;
-    restrictedLabels?: string[];
+    restrictedLabels?: RestrictedLabel[];
   };
 
   const [newLabel, setNewLabel] = React.useState<string>("");
@@ -73,8 +87,22 @@ export const HookFormPFAddLabels = <
           if (!trimmed) {
             return;
           }
-          if (restrictedLabels.includes(trimmed)) {
-            setLabelError(`The label '${trimmed}' is reserved`);
+          const matchedRestriction = restrictedLabels.find((rule) => {
+            if (typeof rule === "string") {
+              return rule === trimmed;
+            }
+            const regex =
+              rule.pattern instanceof RegExp
+                ? rule.pattern
+                : new RegExp(rule.pattern);
+            return regex.test(trimmed);
+          });
+          if (matchedRestriction) {
+            setLabelError(
+              typeof matchedRestriction === "string"
+                ? `The label '${trimmed}' is reserved`
+                : matchedRestriction.errorMessage,
+            );
             return;
           }
           if (labels.includes(trimmed)) {
@@ -92,7 +120,7 @@ export const HookFormPFAddLabels = <
 
         return (
           <Stack hasGutter>
-            <StackItem>Add metadata labels</StackItem>
+            <StackItem>Add metadata labels as key-value pairs</StackItem>
             <StackItem>
               <Card style={{ padding: 10, minHeight: 100, borderRadius: 8 }}>
                 <LabelGroup numLabels={10}>
@@ -119,6 +147,7 @@ export const HookFormPFAddLabels = <
                     setLabelError(null);
                   }
                 }}
+                validated={labelError ? "error" : "default"}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();

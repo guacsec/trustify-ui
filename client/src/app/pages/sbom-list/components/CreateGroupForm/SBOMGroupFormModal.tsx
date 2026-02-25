@@ -76,6 +76,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   });
 
   const parentGroup = watch("parentGroup");
+  const isProduct = watch("isProduct");
 
   React.useEffect(() => {
     if (isOpen) {
@@ -208,7 +209,18 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
               name="labels"
               fieldId="labels"
               label="Labels"
-              restrictedLabels={["Product"]}
+              restrictedLabels={[
+                "Product",
+                ...(isProduct === "yes"
+                  ? [
+                      {
+                        pattern: /^type=/,
+                        errorMessage:
+                          "Groups designated as products cannot have additional 'type' labels",
+                      },
+                    ]
+                  : []),
+              ]}
             />
           </ExpandableSection>
         </Form>
