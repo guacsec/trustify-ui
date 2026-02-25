@@ -4,11 +4,11 @@ import { Content, PageSection } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
-import { GroupsProvider } from "./groups-context";
-import { GroupsToolbar } from "./groups-toolbar";
-import { GroupsTable } from "./groups-table";
+import { SbomGroupsProvider } from "./sbom-groups-context";
+import { SbomGroupsToolbar } from "./sbom-groups-toolbar";
+import { SbomGroupsTable } from "./sbom-groups-table";
 
-export const Groups: React.FC = () => {
+export const SbomGroups: React.FC = () => {
   return (
     <>
       <DocumentMetadata title={"Groups"} />
@@ -19,10 +19,10 @@ export const Groups: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <GroupsProvider>
-            <GroupsToolbar />
-            <GroupsTable />
-          </GroupsProvider>
+          <SbomGroupsProvider>
+            <SbomGroupsToolbar />
+            <SbomGroupsTable />
+          </SbomGroupsProvider>
         </div>
       </PageSection>
     </>

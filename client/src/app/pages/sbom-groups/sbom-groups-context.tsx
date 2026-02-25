@@ -14,13 +14,16 @@ import {
 import { useSelectionState } from "@app/hooks/useSelectionState";
 
 import type { PaginatedResultsGroupDetails } from "@app/client";
-import { useFetchGroupChildren, useFetchGroups } from "@app/queries/groups";
-import { buildGroupTree } from "./utils";
+import {
+  useFetchSbomGroupChildren,
+  useFetchSbomGroups,
+} from "@app/queries/sbom-groups";
+import { buildSbomGroupTree } from "./utils";
 
-export type GroupItem = PaginatedResultsGroupDetails["items"][number];
+export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];
 
-export type GroupTreeNode = GroupItem & {
-  children: GroupTreeNode[];
+export type SbomGroupTreeNode = SbomGroupItem & {
+  children: SbomGroupTreeNode[];
 };
 
 interface ITreeExpansionState {
@@ -29,17 +32,17 @@ interface ITreeExpansionState {
 }
 
 interface ITreeSelectionState {
-  selectedNodes: GroupItem[];
-  isNodeSelected(node: GroupTreeNode): boolean;
+  selectedNodes: SbomGroupItem[];
+  isNodeSelected(node: SbomGroupTreeNode): boolean;
   areAllSelected: boolean;
-  selectNodes: (nodes: GroupTreeNode[], isSelected: boolean) => void;
-  selectOnlyNodes: (nodes: GroupTreeNode[]) => void;
+  selectNodes: (nodes: SbomGroupTreeNode[], isSelected: boolean) => void;
+  selectOnlyNodes: (nodes: SbomGroupTreeNode[]) => void;
   selectAllNodes: (isSelected: boolean) => void;
 }
 
-interface IGroupsContext {
+interface ISbomGroupsContext {
   tableControls: ITableControls<
-    GroupTreeNode,
+    SbomGroupTreeNode,
     // Column keys
     "name",
     // Sortable column keys
@@ -57,24 +60,24 @@ interface IGroupsContext {
   // Tree fields
   treeExpansion: ITreeExpansionState;
   treeSelection: ITreeSelectionState;
-  treeData: GroupTreeNode[];
+  treeData: SbomGroupTreeNode[];
 }
 
-const contextDefaultValue = {} as IGroupsContext;
+const contextDefaultValue = {} as ISbomGroupsContext;
 
-export const GroupsContext =
-  React.createContext<IGroupsContext>(contextDefaultValue);
+export const SbomGroupsContext =
+  React.createContext<ISbomGroupsContext>(contextDefaultValue);
 
-interface IGroupsProvider {
+interface ISbomGroupsProvider {
   children: React.ReactNode;
 }
 
-export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
-  children,
-}) => {
+export const SbomGroupsProvider: React.FunctionComponent<
+  ISbomGroupsProvider
+> = ({ children }) => {
   const tableControlState = useTableControlState({
-    tableName: "groups",
-    persistenceKeyPrefix: TablePersistenceKeyPrefixes.groups,
+    tableName: "sbom-groups",
+    persistenceKeyPrefix: TablePersistenceKeyPrefixes.sbomGroups,
     persistTo: "urlParams",
     columnNames: {
       name: "name",
@@ -103,7 +106,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
     result: { data: rootGroups, total: totalItemCount },
     isFetching: isRootsFetching,
     fetchError,
-  } = useFetchGroups(
+  } = useFetchSbomGroups(
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
@@ -113,7 +116,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
   );
 
   // Fetch children for all expanded groups
-  const { data: childGroups } = useFetchGroupChildren(expandedNodeIds);
+  const { data: childGroups } = useFetchSbomGroupChildren(expandedNodeIds);
 
   // Merge root groups + children into a flat list, then build tree
   const allGroups = React.useMemo(
@@ -122,7 +125,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
   );
 
   const roots = React.useMemo(() => {
-    return buildGroupTree(allGroups);
+    return buildSbomGroupTree(allGroups);
   }, [allGroups]);
 
   // Only use root-fetching for the table loading state.
@@ -150,7 +153,7 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
   });
 
   return (
-    <GroupsContext.Provider
+    <SbomGroupsContext.Provider
       value={{
         tableControls,
         isFetching,
@@ -172,6 +175,6 @@ export const GroupsProvider: React.FunctionComponent<IGroupsProvider> = ({
       }}
     >
       {children}
-    </GroupsContext.Provider>
+    </SbomGroupsContext.Provider>
   );
 };

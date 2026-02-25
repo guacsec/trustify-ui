@@ -1,11 +1,13 @@
-import type { GroupItem, GroupTreeNode } from "./groups-context";
+import type { SbomGroupItem, SbomGroupTreeNode } from "./sbom-groups-context";
 
 /**
  * Generates a simple tree structure for groups
  */
-export function buildGroupTree(items: GroupItem[]): GroupTreeNode[] {
-  const byId = new Map<string, GroupTreeNode>();
-  const roots: GroupTreeNode[] = [];
+export function buildSbomGroupTree(
+  items: SbomGroupItem[],
+): SbomGroupTreeNode[] {
+  const byId = new Map<string, SbomGroupTreeNode>();
+  const roots: SbomGroupTreeNode[] = [];
 
   // initialize nodes
   for (const item of items) {

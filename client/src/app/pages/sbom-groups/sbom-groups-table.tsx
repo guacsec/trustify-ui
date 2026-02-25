@@ -15,13 +15,16 @@ import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ConditionalTableBody } from "@app/components/TableControls";
 import type { Group } from "@app/client";
-import { GroupsContext, type GroupTreeNode } from "./groups-context";
-import { GroupTableData } from "./group-table-data";
+import {
+  SbomGroupsContext,
+  type SbomGroupTreeNode,
+} from "./sbom-groups-context";
+import { SbomGroupTableData } from "./sbom-group-table-data";
 import type { AxiosError } from "axios";
-import { useDeleteGroupMutation } from "@app/queries/groups";
+import { useDeleteSbomGroupMutation } from "@app/queries/sbom-groups";
 import { childGroupDeleteDialogProps } from "@app/Constants";
 
-export const GroupsTable: React.FC = () => {
+export const SbomGroupsTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
   const {
     isFetching,
@@ -31,7 +34,7 @@ export const GroupsTable: React.FC = () => {
     treeExpansion: { expandedNodeIds, setExpandedNodeIds },
     treeSelection: { isNodeSelected, selectNodes },
     treeData,
-  } = React.useContext(GroupsContext);
+  } = React.useContext(SbomGroupsContext);
 
   const {
     numRenderedColumns,
@@ -41,7 +44,7 @@ export const GroupsTable: React.FC = () => {
   // Delete action
   // NOTE: only applies to child groups, not parent groups.
   const [childGroupToDelete, setChildGroupToDelete] =
-    React.useState<GroupTreeNode | null>(null);
+    React.useState<SbomGroupTreeNode | null>(null);
   const onDeleteChildGroupSuccess = (group: Group) => {
     setChildGroupToDelete(null);
     pushNotification({
@@ -58,7 +61,10 @@ export const GroupsTable: React.FC = () => {
   };
 
   const { mutate: deleteChildGroup, isPending: isDeletingChildGroup } =
-    useDeleteGroupMutation(onDeleteChildGroupSuccess, onDeleteChildGroupError);
+    useDeleteSbomGroupMutation(
+      onDeleteChildGroupSuccess,
+      onDeleteChildGroupError,
+    );
 
   /**
     Recursive function which flattens the data into an array of flattened TreeRowWrapper components
@@ -70,7 +76,7 @@ export const GroupsTable: React.FC = () => {
       - isHidden - defaults to false, true if this row's parent is expanded
   */
   const renderRows = (
-    [node, ...remainingNodes]: GroupTreeNode[],
+    [node, ...remainingNodes]: SbomGroupTreeNode[],
     level = 1,
     posinset = 1,
     rowIndex = 0,
@@ -114,7 +120,7 @@ export const GroupsTable: React.FC = () => {
         )
       : [];
 
-    const lastRowActions = (node: GroupTreeNode): IAction[] => [
+    const lastRowActions = (node: SbomGroupTreeNode): IAction[] => [
       {
         title: "Delete",
         onClick: () => {
@@ -127,7 +133,7 @@ export const GroupsTable: React.FC = () => {
     return [
       <TreeRowWrapper key={node.id} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
-          <GroupTableData item={node} />
+          <SbomGroupTableData item={node} />
         </Td>
         {
           // Only render for non-parent group nodes
@@ -154,7 +160,7 @@ export const GroupsTable: React.FC = () => {
 
   return (
     <>
-      <Table {...tableProps} isTreeTable aria-label="groups-table">
+      <Table {...tableProps} isTreeTable aria-label="sbom-groups-table">
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
@@ -165,7 +171,7 @@ export const GroupsTable: React.FC = () => {
         </ConditionalTableBody>
       </Table>
       <SimplePagination
-        idPrefix="groups-table"
+        idPrefix="sbom-groups-table"
         isTop={false}
         paginationProps={paginationProps}
       />

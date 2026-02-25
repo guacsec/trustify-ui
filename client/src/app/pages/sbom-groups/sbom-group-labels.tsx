@@ -14,7 +14,7 @@ function formatLabel(key: string, value: string | null): FormattedLabel {
   return { color, text };
 }
 
-export const GroupLabels = ({ labels }: Props) => {
+export const SbomGroupLabels = ({ labels }: Props) => {
   if (!labels || Object.keys(labels).length === 0) {
     return null;
   }

@@ -6,9 +6,9 @@ import {
   Content,
 } from "@patternfly/react-core";
 import { NavLink } from "react-router-dom";
-import { GroupLabels } from "./group-labels";
-import type { GroupTreeNode } from "./groups-context";
-export const GroupTableData = ({ item }: { item: GroupTreeNode }) => {
+import { SbomGroupLabels } from "./sbom-group-labels";
+import type { SbomGroupTreeNode } from "./sbom-groups-context";
+export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
   return (
     <Stack hasGutter>
       <StackItem isFilled>
@@ -26,7 +26,7 @@ export const GroupTableData = ({ item }: { item: GroupTreeNode }) => {
             </NavLink>
           </FlexItem>
           <FlexItem>
-            <GroupLabels labels={item.labels} />
+            <SbomGroupLabels labels={item.labels} />
           </FlexItem>
         </Flex>
       </StackItem>

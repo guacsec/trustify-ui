@@ -10,10 +10,10 @@ import {
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { SimplePagination } from "@app/components/SimplePagination";
 
-import { GroupsContext } from "./groups-context";
+import { SbomGroupsContext } from "./sbom-groups-context";
 
-export const GroupsToolbar: React.FC = () => {
-  const { tableControls } = React.useContext(GroupsContext);
+export const SbomGroupsToolbar: React.FC = () => {
+  const { tableControls } = React.useContext(SbomGroupsContext);
 
   const {
     propHelpers: {
@@ -25,7 +25,7 @@ export const GroupsToolbar: React.FC = () => {
   } = tableControls;
 
   return (
-    <Toolbar {...toolbarProps} aria-label="groups-toolbar">
+    <Toolbar {...toolbarProps} aria-label="sbom-groups-toolbar">
       <ToolbarContent>
         <FilterToolbar {...filterToolbarProps} />
         <ToolbarItem>
@@ -40,7 +40,7 @@ export const GroupsToolbar: React.FC = () => {
         </ToolbarItem>
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination
-            idPrefix="groups-table"
+            idPrefix="sbom-groups-table"
             isTop
             paginationProps={paginationProps}
           />

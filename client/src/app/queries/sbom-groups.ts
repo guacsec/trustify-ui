@@ -16,7 +16,7 @@ import {
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
 
-export const GroupQueryKey = "groups";
+export const SbomGroupQueryKey = "sbomGroups";
 
 /**
  * Prepend a parent filter to an existing q value.
@@ -33,12 +33,12 @@ function withParentFilter(parentValue: string, existingQ?: string): string {
 /**
  * Fetch root-level groups only (where parent IS NULL), with pagination.
  */
-export const useFetchGroups = (
+export const useFetchSbomGroups = (
   params: HubRequestParams = {},
   disableQuery = false,
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [GroupQueryKey, "roots", params],
+    queryKey: [SbomGroupQueryKey, "roots", params],
     queryFn: () => {
       const query = requestParamsQuery(params);
       return listSbomGroups({
@@ -70,10 +70,10 @@ export const useFetchGroups = (
  * Issues one query per parent ID using `useQueries`. Each query fetches all
  * direct children of the given parent (no pagination limit).
  */
-export const useFetchGroupChildren = (parentIds: string[]) => {
+export const useFetchSbomGroupChildren = (parentIds: string[]) => {
   const results = useQueries({
     queries: parentIds.map((parentId) => ({
-      queryKey: [GroupQueryKey, "children", parentId],
+      queryKey: [SbomGroupQueryKey, "children", parentId],
       queryFn: () =>
         listSbomGroups({
           client,
@@ -93,7 +93,7 @@ export const useFetchGroupChildren = (parentIds: string[]) => {
   };
 };
 
-export const useDeleteGroupMutation = (
+export const useDeleteSbomGroupMutation = (
   onSuccess: (payload: Group) => void,
   onError: (err: AxiosError) => void,
 ) => {
@@ -113,11 +113,15 @@ export const useDeleteGroupMutation = (
     },
     onSuccess: async (_res, payload) => {
       onSuccess(payload);
-      await queryClient.invalidateQueries({ queryKey: [GroupQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [SbomGroupQueryKey],
+      });
     },
     onError: async (err: AxiosError) => {
       onError(err);
-      await queryClient.invalidateQueries({ queryKey: [GroupQueryKey] });
+      await queryClient.invalidateQueries({
+        queryKey: [SbomGroupQueryKey],
+      });
     },
   });
 };
