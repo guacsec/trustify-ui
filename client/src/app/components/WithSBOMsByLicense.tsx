@@ -1,7 +1,7 @@
 import type React from "react";
 
-import type { AxiosError } from "axios";
 import { useFetchSBOMs } from "@app/queries/sboms";
+import type { AxiosError } from "axios";
 
 export interface WithSBOMsByLicenseProps {
   licenseId: string;
@@ -17,6 +17,7 @@ export const WithSBOMsByLicense: React.FC<WithSBOMsByLicenseProps> = ({
   children,
 }) => {
   const { result, isFetching, fetchError } = useFetchSBOMs(
+    undefined,
     {
       filters: [{ field: "license", operator: "=", value: licenseId }],
       page: { itemsPerPage: 1, pageNumber: 1 },

@@ -161,6 +161,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     isFetching,
     fetchError,
   } = useFetchSBOMs(
+    undefined,
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {

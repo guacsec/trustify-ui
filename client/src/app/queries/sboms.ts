@@ -8,6 +8,7 @@ import {
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams, Label } from "@app/api/models";
+import { uploadSbom } from "@app/api/rest";
 import { client } from "@app/axios-config/apiInit";
 import {
   type IngestResult,
@@ -23,9 +24,9 @@ import {
   listSboms,
   updateSbomLabels,
 } from "@app/client";
+import { FILTER_NULL_VALUE } from "@app/Constants";
 import { useUpload } from "@app/hooks/useUpload";
 
-import { uploadSbom } from "@app/api/rest";
 import {
   labelRequestParamsQuery,
   requestParamsQuery,
@@ -54,6 +55,7 @@ export const useFetchSBOMLabels = (filterText: string) => {
 };
 
 export const useFetchSBOMs = (
+  groups: string[] = [FILTER_NULL_VALUE],
   params: HubRequestParams = {},
   labels: Label[] = [],
   disableQuery = false,
@@ -69,6 +71,9 @@ export const useFetchSBOMs = (
         query: {
           ...rest,
           q: [q, labelQuery].filter((e) => e).join("&"),
+        },
+        path: {
+          group: groups,
         },
       }),
     enabled: !disableQuery,
