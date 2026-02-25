@@ -10,6 +10,10 @@ export class AdvisoryDetailsPage {
     this._layout = layout;
   }
 
+  /**
+   * Build the page object by navigating from the sidebar to the advisory list,
+   * filtering, and clicking on the advisory link.
+   */
   static async build(page: Page, advisoryID: string) {
     const navigation = await Navigation.build(page);
     await navigation.goToSidebar("Advisories");
@@ -26,6 +30,21 @@ export class AdvisoryDetailsPage {
 
     const layout = await DetailsPageLayout.build(page);
     await layout.verifyPageHeader(advisoryID);
+
+    return new AdvisoryDetailsPage(page, layout);
+  }
+
+  /**
+   * Build the page object from the current page state WITHOUT navigating.
+   * @param page - The Playwright page object
+   * @param advisoryID - Optional advisory ID to verify the page header
+   */
+  static async fromCurrentPage(page: Page, advisoryID?: string) {
+    const layout = await DetailsPageLayout.build(page);
+
+    if (advisoryID) {
+      await layout.verifyPageHeader(advisoryID);
+    }
 
     return new AdvisoryDetailsPage(page, layout);
   }

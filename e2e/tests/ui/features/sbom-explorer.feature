@@ -193,7 +193,7 @@ Feature: SBOM Explorer - View SBOM details
     Given there is ingested <sbomType> SBOM which is affected by Vulnerabilities
     When user visits SBOM details page
     And user selects Vulnerabilities tab
-    Then Pagination of Vulnerabilities list works
+    Then Pagination of "vulnerabilities" list works
 
     Examples:
       | sbomType |

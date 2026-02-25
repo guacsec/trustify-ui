@@ -13,8 +13,11 @@ export class SbomListPage {
 
   static async build(page: Page) {
     const navigation = await Navigation.build(page);
-    await navigation.goToSidebar("SBOMs");
+    await navigation.goToSidebar("All SBOMs");
+    return new SbomListPage(page);
+  }
 
+  static async fromCurrentPage(page: Page) {
     return new SbomListPage(page);
   }
 
@@ -23,7 +26,20 @@ export class SbomListPage {
   }
 
   async getTable() {
-    return await Table.build(this._page, "sbom-table");
+    return await Table.build(
+      this._page,
+      "sbom-table",
+      {
+        Name: { isSortable: true },
+        Version: { isSortable: false },
+        Supplier: { isSortable: false },
+        Labels: { isSortable: false },
+        "Created on": { isSortable: true },
+        Dependencies: { isSortable: false },
+        Vulnerabilities: { isSortable: false },
+      },
+      ["Edit labels", "Download SBOM", "Download License Report", "Delete"],
+    );
   }
 
   async getPagination(top: boolean = true) {
