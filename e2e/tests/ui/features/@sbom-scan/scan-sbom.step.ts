@@ -83,12 +83,14 @@ When(
       await route.continue();
     });
 
-    // Verify spinner and click cancel while requests are blocked
-    await scanPage.expectProcessingSpinner(header, cancelLabel);
-    await scanPage.clickCancelProcessing(cancelLabel);
-
-    // Clean up the route after cancel
-    await page.unroute("**/api/**");
+    try {
+      // Verify spinner and click cancel while requests are blocked
+      await scanPage.expectProcessingSpinner(header, cancelLabel);
+      await scanPage.clickCancelProcessing(cancelLabel);
+    } finally {
+      // Always clean up the route to prevent it from leaking into other tests
+      await page.unroute("**/api/**");
+    }
   },
 );
 
