@@ -16,7 +16,7 @@ import {
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
 
-export const SbomGroupQueryKey = "sbomGroups";
+export const SBOMGroupsQueryKey = "sbom-groups";
 
 /**
  * Prepend a parent filter to an existing q value.
@@ -38,7 +38,7 @@ export const useFetchSbomGroups = (
   disableQuery = false,
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SbomGroupQueryKey, "roots", params],
+    queryKey: [SBOMGroupsQueryKey, "roots", params],
     queryFn: () => {
       const query = requestParamsQuery(params);
       return listSbomGroups({
@@ -73,7 +73,7 @@ export const useFetchSbomGroups = (
 export const useFetchSbomGroupChildren = (parentIds: string[]) => {
   const results = useQueries({
     queries: parentIds.map((parentId) => ({
-      queryKey: [SbomGroupQueryKey, "children", parentId],
+      queryKey: [SBOMGroupsQueryKey, "children", parentId],
       queryFn: () =>
         listSbomGroups({
           client,
@@ -114,13 +114,13 @@ export const useDeleteSbomGroupMutation = (
     onSuccess: async (_res, payload) => {
       onSuccess(payload);
       await queryClient.invalidateQueries({
-        queryKey: [SbomGroupQueryKey],
+        queryKey: [SBOMGroupsQueryKey],
       });
     },
     onError: async (err: AxiosError) => {
       onError(err);
       await queryClient.invalidateQueries({
-        queryKey: [SbomGroupQueryKey],
+        queryKey: [SBOMGroupsQueryKey],
       });
     },
   });
