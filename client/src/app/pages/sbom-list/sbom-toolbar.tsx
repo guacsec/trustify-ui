@@ -11,7 +11,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 
-import type { Group, GroupRequest, Labels } from "@app/client";
+import type { GroupRequest } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -19,8 +19,6 @@ import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { useCreateSBOMGroupMutation } from "@app/queries/sbom-groups";
 import { Paths } from "@app/Routes";
-
-import { splitStringAsKeyValue } from "@app/api/model-utils";
 
 import { SbomSearchContext } from "./sbom-context";
 import { SBOMGroupFormModal } from "./components/CreateGroupForm/SBOMGroupFormModal";
@@ -82,32 +80,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
 
-  const handleCreateGroup = async (values: {
-    name: string;
-    parentGroup?: Group;
-    isProduct: "yes" | "no";
-    description?: string;
-    labels: string[];
-  }) => {
-    // Convert labels array to Labels object
-    const labelsObj: Labels = {};
-    for (const label of values.labels) {
-      const { key, value } = splitStringAsKeyValue(label);
-      labelsObj[key] = value ?? "";
-    }
-
-    // Add Product label if isProduct is "yes"
-    if (values.isProduct === "yes") {
-      labelsObj.Product = "";
-    }
-
-    const body: GroupRequest = {
-      name: values.name,
-      description: values.description || null,
-      parent: values.parentGroup?.id || null,
-      labels: Object.keys(labelsObj).length > 0 ? labelsObj : undefined,
-    };
-
+  const handleCreateGroup = async (body: GroupRequest) => {
     await createGroupMutation.mutateAsync(body);
   };
 

@@ -69,7 +69,7 @@ export const HookFormPFGroupSelect = <
 interface GroupSelectTypeaheadProps {
   fieldId: string;
   name: string;
-  value: Group;
+  value: Group | undefined;
   onChange: (value: Group | undefined) => void;
   placeholderText: string;
   limit: number;

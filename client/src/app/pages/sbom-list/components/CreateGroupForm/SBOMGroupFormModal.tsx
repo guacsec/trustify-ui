@@ -22,8 +22,9 @@ import {
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
-import type { Group } from "@app/client";
+import type { Group, GroupRequest, Labels } from "@app/client";
 import { HookFormPFGroupSelect } from "./HookFormPFGroupSelect";
+import { splitStringAsKeyValue } from "@app/api/model-utils";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -36,7 +37,7 @@ type SBOMGroupFormValues = {
 export interface SBOMGroupFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: SBOMGroupFormValues) => void | Promise<void>;
+  onSubmit: (body: GroupRequest) => void | Promise<void>;
   initialValues?: Partial<SBOMGroupFormValues>;
   type?: "Create" | "Edit";
 }
@@ -47,6 +48,29 @@ const defaultValues: SBOMGroupFormValues = {
   isProduct: "no",
   description: "",
   labels: [],
+};
+
+const convertValues = (values: SBOMGroupFormValues): GroupRequest => {
+  // Convert labels array to Labels object
+  const labelsObj: Labels = {};
+  for (const label of values.labels) {
+    const { key, value } = splitStringAsKeyValue(label);
+    labelsObj[key] = value ?? "";
+  }
+
+  // Add Product label if isProduct is "yes"
+  if (values.isProduct === "yes") {
+    labelsObj.Product = "";
+  }
+
+  const body: GroupRequest = {
+    name: values.name.trim(),
+    description: values.description?.trim() || null,
+    parent: values.parentGroup?.id || null,
+    labels: Object.keys(labelsObj).length > 0 ? labelsObj : undefined,
+  };
+
+  return body;
 };
 
 export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
@@ -97,7 +121,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
   }, [parentGroup, trigger, getValues]);
 
   const onSubmitHandler = (values: SBOMGroupFormValues) => {
-    onSubmit(values);
+    onSubmit(convertValues(values));
   };
 
   return (
@@ -123,26 +147,28 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             control={control}
             controllerProps={{
               rules: {
-                required: "This field is required",
                 validate: async (value: string) => {
+                  const trimmed = value.trim();
+                  // if (!trimmed) return "This field is required";
+
                   const currentParent = getValues("parentGroup");
 
                   // Skip uniqueness check if editing and neither name nor parent changed
                   if (
                     type === "Edit" &&
-                    value === initialValues?.name &&
+                    trimmed === initialValues?.name &&
                     currentParent?.id === initialValues?.parentGroup?.id
                   ) {
                     return true;
                   }
 
                   const isUnique = await checkGroupNameUniqueness(
-                    value,
+                    trimmed,
                     currentParent?.id || undefined,
                   );
                   return (
                     isUnique ||
-                    `${value} already exists${currentParent ? ` in ${currentParent.name}` : ""}`
+                    `${trimmed} already exists${currentParent ? ` in ${currentParent.name}` : ""}`
                   );
                 },
               },
@@ -232,7 +258,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
           aria-label={`${type} btn`}
           variant={ButtonVariant.primary}
           isDisabled={!isValid || isSubmitting || isValidating}
-          isLoading={isSubmitting || isValidating}
+          isLoading={isSubmitting}
           spinnerAriaLabel="Loading"
           spinnerAriaValueText="Loading"
         >
