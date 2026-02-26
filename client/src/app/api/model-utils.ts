@@ -18,8 +18,9 @@ import {
   t_global_icon_color_severity_undefined_default as undefinedColor,
 } from "@patternfly/react-tokens";
 
-import type { Score, ScoreType } from "@app/client";
+import { listSbomGroups, type Score, type ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
+import { client } from "@app/axios-config/apiInit";
 
 type ListType = {
   [key in ExtendedSeverity]: {
@@ -181,4 +182,29 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
   }
 
   return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
+};
+
+// API function to check if group name is unique
+// Returns boolean
+export const checkSbomGroupNameUniqueness = async (
+  name: string,
+  parentId?: string,
+): Promise<boolean> => {
+  try {
+    // Build query based on whether parent is specified
+
+    const response = await listSbomGroups({
+      client,
+      query: {
+        q: `parent=${parentId || "\0"}&name=${name}`,
+        limit: 1,
+      },
+    });
+    const isUnique = !response.data?.items || response.data?.items.length === 0;
+    return isUnique;
+  } catch (error) {
+    // On error, assume name is available (fail open for better UX)
+    console.error("Failed to check group name uniqueness:", error);
+    return true;
+  }
 };

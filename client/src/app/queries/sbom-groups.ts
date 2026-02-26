@@ -1,5 +1,4 @@
 import {
-  keepPreviousData,
   useMutation,
   useQuery,
   useQueryClient,
@@ -14,31 +13,6 @@ export type FetchSBOMGroupsParams = ListSbomGroupsData["query"];
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
-// API function to check if group name is unique
-// Returns boolean
-export const checkGroupNameUniqueness = async (
-  name: string,
-  parentId?: string,
-): Promise<boolean> => {
-  try {
-    // Build query based on whether parent is specified
-
-    const response = await listSbomGroups({
-      client,
-      query: {
-        q: `parent=${parentId || "\0"}&name=${name}`,
-        limit: 1,
-      },
-    });
-    const isUnique = !response.data?.items || response.data?.items.length === 0;
-    return isUnique;
-  } catch (error) {
-    // On error, assume name is available (fail open for better UX)
-    console.error("Failed to check group name uniqueness:", error);
-    return true;
-  }
-};
-
 export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMGroupsQueryKey, params],
@@ -46,8 +20,7 @@ export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
       listSbomGroups({
         client,
         query: params,
-      }),
-    placeholderData: keepPreviousData,
+      })
   });
 
   return {

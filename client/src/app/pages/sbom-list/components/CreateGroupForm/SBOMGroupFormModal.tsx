@@ -21,10 +21,9 @@ import {
   HookFormPFTextInput,
 } from "@app/components/HookFormPFFields";
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
-import { checkGroupNameUniqueness } from "@app/queries/sbom-groups";
 import type { Group, GroupRequest, Labels } from "@app/client";
 import { HookFormPFGroupSelect } from "./HookFormPFGroupSelect";
-import { splitStringAsKeyValue } from "@app/api/model-utils";
+import { checkSbomGroupNameUniqueness, splitStringAsKeyValue } from "@app/api/model-utils";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -162,7 +161,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
                     return true;
                   }
 
-                  const isUnique = await checkGroupNameUniqueness(
+                  const isUnique = await checkSbomGroupNameUniqueness(
                     trimmed,
                     currentParent?.id || undefined,
                   );
