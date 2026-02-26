@@ -18,6 +18,7 @@ import {
   HookFormPFGroupController,
   extractGroupControllerProps,
 } from "./HookFormPFGroupController";
+import { splitStringAsKeyValue } from "@app/api/model-utils";
 
 export interface RestrictedLabelPattern {
   pattern: string | RegExp;
@@ -84,34 +85,44 @@ export const HookFormPFAddLabels = <
 
         const handleAdd = () => {
           const trimmed = newLabel.trim();
-          if (!trimmed) {
-            return;
-          }
-          const matchedRestriction = restrictedLabels.find((rule) => {
-            if (typeof rule === "string") {
-              return rule === trimmed;
+          if (
+            !!trimmed &&
+            trimmed.length > 0 &&
+            /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/.test(
+              trimmed,
+            )
+          ) {
+            const matchedRestriction = restrictedLabels.find((rule) => {
+              if (typeof rule === "string") {
+                return rule === trimmed;
+              }
+              const regex =
+                rule.pattern instanceof RegExp
+                  ? rule.pattern
+                  : new RegExp(rule.pattern);
+              return regex.test(trimmed);
+            });
+            if (matchedRestriction) {
+              setLabelError(
+                typeof matchedRestriction === "string"
+                  ? `The label '${trimmed}' is reserved`
+                  : matchedRestriction.errorMessage,
+              );
+              return;
             }
-            const regex =
-              rule.pattern instanceof RegExp
-                ? rule.pattern
-                : new RegExp(rule.pattern);
-            return regex.test(trimmed);
-          });
-          if (matchedRestriction) {
-            setLabelError(
-              typeof matchedRestriction === "string"
-                ? `The label '${trimmed}' is reserved`
-                : matchedRestriction.errorMessage,
-            );
-            return;
-          }
-          if (labels.includes(trimmed)) {
-            setLabelError("Label already exists");
-            return;
-          }
-          onChange([...labels, trimmed]);
-          setNewLabel("");
-          setLabelError(null);
+            if (labels.includes(trimmed)) {
+              setLabelError("Label already exists");
+              return;
+            }
+            const newOptionKeyValue = splitStringAsKeyValue(trimmed);
+            const filteredLabels = labels.filter((label) => {
+              const optionKeyValue = splitStringAsKeyValue(label);
+              return optionKeyValue.key !== newOptionKeyValue.key;
+            });
+            onChange([...filteredLabels, trimmed]);
+            setNewLabel("");
+            setLabelError(null);
+          } else return;
         };
 
         const handleDelete = (labelToRemove: string) => {
