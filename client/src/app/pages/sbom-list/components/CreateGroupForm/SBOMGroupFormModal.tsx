@@ -23,7 +23,10 @@ import {
 import { HookFormPFAddLabels } from "@app/components/HookFormPFFields/HookFormPFAddLabels";
 import type { Group, GroupRequest, Labels } from "@app/client";
 import { HookFormPFGroupSelect } from "./HookFormPFGroupSelect";
-import { checkSbomGroupNameUniqueness, splitStringAsKeyValue } from "@app/api/model-utils";
+import {
+  checkSbomGroupNameUniqueness,
+  splitStringAsKeyValue,
+} from "@app/api/model-utils";
 
 type SBOMGroupFormValues = {
   name: string;
@@ -81,6 +84,10 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
 }) => {
   const [isAdvancedExpanded, setIsAdvancedExpanded] =
     React.useState<boolean>(false);
+  const [tempName, setTempName] = React.useState<string>("");
+  const [tempParent, setTempParent] = React.useState<Group | undefined>(
+    undefined,
+  );
 
   const {
     control,
@@ -152,14 +159,19 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
 
                   const currentParent = values.parentGroup;
 
-                  // Skip uniqueness check if editing and neither name nor parent changed
+                  // Skip uniqueness check if editing and neither name nor parent changed or if not parent or name changed depending on previous input
                   if (
-                    type === "Edit" &&
-                    trimmed === initialValues?.name &&
-                    currentParent?.id === initialValues?.parentGroup?.id
+                    (type === "Edit" &&
+                      trimmed === initialValues?.name &&
+                      currentParent?.id === initialValues?.parentGroup?.id) ||
+                    (currentParent?.id === tempParent?.id &&
+                      trimmed === tempName)
                   ) {
                     return true;
                   }
+
+                  setTempName(trimmed);
+                  setTempParent(currentParent);
 
                   const isUnique = await checkSbomGroupNameUniqueness(
                     trimmed,

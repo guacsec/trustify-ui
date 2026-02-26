@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { client } from "@app/axios-config/apiInit";
 
@@ -20,7 +16,7 @@ export const useFetchSBOMGroups = (params?: FetchSBOMGroupsParams) => {
       listSbomGroups({
         client,
         query: params,
-      })
+      }),
   });
 
   return {
