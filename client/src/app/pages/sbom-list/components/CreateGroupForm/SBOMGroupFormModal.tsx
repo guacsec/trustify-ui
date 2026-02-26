@@ -147,11 +147,11 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
             control={control}
             controllerProps={{
               rules: {
-                validate: async (value: string) => {
+                validate: async (value: string, values) => {
                   const trimmed = value.trim();
-                  // if (!trimmed) return "This field is required";
+                  if (!trimmed) return "This field is required";
 
-                  const currentParent = getValues("parentGroup");
+                  const currentParent = values.parentGroup;
 
                   // Skip uniqueness check if editing and neither name nor parent changed
                   if (
