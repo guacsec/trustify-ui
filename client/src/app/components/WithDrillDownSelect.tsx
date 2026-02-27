@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   Menu,
+  MenuContainer,
   MenuContent,
   MenuList,
   MenuItem,
@@ -9,8 +10,12 @@ import {
   MenuSearchInput,
   SearchInput,
   MenuSearch,
+  MenuToggle,
+  Button,
   debounce,
 } from "@patternfly/react-core";
+
+import { TimesIcon } from "@patternfly/react-icons";
 
 type SelectOption = {
   id: string;
@@ -21,9 +26,14 @@ type SelectOption = {
 
 interface MenuWithDrilldownProps {
   options: SelectOption[];
-  onSelect?: (option: SelectOption) => void;
+  onSelect: (option: SelectOption) => void;
   onInputChange?: (value: string) => void;
   inputValue?: string;
+  onClear?: (_event: SyntheticEvent) => void;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  showClearBrn?: boolean;
+  displayText?: string;
 }
 
 const TOGGLE_ICON_CLASS = "pf-v6-c-menu__item-toggle-icon";
@@ -43,14 +53,25 @@ function buildOptionMap(
   return map;
 }
 
-export const MenuWithDrilldown: React.FunctionComponent<
+export const SelectWithDrilldown: React.FunctionComponent<
   MenuWithDrilldownProps
-> = ({ options, onSelect, onInputChange, inputValue }) => {
+> = ({
+  options,
+  onSelect,
+  onInputChange,
+  inputValue,
+  isOpen,
+  setIsOpen,
+  onClear = undefined,
+  showClearBrn = false,
+  displayText = 'Select',
+}) => {
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
   const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
   const [activeMenu, setActiveMenu] = useState<string>("drilldown-rootMenu");
-
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const optionMap = useMemo(() => buildOptionMap(options), [options]);
 
   const drillIn = (
@@ -106,7 +127,34 @@ export const MenuWithDrilldown: React.FunctionComponent<
     }
   };
 
-  return (
+  const onToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const toggle = () => (
+    <MenuToggle
+      ref={toggleRef}
+      onClick={onToggle}
+      isExpanded={isOpen}
+      isFullWidth
+      icon={
+        showClearBrn && onClear ? (
+          <Button
+            size="sm"
+            variant="plain"
+            onClick={onClear}
+            aria-label="Clear chosen value"
+          >
+            <TimesIcon />
+          </Button>
+        ) : null
+      }
+    >
+      {displayText}
+    </MenuToggle>
+  );
+
+  const menu = (
     <Menu
       id="drilldown-rootMenu"
       containsDrilldown
@@ -116,8 +164,9 @@ export const MenuWithDrilldown: React.FunctionComponent<
       onDrillIn={drillIn}
       onDrillOut={drillOut}
       onGetMenuHeight={setHeight}
+      ref={menuRef}
     >
-      <MenuSearch>
+      {onInputChange ? <MenuSearch>
         <MenuSearchInput>
           <SearchInput
             value={inputValue}
@@ -126,7 +175,7 @@ export const MenuWithDrilldown: React.FunctionComponent<
             onClear={() => handleInputChange("")}
           />
         </MenuSearchInput>
-      </MenuSearch>
+      </MenuSearch> : null}
       <Divider />
       <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
         <MenuList>
@@ -144,6 +193,18 @@ export const MenuWithDrilldown: React.FunctionComponent<
         </MenuList>
       </MenuContent>
     </Menu>
+  );
+
+  return (
+    <MenuContainer
+      toggle={toggle()}
+      toggleRef={toggleRef}
+      menu={menu}
+      menuRef={menuRef}
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      popperProps={{ appendTo: "inline" }}
+    />
   );
 };
 

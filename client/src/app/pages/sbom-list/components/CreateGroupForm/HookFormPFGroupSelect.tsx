@@ -1,9 +1,6 @@
 import React from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
-import { Button, MenuToggle, Select, SelectList } from "@patternfly/react-core";
-import { TimesIcon } from "@patternfly/react-icons";
-
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 import { getValidatedFromErrors } from "@app/utils/utils";
 
@@ -12,7 +9,7 @@ import {
   HookFormPFGroupController,
   extractGroupControllerProps,
 } from "../../../../components/HookFormPFFields/HookFormPFGroupController";
-import { MenuWithDrilldown } from "../../../../components/WithDrillDownMenu";
+import { SelectWithDrilldown } from "../../../../components/WithDrillDownSelect";
 import { buildHierarchy } from "./utils";
 import type { Group } from "@app/client";
 
@@ -79,7 +76,6 @@ interface GroupSelectTypeaheadProps {
 }
 
 const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
-  fieldId,
   value,
   onChange,
   placeholderText,
@@ -101,10 +97,6 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     ? buildHierarchy(groups?.data, searchQuery.length < 1)
     : [];
 
-  const onToggle = () => {
-    setIsOpen(!isOpen);
-  };
-
   const onClear = (_event: React.SyntheticEvent) => {
     _event.stopPropagation();
     onChange(undefined);
@@ -117,48 +109,20 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
     setIsOpen(false);
   };
 
-  const toggle = (toggleRef: React.Ref<HTMLButtonElement>) => (
-    <MenuToggle
-      ref={toggleRef}
-      onClick={onToggle}
-      isExpanded={isOpen}
-      isFullWidth
-      icon={
-        !!value && (
-          <Button
-            size="sm"
-            variant="plain"
-            onClick={onClear}
-            aria-label="Clear chosen value"
-          >
-            <TimesIcon />
-          </Button>
-        )
-      }
-    >
-      {value?.name || placeholderText}
-    </MenuToggle>
-  );
-
   return (
-    <Select
-      id={`${fieldId}-select`}
+    <SelectWithDrilldown
+      options={mappedGroups.map((gr) => ({
+        ...gr,
+        description: gr.parentsNames,
+      }))}
+      onSelect={onSelect}
+      onInputChange={setSearchQuery}
+      inputValue={searchQuery}
+      onClear={onClear}
       isOpen={isOpen}
-      selected={undefined}
-      onOpenChange={setIsOpen}
-      toggle={toggle}
-    >
-      <SelectList>
-        <MenuWithDrilldown
-          options={mappedGroups.map((gr) => ({
-            ...gr,
-            description: gr.parentsNames,
-          }))}
-          onSelect={onSelect}
-          onInputChange={setSearchQuery}
-          inputValue={searchQuery}
-        />
-      </SelectList>
-    </Select>
+      setIsOpen={setIsOpen}
+      displayText={value?.name || placeholderText}
+      showClearBrn={!!value}
+    />
   );
 };
