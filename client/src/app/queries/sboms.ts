@@ -24,7 +24,6 @@ import {
   listSboms,
   updateSbomLabels,
 } from "@app/client";
-import { FILTER_NULL_VALUE } from "@app/Constants";
 import { useUpload } from "@app/hooks/useUpload";
 
 import {
@@ -55,7 +54,7 @@ export const useFetchSBOMLabels = (filterText: string) => {
 };
 
 export const useFetchSBOMs = (
-  groups: string[] = [FILTER_NULL_VALUE],
+  groups: string[] = [],
   params: HubRequestParams = {},
   labels: Label[] = [],
   disableQuery = false,
@@ -64,16 +63,14 @@ export const useFetchSBOMs = (
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMsQueryKey, params, labelQuery],
+    queryKey: [SBOMsQueryKey, groups, params, labelQuery],
     queryFn: () =>
       listSboms({
         client,
         query: {
           ...rest,
-          q: [q, labelQuery].filter((e) => e).join("&"),
-        },
-        path: {
           group: groups,
+          q: [q, labelQuery].filter((e) => e).join("&"),
         },
       }),
     enabled: !disableQuery,
