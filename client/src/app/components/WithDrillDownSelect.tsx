@@ -64,7 +64,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
   setIsOpen,
   onClear = undefined,
   showClearBrn = false,
-  displayText = 'Select',
+  displayText = "Select",
 }) => {
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
@@ -166,16 +166,18 @@ export const SelectWithDrilldown: React.FunctionComponent<
       onGetMenuHeight={setHeight}
       ref={menuRef}
     >
-      {onInputChange ? <MenuSearch>
-        <MenuSearchInput>
-          <SearchInput
-            value={inputValue}
-            aria-label="Filter menu items"
-            onChange={(_event, value) => handleInputChange(value)}
-            onClear={() => handleInputChange("")}
-          />
-        </MenuSearchInput>
-      </MenuSearch> : null}
+      {onInputChange ? (
+        <MenuSearch>
+          <MenuSearchInput>
+            <SearchInput
+              value={inputValue}
+              aria-label="Filter menu items"
+              onChange={(_event, value) => handleInputChange(value)}
+              onClear={() => handleInputChange("")}
+            />
+          </MenuSearchInput>
+        </MenuSearch>
+      ) : null}
       <Divider />
       <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
         <MenuList>
