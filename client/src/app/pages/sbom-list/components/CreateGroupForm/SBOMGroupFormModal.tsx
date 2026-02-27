@@ -98,7 +98,7 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     trigger,
     formState: { isSubmitting, isValid, isValidating },
   } = useForm<SBOMGroupFormValues>({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       ...defaultValues,
       ...initialValues,
