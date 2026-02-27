@@ -91,14 +91,18 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Fetch groups with search query
-  const { groups } = useFetchSBOMGroups({
-    ...(searchQuery && { q: `name~${searchQuery}` }),
-    parents: "resolve",
-    limit,
-  });
+  const { rawData: groups } = useFetchSBOMGroups(
+    {
+      page: { pageNumber: 1, itemsPerPage: limit },
+      ...(searchQuery && {
+        filters: [{ field: "name", operator: "~", value: searchQuery }],
+      }),
+    },
+    { parents: "resolve" },
+  );
 
-  const mappedGroups = groups?.data
-    ? buildHierarchy(groups?.data, searchQuery.length < 1)
+  const mappedGroups = groups
+    ? buildHierarchy(groups, searchQuery.length < 1)
     : [];
 
   const onClear = (_event: React.SyntheticEvent) => {

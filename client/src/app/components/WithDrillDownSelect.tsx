@@ -1,4 +1,10 @@
-import { SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Menu,
   MenuContainer,
