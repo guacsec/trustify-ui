@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -12,9 +12,9 @@ import {
 } from "@patternfly/react-core";
 
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
-
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { useSuspenseSBOMGroupById } from "@app/queries/sbom-groups";
+
 import { SbomSearchProvider } from "../sbom-list/sbom-context";
 import { SbomTable } from "../sbom-list/sbom-table";
 import { SbomToolbar } from "../sbom-list/sbom-toolbar";
@@ -50,7 +50,7 @@ export const SBOMGroupDetails: React.FC = () => {
       </PageSection>
       <PageSection>
         <SbomSearchProvider sbomGroupIds={[sbomGroupId]}>
-          <SbomToolbar showFilters showActions />
+          <SbomToolbar showFilters />
           <SbomTable />
         </SbomSearchProvider>
       </PageSection>

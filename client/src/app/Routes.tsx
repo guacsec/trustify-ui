@@ -263,7 +263,10 @@ export const AppRoutes = createBrowserRouter([
         ),
         errorElement: <RouteErrorBoundary />,
         loader: async ({ params }) => {
-          const sbomGroupId = usePathFromParams(params, PathParam.SBOM_GROUP_ID);
+          const sbomGroupId = usePathFromParams(
+            params,
+            PathParam.SBOM_GROUP_ID,
+          );
           const response = await queryClient.ensureQueryData(
             SBOMGroupByIdQueryOptions(sbomGroupId),
           );
