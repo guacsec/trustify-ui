@@ -1,14 +1,20 @@
+import { client } from "@app/axios-config/apiInit";
 import {
   keepPreviousData,
+  queryOptions,
   useMutation,
   useQuery,
   useQueryClient,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { client } from "@app/axios-config/apiInit";
 
-import { createSbomGroup, listSbomGroups } from "@app/client";
-import type { GroupRequest, ListSbomGroupsData } from "@app/client";
+import type {
+  GroupRequest,
+  ListSbomGroupsData,
+  RevisionedGroup,
+} from "@app/client";
+import { createSbomGroup, listSbomGroups, readSbomGroup } from "@app/client";
 
 export type FetchSBOMGroupsParams = ListSbomGroupsData["query"];
 
@@ -74,4 +80,32 @@ export const useCreateSBOMGroupMutation = (
     },
     onError: onError,
   });
+};
+
+export const SBOMGroupByIdQueryOptions = (id: string) => {
+  return queryOptions({
+    queryKey: [SBOMGroupsQueryKey, id],
+    queryFn: () => readSbomGroup({ client, path: { id } }),
+  });
+};
+
+export const useFetchSBOMGroupById = (id: string) => {
+  const { data, isLoading, error } = useQuery(SBOMGroupByIdQueryOptions(id));
+  return {
+    sbomGroup: data?.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+export const useSuspenseSBOMGroupById = (id: string) => {
+  const { data, isLoading, error, refetch } = useSuspenseQuery({
+    ...SBOMGroupByIdQueryOptions(id),
+  });
+  return {
+    sbomGroup: data.data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+    refetch,
+  };
 };
