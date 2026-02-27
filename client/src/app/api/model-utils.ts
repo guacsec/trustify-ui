@@ -21,6 +21,7 @@ import {
 import { listSbomGroups, type Score, type ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 import { client } from "@app/axios-config/apiInit";
+import { requestParamsQuery } from "@app/hooks/table-controls";
 
 type ListType = {
   [key in ExtendedSeverity]: {
@@ -195,10 +196,13 @@ export const checkSbomGroupNameUniqueness = async (
 
     const response = await listSbomGroups({
       client,
-      query: {
-        q: `parent=${parentId || "\0"}&name=${name}`,
-        limit: 1,
-      },
+      query: requestParamsQuery({
+        page: { pageNumber: 1, itemsPerPage: 1 },
+        filters: [
+          { field: "name", operator: "=", value: name },
+          { field: "parent", operator: "=", value: parentId || "\0" },
+        ],
+      }),
     });
     const isUnique = !response.data?.items || response.data?.items.length === 0;
     return isUnique;

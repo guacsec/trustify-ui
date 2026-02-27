@@ -80,8 +80,8 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
 
-  const handleCreateGroup = async (body: GroupRequest) => {
-    await createGroupMutation.mutateAsync(body);
+  const handleCreateGroup = (body: GroupRequest) => {
+    createGroupMutation.mutate(body);
   };
 
   return (

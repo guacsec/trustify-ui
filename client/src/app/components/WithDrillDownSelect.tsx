@@ -103,12 +103,16 @@ export const SelectWithDrilldown: React.FunctionComponent<
     }
   };
 
-  const handleInputChange = debounce((value: string) => {
-    setMenuDrilledIn([]);
-    setDrilldownPath([]);
-    setActiveMenu("drilldown-rootMenu");
-    onInputChange?.(value);
-  }, 300);
+  const handleInputChange = useMemo(
+    () =>
+      debounce((value: string) => {
+        setMenuDrilledIn([]);
+        setDrilldownPath([]);
+        setActiveMenu("drilldown-rootMenu");
+        onInputChange?.(value);
+      }, 300),
+    [onInputChange],
+  );
 
   const drillOut = (
     _event: React.KeyboardEvent | React.MouseEvent,
