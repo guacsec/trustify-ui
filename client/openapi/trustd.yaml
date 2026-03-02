@@ -5,7 +5,7 @@ info:
   license:
     name: Apache License, Version 2.0
     identifier: Apache-2.0
-  version: 0.4.0-beta.1
+  version: 0.5.0-alpha.1
 paths:
   /.well-known/trustify:
     get:
@@ -338,17 +338,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -562,17 +562,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -839,6 +839,362 @@ paths:
           description: Uploaded the dataset
         '400':
           description: The file could not be parsed as an dataset
+  /api/v2/group/sbom:
+    get:
+      tags:
+      - sbomGroup
+      summary: List SBOM groups
+      operationId: listSbomGroups
+      parameters:
+      - name: totals
+        in: query
+        description: return the total number of children
+        required: false
+        schema:
+          type: boolean
+      - name: parents
+        in: query
+        description: return the parent chain
+        required: false
+        schema:
+          type: string
+          enum:
+          - skip
+          - id
+          - resolve
+      - name: offset
+        in: query
+        description: |-
+          The first item to return, skipping all that come before it.
+
+          NOTE: The order of items is defined by the API being called.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        description: |-
+          The maximum number of entries to return.
+
+          Zero means: no limit
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: q
+        in: query
+        description: |
+          EBNF grammar for the _q_ parameter:
+          ```text
+              q = ( values | filter ) { '&' q }
+              values = value { '|', values }
+              filter = field, operator, values
+              operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<"
+              value = (* any text but escape special characters with '\' *)
+              field = (* must match an entity attribute name *)
+          ```
+          Any values in a _q_ will result in a case-insensitive "full
+          text search", effectively producing an OR clause of LIKE
+          clauses for every string-ish field in the resource being
+          queried.
+
+          Examples:
+          - `foo` - any field containing 'foo'
+          - `foo|bar` - any field containing either 'foo' OR 'bar'
+          - `foo&bar` - some field contains 'foo' AND some field contains 'bar'
+
+          A _filter_ may also be used to constrain the results. The
+          filter's field name must correspond to one of the resource's
+          attributes. If it doesn't, an error will be returned
+          containing a list of the valid fields for that resource.
+
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
+
+          Examples:
+          - `name=foo` - entity's _name_ matches 'foo' exactly
+          - `name~foo` - entity's _name_ contains 'foo', case-insensitive
+          - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
+          - `name=` - entity's _name_ is the empty string, ''
+          - `name=%00` - entity's _name_ isn't set
+          - `published>3 days ago` - date values can be "human time"
+
+          Multiple full text searches and/or filters should be
+          '&'-delimited -- they are logically AND'd together.
+
+          - `red hat|fedora&labels:type=cve|osv&published>last wednesday 17:00`
+
+          Fields corresponding to JSON objects in the database may use a
+          ':' to delimit the column name and the object key,
+          e.g. `purl:qualifiers:type=pom`
+
+          Any operator or special character, e.g. '|', '&', within a
+          value should be escaped by prefixing it with a backslash.
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |
+          EBNF grammar for the _sort_ parameter:
+          ```text
+              sort = field [ ':', order ] { ',' sort }
+              order = ( "asc" | "desc" )
+              field = (* must match the name of entity's attributes *)
+          ```
+          The optional _order_ should be one of "asc" or "desc". If
+          omitted, the order defaults to "asc".
+
+          Each _field_ name must correspond to one of the columns of the
+          table holding the entities being queried. Those corresponding
+          to JSON objects in the database may use a ':' to delimit the
+          column name and the object key,
+          e.g. `purl:qualifiers:type:desc`
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Executed the SBOM group query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupListResult'
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+    post:
+      tags:
+      - sbomGroup
+      summary: Create a new SBOM group
+      operationId: createSbomGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequest'
+        required: true
+      responses:
+        '201':
+          description: Created the requested group
+          headers:
+            location:
+              schema:
+                type: string
+              description: The relative URL to the created resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResponse'
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '409':
+          description: The name of the group is not unique within the parent
+  /api/v2/group/sbom-assignment:
+    put:
+      tags:
+      - sbomGroup
+      summary: Bulk update SBOM group assignments
+      operationId: bulkUpdateSbomGroupAssignments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkAssignmentRequest'
+        required: true
+      responses:
+        '204':
+          description: The SBOM assignments were updated
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+  /api/v2/group/sbom-assignment/{id}:
+    get:
+      tags:
+      - sbomGroup
+      summary: Get SBOM group assignments
+      operationId: readSbomGroupAssignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the SBOM
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The SBOM was found and assignments returned
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '404':
+          description: The SBOM was not found
+    put:
+      tags:
+      - sbomGroup
+      summary: Update SBOM group assignments
+      operationId: updateSbomGroupAssignments
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the SBOM to update
+        required: true
+        schema:
+          type: string
+      - name: if-match
+        in: header
+        description: The revision of the SBOM assignments
+        required: false
+        schema:
+          type:
+          - string
+          - 'null'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        '204':
+          description: The SBOM assignments were updated
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '412':
+          description: The requested revision is not the current revision
+  /api/v2/group/sbom/{id}:
+    get:
+      tags:
+      - sbomGroup
+      summary: Read the SBOM group information
+      operationId: readSbomGroup
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the group to read
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The group was found and returned
+          headers:
+            etag:
+              schema:
+                type: string
+              description: Revision ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revisioned_Group'
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+    put:
+      tags:
+      - sbomGroup
+      summary: Update an SBOM group
+      operationId: updateSbomGroup
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the group to update
+        required: true
+        schema:
+          type: string
+      - name: if-match
+        in: header
+        description: The revision to update
+        required: false
+        schema:
+          type:
+          - string
+          - 'null'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequest'
+        required: true
+      responses:
+        '204':
+          description: The group was delete or did not exist
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '409':
+          description: Assigning the parent would create a cycle
+        '412':
+          description: The requested revision is not the current revision of the group
+    delete:
+      tags:
+      - sbomGroup
+      summary: Delete an SBOM group
+      operationId: deleteSbomGroup
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the group to delete
+        required: true
+        schema:
+          type: string
+      - name: if-match
+        in: header
+        description: The revision to delete
+        required: false
+        schema:
+          type:
+          - string
+          - 'null'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequest'
+        required: true
+      responses:
+        '204':
+          description: The group was deleted or did not exist
+        '400':
+          description: The request was not valid
+        '401':
+          description: The user was not authenticated
+        '403':
+          description: The user authenticated, but not authorized for this operation
+        '409':
+          description: The group has child groups and cannot be deleted
+        '412':
+          description: The requested revision is not the current revision of the group
   /api/v2/importer:
     get:
       tags:
@@ -1094,17 +1450,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1291,17 +1647,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1420,17 +1776,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1552,17 +1908,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1705,17 +2061,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1815,17 +2171,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -1991,17 +2347,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -2060,6 +2416,16 @@ paths:
           type: integer
           format: int64
           minimum: 0
+      - name: group
+        in: path
+        description: |-
+          Filter by group IDs. Only SBOMs assigned to any of the provided groups will be returned.
+          Can be specified multiple times. Malformed IDs are silently ignored.
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
       responses:
         '200':
           description: Matching SBOMs
@@ -2074,7 +2440,7 @@ paths:
       operationId: uploadSbom
       parameters:
       - name: labels
-        in: query
+        in: path
         description: |-
           Optional labels.
 
@@ -2083,9 +2449,9 @@ paths:
         schema:
           $ref: '#/components/schemas/Labels'
       - name: format
-        in: query
+        in: path
         description: The format of the uploaded document.
-        required: false
+        required: true
         schema:
           type: string
           enum:
@@ -2101,15 +2467,27 @@ paths:
           - sbom
           - unknown
       - name: cache
-        in: query
+        in: path
         description: Await loading the document into the analysis graph cache
-        required: false
+        required: true
         schema:
           type: string
           enum:
           - skip
           - queue
           - wait
+      - name: group
+        in: path
+        description: |-
+          Optional group IDs to assign the SBOM to after ingestion.
+
+          If one or more group IDs are invalid, the upload will fail with 400 Bad Request
+          and the SBOM will not be ingested.
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
       requestBody:
         content:
           application/octet-stream:
@@ -2128,7 +2506,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IngestResult'
         '400':
-          description: The file could not be parsed as an SBOM
+          description: One or more group IDs are invalid or do not exist
   /api/v2/sbom-labels:
     get:
       tags:
@@ -2193,17 +2571,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -2528,17 +2906,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -2670,17 +3048,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -2992,7 +3370,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalysisResponseV2'
+                $ref: '#/components/schemas/AnalysisResponse'
   /api/v2/vulnerability/{id}:
     get:
       tags:
@@ -3049,17 +3427,17 @@ paths:
           attributes. If it doesn't, an error will be returned
           containing a list of the valid fields for that resource.
 
-          The value 'null' is treated specially for [Not]Equal filters:
-          it returns resources on which the field isn't set. Use the
-          LIKE operator, `~`, to match a literal "null" string. Omit the
-          value to match an empty string.
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
 
           Examples:
           - `name=foo` - entity's _name_ matches 'foo' exactly
           - `name~foo` - entity's _name_ contains 'foo', case-insensitive
           - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
           - `name=` - entity's _name_ is the empty string, ''
-          - `name=null` - entity's _name_ isn't set
+          - `name=%00` - entity's _name_ isn't set
           - `published>3 days ago` - date values can be "human time"
 
           Multiple full text searches and/or filters should be
@@ -3163,7 +3541,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalysisResponse'
+                $ref: '#/components/schemas/AnalysisResponseV3'
 components:
   schemas:
     AdvisoryDetails:
@@ -3335,18 +3713,6 @@ components:
       - $ref: '#/components/schemas/VulnerabilityHead'
       - type: object
         required:
-        - purl_statuses
-        properties:
-          purl_statuses:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurlStatus'
-            description: List of purl statuses
-    AnalysisDetailsV2:
-      allOf:
-      - $ref: '#/components/schemas/VulnerabilityHead'
-      - type: object
-        required:
         - status
         properties:
           status:
@@ -3358,6 +3724,29 @@ components:
                 $ref: '#/components/schemas/AnalysisAdvisory'
             propertyNames:
               type: string
+    AnalysisDetailsV3:
+      allOf:
+      - $ref: '#/components/schemas/VulnerabilityHead'
+      - type: object
+        required:
+        - purl_statuses
+        properties:
+          purl_statuses:
+            type: array
+            items:
+              $ref: '#/components/schemas/AnalysisPurlStatus'
+            description: List of purl statuses & remediations
+    AnalysisPurlStatus:
+      allOf:
+      - $ref: '#/components/schemas/PurlStatus'
+      - type: object
+        required:
+        - remediations
+        properties:
+          remediations:
+            type: array
+            items:
+              $ref: '#/components/schemas/RemediationSummary'
     AnalysisRequest:
       type: object
       required:
@@ -3373,10 +3762,10 @@ components:
         $ref: '#/components/schemas/AnalysisResult'
       propertyNames:
         type: string
-    AnalysisResponseV2:
+    AnalysisResponseV3:
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/AnalysisResultV2'
+        $ref: '#/components/schemas/AnalysisResultV3'
       propertyNames:
         type: string
     AnalysisResult:
@@ -3393,7 +3782,7 @@ components:
           type: array
           items:
             type: string
-    AnalysisResultV2:
+    AnalysisResultV3:
       type: object
       required:
       - details
@@ -3402,7 +3791,7 @@ components:
         details:
           type: array
           items:
-            $ref: '#/components/schemas/AnalysisDetailsV2'
+            $ref: '#/components/schemas/AnalysisDetailsV3'
         warnings:
           type: array
           items:
@@ -3521,6 +3910,23 @@ components:
           type: string
     BinaryByteSize:
       type: string
+    BulkAssignmentRequest:
+      type: object
+      description: Request to assign multiple SBOMs to the same set of groups.
+      required:
+      - sbom_ids
+      - group_ids
+      properties:
+        group_ids:
+          type: array
+          items:
+            type: string
+          description: The group IDs to assign to each SBOM (replaces existing assignments).
+        sbom_ids:
+          type: array
+          items:
+            type: string
+          description: The IDs of the SBOMs to update.
     ByteSizeDef:
       type: string
     CacheStatusDetails:
@@ -3640,6 +4046,14 @@ components:
     Cpe:
       type: string
       format: uri
+    CreateResponse:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: The ID of the newly created group
     CsafImporter:
       allOf:
       - $ref: '#/components/schemas/CommonImporter'
@@ -3766,6 +4180,68 @@ components:
       - advisory
       - sbom
       - unknown
+    Group:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: A user friendly description
+        id:
+          type: string
+          description: The ID of the group
+        labels:
+          $ref: '#/components/schemas/Labels'
+          description: Additional group labels
+        name:
+          type: string
+          description: The name of the group, in the context of its parent
+        parent:
+          type:
+          - string
+          - 'null'
+          description: The direct parent of this group
+    GroupListResult:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResults_GroupDetails'
+      - type: object
+        properties:
+          referenced:
+            type:
+            - array
+            - 'null'
+            items:
+              $ref: '#/components/schemas/Group'
+            description: |-
+              Groups referenced by parent chains but not present in the primary result set.
+
+              Only present when `parents=resolve` is requested.
+      description: Result of listing SBOM groups, with optional resolved parent references.
+    GroupRequest:
+      type: object
+      description: Mutable properties of a [`Group`].
+      required:
+      - name
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          description: A user provided description
+        labels:
+          $ref: '#/components/schemas/Labels'
+        name:
+          type: string
+          description: The name of the group.
+        parent:
+          type:
+          - string
+          - 'null'
+          description: The ID of the group's parent.
     Id:
       type: string
       description: |-
@@ -4148,6 +4624,54 @@ components:
           items:
             allOf:
             - $ref: '#/components/schemas/BasePurlHead'
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+    PaginatedResults_GroupDetails:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/Group'
+            - type: object
+              properties:
+                number_of_groups:
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                  description: |-
+                    The number of groups owned directly by this group
+
+                    This information is only present when requested.
+                  minimum: 0
+                number_of_sboms:
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                  description: |-
+                    The number of SBOMs directly assigned to this group
+
+                    This information is only present when requested.
+                  minimum: 0
+                parents:
+                  type:
+                  - array
+                  - 'null'
+                  items:
+                    type: string
+                  description: |-
+                    The path, of IDs, from the root to this group
+
+                    This information is only present when requested.
+            description: Detailed group information, extends [`Group`]
         total:
           type: integer
           format: int64
@@ -4694,6 +5218,7 @@ components:
       required:
       - vulnerability
       - advisory
+      - scores
       - average_severity
       - average_score
       - status
@@ -4704,12 +5229,18 @@ components:
         average_score:
           type: number
           format: double
+          deprecated: true
         average_severity:
           $ref: '#/components/schemas/Severity'
         context:
           oneOf:
           - type: 'null'
           - $ref: '#/components/schemas/StatusContext'
+        scores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Score'
+          description: All CVSS scores associated with the vulnerability
         status:
           type: string
         version_range:
@@ -4823,6 +5354,36 @@ components:
       - describes
       - package
       - undefined
+    RemediationCategory:
+      type: string
+      enum:
+      - vendor_fix
+      - workaround
+      - mitigation
+      - no_fix_planned
+      - none_available
+      - will_not_fix
+    RemediationSummary:
+      type: object
+      required:
+      - id
+      - category
+      - data
+      properties:
+        category:
+          $ref: '#/components/schemas/RemediationCategory'
+        data: {}
+        details:
+          type:
+          - string
+          - 'null'
+        id:
+          type: string
+          format: uuid
+        url:
+          type:
+          - string
+          - 'null'
     Report:
       type: object
       required:
@@ -4859,6 +5420,48 @@ components:
           type: string
           format: date-time
           description: Start of the import run
+    Revisioned_Group:
+      type: object
+      description: |-
+        A struct wrapping an item with a revision.
+
+        If the revision should not be part of the payload, but e.g. an HTTP header (like `ETag`), this
+        struct can help carrying both pieces.
+      required:
+      - value
+      - revision
+      properties:
+        revision:
+          type: string
+          description: |-
+            The revision.
+
+            An opaque string that should have no meaning to the user, only to the backend.
+        value:
+          type: object
+          required:
+          - id
+          - name
+          properties:
+            description:
+              type:
+              - string
+              - 'null'
+              description: A user friendly description
+            id:
+              type: string
+              description: The ID of the group
+            labels:
+              $ref: '#/components/schemas/Labels'
+              description: Additional group labels
+            name:
+              type: string
+              description: The name of the group, in the context of its parent
+            parent:
+              type:
+              - string
+              - 'null'
+              description: The direct parent of this group
     Revisioned_Importer:
       type: object
       description: |-
@@ -5504,6 +6107,7 @@ components:
       type: object
       required:
       - id
+      - remediations
       properties:
         id:
           type: string
@@ -5511,6 +6115,10 @@ components:
           oneOf:
           - type: 'null'
           - $ref: '#/components/schemas/VexJustification'
+        remediations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemediationSummary'
         status:
           oneOf:
           - type: 'null'

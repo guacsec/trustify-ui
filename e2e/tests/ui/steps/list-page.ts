@@ -1,8 +1,12 @@
 import { createBdd } from "playwright-bdd";
-import { SbomListPage } from "../pages/sbom-list/SbomListPage";
+
+import { test } from "../fixtures";
+
 import { expect } from "../assertions";
 
-export const { Given, When, Then } = createBdd();
+import { SbomListPage } from "../pages/sbom-list/SbomListPage";
+
+export const { Given, When, Then } = createBdd(test);
 
 Given("An ingested SBOM {string} is available", async ({ page }, sbomName) => {
   const sbomListPage = await SbomListPage.build(page);
