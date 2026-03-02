@@ -1,8 +1,8 @@
 import { createBdd } from "playwright-bdd";
 import { expect } from "../../assertions";
 import { test } from "../../fixtures";
-import { ImporterListPage } from "../../pages/importer-list/ImporterListPage";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
+import { ImporterListPage } from "../../pages/importer-list/ImporterListPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -82,21 +82,14 @@ Then("The filter toggle button should be available", async ({ page }) => {
 // Search and filtering
 When(
   "User applies filter {string} with value {string}",
-  async ({ page }, filterName, filterValue) => {
+  async ({ page }, _filterName, filterValue) => {
     const listPage = new ImporterListPage(page);
     const toolbar = await listPage.getToolbar();
-
-    // Map UI filter names to internal filter keys if needed
-    const filterMapping: { [key: string]: string } = {
-      "Filter text": "Name",
-      Name: "Name",
-      Status: "Status",
-    };
 
     const filter = toolbar._toolbar.getByPlaceholder("Search by name...");
     await expect(filter).toBeVisible();
     await filter.fill(filterValue);
-    await listPage.page.keyboard.press('Enter');
+    await listPage.page.keyboard.press("Enter");
     await page.waitForTimeout(1000);
   },
 );
@@ -486,11 +479,12 @@ Then(
 
 Then(
   "The {string} importer should show {string} state or progress indicator",
-  async ({ page }, importerName, expectedState) => {  
+  async ({ page }, importerName, expectedState) => {
     const listPage = new ImporterListPage(page);
     const table = await listPage.getTable();
-    const nameColumn = await table.getColumn("Name");
+    await table.getRowsByCellValue({ Name: importerName });
     const stateColumn = await table.getColumn("State");
+    const nameColumn = await table.getColumn("Name");
     const allRows = await table.getRows();
     const allRowCount = await allRows.count();
     for (let i = 0; i < allRowCount; i++) {
@@ -498,29 +492,11 @@ Then(
       const nameText = await nameCell.textContent();
       if (nameText?.includes(importerName)) {
         const stateCell = stateColumn.nth(i);
+        const scheduledText = stateCell.getByText(expectedState);
         const progressBar = stateCell.locator('[role="progressbar"]');
-        const scheduledText = stateCell.getByText("Scheduled");
-
-        // Wait a moment for the state to update
-        await listPage.page.waitForTimeout(1000);
-
-        // Check if either progress bar is visible or Scheduled state is shown
-        const hasProgressBar =
-          (await progressBar.count()) > 0 && (await progressBar.isVisible());
-        const isScheduled = (await scheduledText.count()) > 0;
-
-        if (hasProgressBar || isScheduled) {
-          return;
-        }
-
-        // If neither is found, wait a bit longer and try again
-        await listPage.page.waitForTimeout(2000);
-
-        const hasProgressBarRetry =
-          (await progressBar.count()) > 0 && (await progressBar.isVisible());
-        const isScheduledRetry = (await scheduledText.count()) > 0;
-
-        expect(hasProgressBarRetry || isScheduledRetry).toBeTruthy();
+        const isScheduledVisible = (await scheduledText.count()) > 0;
+        const isProgressVisible = (await progressBar.count()) > 0;
+        expect(isScheduledVisible || isProgressVisible).toBeTruthy();
         return;
       }
     }
@@ -531,7 +507,7 @@ Then(
 
 Then(
   "The {string} importer should show progress indicator",
-  async ({ page }, importerName) => {  
+  async ({ page }, importerName) => {
     const listPage = new ImporterListPage(page);
     const table = await listPage.getTable();
     const nameColumn = await table.getColumn("Name");

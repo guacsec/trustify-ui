@@ -81,7 +81,10 @@ export class Toolbar<
 
       const filterType = this._filters[filterName];
 
-      
+      await this.selectFilter(filterName);
+      if (isStringFilter(filterType, filterValue)) {
+        await this.applyTextFilter(filterName, filterValue);
+      }
       if (isDateRangeFilter(filterType, filterValue)) {
         await this.applyDateRangeFilter(filterName, filterValue);
       }
@@ -96,7 +99,10 @@ export class Toolbar<
     await expect(this).toHaveLabels(filters);
   }
 
-  
+  private async applyTextFilter(_filterName: TFilterName, filterValue: string) {
+    await this._toolbar.getByRole("textbox").fill(filterValue);
+    await this._page.keyboard.press("Enter");
+  }
 
   private async applyDateRangeFilter(
     _filterName: TFilterName,
@@ -148,7 +154,16 @@ export class Toolbar<
     }
   }
 
-
+  /**
+   * Selects the main filter to be applied
+   * @param filterName the name of the filter as rendered in the UI
+   */
+  private async selectFilter(filterName: TFilterName) {
+    await this._toolbar
+      .locator(".pf-m-toggle-group button.pf-v6-c-menu-toggle")
+      .click();
+    await this._page.getByRole("menuitem", { name: filterName }).click();
+  }
 
   /**
    * Clears all applied filters by clicking the "Clear all filters" button
@@ -174,6 +189,7 @@ export class Toolbar<
       hasText: filterName,
     });
     await expect(chipGroup).toBeVisible();
+
     const chip = chipGroup.locator(".pf-v6-c-label-group__list-item").filter({
       has: this._page.locator(".pf-v6-c-label__content").filter({
         hasText: new RegExp(
@@ -183,6 +199,7 @@ export class Toolbar<
     });
 
     await expect(chip).toBeVisible();
+
     const closeButton = chip.getByRole("button", { name: /close/i });
     await expect(closeButton).toBeVisible();
     await closeButton.click();

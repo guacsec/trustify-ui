@@ -69,6 +69,4 @@ export class ImporterListPage {
     expect(targetRowIndex).toBeGreaterThanOrEqual(0);
     await table.clickAction(action, targetRowIndex);
   }
-
-  
 }
