@@ -17,7 +17,6 @@ import {
   SearchInput,
   MenuSearch,
   MenuToggle,
-  Button,
   debounce,
 } from "@patternfly/react-core";
 
@@ -178,14 +177,20 @@ export const SelectWithDrilldown: React.FunctionComponent<
       isFullWidth
       icon={
         showClearBrn && onClear ? (
-          <Button
-            size="sm"
-            variant="plain"
+          <span
             onClick={onClear}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClear(e as unknown as React.SyntheticEvent);
+              }
+            }}
+            role="button"
+            tabIndex={0}
             aria-label="Clear chosen value"
           >
             <TimesIcon />
-          </Button>
+          </span>
         ) : null
       }
     >
