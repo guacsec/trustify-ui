@@ -1,10 +1,4 @@
-import {
-  type SyntheticEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type SyntheticEvent, useMemo, useRef, useState } from "react";
 import {
   Menu,
   MenuContainer,
@@ -121,11 +115,6 @@ export const SelectWithDrilldown: React.FunctionComponent<
     setDrilldownPath((prev) => prev.slice(0, -1));
     setActiveMenu(toMenuId);
   };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: options is intentionally a dependency to re-trigger menu height
-  useEffect(() => {
-    setMenuHeights({});
-  }, [options]);
 
   const setHeight = (menuId: string, height: number) => {
     if (
