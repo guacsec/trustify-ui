@@ -160,7 +160,7 @@ export const SbomGroupsTable: React.FC = () => {
       },
     ];
 
-    const isChildNodeOnly = !node.number_of_groups;
+    const groupWithoutChildren = !node.number_of_groups;
     return [
       <TreeRowWrapper key={node.id} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
@@ -168,7 +168,7 @@ export const SbomGroupsTable: React.FC = () => {
         </Td>
         {
           // Only render for non-parent group nodes
-          isChildNodeOnly && (
+          groupWithoutChildren && (
             <Td isActionCell style={{ verticalAlign: "middle" }}>
               <ActionsColumn
                 items={lastRowActions(node)}
