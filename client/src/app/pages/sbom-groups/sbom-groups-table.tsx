@@ -154,7 +154,12 @@ export const SbomGroupsTable: React.FC = () => {
 
   return (
     <>
-      <Table {...tableProps} isTreeTable aria-label="sbom-groups-table">
+      <Table
+        {...tableProps}
+        isTreeTable
+        isExpandable={false}
+        aria-label="sbom-groups-table"
+      >
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
