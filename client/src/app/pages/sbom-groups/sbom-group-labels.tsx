@@ -9,7 +9,7 @@ type FormattedLabel = {
 };
 
 function formatLabel(key: string, value: string | null): FormattedLabel {
-  const text = value ? `${key}: ${value}` : `${key}`;
+  const text = value ? `${key}=${value}` : `${key}`;
   const color = key === "Product" ? "purple" : "blue";
   return { color, text };
 }
