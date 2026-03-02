@@ -15,37 +15,29 @@ import {
   listSbomGroups,
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
+import { FILTER_NULL_VALUE } from "@app/Constants";
 
 export const SBOMGroupsQueryKey = "sbom-groups";
-
-/**
- * Prepend a parent filter to an existing q value.
- *
- * The backend uses `\x00` (NUL byte) as a sentinel for IS NULL, so
- * `parent=\x00` returns only root-level groups.
- * `parent=<uuid>` returns only direct children of that group.
- */
-function withParentFilter(parentValue: string, existingQ?: string): string {
-  const filter = `parent=${parentValue}`;
-  return existingQ ? `${filter}&${existingQ}` : filter;
-}
 
 /**
  * Fetch root-level groups only (where parent IS NULL), with pagination.
  */
 export const useFetchSbomGroups = (
+  parentId: string | undefined,
   params: HubRequestParams = {},
   disableQuery = false,
 ) => {
+  const { q, ...rest } = requestParamsQuery(params);
+  const parentQuery = `parent=${parentId ?? FILTER_NULL_VALUE}`;
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMGroupsQueryKey, "roots", params],
+    queryKey: [SBOMGroupsQueryKey, parentId, params],
     queryFn: () => {
-      const query = requestParamsQuery(params);
       return listSbomGroups({
         client,
         query: {
-          ...query,
-          q: withParentFilter("\x00", query.q),
+          ...rest,
+          q: [parentQuery, q].filter((e) => e).join("&"),
           totals: true,
         },
       });
@@ -55,7 +47,7 @@ export const useFetchSbomGroups = (
 
   return {
     result: {
-      data: (data?.data?.items as Group[]) ?? [],
+      data: data?.data?.items ?? [],
       total: data?.data?.total ?? 0,
     },
     isFetching: isLoading,
@@ -98,7 +90,7 @@ export const useFetchSbomGroupChildren = (parentIds: string[]) => {
   });
 
   return {
-    data: results.flatMap((r) => (r.data?.data?.items as Group[]) ?? []),
+    data: results.flatMap((r) => r.data?.data?.items ?? []),
     isFetching: results.some((r) => r.isLoading),
     isError: results.some((r) => r.isError),
     nodeStatus,

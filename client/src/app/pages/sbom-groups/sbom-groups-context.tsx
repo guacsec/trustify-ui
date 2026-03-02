@@ -111,6 +111,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
     isFetching: isRootsFetching,
     fetchError,
   } = useFetchSbomGroups(
+    undefined,
     getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
