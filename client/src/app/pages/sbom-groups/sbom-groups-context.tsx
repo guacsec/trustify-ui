@@ -29,6 +29,10 @@ export type SbomGroupTreeNode = SbomGroupItem & {
 interface ITreeExpansionState {
   expandedNodeIds: string[];
   setExpandedNodeIds: React.Dispatch<React.SetStateAction<string[]>>;
+  childrenNodeStatus: Map<
+    string,
+    { isFetching: boolean; fetchError: AxiosError | null }
+  >;
 }
 
 interface ITreeSelectionState {
@@ -116,7 +120,8 @@ export const SbomGroupsProvider: React.FunctionComponent<
   );
 
   // Fetch children for all expanded groups
-  const { data: childGroups } = useFetchSbomGroupChildren(expandedNodeIds);
+  const { data: childGroups, nodeStatus: childrenNodeStatus } =
+    useFetchSbomGroupChildren(expandedNodeIds);
 
   // Merge root groups + children into a flat list, then build tree
   const allGroups = React.useMemo(
@@ -162,6 +167,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
         treeExpansion: {
           expandedNodeIds,
           setExpandedNodeIds,
+          childrenNodeStatus,
         },
         treeSelection: {
           selectedNodes,

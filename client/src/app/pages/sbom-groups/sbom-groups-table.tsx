@@ -1,5 +1,5 @@
 import React from "react";
-import { ButtonVariant } from "@patternfly/react-core";
+import { ButtonVariant, Skeleton } from "@patternfly/react-core";
 
 import {
   ActionsColumn,
@@ -11,8 +11,10 @@ import {
   type IAction,
 } from "@patternfly/react-table";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
+import { TableCellError } from "@app/components/TableCellError";
 import { ConditionalTableBody } from "@app/components/TableControls";
 import type { Group } from "@app/client";
 import {
@@ -31,7 +33,7 @@ export const SbomGroupsTable: React.FC = () => {
     fetchError,
     totalItemCount,
     tableControls,
-    treeExpansion: { expandedNodeIds, setExpandedNodeIds },
+    treeExpansion: { expandedNodeIds, setExpandedNodeIds, childrenNodeStatus },
     treeData,
   } = React.useContext(SbomGroupsContext);
 
@@ -104,15 +106,50 @@ export const SbomGroupsTable: React.FC = () => {
       },
     };
 
-    const childRows = node.children?.length
-      ? renderRows(
-          node.children,
-          level + 1,
-          1,
-          rowIndex + 1,
-          !isExpanded || isHidden,
-        )
-      : [];
+    let childRows: React.ReactNode[] = [];
+    if (node.children?.length) {
+      childRows = renderRows(
+        node.children,
+        level + 1,
+        1,
+        rowIndex + 1,
+        !isExpanded || isHidden,
+      );
+    } else if (isExpanded && !isHidden) {
+      const status = childrenNodeStatus.get(node.id);
+      if (status?.isFetching || status?.fetchError) {
+        childRows = [
+          <TreeRowWrapper
+            key={`${node.id}-status`}
+            row={{
+              props: {
+                isHidden: false,
+                "aria-level": level + 1,
+                "aria-posinset": 1,
+                "aria-setsize": 1,
+              },
+            }}
+          >
+            <Td colSpan={numRenderedColumns}>
+              <LoadingWrapper
+                isFetching={status.isFetching}
+                fetchError={status.fetchError}
+                isFetchingState={
+                  <Skeleton
+                    screenreaderText="Loading child groups"
+                    fontSize="lg"
+                    width="60%"
+                  />
+                }
+                fetchErrorState={(error) => <TableCellError error={error} />}
+              >
+                {null}
+              </LoadingWrapper>
+            </Td>
+          </TreeRowWrapper>,
+        ];
+      }
+    }
 
     const lastRowActions = (node: SbomGroupTreeNode): IAction[] => [
       {

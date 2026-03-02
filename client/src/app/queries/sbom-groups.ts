@@ -86,10 +86,22 @@ export const useFetchSbomGroupChildren = (parentIds: string[]) => {
     })),
   });
 
+  const nodeStatus = new Map<
+    string,
+    { isFetching: boolean; fetchError: AxiosError | null }
+  >();
+  parentIds.forEach((id, index) => {
+    nodeStatus.set(id, {
+      isFetching: results[index].isLoading,
+      fetchError: (results[index].error as AxiosError) ?? null,
+    });
+  });
+
   return {
     data: results.flatMap((r) => (r.data?.data?.items as Group[]) ?? []),
     isFetching: results.some((r) => r.isLoading),
     isError: results.some((r) => r.isError),
+    nodeStatus,
   };
 };
 
