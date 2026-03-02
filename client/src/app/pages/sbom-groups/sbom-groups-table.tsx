@@ -32,7 +32,6 @@ export const SbomGroupsTable: React.FC = () => {
     totalItemCount,
     tableControls,
     treeExpansion: { expandedNodeIds, setExpandedNodeIds },
-    treeSelection: { isNodeSelected, selectNodes },
     treeData,
   } = React.useContext(SbomGroupsContext);
 
@@ -95,9 +94,6 @@ export const SbomGroupsTable: React.FC = () => {
             : [...prevIds, node.id],
         );
       },
-      onCheckChange: (_event, isChecking) => {
-        selectNodes([node], isChecking);
-      },
       rowIndex,
       props: {
         isExpanded,
@@ -105,8 +101,6 @@ export const SbomGroupsTable: React.FC = () => {
         "aria-level": level,
         "aria-posinset": posinset,
         "aria-setsize": node.children.length || node.number_of_groups || 0,
-        isChecked: isNodeSelected(node),
-        checkboxId: `checkbox_id_${node.id}`,
       },
     };
 
