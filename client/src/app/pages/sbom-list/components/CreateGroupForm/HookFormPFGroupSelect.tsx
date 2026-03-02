@@ -39,10 +39,6 @@ export const HookFormPFGroupSelect = <
   return (
     <HookFormPFGroupController<TFieldValues, TName>
       {...extractedProps}
-      controllerProps={{
-        ...extractedProps.controllerProps,
-        shouldUnregister: true,
-      }}
       renderInput={({
         field: { onChange, value, name },
         fieldState: { isDirty, error, isTouched },
