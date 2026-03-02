@@ -122,7 +122,7 @@ export const HookFormPFAddLabels = <
             onChange([...filteredLabels, trimmed]);
             setNewLabel("");
             setLabelError(null);
-          } else return;
+          } else setLabelError('Incorrect label');
         };
 
         const handleDelete = (labelToRemove: string) => {

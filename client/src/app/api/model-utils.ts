@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { type LabelProps, type ProgressProps } from "@patternfly/react-core";
+import type { LabelProps, ProgressProps } from "@patternfly/react-core";
 import {
   SeverityCriticalIcon,
   SeverityImportantIcon,
