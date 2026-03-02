@@ -138,7 +138,6 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       aria-label={`${type} group`}
-      disableFocusTrap={true}
     >
       <ModalHeader title={`${type} group`} />
       <ModalBody>

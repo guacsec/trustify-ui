@@ -251,6 +251,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       onToggleKeydown={onToggleArrowKeydown}
+      popperProps={{ appendTo: "inline" }}
     />
   );
 };
