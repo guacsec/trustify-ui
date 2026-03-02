@@ -130,12 +130,15 @@ export const SBOMGroupFormModal: React.FC<SBOMGroupFormModalProps> = ({
     onSubmit(convertValues(values));
   };
 
+  if (!isOpen) return null;
+
   return (
     <Modal
       variant="small"
       isOpen={isOpen}
       onClose={onClose}
       aria-label={`${type} group`}
+      disableFocusTrap={true}
     >
       <ModalHeader title={`${type} group`} />
       <ModalBody>

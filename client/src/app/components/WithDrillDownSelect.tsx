@@ -141,6 +141,35 @@ export const SelectWithDrilldown: React.FunctionComponent<
     setIsOpen(!isOpen);
   };
 
+  const onToggleArrowKeydown = (event: KeyboardEvent) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+      return;
+    }
+
+    event.preventDefault();
+
+    const listItems = Array.from(menuRef.current?.querySelectorAll("li") ?? []);
+    const searchInput = menuRef.current?.querySelector("input");
+    const focusableElements = [
+      searchInput,
+      ...listItems.map((li) =>
+        li.querySelector(
+          'button:not(:disabled),input:not(:disabled),a:not([aria-disabled="true"])',
+        ),
+      ),
+    ].filter((el) => el !== null && el !== undefined);
+
+    let focusableElement: Element;
+    if (event.key === "ArrowDown") {
+      focusableElement = focusableElements[0];
+    } else {
+      focusableElement = focusableElements[focusableElements.length - 1];
+    }
+
+    if (focusableElement && focusableElement instanceof HTMLElement)
+      focusableElement.focus();
+  };
+
   const toggle = () => (
     <MenuToggle
       ref={toggleRef}
@@ -168,6 +197,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
     <Menu
       id="drilldown-rootMenu"
       containsDrilldown
+      isScrollable
       drilldownItemPath={drilldownPath}
       drilledInMenus={menuDrilledIn}
       activeMenu={activeMenu}
@@ -176,21 +206,21 @@ export const SelectWithDrilldown: React.FunctionComponent<
       onGetMenuHeight={setHeight}
       ref={menuRef}
     >
-      {onInputChange ? (
-        <MenuSearch>
-          <MenuSearchInput>
-            <SearchInput
-              value={inputValue}
-              aria-label="Filter menu items"
-              onChange={(_event, value) => handleInputChange(value)}
-              onClear={() => handleInputChange("")}
-            />
-          </MenuSearchInput>
-        </MenuSearch>
-      ) : null}
-      <Divider />
       <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
         <MenuList>
+          {onInputChange && activeMenu === "drilldown-rootMenu" ? (
+            <MenuSearch>
+              <MenuSearchInput>
+                <SearchInput
+                  value={inputValue}
+                  aria-label="Filter menu items"
+                  onChange={(_event, value) => handleInputChange(value)}
+                  onClear={() => handleInputChange("")}
+                />
+              </MenuSearchInput>
+            </MenuSearch>
+          ) : null}
+          <Divider />
           {options.length ? (
             options.map((option) => (
               <DrilldownMenuItem
@@ -215,7 +245,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
       menuRef={menuRef}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
-      popperProps={{ appendTo: "inline" }}
+      onToggleKeydown={onToggleArrowKeydown}
     />
   );
 };
