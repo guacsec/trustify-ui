@@ -1,77 +1,157 @@
 import { type SyntheticEvent, useMemo, useRef, useState } from "react";
+
 import {
+  Divider,
+  DrilldownMenu,
   Menu,
   MenuContainer,
   MenuContent,
-  MenuList,
   MenuItem,
-  Divider,
-  DrilldownMenu,
-  MenuSearchInput,
-  SearchInput,
+  MenuList,
   MenuSearch,
+  MenuSearchInput,
   MenuToggle,
+  SearchInput,
   debounce,
 } from "@patternfly/react-core";
-
 import { TimesIcon } from "@patternfly/react-icons";
 
-type SelectOption = {
+/**
+ * Option type for DrilldownSelect component
+ * @template TData - Optional data type to attach to each option
+ */
+export type DrilldownOption<TData = unknown> = {
+  /** Unique identifier for the option */
   id: string;
+  /** Display name for the option */
   name: string;
+  /** Optional description shown below the name */
   description?: string | null;
-  children?: SelectOption[];
+  /** Child options for hierarchical menus */
+  children?: DrilldownOption<TData>[];
+  /** Arbitrary data attached to this option */
+  data?: TData;
 };
 
-interface MenuWithDrilldownProps {
-  options: SelectOption[];
-  onSelect: (option: SelectOption) => void;
+/**
+ * Props for DrilldownSelect component
+ */
+export interface DrilldownSelectProps<TData = unknown> {
+  /** Available options to select from */
+  options: DrilldownOption<TData>[];
+  /** Currently selected option */
+  value?: DrilldownOption<TData> | null;
+  /** Callback when selection changes */
+  onChange: (option: DrilldownOption<TData>) => void;
+  /** Placeholder text when no value selected */
+  placeholder?: string;
+  /** Callback when search input changes */
   onInputChange?: (value: string) => void;
+  /** Current search input value */
   inputValue?: string;
-  onClear?: (_event: SyntheticEvent) => void;
-  isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
-  showClearBrn?: boolean;
-  displayText?: string;
+  /** Callback when clear button is clicked */
+  onClear?: (event: SyntheticEvent) => void;
+  /** Whether the menu is open (controlled mode) */
+  isOpen?: boolean;
+  /** Set menu open state (controlled mode) */
+  setIsOpen?: (value: boolean) => void;
+  /** Default open state (uncontrolled mode) */
+  defaultIsOpen?: boolean;
+  /** Whether the select is disabled */
+  isDisabled?: boolean;
+  /** Whether the select is in loading state */
+  isLoading?: boolean;
+  /** Text to show when loading */
+  loadingText?: string;
+  /** Text to show when no results found */
+  emptyStateText?: string;
+  /** Placeholder for search input */
+  searchPlaceholder?: string;
+  /** ARIA label for clear button */
+  clearButtonAriaLabel?: string;
+  /** Debounce delay for search input in milliseconds */
+  searchDebounceMs?: number;
+  /** Custom function to generate itemId for menu items */
+  getItemId?: (option: DrilldownOption<TData>, hasChildren: boolean) => string;
 }
 
 const TOGGLE_ICON_CLASS = "pf-v6-c-menu__item-toggle-icon";
 
-/** Build a flat map of itemId → option for quick lookup */
-function buildOptionMap(
-  options: SelectOption[],
-  map = new Map<string, SelectOption>(),
-): Map<string, SelectOption> {
+/**
+ * Build a flat map of itemId → option for quick lookup
+ */
+function buildOptionMap<TData>(
+  options: DrilldownOption<TData>[],
+  getItemId: (option: DrilldownOption<TData>, hasChildren: boolean) => string,
+  map = new Map<string, DrilldownOption<TData>>(),
+): Map<string, DrilldownOption<TData>> {
   for (const opt of options) {
-    map.set(`group:${opt.id}`, opt);
+    const hasChildren = !!opt.children?.length;
+    const itemId = getItemId(opt, hasChildren);
+    map.set(itemId, opt);
+    // Also set the base ID for backwards compatibility
     map.set(opt.id, opt);
     if (opt.children?.length) {
-      buildOptionMap(opt.children, map);
+      buildOptionMap(opt.children, getItemId, map);
     }
   }
   return map;
 }
 
-export const SelectWithDrilldown: React.FunctionComponent<
-  MenuWithDrilldownProps
-> = ({
+/**
+ * DrilldownSelect - A hierarchical menu select component with search and keyboard navigation
+ *
+ * @example
+ * ```tsx
+ * <DrilldownSelect
+ *   options={[
+ *     { id: '1', name: 'Parent', children: [
+ *       { id: '1-1', name: 'Child', description: 'Optional description' }
+ *     ]}
+ *   ]}
+ *   value={selectedGroup}
+ *   onChange={(option) => setSelectedGroup(option)}
+ *   placeholder="Select a group"
+ *   onClear={() => setSelectedGroup(undefined)}
+ * />
+ * ```
+ */
+export const DrilldownSelect = <TData = unknown>({
   options,
-  onSelect,
+  value,
+  onChange,
+  placeholder = "Select an option",
   onInputChange,
   inputValue,
-  isOpen,
-  setIsOpen,
-  onClear = undefined,
-  showClearBrn = false,
-  displayText = "Select",
-}) => {
+  isOpen: controlledIsOpen,
+  setIsOpen: controlledSetIsOpen,
+  defaultIsOpen = false,
+  onClear,
+  isDisabled = false,
+  isLoading = false,
+  loadingText = "Loading...",
+  emptyStateText = "No results",
+  searchPlaceholder = "Filter menu items",
+  clearButtonAriaLabel = "Clear selection",
+  searchDebounceMs = 300,
+  getItemId = (opt, hasChildren) =>
+    hasChildren ? `drilldown:${opt.id}` : opt.id,
+}: DrilldownSelectProps<TData>) => {
+  // Support both controlled and uncontrolled modes
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultIsOpen);
+  const isOpen = controlledIsOpen ?? internalIsOpen;
+  const setIsOpen = controlledSetIsOpen ?? setInternalIsOpen;
+
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
   const [menuHeights, setMenuHeights] = useState<Record<string, number>>({});
   const [activeMenu, setActiveMenu] = useState<string>("drilldown-rootMenu");
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const optionMap = useMemo(() => buildOptionMap(options), [options]);
+  const optionMap = useMemo(
+    () => buildOptionMap(options, getItemId),
+    [options, getItemId],
+  );
 
   const drillIn = (
     event: React.KeyboardEvent | React.MouseEvent,
@@ -91,7 +171,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
       // Text clicked → select the item
       const option = optionMap.get(pathId);
       if (option) {
-        onSelect?.(option);
+        onChange(option);
       }
     }
   };
@@ -103,8 +183,8 @@ export const SelectWithDrilldown: React.FunctionComponent<
         setDrilldownPath([]);
         setActiveMenu("drilldown-rootMenu");
         onInputChange?.(value);
-      }, 300),
-    [onInputChange],
+      }, searchDebounceMs),
+    [onInputChange, searchDebounceMs],
   );
 
   const drillOut = (
@@ -126,7 +206,9 @@ export const SelectWithDrilldown: React.FunctionComponent<
   };
 
   const onToggle = () => {
-    setIsOpen(!isOpen);
+    if (!isDisabled) {
+      setIsOpen(!isOpen);
+    }
   };
 
   const onToggleArrowKeydown = (event: KeyboardEvent) => {
@@ -158,32 +240,42 @@ export const SelectWithDrilldown: React.FunctionComponent<
       focusableElement.focus();
   };
 
+  const handleClear = (event: SyntheticEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onClear?.(event);
+  };
+
+  // Auto-show clear button when value exists and onClear is provided
+  const showClearButton = !!value && !!onClear;
+
   const toggle = () => (
     <MenuToggle
       ref={toggleRef}
       onClick={onToggle}
       isExpanded={isOpen}
       isFullWidth
+      isDisabled={isDisabled}
       icon={
-        showClearBrn && onClear ? (
+        showClearButton ? (
           <span
-            onClick={onClear}
+            onClick={handleClear}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onClear(e as unknown as React.SyntheticEvent);
+                handleClear(e as unknown as React.SyntheticEvent);
               }
             }}
             role="button"
             tabIndex={0}
-            aria-label="Clear chosen value"
+            aria-label={clearButtonAriaLabel}
           >
             <TimesIcon />
           </span>
         ) : null
       }
     >
-      {displayText}
+      {isLoading ? loadingText : value?.name || placeholder}
     </MenuToggle>
   );
 
@@ -207,7 +299,7 @@ export const SelectWithDrilldown: React.FunctionComponent<
               <MenuSearchInput>
                 <SearchInput
                   value={inputValue}
-                  aria-label="Filter menu items"
+                  aria-label={searchPlaceholder}
                   onChange={(_event, value) => handleInputChange(value)}
                   onClear={() => handleInputChange("")}
                 />
@@ -215,16 +307,19 @@ export const SelectWithDrilldown: React.FunctionComponent<
             </MenuSearch>
           ) : null}
           <Divider />
-          {options.length ? (
+          {isLoading ? (
+            <MenuItem isDisabled>{loadingText}</MenuItem>
+          ) : options.length ? (
             options.map((option) => (
               <DrilldownMenuItem
                 key={option.id}
                 option={option}
-                onSelect={onSelect}
+                onChange={onChange}
+                getItemId={getItemId}
               />
             ))
           ) : (
-            <MenuItem isDisabled>No results</MenuItem>
+            <MenuItem isDisabled>{emptyStateText}</MenuItem>
           )}
         </MenuList>
       </MenuContent>
@@ -245,21 +340,24 @@ export const SelectWithDrilldown: React.FunctionComponent<
   );
 };
 
-function DrilldownMenuItem({
+function DrilldownMenuItem<TData>({
   option,
-  onSelect,
+  onChange,
+  getItemId,
 }: {
-  option: SelectOption;
-  onSelect?: (option: SelectOption) => void;
+  option: DrilldownOption<TData>;
+  onChange?: (option: DrilldownOption<TData>) => void;
+  getItemId: (option: DrilldownOption<TData>, hasChildren: boolean) => string;
 }) {
   const hasChildren = !!option.children?.length;
+  const itemId = getItemId(option, hasChildren);
 
   if (!hasChildren) {
     return (
       <MenuItem
-        itemId={option.id}
+        itemId={itemId}
         description={option.description}
-        onClick={() => onSelect?.(option)}
+        onClick={() => onChange?.(option)}
       >
         {option.name}
       </MenuItem>
@@ -268,12 +366,12 @@ function DrilldownMenuItem({
 
   return (
     <MenuItem
-      itemId={`group:${option.id}`}
+      itemId={itemId}
       description={option.description}
       direction="down"
       drilldownMenu={
         <DrilldownMenu id={`drilldown-menu-${option.id}`}>
-          <MenuItem itemId={`group:${option.id}_breadcrumb`} direction="up">
+          <MenuItem itemId={`${itemId}_breadcrumb`} direction="up">
             {option.name}
           </MenuItem>
           <Divider component="li" />
@@ -281,7 +379,8 @@ function DrilldownMenuItem({
             <DrilldownMenuItem
               key={child.id}
               option={child}
-              onSelect={onSelect}
+              onChange={onChange}
+              getItemId={getItemId}
             />
           ))}
         </DrilldownMenu>

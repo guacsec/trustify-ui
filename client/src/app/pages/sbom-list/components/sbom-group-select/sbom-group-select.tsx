@@ -1,84 +1,23 @@
 import React from "react";
-import type { FieldValues, Path } from "react-hook-form";
 
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
-import { getValidatedFromErrors } from "@app/utils/utils";
 
-import {
-  type BaseHookFormPFGroupControllerProps,
-  HookFormPFGroupController,
-  extractGroupControllerProps,
-} from "../../../../components/HookFormPFFields/HookFormPFGroupController";
-import { SelectWithDrilldown } from "../../../../components/WithDrillDownSelect";
-import { buildHierarchy } from "./utils";
 import type { Group } from "@app/client";
 
-export type HookFormPFGroupSelectProps<
-  TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>,
-> = BaseHookFormPFGroupControllerProps<TFieldValues, TName> & {
-  placeholderText?: string;
-  limit?: number;
-};
-
-export const HookFormPFGroupSelect = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>,
->(
-  props: HookFormPFGroupSelectProps<TFieldValues, TName>,
-) => {
-  const { extractedProps } = extractGroupControllerProps<
-    TFieldValues,
-    TName,
-    HookFormPFGroupSelectProps<TFieldValues, TName>
-  >(props);
-  const { fieldId, helperText, isRequired, errorsSuppressed } = extractedProps;
-  const placeholderText = props.placeholderText || "Select a group";
-  const limit = props.limit || 100;
-
-  return (
-    <HookFormPFGroupController<TFieldValues, TName>
-      {...extractedProps}
-      renderInput={({
-        field: { onChange, value, name },
-        fieldState: { isDirty, error, isTouched },
-      }) => (
-        <GroupSelect
-          fieldId={fieldId}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholderText={placeholderText}
-          limit={limit}
-          helperText={helperText}
-          isRequired={isRequired}
-          validated={
-            errorsSuppressed
-              ? "default"
-              : getValidatedFromErrors(error, isDirty, isTouched)
-          }
-        />
-      )}
-    />
-  );
-};
+import { DrilldownSelect } from "../../../../components/DrilldownSelect";
+import { buildHierarchy } from "./utils";
 
 interface GroupSelectProps {
-  fieldId: string;
-  name: string;
   value: Group | undefined;
   onChange: (value: Group | undefined) => void;
-  placeholderText: string;
+  placeholder?: string;
   limit: number;
-  helperText?: React.ReactNode;
-  isRequired?: boolean;
-  validated?: "success" | "warning" | "error" | "default";
 }
 
 export const GroupSelect: React.FC<GroupSelectProps> = ({
   value,
   onChange,
-  placeholderText,
+  placeholder = "Select",
   limit,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -112,19 +51,19 @@ export const GroupSelect: React.FC<GroupSelectProps> = ({
   };
 
   return (
-    <SelectWithDrilldown
+    <DrilldownSelect
       options={mappedGroups.map((gr) => ({
         ...gr,
         description: gr.parentsNames,
       }))}
-      onSelect={onSelect}
+      value={value}
+      onChange={onSelect}
+      placeholder={placeholder}
       onInputChange={setSearchQuery}
       inputValue={searchQuery}
       onClear={onClear}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      displayText={value?.name || placeholderText}
-      showClearBrn={!!value}
     />
   );
 };

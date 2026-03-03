@@ -18,7 +18,7 @@ import {
   t_global_icon_color_severity_undefined_default as undefinedColor,
 } from "@patternfly/react-tokens";
 
-import type  { Score,  ScoreType } from "@app/client";
+import type { Score, ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 
 type ListType = {

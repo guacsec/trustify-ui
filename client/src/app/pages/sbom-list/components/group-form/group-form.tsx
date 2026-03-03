@@ -23,7 +23,7 @@ import {
 import { LABEL_VALIDATION_REGEX, PRODUCT_LABEL_KEY } from "@app/Constants";
 import { getString } from "@app/utils/utils";
 
-import { HookFormPFGroupSelect } from "../sbom-group-select/sbom-group-select";
+import { GroupSelect } from "../sbom-group-select/sbom-group-select";
 import type { useGroupForm } from "./useGroupForm";
 import type { useGroupFormData } from "./useGroupFormData";
 
@@ -46,14 +46,20 @@ export const GroupForm: React.FC<GroupFormProps> = ({ form }) => {
 
   return (
     <Form>
-      <HookFormPFGroupSelect
+      <HookFormPFGroupController
         control={control}
         name="parentGroup"
         label="Parent group"
         fieldId="parent-group-id"
-        placeholderText="Select parent group"
         helperText="Leave blank if this group does not have a parent"
-        limit={10}
+        renderInput={({ field: { onChange, value } }) => (
+          <GroupSelect
+            value={value || undefined}
+            onChange={onChange}
+            placeholder={"Select parent group"}
+            limit={10}
+          />
+        )}
       />
 
       <HookFormPFTextInput
