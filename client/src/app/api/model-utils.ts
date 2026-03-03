@@ -18,10 +18,8 @@ import {
   t_global_icon_color_severity_undefined_default as undefinedColor,
 } from "@patternfly/react-tokens";
 
-import { listSbomGroups, type Score, type ScoreType } from "@app/client";
+import { type Score, type ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
-import { client } from "@app/axios-config/apiInit";
-import { requestParamsQuery } from "@app/hooks/table-controls";
 
 type ListType = {
   [key in ExtendedSeverity]: {
@@ -183,25 +181,4 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
   }
 
   return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
-};
-
-export const checkSbomGroupNameUniqueness = async (
-  name: string,
-  parentId?: string,
-): Promise<boolean> => {
-  try {
-    const response = await listSbomGroups({
-      client,
-      query: requestParamsQuery({
-        page: { pageNumber: 1, itemsPerPage: 1 },
-        filters: [
-          { field: "name", operator: "=", value: name },
-          { field: "parent", operator: "=", value: parentId || "\0" },
-        ],
-      }),
-    });
-    return !response.data?.items || response.data?.items.length === 0;
-  } catch (_error) {
-    return true;
-  }
 };

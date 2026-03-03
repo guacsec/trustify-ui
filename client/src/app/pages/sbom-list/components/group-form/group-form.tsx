@@ -23,7 +23,7 @@ import {
 import { LABEL_VALIDATION_REGEX, PRODUCT_LABEL_KEY } from "@app/Constants";
 import { getString } from "@app/utils/utils";
 
-import { HookFormPFGroupSelect } from "../CreateGroupForm/HookFormPFGroupSelect";
+import { HookFormPFGroupSelect } from "../sbom-group-select/sbom-group-select";
 import type { useGroupForm } from "./useGroupForm";
 import type { useGroupFormData } from "./useGroupFormData";
 

@@ -43,7 +43,7 @@ export const HookFormPFGroupSelect = <
         field: { onChange, value, name },
         fieldState: { isDirty, error, isTouched },
       }) => (
-        <GroupSelectTypeahead
+        <GroupSelect
           fieldId={fieldId}
           name={name}
           value={value}
@@ -63,7 +63,7 @@ export const HookFormPFGroupSelect = <
   );
 };
 
-interface GroupSelectTypeaheadProps {
+interface GroupSelectProps {
   fieldId: string;
   name: string;
   value: Group | undefined;
@@ -75,7 +75,7 @@ interface GroupSelectTypeaheadProps {
   validated?: "success" | "warning" | "error" | "default";
 }
 
-const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
+export const GroupSelect: React.FC<GroupSelectProps> = ({
   value,
   onChange,
   placeholderText,
@@ -83,10 +83,8 @@ const GroupSelectTypeahead: React.FC<GroupSelectTypeaheadProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  // Debounced search query
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Fetch groups with search query
   const { rawData: groups } = useFetchSBOMGroups(
     {
       page: { pageNumber: 1, itemsPerPage: limit },

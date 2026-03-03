@@ -11,7 +11,7 @@ export const FILTER_DATE_FORMAT = "YYYY-MM-DD";
 
 export const DEFAULT_REFETCH_INTERVAL = 5000;
 
-export const PRODUCT_LABEL_KEY = "product";
+export const PRODUCT_LABEL_KEY = "Product";
 
 // The following regex ensures:
 // - No backslashes anywhere in the string
