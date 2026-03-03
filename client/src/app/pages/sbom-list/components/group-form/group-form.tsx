@@ -164,8 +164,10 @@ export const GroupForm: React.FC<GroupFormProps> = ({ form }) => {
                       if (!LABEL_VALIDATION_REGEX.test(val)) return false;
 
                       const { key } = splitStringAsKeyValue(val);
-                      if (key === PRODUCT_LABEL_KEY) return false;
-                      if (isProduct && /^type=/.test(val)) return false;
+                      if (key === PRODUCT_LABEL_KEY)
+                        return `The label '${PRODUCT_LABEL_KEY}' is reserved`;
+                      if (isProduct && /^type=/.test(val))
+                        return "Groups designated as products cannot have additional 'type' labels";
 
                       return true;
                     }}
