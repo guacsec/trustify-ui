@@ -11,6 +11,8 @@ export const FILTER_DATE_FORMAT = "YYYY-MM-DD";
 
 export const DEFAULT_REFETCH_INTERVAL = 5000;
 
+export const PRODUCT_LABEL_KEY = "product";
+
 export const TablePersistenceKeyPrefixes = {
   products: "pd",
   advisories: "ad",

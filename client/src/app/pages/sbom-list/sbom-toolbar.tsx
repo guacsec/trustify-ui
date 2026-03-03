@@ -1,7 +1,5 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-
-import type { AxiosError } from "axios";
 
 import {
   Button,
@@ -11,17 +9,15 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 
-import type { GroupRequest } from "@app/client";
+import type { Group } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
-import { NotificationsContext } from "@app/components/NotificationsContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
-import { useCreateSBOMGroupMutation } from "@app/queries/sbom-groups";
 import { Paths } from "@app/Routes";
 
+import { GroupFormModal } from "./components/group-form";
 import { SbomSearchContext } from "./sbom-context";
-import { SBOMGroupFormModal } from "./components/CreateGroupForm/SBOMGroupFormModal";
 
 interface SbomToolbarProps {
   showFilters?: boolean;
@@ -33,31 +29,13 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
-  const { pushNotification } = useContext(NotificationsContext);
 
-  const [createGroupOpened, setCreateGroupOpened] =
-    React.useState<boolean>(false);
-  const closeCreateGroup = () => setCreateGroupOpened(false);
-
-  const onCreateSuccess = () => {
-    pushNotification({
-      title: "Group created successfully",
-      variant: "success",
-    });
-    closeCreateGroup();
-  };
-
-  const onCreateError = (_error: AxiosError) => {
-    pushNotification({
-      title: "Error while creating the group",
-      variant: "danger",
-    });
-  };
-
-  const createGroupMutation = useCreateSBOMGroupMutation(
-    onCreateSuccess,
-    onCreateError,
-  );
+  const [saveGroupModalState, setSaveGroupModalState] = React.useState<
+    "create" | Group | null
+  >(null);
+  const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
+  const createUpdateGroup =
+    saveGroupModalState !== "create" ? saveGroupModalState : null;
 
   const {
     tableControls,
@@ -80,10 +58,6 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
 
-  const handleCreateGroup = (body: GroupRequest) => {
-    createGroupMutation.mutate(body);
-  };
-
   return (
     <>
       <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
@@ -97,7 +71,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
               <ToolbarItem>
                 <Button
                   variant="primary"
-                  onClick={() => setCreateGroupOpened(true)}
+                  onClick={() => setSaveGroupModalState("create")}
                 >
                   Create group
                 </Button>
@@ -139,10 +113,11 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
           </ToolbarItem>
         </ToolbarContent>
       </Toolbar>
-      <SBOMGroupFormModal
-        isOpen={createGroupOpened}
-        onClose={closeCreateGroup}
-        onSubmit={handleCreateGroup}
+
+      <GroupFormModal
+        isOpen={isCreateUpdateGroupModalOpen}
+        group={createUpdateGroup ?? null}
+        onClose={() => setSaveGroupModalState(null)}
       />
     </>
   );
