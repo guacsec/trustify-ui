@@ -11,7 +11,7 @@ import { FilterToolbar } from "@app/components/FilterToolbar";
 import { SimplePagination } from "@app/components/SimplePagination";
 
 import { SbomGroupsContext } from "./sbom-groups-context";
-import { Group } from "@app/client";
+import type { Group } from "@app/client";
 import { GroupFormModal } from "../sbom-list/components/group-form";
 
 export const SbomGroupsToolbar: React.FC = () => {
