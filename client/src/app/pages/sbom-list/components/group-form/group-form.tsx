@@ -11,6 +11,7 @@ import {
 
 import type { useGroupForm } from "./useGroupForm";
 import type { useGroupFormData } from "./useGroupFormData";
+import { HookFormPFGroupSelect } from "../CreateGroupForm/HookFormPFGroupSelect";
 
 export interface GroupFormProps {
   form: ReturnType<typeof useGroupForm>["form"];
@@ -23,7 +24,15 @@ export const GroupForm: React.FC<GroupFormProps> = ({ form }) => {
 
   return (
     <Form>
-      {/* <ParentGroupField control={control} group={group} /> */}
+      <HookFormPFGroupSelect
+        control={control}
+        name="parentGroup"
+        label="Parent group"
+        fieldId="parent-group-id"
+        placeholderText="Select parent group"
+        helperText="Leave blank if this group does not have a parent"
+        limit={10}
+      />
 
       <HookFormPFTextInput
         control={control}

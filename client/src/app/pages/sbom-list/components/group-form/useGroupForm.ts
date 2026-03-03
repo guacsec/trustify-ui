@@ -19,7 +19,7 @@ export interface FormValues {
   description: string;
   isProduct: boolean;
   labels: string[];
-  parentGroupId: string | null;
+  parentGroup: Group | null;
 }
 
 export interface UseGroupFormArgs {
@@ -47,13 +47,13 @@ export const useGroupForm = ({
         function (value) {
           if (!value) return true;
 
-          const { parentGroupId } = this.parent as FormValues;
+          const { parentGroup } = this.parent as FormValues;
 
           // Skip check when editing and neither name nor parent changed
           if (
             group &&
             value === group.name &&
-            parentGroupId === (group.parent ?? null)
+            (parentGroup?.id ?? null) === (group.parent ?? null)
           ) {
             return true;
           }
@@ -83,7 +83,8 @@ export const useGroupForm = ({
       labels: Object.entries(group?.labels ?? {})
         .filter(([key]) => key !== PRODUCT_LABEL_KEY)
         .map(([key, value]) => joinKeyValueAsString({ key, value })),
-      parentGroupId: group?.parent ?? null,
+      // TODO infer parent group
+      parentGroup: null,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
@@ -91,10 +92,12 @@ export const useGroupForm = ({
   });
 
   // Watch parentGroupId to fetch siblings for that parent
-  const parentGroupId = form.watch("parentGroupId");
+  const parentGroup = form.watch("parentGroup");
   const { result, isFetching } = useFetchSBOMGroups({
     page: { pageNumber: 1, itemsPerPage: 1000 },
-    filters: [{ field: "parent", operator: "=", value: parentGroupId || "\0" }],
+    filters: [
+      { field: "parent", operator: "=", value: parentGroup?.id || "\0" },
+    ],
   });
 
   siblingsRef.current = result.data;
@@ -126,7 +129,7 @@ export const useGroupForm = ({
         ),
         [PRODUCT_LABEL_KEY]: String(formValues.isProduct),
       },
-      parent: formValues.parentGroupId,
+      parent: formValues.parentGroup?.id ?? null,
     };
 
     if (group) {
