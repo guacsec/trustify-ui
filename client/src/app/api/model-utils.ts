@@ -185,52 +185,23 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
   return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
 };
 
-export const checkSbomGroupNameUniqueness = debounceAsync(
-  async (name: string, parentId?: string): Promise<boolean> => {
-    try {
-      const response = await listSbomGroups({
-        client,
-        query: requestParamsQuery({
-          page: { pageNumber: 1, itemsPerPage: 1 },
-          filters: [
-            { field: "name", operator: "=", value: name },
-            { field: "parent", operator: "=", value: parentId || "\0" },
-          ],
-        }),
-      });
-      return !response.data?.items || response.data?.items.length === 0;
-    } catch (error) {
-      console.error("Failed to check group name uniqueness:", error);
-      return true;
-    }
-  },
-  500,
-);
-
-function debounceAsync<TArgs extends unknown[], TResult>(
-  fn: (...args: TArgs) => Promise<TResult>,
-  delay: number,
-) {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let pendingResolve: ((value: TResult) => void) | null = null;
-
-  return (...args: TArgs): Promise<TResult> => {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-    if (pendingResolve) {
-      pendingResolve(true as TResult);
-    }
-
-    return new Promise<TResult>((resolve) => {
-      pendingResolve = resolve;
-      timeoutId = setTimeout(() => {
-        pendingResolve = null;
-        timeoutId = null;
-        fn(...args)
-          .then(resolve)
-          .catch(() => resolve(true as TResult));
-      }, delay);
+export const checkSbomGroupNameUniqueness = async (
+  name: string,
+  parentId?: string,
+): Promise<boolean> => {
+  try {
+    const response = await listSbomGroups({
+      client,
+      query: requestParamsQuery({
+        page: { pageNumber: 1, itemsPerPage: 1 },
+        filters: [
+          { field: "name", operator: "=", value: name },
+          { field: "parent", operator: "=", value: parentId || "\0" },
+        ],
+      }),
     });
-  };
-}
+    return !response.data?.items || response.data?.items.length === 0;
+  } catch (_error) {
+    return true;
+  }
+};
