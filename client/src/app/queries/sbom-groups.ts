@@ -37,7 +37,7 @@ export const useFetchSbomGroups = (
         client,
         query: {
           ...rest,
-          q: [parentQuery, q].filter((e) => e).join("&"),
+          q: [q, parentQuery].filter((e) => e).join("&"),
           totals: true,
         },
       });
