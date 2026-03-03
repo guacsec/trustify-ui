@@ -1,14 +1,16 @@
+import { useEffect, useRef } from "react";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { array, boolean, mixed, object, string } from "yup";
 
 import {
-  checkSbomGroupNameUniqueness,
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
 import { PRODUCT_LABEL_KEY } from "@app/Constants";
+import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
 
@@ -31,6 +33,8 @@ export const useGroupForm = ({
   group,
   formData: { createGroup, updateGroup },
 }: UseGroupFormArgs) => {
+  const siblingsRef = useRef<Group[]>([]);
+
   const validationSchema = object().shape({
     name: string()
       .trim()
@@ -40,7 +44,7 @@ export const useGroupForm = ({
       .test(
         "unique-name",
         "A group with this name already exists",
-        async function (value) {
+        function (value) {
           if (!value) return true;
 
           const { parentGroupId } = this.parent as FormValues;
@@ -54,13 +58,11 @@ export const useGroupForm = ({
             return true;
           }
 
-          const isUnique = await checkSbomGroupNameUniqueness(
-            value,
-            parentGroupId || undefined,
-          );
+          // Synchronous in-memory check against siblings
+          const isDuplicate = siblingsRef.current.some((g) => g.name === value);
 
           return (
-            isUnique ||
+            !isDuplicate ||
             this.createError({
               message: `${value} already exists in group`,
             })
@@ -87,6 +89,24 @@ export const useGroupForm = ({
     mode: "onChange",
     shouldUnregister: true,
   });
+
+  // Watch parentGroupId to fetch siblings for that parent
+  const parentGroupId = form.watch("parentGroupId");
+  const { result, isFetching } = useFetchSBOMGroups({
+    page: { pageNumber: 1, itemsPerPage: 1000 },
+    filters: [{ field: "parent", operator: "=", value: parentGroupId || "\0" }],
+  });
+
+  siblingsRef.current = result.data;
+
+  // Re-validate name when fetch completes (isFetching transitions true → false)
+  const wasFetchingRef = useRef(false);
+  useEffect(() => {
+    if (wasFetchingRef.current && !isFetching) {
+      form.trigger("name");
+    }
+    wasFetchingRef.current = isFetching;
+  }, [isFetching, form]);
 
   const {
     handleSubmit,
