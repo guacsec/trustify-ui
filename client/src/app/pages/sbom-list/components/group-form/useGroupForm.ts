@@ -127,7 +127,7 @@ export const useGroupForm = ({
             return [key, value];
           }),
         ),
-        [PRODUCT_LABEL_KEY]: String(formValues.isProduct),
+        ...(formValues.isProduct ? { [PRODUCT_LABEL_KEY]: "" } : {}),
       },
       parent: formValues.parentGroup?.id ?? null,
     };
