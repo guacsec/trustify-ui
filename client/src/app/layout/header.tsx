@@ -36,6 +36,7 @@ import ExternalLinkAltIcon from "@patternfly/react-icons/dist/js/icons/external-
 
 import { isAuthRequired } from "@app/Constants";
 import useBranding from "@app/hooks/useBranding";
+import { oidcSignoutArgs } from "@app/oidc";
 
 import imgAvatar from "../images/avatar.svg";
 import { AboutApp } from "./about";
@@ -68,7 +69,7 @@ export const HeaderApp: React.FC = () => {
 
   const logout = () => {
     auth
-      ?.signoutRedirect()
+      ?.signoutRedirect(oidcSignoutArgs)
       .then(() => {})
       .catch((err) => {
         console.error("Logout failed:", err);
