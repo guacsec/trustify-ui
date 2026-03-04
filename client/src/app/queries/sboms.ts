@@ -70,10 +70,8 @@ export const useFetchSBOMs = (
         client,
         query: {
           ...rest,
-          q: [q, labelQuery].filter((e) => e).join("&"),
-        },
-        path: {
           group: groups,
+          q: [q, labelQuery].filter((e) => e).join("&"),
         },
       }),
     enabled: !disableQuery,
