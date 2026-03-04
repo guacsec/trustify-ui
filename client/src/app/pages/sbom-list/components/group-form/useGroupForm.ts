@@ -107,7 +107,7 @@ export const useGroupForm = ({
   useEffect(() => {
     if (!parentId) return;
 
-    const parent = parentResult.data[0];
+    const parent = parentResult.data?.[0];
     if (!parent) return;
 
     form.setValue("parentGroup", parent, {
