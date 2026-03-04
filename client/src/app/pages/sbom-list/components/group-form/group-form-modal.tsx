@@ -1,12 +1,14 @@
 import type React from "react";
 
 import {
+  Bullseye,
   Button,
   ButtonVariant,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
+  Spinner,
 } from "@patternfly/react-core";
 
 import type { Group } from "@app/client";
@@ -48,7 +50,13 @@ const GroupFormModalInner: React.FC<GroupFormModalProps> = ({
   const formData = useGroupFormData({
     onActionSuccess: onClose,
   });
-  const { form, onSubmit, isSubmitDisabled, isCancelDisabled } = useGroupForm({
+  const {
+    form,
+    onSubmit,
+    isSubmitDisabled,
+    isCancelDisabled,
+    isParentHydrating,
+  } = useGroupForm({
     group,
     formData,
   });
@@ -62,7 +70,13 @@ const GroupFormModalInner: React.FC<GroupFormModalProps> = ({
     >
       <ModalHeader title={group ? "Edit group" : "Create group"} />
       <ModalBody>
-        <GroupForm group={group} form={form} data={formData} />
+        {isParentHydrating ? (
+          <Bullseye>
+            <Spinner />
+          </Bullseye>
+        ) : (
+          <GroupForm group={group} form={form} data={formData} />
+        )}
       </ModalBody>
       <ModalFooter>
         <Button

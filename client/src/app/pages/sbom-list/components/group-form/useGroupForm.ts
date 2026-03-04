@@ -79,17 +79,43 @@ export const useGroupForm = ({
     defaultValues: {
       name: group?.name || "",
       description: group?.description || "",
-      isProduct: group?.labels?.[PRODUCT_LABEL_KEY] === "true",
+      isProduct: typeof group?.labels?.[PRODUCT_LABEL_KEY] === "string",
       labels: Object.entries(group?.labels ?? {})
         .filter(([key]) => key !== PRODUCT_LABEL_KEY)
         .map(([key, value]) => joinKeyValueAsString({ key, value })),
-      // TODO infer parent group
       parentGroup: null,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
-    shouldUnregister: true,
   });
+
+  //Infer parent group
+  const parentId = group?.parent ?? null;
+
+  const { result: parentResult, isFetching: isParentFetching } =
+    useFetchSBOMGroups(
+      {
+        page: { pageNumber: 1, itemsPerPage: 1 },
+        filters: parentId
+          ? [{ field: "id", operator: "=", value: parentId }]
+          : [],
+      },
+      {},
+      !parentId, // disable when no parent
+    );
+
+  useEffect(() => {
+    if (!parentId) return;
+
+    const parent = parentResult.data[0];
+    if (!parent) return;
+
+    form.setValue("parentGroup", parent, {
+      shouldDirty: false,
+      shouldTouch: false,
+      shouldValidate: true,
+    });
+  }, [parentId, parentResult.data, form]);
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");
@@ -141,11 +167,14 @@ export const useGroupForm = ({
       createGroup(payload);
     }
   };
+  const isParentHydrating =
+    Boolean(parentId) && isParentFetching && !parentGroup;
 
   return {
     form,
     isSubmitDisabled: !isValid || isSubmitting || isValidating || !isDirty,
     isCancelDisabled: isSubmitting || isValidating,
     onSubmit: handleSubmit(onValidSubmit),
+    isParentHydrating,
   };
 };
