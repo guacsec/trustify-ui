@@ -23,7 +23,9 @@ export const SbomGroupLabels = ({ labels }: Props) => {
   return (
     <LabelGroup>
       {Object.entries(labels)
-        .sort(([a], [b]) => (a === PRODUCT_LABEL_KEY ? -1 : b === PRODUCT_LABEL_KEY ? 1 : 0))
+        .sort(([a], [b]) =>
+          a === PRODUCT_LABEL_KEY ? -1 : b === PRODUCT_LABEL_KEY ? 1 : 0,
+        )
         .map(([key, value]) => {
           const { color, text } = formatLabel(key, value);
           return (
