@@ -61,6 +61,7 @@ export const Paths = {
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
   sboms: "/sboms",
   sbomGroups: "/sboms/groups",
+  sbomGroupDetails: `/sbom/groups/:${PathParam.SBOM_GROUP_ID}`,
   sbomUpload: "/sboms/upload",
   sbomScan: "/sboms/scan",
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
@@ -69,8 +70,6 @@ export const Paths = {
   search: "/search",
   importers: "/importers",
   licenses: "/licenses",
-  sbomGroups: `/sbom-groups`,
-  sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
 } as const;
 
 export const usePathFromParams = (
@@ -194,6 +193,28 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
+        path: Paths.sbomGroupDetails,
+        element: (
+          <LazyRouteElement
+            identifier="sbom-group-details"
+            component={<SBOMGroupDetails />}
+          />
+        ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const sbomGroupId = usePathFromParams(
+            params,
+            PathParam.SBOM_GROUP_ID,
+          );
+          const response = await queryClient.ensureQueryData(
+            SBOMGroupByIdQueryOptions(sbomGroupId),
+          );
+          return {
+            sbomGroup: response?.data,
+          };
+        },
+      },
+      {
         path: Paths.sbomDetails,
         element: (
           <LazyRouteElement
@@ -261,28 +282,6 @@ export const AppRoutes = createBrowserRouter([
           );
           return {
             vulnerability: response.data,
-          };
-        },
-      },
-      {
-        path: Paths.sbomGroupDetails,
-        element: (
-          <LazyRouteElement
-            identifier="sbom-group-details"
-            component={<SBOMGroupDetails />}
-          />
-        ),
-        errorElement: <RouteErrorBoundary />,
-        loader: async ({ params }) => {
-          const sbomGroupId = usePathFromParams(
-            params,
-            PathParam.SBOM_GROUP_ID,
-          );
-          const response = await queryClient.ensureQueryData(
-            SBOMGroupByIdQueryOptions(sbomGroupId),
-          );
-          return {
-            sbomGroup: response?.data,
           };
         },
       },
