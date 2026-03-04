@@ -24,7 +24,6 @@ import {
   listSboms,
   updateSbomLabels,
 } from "@app/client";
-import { FILTER_NULL_VALUE } from "@app/Constants";
 import { useUpload } from "@app/hooks/useUpload";
 
 import {
