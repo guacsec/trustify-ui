@@ -16,7 +16,7 @@ import { useSelectionState } from "@app/hooks/useSelectionState";
 import type { PaginatedResultsGroupDetails } from "@app/client";
 import {
   useFetchSbomGroupChildren,
-  useFetchSbomGroups,
+  useFetchSBOMGroups,
 } from "@app/queries/sbom-groups";
 import { buildSbomGroupTree } from "./utils";
 
@@ -105,19 +105,21 @@ export const SbomGroupsProvider: React.FunctionComponent<
   // Expansion state stored in React state (transient UI state, not URL-worthy)
   const [expandedNodeIds, setExpandedNodeIds] = React.useState<string[]>([]);
 
-  // Fetch paginated root groups (parent IS NULL)
   const {
     result: { data: rootGroups, total: totalItemCount },
     isFetching: isRootsFetching,
     fetchError,
-  } = useFetchSbomGroups(
-    undefined,
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "name",
-      },
-    }),
+  } = useFetchSBOMGroups(
+    {
+      filters: [{ field: "parent", operator: "=", value: "\0" }],
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "name",
+        },
+      }),
+    },
+    { totals: true },
   );
 
   // Fetch children for all expanded groups

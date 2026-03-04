@@ -4,6 +4,9 @@ import { useRef } from "react";
 import {
   Flex,
   FlexItem,
+  FormHelperText,
+  HelperText,
+  HelperTextItem,
   Label,
   type LabelProps,
   MenuToggle,
@@ -12,6 +15,7 @@ import {
   SelectList,
   SelectOption,
 } from "@patternfly/react-core";
+import { ExclamationCircleIcon } from "@patternfly/react-icons";
 
 import { getString } from "@app/utils/utils";
 
@@ -41,7 +45,7 @@ export interface IAutocompleteProps {
   showChips?: boolean;
   onSearchChange?: (value: string) => void;
   onCreateNewOption?: (value: string) => AutocompleteOptionProps;
-  validateNewOption?: (value: string) => boolean;
+  validateNewOption?: (value: string) => boolean | string;
 
   isDisabled?: boolean;
   isScrollable?: boolean;
@@ -100,6 +104,10 @@ export const Autocomplete: React.FC<IAutocompleteProps> = ({
   const createItemId = (value: string) =>
     `select-typeahead-${value.replace(" ", "-")}`;
 
+  // Get validation result for current input
+  const validationResult =
+    validateNewOption && inputValue ? validateNewOption(inputValue) : true;
+
   const inputGroup = (
     <SearchInputComponent
       id={id}
@@ -126,10 +134,8 @@ export const Autocomplete: React.FC<IAutocompleteProps> = ({
       isDisabled={isDisabled}
       isFullWidth
       status={
-        inputValue && validateNewOption
-          ? !validateNewOption(inputValue)
-            ? "danger"
-            : undefined
+        !validationResult || typeof validationResult === "string"
+          ? "danger"
           : undefined
       }
     >
@@ -178,6 +184,15 @@ export const Autocomplete: React.FC<IAutocompleteProps> = ({
             )}
           </SelectList>
         </Select>
+        {typeof validationResult === "string" && (
+          <FormHelperText>
+            <HelperText>
+              <HelperTextItem variant="error" icon={<ExclamationCircleIcon />}>
+                {validationResult}
+              </HelperTextItem>
+            </HelperText>
+          </FormHelperText>
+        )}
       </FlexItem>
       {showChips && (
         <FlexItem key="chips">

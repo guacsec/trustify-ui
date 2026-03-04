@@ -11,6 +11,19 @@ export const FILTER_DATE_FORMAT = "YYYY-MM-DD";
 
 export const DEFAULT_REFETCH_INTERVAL = 5000;
 
+export const PRODUCT_LABEL_KEY = "Product";
+
+// The following regex ensures:
+// - No backslashes anywhere in the string
+// - The string does not start with whitespace or '='
+// - The string does not start with a backslash
+// - The string contains an optional '=' with optional whitespace around it
+// - Both key and value parts do not contain backslashes or are empty
+// - The key does not start with whitespace or '='
+// This is used to validate new label options in the form.
+export const LABEL_VALIDATION_REGEX =
+  /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/;
+
 export const TablePersistenceKeyPrefixes = {
   products: "pd",
   advisories: "ad",
