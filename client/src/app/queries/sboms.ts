@@ -55,7 +55,7 @@ export const useFetchSBOMLabels = (filterText: string) => {
 };
 
 export const useFetchSBOMs = (
-  groups: string[] = [FILTER_NULL_VALUE],
+  groups: string[] = [],
   params: HubRequestParams = {},
   labels: Label[] = [],
   disableQuery = false,
