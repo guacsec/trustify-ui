@@ -168,26 +168,22 @@ export const SbomGroupsTable: React.FC = () => {
         onClick: () => {
           setChildGroupToDelete(node);
         },
+        isDisabled: !!node.number_of_groups,
       },
     ];
 
-    const groupWithoutChildren = !node.number_of_groups;
     return [
       <TreeRowWrapper key={node.id} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
           <SbomGroupTableData item={node} />
         </Td>
-        {
-          // Only render for non-parent group nodes
-          groupWithoutChildren && (
-            <Td isActionCell style={{ verticalAlign: "middle" }}>
-              <ActionsColumn
-                items={lastRowActions(node)}
-                isDisabled={false}
-              ></ActionsColumn>
-            </Td>
-          )
-        }
+
+        <Td isActionCell style={{ verticalAlign: "middle" }}>
+          <ActionsColumn
+            items={lastRowActions(node)}
+            isDisabled={false}
+          ></ActionsColumn>
+        </Td>
       </TreeRowWrapper>,
       ...childRows,
       ...renderRows(
