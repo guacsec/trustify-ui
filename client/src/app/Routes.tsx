@@ -5,13 +5,12 @@ import { queryClient } from "./queries/config";
 import { sbomByIdQueryOptions } from "./queries/sboms";
 import { packageByIdQueryOptions } from "./queries/packages";
 import { advisoryByIdQueryOptions } from "./queries/advisories";
+import { SBOMGroupByIdQueryOptions } from "./queries/sbom-groups";
 import { vulnerabilityByIdQueryOptions } from "./queries/vulnerabilities";
 
 import { LazyRouteElement } from "@app/components/LazyRouteElement";
-
 import App from "./App";
 import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
-import { SBOMGroupByIdQueryOptions } from "./queries/sbom-groups";
 
 const Home = lazy(() => import("./pages/home"));
 
@@ -35,7 +34,9 @@ const SBOMList = lazy(() => import("./pages/sbom-list"));
 const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMScan = lazy(() => import("./pages/sbom-scan"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
-const SbomGroups = lazy(() => import("./pages/sbom-groups"));
+
+// SBOM Groups
+const SbomGroupList = lazy(() => import("./pages/sbom-groups"));
 const SBOMGroupDetails = lazy(() => import("./pages/sbom-group-details"));
 
 // Others
@@ -60,8 +61,6 @@ export const Paths = {
   vulnerabilities: "/vulnerabilities",
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
   sboms: "/sboms",
-  sbomGroups: "/sboms/groups",
-  sbomGroupDetails: `/sbom/groups/:${PathParam.SBOM_GROUP_ID}`,
   sbomUpload: "/sboms/upload",
   sbomScan: "/sboms/scan",
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
@@ -70,6 +69,8 @@ export const Paths = {
   search: "/search",
   importers: "/importers",
   licenses: "/licenses",
+  sbomGroups: "/sbom-groups",
+  sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
 } as const;
 
 export const usePathFromParams = (
@@ -184,37 +185,6 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomGroups,
-        element: (
-          <LazyRouteElement
-            identifier="sbom-groups"
-            component={<SbomGroups />}
-          />
-        ),
-      },
-      {
-        path: Paths.sbomGroupDetails,
-        element: (
-          <LazyRouteElement
-            identifier="sbom-group-details"
-            component={<SBOMGroupDetails />}
-          />
-        ),
-        errorElement: <RouteErrorBoundary />,
-        loader: async ({ params }) => {
-          const sbomGroupId = usePathFromParams(
-            params,
-            PathParam.SBOM_GROUP_ID,
-          );
-          const response = await queryClient.ensureQueryData(
-            SBOMGroupByIdQueryOptions(sbomGroupId),
-          );
-          return {
-            sbomGroup: response?.data,
-          };
-        },
-      },
-      {
         path: Paths.sbomDetails,
         element: (
           <LazyRouteElement
@@ -282,6 +252,37 @@ export const AppRoutes = createBrowserRouter([
           );
           return {
             vulnerability: response.data,
+          };
+        },
+      },
+      {
+        path: Paths.sbomGroups,
+        element: (
+          <LazyRouteElement
+            identifier="sbom-group-list"
+            component={<SbomGroupList />}
+          />
+        ),
+      },
+      {
+        path: Paths.sbomGroupDetails,
+        element: (
+          <LazyRouteElement
+            identifier="sbom-group-details"
+            component={<SBOMGroupDetails />}
+          />
+        ),
+        errorElement: <RouteErrorBoundary />,
+        loader: async ({ params }) => {
+          const sbomGroupId = usePathFromParams(
+            params,
+            PathParam.SBOM_GROUP_ID,
+          );
+          const response = await queryClient.ensureQueryData(
+            SBOMGroupByIdQueryOptions(sbomGroupId),
+          );
+          return {
+            sbomGroup: response?.data,
           };
         },
       },
