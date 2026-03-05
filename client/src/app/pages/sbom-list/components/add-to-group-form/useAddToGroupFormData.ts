@@ -39,7 +39,7 @@ export const useAddToGroupFormData = ({
   );
 
   // Mutations
-  const { mutate: addToGroup } = useAddSBOMsToGroupsMutation(
+  const { mutateAsync: addToGroup } = useAddSBOMsToGroupsMutation(
     onAddSuccess,
     onAddError,
   );
