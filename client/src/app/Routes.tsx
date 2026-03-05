@@ -34,7 +34,9 @@ const SBOMList = lazy(() => import("./pages/sbom-list"));
 const SBOMUpload = lazy(() => import("./pages/sbom-upload"));
 const SBOMScan = lazy(() => import("./pages/sbom-scan"));
 const SBOMDetails = lazy(() => import("./pages/sbom-details"));
-const SbomGroups = lazy(() => import("./pages/sbom-groups"));
+
+// SBOM Groups
+const SbomGroupList = lazy(() => import("./pages/sbom-groups"));
 
 // Others
 const Search = lazy(() => import("./pages/search"));
@@ -57,7 +59,6 @@ export const Paths = {
   vulnerabilities: "/vulnerabilities",
   vulnerabilityDetails: `/vulnerabilities/:${PathParam.VULNERABILITY_ID}`,
   sboms: "/sboms",
-  sbomGroups: "/sboms/groups",
   sbomUpload: "/sboms/upload",
   sbomScan: "/sboms/scan",
   sbomDetails: `/sboms/:${PathParam.SBOM_ID}`,
@@ -66,6 +67,7 @@ export const Paths = {
   search: "/search",
   importers: "/importers",
   licenses: "/licenses",
+  sbomGroups: "/sbom-groups",
 } as const;
 
 export const usePathFromParams = (
@@ -180,15 +182,6 @@ export const AppRoutes = createBrowserRouter([
         ),
       },
       {
-        path: Paths.sbomGroups,
-        element: (
-          <LazyRouteElement
-            identifier="sbom-groups"
-            component={<SbomGroups />}
-          />
-        ),
-      },
-      {
         path: Paths.sbomDetails,
         element: (
           <LazyRouteElement
@@ -258,6 +251,15 @@ export const AppRoutes = createBrowserRouter([
             vulnerability: response.data,
           };
         },
+      },
+      {
+        path: Paths.sbomGroups,
+        element: (
+          <LazyRouteElement
+            identifier="sbom-groups"
+            component={<SbomGroupList />}
+          />
+        ),
       },
       {
         path: "*",
