@@ -1,13 +1,18 @@
+import { generatePath, NavLink } from "react-router-dom";
+
 import {
-  Stack,
-  StackItem,
+  Content,
   Flex,
   FlexItem,
-  Content,
+  Stack,
+  StackItem,
 } from "@patternfly/react-core";
-import { NavLink } from "react-router-dom";
+
+import { Paths } from "@app/Routes";
+
 import { SbomGroupLabels } from "./sbom-group-labels";
 import type { SbomGroupTreeNode } from "./sbom-groups-context";
+
 export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
   return (
     <Stack hasGutter>
@@ -19,8 +24,9 @@ export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
         >
           <FlexItem>
             <NavLink
-              className="pf-v6-c-button pf-m-link pf-m-inline"
-              to={"https://example.com"}
+              to={generatePath(Paths.sbomGroupDetails, {
+                sbomGroupId: item.id,
+              })}
             >
               {item.name}
             </NavLink>

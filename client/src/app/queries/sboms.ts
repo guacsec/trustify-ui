@@ -63,7 +63,7 @@ export const useFetchSBOMs = (
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMsQueryKey, params, labelQuery],
+    queryKey: [SBOMsQueryKey, groups, params, labelQuery],
     queryFn: () =>
       listSboms({
         client,
