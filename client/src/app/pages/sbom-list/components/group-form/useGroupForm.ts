@@ -10,7 +10,10 @@ import {
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
 import { PRODUCT_LABEL_KEY } from "@app/Constants";
-import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
+import {
+  useFetchSBOMGroupById,
+  useFetchSBOMGroups,
+} from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
 
@@ -92,22 +95,13 @@ export const useGroupForm = ({
   //Infer parent group
   const parentId = group?.parent ?? null;
 
-  const { result: parentResult, isFetching: isParentFetching } =
-    useFetchSBOMGroups(
-      {
-        page: { pageNumber: 1, itemsPerPage: 1 },
-        filters: parentId
-          ? [{ field: "id", operator: "=", value: parentId }]
-          : [],
-      },
-      {},
-      !parentId, // disable when no parent
-    );
+  const { sbomGroup: parentResult, isFetching: isParentFetching } =
+    useFetchSBOMGroupById(parentId ?? "");
 
   useEffect(() => {
     if (!parentId) return;
 
-    const parent = parentResult.data?.[0];
+    const parent = parentResult;
     if (!parent) return;
 
     form.setValue("parentGroup", parent, {
@@ -115,7 +109,7 @@ export const useGroupForm = ({
       shouldTouch: false,
       shouldValidate: true,
     });
-  }, [parentId, parentResult.data, form]);
+  }, [parentId, parentResult, form]);
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");

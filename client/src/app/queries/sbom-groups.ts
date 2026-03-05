@@ -28,6 +28,7 @@ export const SBOMGroupByIdQueryOptions = (id: string) => {
   return queryOptions({
     queryKey: [SBOMGroupsQueryKey, id],
     queryFn: () => readSbomGroup({ client, path: { id } }),
+    enabled: !!id,
   });
 };
 
