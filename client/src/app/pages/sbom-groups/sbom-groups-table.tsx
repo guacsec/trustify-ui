@@ -25,9 +25,16 @@ import { SbomGroupTableData } from "./sbom-group-table-data";
 import type { AxiosError } from "axios";
 import { useDeleteSbomGroupMutation } from "@app/queries/sbom-groups";
 import { childGroupDeleteDialogProps } from "@app/Constants";
+import { GroupFormModal } from "../sbom-list/components/group-form";
 
 export const SbomGroupsTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const [saveGroupModalState, setSaveGroupModalState] = React.useState<
+    "create" | Group | null
+  >(null);
+  const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
+  const createUpdateGroup =
+    saveGroupModalState !== "create" ? saveGroupModalState : null;
   const {
     isFetching,
     fetchError,
@@ -153,30 +160,30 @@ export const SbomGroupsTable: React.FC = () => {
 
     const lastRowActions = (node: SbomGroupTreeNode): IAction[] => [
       {
+        title: "Edit",
+        onClick: () => setSaveGroupModalState(node),
+      },
+      {
         title: "Delete",
         onClick: () => {
           setChildGroupToDelete(node);
         },
+        isDisabled: !!node.number_of_groups,
       },
     ];
 
-    const groupWithoutChildren = !node.number_of_groups;
     return [
       <TreeRowWrapper key={node.id} row={{ props: treeRow.props }}>
         <Td dataLabel={"name"} treeRow={treeRow}>
           <SbomGroupTableData item={node} />
         </Td>
-        {
-          // Only render for non-parent group nodes
-          groupWithoutChildren && (
-            <Td isActionCell style={{ verticalAlign: "middle" }}>
-              <ActionsColumn
-                items={lastRowActions(node)}
-                isDisabled={false}
-              ></ActionsColumn>
-            </Td>
-          )
-        }
+
+        <Td isActionCell style={{ verticalAlign: "middle" }}>
+          <ActionsColumn
+            items={lastRowActions(node)}
+            isDisabled={false}
+          ></ActionsColumn>
+        </Td>
       </TreeRowWrapper>,
       ...childRows,
       ...renderRows(
@@ -211,7 +218,11 @@ export const SbomGroupsTable: React.FC = () => {
         isTop={false}
         paginationProps={paginationProps}
       />
-
+      <GroupFormModal
+        isOpen={isCreateUpdateGroupModalOpen}
+        group={createUpdateGroup ?? null}
+        onClose={() => setSaveGroupModalState(null)}
+      />
       <ConfirmDialog
         {...childGroupDeleteDialogProps(childGroupToDelete)}
         inProgress={isDeletingChildGroup}
