@@ -74,7 +74,6 @@ export const SbomTable: React.FC = () => {
   } = tableControls;
 
   const {
-    selectedItems: _selectedItems,
     propHelpers: { getSelectCheckboxTdProps },
   } = bulkSelectionControls;
 
