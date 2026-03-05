@@ -259,7 +259,7 @@ export const AppRoutes = createBrowserRouter([
         path: Paths.sbomGroups,
         element: (
           <LazyRouteElement
-            identifier="sbom-groups"
+            identifier="sbom-group-list"
             component={<SbomGroupList />}
           />
         ),
