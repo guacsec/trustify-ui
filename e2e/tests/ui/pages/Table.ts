@@ -86,14 +86,18 @@ export class Table<
     await expect(toggleButton).toBeVisible();
     await toggleButton.click();
 
-    const expandedArea = row.locator(".pf-m-expanded");
-    await expect(expandedArea).toBeVisible();
-    return expandedArea;
+    // PatternFly expandable tables have separate tbody elements per row
+    // The expanded content is in a tr.pf-v6-c-table__expandable-row within the same tbody
+    const expandedRow = row.locator(
+      "tr.pf-v6-c-table__expandable-row.pf-m-expanded",
+    );
+    await expect(expandedRow).toBeVisible();
+    return expandedRow;
   }
 
   async getRows() {
     const rows = this._table.locator("tbody");
-    await expect(rows).toBeVisible();
+    await expect(rows.first()).toBeVisible();
     return rows;
   }
 
