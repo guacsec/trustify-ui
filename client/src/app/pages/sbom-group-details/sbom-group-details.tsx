@@ -11,6 +11,7 @@ import {
   PageSection,
 } from "@patternfly/react-core";
 
+import { PRODUCT_LABEL_KEY } from "@app/Constants.ts";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { useSuspenseSBOMGroupById } from "@app/queries/sbom-groups";
@@ -41,9 +42,11 @@ export const SBOMGroupDetails: React.FC = () => {
             <Content component="h1">{sbomGroup?.name} </Content>
           </FlexItem>
           <FlexItem>
-            <Label color={"purple"} isCompact>
-              {sbomGroup?.labels?.product}
-            </Label>
+            {PRODUCT_LABEL_KEY in (sbomGroup?.labels ?? {}) ? (
+              <Label color="purple" isCompact>
+                {PRODUCT_LABEL_KEY}
+              </Label>
+            ) : null}
           </FlexItem>
         </Flex>
         <Content component="p">{sbomGroup?.description} </Content>
