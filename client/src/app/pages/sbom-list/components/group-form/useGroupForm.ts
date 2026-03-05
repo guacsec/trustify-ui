@@ -10,10 +10,7 @@ import {
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
 import { PRODUCT_LABEL_KEY } from "@app/Constants";
-import {
-  useFetchSBOMGroupById,
-  useFetchSBOMGroups,
-} from "@app/queries/sbom-groups";
+import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
 
@@ -28,12 +25,15 @@ export interface FormValues {
 export interface UseGroupFormArgs {
   /** The group being edited, or null for create mode */
   group: Group | null;
+  /** Preloaded parent group for edit mode */
+  initialParentGroup: Group | null;
   /** Data result from useGroupFormData */
   formData: ReturnType<typeof useGroupFormData>;
 }
 
 export const useGroupForm = ({
   group,
+  initialParentGroup,
   formData: { createGroup, updateGroup },
 }: UseGroupFormArgs) => {
   const siblingsRef = useRef<Group[]>([]);
@@ -86,30 +86,11 @@ export const useGroupForm = ({
       labels: Object.entries(group?.labels ?? {})
         .filter(([key]) => key !== PRODUCT_LABEL_KEY)
         .map(([key, value]) => joinKeyValueAsString({ key, value })),
-      parentGroup: null,
+      parentGroup: initialParentGroup,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
-
-  //Infer parent group
-  const parentId = group?.parent ?? null;
-
-  const { sbomGroup: parentResult, isFetching: isParentFetching } =
-    useFetchSBOMGroupById(parentId ?? "");
-
-  useEffect(() => {
-    if (!parentId) return;
-
-    const parent = parentResult;
-    if (!parent) return;
-
-    form.setValue("parentGroup", parent, {
-      shouldDirty: false,
-      shouldTouch: false,
-      shouldValidate: true,
-    });
-  }, [parentId, parentResult, form]);
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");
@@ -161,14 +142,10 @@ export const useGroupForm = ({
       createGroup(payload);
     }
   };
-  const isParentHydrating =
-    Boolean(parentId) && isParentFetching && !parentGroup;
-
   return {
     form,
     isSubmitDisabled: !isValid || isSubmitting || isValidating || !isDirty,
     isCancelDisabled: isSubmitting || isValidating,
     onSubmit: handleSubmit(onValidSubmit),
-    isParentHydrating,
   };
 };
