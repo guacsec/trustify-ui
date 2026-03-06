@@ -110,6 +110,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
     isFetching: isRootsFetching,
     fetchError,
   } = useFetchSBOMGroups(
+    null,
     {
       filters: [{ field: "parent", operator: "=", value: "\0" }],
       ...getHubRequestParams({

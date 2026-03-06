@@ -1,0 +1,327 @@
+import React, { useRef, useState } from "react";
+
+import type { AxiosError } from "axios";
+
+import {
+  Alert,
+  Button,
+  Divider,
+  Menu,
+  MenuContainer,
+  MenuContent,
+  MenuItem,
+  MenuItemAction,
+  MenuList,
+  MenuSearch,
+  MenuSearchInput,
+  MenuToggle,
+  SearchInput,
+  type SearchInputProps,
+} from "@patternfly/react-core";
+import AngleLeftIcon from "@patternfly/react-icons/dist/esm/icons/angle-left-icon";
+import AngleRightIcon from "@patternfly/react-icons/dist/esm/icons/angle-right-icon";
+import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
+
+export type SearchQuery =
+  | {
+      type: "filterText";
+      value: string;
+    }
+  | {
+      type: "drillIn";
+      parentIds: string[];
+    };
+
+/**
+ * Option type for DrilldownSelect component
+ * @template TData - Optional data type to attach to each option
+ */
+export type DrilldownOption = {
+  /** Unique identifier for the option */
+  id: string;
+  /** Display name for the option */
+  name: string;
+  /** Whether or not it has children */
+  hasChildren: boolean;
+  /** Arbitrary data attached to this option */
+  value?: any;
+};
+
+/**
+ * Props for DrilldownSelect component
+ */
+export interface IDrilldownSelectProps {
+  /** Available options to select from */
+  options: DrilldownOption[];
+  /** Whether the select is in loading state */
+  isLoading?: boolean;
+  /** Error while loading data */
+  fetchError?: AxiosError;
+
+  value?: DrilldownOption;
+  /** Callback when selection changes */
+  onChange: (option: DrilldownOption | null) => void;
+
+  /** Placeholder text when no value selected */
+  placeholder?: React.ReactNode;
+  /** Node to render when isLoading=true */
+  loading?: React.ReactNode;
+  /** Node to render when isLoading=true */
+  noResults?: React.ReactNode;
+
+  /** Whether the menu is open (controlled mode) */
+  isOpen?: boolean;
+  /** Set menu open state (controlled mode) */
+  setIsOpen?: (value: boolean) => void;
+  /** Default open state (uncontrolled mode) */
+  defaultIsOpen?: boolean;
+  /** Whether the select is disabled */
+  isDisabled?: boolean;
+
+  // Search input props
+  searchInputProps?: Omit<SearchInputProps, "value" | "onChange" | "onClear">;
+
+  // Search
+  searchQuery: SearchQuery;
+  onSearchQueryChange: (value: SearchQuery) => void;
+}
+
+const ROOT_MENU_ID = "rootMenu";
+
+export const DrilldownSelect = ({
+  options,
+  isLoading,
+  fetchError,
+
+  value,
+  onChange,
+
+  placeholder = "Select one",
+  loading = "Loading...",
+  noResults = "No results",
+
+  isOpen: controlledIsOpen,
+  setIsOpen: controlledSetIsOpen,
+  defaultIsOpen = false,
+  isDisabled,
+
+  searchInputProps,
+
+  searchQuery,
+  onSearchQueryChange,
+}: IDrilldownSelectProps) => {
+  const [searchInputValue, setSearchInputValue] = React.useState("");
+
+  // Support both controlled and uncontrolled modes
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultIsOpen);
+  const isOpen = controlledIsOpen ?? internalIsOpen;
+  const setIsOpen = controlledSetIsOpen ?? setInternalIsOpen;
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const [activeMenu, setActiveMenu] = useState<string>(ROOT_MENU_ID);
+
+  const parentIdMap = React.useRef(new Map<string, DrilldownOption>());
+
+  const currentParentId =
+    searchQuery.type === "drillIn"
+      ? searchQuery.parentIds[searchQuery.parentIds.length - 1]
+      : undefined;
+
+  const handleSearchInputChange = (value: string) => {
+    setSearchInputValue(value);
+    if (value) {
+      onSearchQueryChange({ type: "filterText", value });
+    } else {
+      onSearchQueryChange({ type: "drillIn", parentIds: [] });
+    }
+  };
+
+  const handleOnDrillIn = (option: DrilldownOption) => {
+    if (searchQuery.type === "drillIn") {
+      parentIdMap.current.set(option.id, option);
+      onSearchQueryChange({
+        type: "drillIn",
+        parentIds: [...searchQuery.parentIds, option.id],
+      });
+      setActiveMenu(option.id);
+    }
+  };
+
+  const handleOnDrillOut = () => {
+    if (searchQuery.type === "drillIn") {
+      currentParentId && parentIdMap.current.delete(currentParentId);
+
+      const newParentIds = searchQuery.parentIds.slice(0, -1);
+      onSearchQueryChange({
+        type: "drillIn",
+        parentIds: newParentIds,
+      });
+      setActiveMenu(newParentIds[newParentIds.length - 1] ?? ROOT_MENU_ID);
+    }
+  };
+
+  const handleOnSelectMenu = (event?: React.MouseEvent, itemId?: string) => {
+    if (currentParentId === itemId) {
+      event?.stopPropagation();
+      handleOnDrillOut();
+    } else {
+      const selected = options.find((option) => option.id === itemId);
+      if (selected) {
+        onChange(selected);
+        setIsOpen(false);
+      }
+    }
+  };
+
+  const onToggleClick = () => {
+    setIsOpen(!isOpen);
+    setActiveMenu(ROOT_MENU_ID);
+  };
+
+  const toggle = (
+    <MenuToggle
+      ref={toggleRef}
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      isDisabled={isDisabled}
+      badge={
+        value && (
+          <Button
+            key="clean"
+            component={"span"}
+            variant="plain"
+            aria-label="Action"
+            icon={<TimesIcon />}
+            style={{ paddingTop: 0, paddingBottom: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(null);
+            }}
+          />
+        )
+      }
+      isFullWidth
+    >
+      {value?.name ?? placeholder}
+    </MenuToggle>
+  );
+
+  const menu = (
+    <Menu
+      id={ROOT_MENU_ID}
+      activeMenu={activeMenu}
+      ref={menuRef}
+      isScrollable
+      onSelect={handleOnSelectMenu}
+    >
+      <MenuSearch>
+        <MenuSearchInput>
+          <SearchInput
+            value={searchInputValue}
+            onChange={(_event, value) => handleSearchInputChange(value)}
+            onClear={(e) => {
+              e.stopPropagation();
+              handleSearchInputChange("");
+            }}
+            {...searchInputProps}
+          />
+        </MenuSearchInput>
+      </MenuSearch>
+      <Divider />
+      <MenuContent maxMenuHeight={"300px"}>
+        <MenuList>
+          {isLoading ? (
+            <MenuItem isDisabled>{loading}</MenuItem>
+          ) : fetchError ? (
+            <Alert
+              variant="danger"
+              isInline
+              isPlain
+              title="Error while loading data"
+            />
+          ) : options.length > 0 ? (
+            <>
+              {currentParentId && (
+                <>
+                  <MenuItem
+                    itemId={currentParentId}
+                    component={"button"}
+                    icon={<AngleLeftIcon />}
+                  >
+                    {parentIdMap.current.get(currentParentId)?.name ??
+                      currentParentId}
+                  </MenuItem>
+                  <Divider role="separator" component="li" />
+                </>
+              )}
+              {options.map((option) => (
+                <DrilldownMenuItem
+                  key={option.id}
+                  searchQuery={searchQuery}
+                  option={option}
+                  hasChildren={option.hasChildren}
+                  onDrillIn={handleOnDrillIn}
+                />
+              ))}
+            </>
+          ) : (
+            <MenuItem isDisabled>{noResults}</MenuItem>
+          )}
+        </MenuList>
+      </MenuContent>
+    </Menu>
+  );
+
+  return (
+    <MenuContainer
+      menu={menu}
+      menuRef={menuRef}
+      toggle={toggle}
+      toggleRef={toggleRef}
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      onOpenChangeKeys={["Escape"]}
+      // onToggleKeydown={onToggleArrowKeydown}
+      // popperProps={{ appendTo: "inline" }}
+    />
+  );
+};
+
+export const DrilldownMenuItem = ({
+  searchQuery,
+  option,
+  hasChildren,
+  onDrillIn,
+}: {
+  searchQuery: SearchQuery;
+  option: DrilldownOption;
+  hasChildren: boolean;
+  onDrillIn: (option: DrilldownOption) => void;
+}) => {
+  switch (searchQuery.type) {
+    case "filterText":
+      return <MenuItem itemId={option.id}>{option.name}</MenuItem>;
+    case "drillIn":
+      return (
+        <MenuItem
+          itemId={option.id}
+          actions={
+            hasChildren && (
+              <MenuItemAction
+                icon={<AngleRightIcon />}
+                actionId="drillIn"
+                aria-label="Drill in"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDrillIn(option);
+                }}
+              />
+            )
+          }
+        >
+          {option.name}
+        </MenuItem>
+      );
+  }
+};

@@ -4,7 +4,7 @@ import { Form } from "@patternfly/react-core";
 
 import { HookFormPFGroupController } from "@app/components/HookFormPFFields";
 
-import { GroupSelect } from "../sbom-group-select/sbom-group-select";
+import { SbomGroupSelect } from "../sbom-group-select/sbom-group-select";
 import type { useAddToGroupForm } from "./useAddToGroupForm";
 import type { useAddToGroupFormData } from "./useAddToGroupFormData";
 
@@ -18,7 +18,7 @@ export const AddToGroupForm: React.FC<IAddToGroupFormProps> = ({ form }) => {
 
   return (
     <Form>
-      <HookFormPFGroupController
+      {/* <HookFormPFGroupController
         control={control}
         name="targetGroup"
         label="Select group"
@@ -30,6 +30,21 @@ export const AddToGroupForm: React.FC<IAddToGroupFormProps> = ({ form }) => {
             onChange={onChange}
             placeholder={"Select group"}
             limit={10}
+          />
+        )}
+      /> */}
+      <HookFormPFGroupController
+        control={control}
+        name="targetGroup"
+        label="Select group"
+        fieldId="target-group-id"
+        isRequired
+        renderInput={() => (
+          <SbomGroupSelect
+          // value={value || undefined}
+          // onChange={onChange}
+          // placeholder={"Select group"}
+          // limit={10}
           />
         )}
       />
