@@ -1,0 +1,16 @@
+.toggle :global(.pf-v6-c-menu-toggle__text) {
+  flex-grow: 1;
+  text-align: start;
+}
+
+.toggle :global(.pf-v6-c-menu-toggle__count) {
+  align-self: stretch;
+  margin-block: calc(-1 * var(--pf-v6-c-menu-toggle--PaddingBlockStart));
+}
+
+.toggle :global(.pf-v6-c-menu-toggle__count) :global(.pf-v6-c-button) {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-block: 0;
+}

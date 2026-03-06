@@ -23,6 +23,8 @@ import AngleLeftIcon from "@patternfly/react-icons/dist/esm/icons/angle-left-ico
 import AngleRightIcon from "@patternfly/react-icons/dist/esm/icons/angle-right-icon";
 import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 
+import styles from "./DrilldownSelect.module.css";
+
 export type SearchQuery =
   | {
       type: "filterText";
@@ -207,6 +209,7 @@ export const DrilldownSelect = ({
 
   const toggle = (
     <MenuToggle
+      className={styles.toggle}
       ref={toggleRef}
       onClick={onToggleClick}
       isExpanded={isOpen}
@@ -217,9 +220,8 @@ export const DrilldownSelect = ({
             key="clean"
             component={"span"}
             variant="plain"
-            aria-label="Action"
+            aria-label="Clear selection"
             icon={<TimesIcon />}
-            style={{ paddingTop: 0, paddingBottom: 0 }}
             onClick={(e) => {
               e.stopPropagation();
               onChange(null);
