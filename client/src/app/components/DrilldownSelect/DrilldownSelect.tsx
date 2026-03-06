@@ -11,6 +11,7 @@ import {
   MenuContent,
   MenuItem,
   MenuItemAction,
+  type MenuItemProps,
   MenuList,
   MenuSearch,
   MenuSearchInput,
@@ -44,7 +45,9 @@ export type DrilldownOption = {
   /** Whether or not it has children */
   hasChildren: boolean;
   /** Arbitrary data attached to this option */
+  // biome-ignore lint/suspicious/noExplicitAny: allowed
   value?: any;
+  itemProps?: Omit<MenuItemProps, "itemId">;
 };
 
 /**
@@ -301,10 +304,15 @@ export const DrilldownMenuItem = ({
 }) => {
   switch (searchQuery.type) {
     case "filterText":
-      return <MenuItem itemId={option.id}>{option.name}</MenuItem>;
+      return (
+        <MenuItem {...option.itemProps} itemId={option.id}>
+          {option.name}
+        </MenuItem>
+      );
     case "drillIn":
       return (
         <MenuItem
+          {...option.itemProps}
           itemId={option.id}
           actions={
             hasChildren && (

@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import {
   queryOptions,
   useMutation,
@@ -26,7 +28,6 @@ import {
   updateSbomGroup,
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls/getHubRequestParams";
-import { FILTER_NULL_VALUE } from "@app/Constants";
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
@@ -67,7 +68,7 @@ export const useFetchSBOMGroups = (
   > = {},
 ) => {
   const { q, ...rest } = requestParamsQuery(params);
-  const parentQuery = `parent=${parentId ?? FILTER_NULL_VALUE}`;
+  const parentQuery = parentId ? `parent=${parentId}` : "";
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMGroupsQueryKey, parentId, { params, extraQueryParams }],
@@ -82,11 +83,22 @@ export const useFetchSBOMGroups = (
       }),
   });
 
+  const references = useMemo(() => {
+    return [
+      ...(data?.data?.items || []),
+      ...(data?.data?.referenced || []),
+    ].reduce((prev, current) => {
+      prev.set(current.id, current);
+      return prev;
+    }, new Map<string, Group>());
+  }, [data?.data]);
+
   return {
     result: {
       data: data?.data?.items || [],
       total: data?.data?.total ?? 0,
     },
+    references,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,

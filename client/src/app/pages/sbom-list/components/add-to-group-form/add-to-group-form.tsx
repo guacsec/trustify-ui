@@ -18,35 +18,17 @@ export const AddToGroupForm: React.FC<IAddToGroupFormProps> = ({ form }) => {
 
   return (
     <Form>
-      {/* <HookFormPFGroupController
-        control={control}
-        name="targetGroup"
-        label="Select group"
-        fieldId="target-group-id"
-        isRequired
-        renderInput={({ field: { onChange, value } }) => (
-          <GroupSelect
-            value={value || undefined}
-            onChange={onChange}
-            placeholder={"Select group"}
-            limit={10}
-          />
-        )}
-      /> */}
       <HookFormPFGroupController
         control={control}
         name="targetGroup"
         label="Select group"
         fieldId="target-group-id"
         isRequired
-        renderInput={() => (
-          <SbomGroupSelect
-          // value={value || undefined}
-          // onChange={onChange}
-          // placeholder={"Select group"}
-          // limit={10}
-          />
-        )}
+        renderInput={({ field: { onChange, value } }) => {
+          return (
+            <SbomGroupSelect value={value || undefined} onChange={onChange} />
+          );
+        }}
       />
     </Form>
   );
