@@ -1,69 +1,68 @@
 import React from "react";
 
+import {
+  type DrilldownOption,
+  DrilldownSelect,
+  type SearchQuery,
+} from "@app/components/DrilldownSelect/DrilldownSelect";
+import { FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
+import { Group } from "@app/client";
 
-import type { Group } from "@app/client";
-
-import { DrilldownSelect } from "../../../../components/DrilldownSelect";
-import { buildHierarchy } from "./utils";
-
-interface GroupSelectProps {
-  value: Group | undefined;
-  onChange: (value: Group | undefined) => void;
-  placeholder?: string;
-  limit: number;
+interface ISbomGroupSelectProps {
+  value: Group;
+  onChange: (value: Group | null) => void;
 }
 
-export const GroupSelect: React.FC<GroupSelectProps> = ({
-  value,
-  onChange,
-  placeholder = "Select",
-  limit,
+export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
+  // value,
+  // onChange,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [value, setValue] = React.useState<DrilldownOption | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState<SearchQuery>({
+    type: "drillIn",
+    parentIds: [],
+  });
 
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const onChange = (value: DrilldownOption | null) => {
+    setValue(value);
+  };
 
-  const { rawData: groups } = useFetchSBOMGroups(
+  const {
+    result: { data: groups },
+    isFetching,
+    fetchError,
+  } = useFetchSBOMGroups(
+    searchQuery.type === "filterText"
+      ? null
+      : searchQuery.parentIds[searchQuery.parentIds.length - 1],
     {
-      page: { pageNumber: 1, itemsPerPage: limit },
-      ...(searchQuery && {
-        filters: [{ field: "name", operator: "~", value: searchQuery }],
+      ...(searchQuery.type === "filterText" && {
+        filters: [
+          { field: FILTER_TEXT_CATEGORY_KEY, value: searchQuery.value },
+        ],
+        page: { pageNumber: 1, itemsPerPage: 10 },
       }),
     },
-    { parents: "resolve" },
+    { parents: "resolve", totals: true },
   );
-
-  const mappedGroups = groups
-    ? buildHierarchy(groups, searchQuery.length < 1)
-    : [];
-
-  const onClear = (_event: React.SyntheticEvent) => {
-    _event.stopPropagation();
-    onChange(undefined);
-    setSearchQuery("");
-  };
-
-  const onSelect = (group: Group) => {
-    onChange(group);
-    setSearchQuery("");
-    setIsOpen(false);
-  };
 
   return (
     <DrilldownSelect
-      options={mappedGroups.map((gr) => ({
-        ...gr,
-        description: gr.parentsNames,
+      options={groups.map((group) => ({
+        id: group.id,
+        name: group.name,
+        value: group,
+        hasChildren: (group.number_of_groups ?? 0) > 0,
       }))}
-      value={value}
-      onChange={onSelect}
-      placeholder={placeholder}
-      onInputChange={setSearchQuery}
-      inputValue={searchQuery}
-      onClear={onClear}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      isLoading={isFetching}
+      fetchError={fetchError ?? undefined}
+      value={value ?? undefined}
+      onChange={onChange}
+      searchQuery={searchQuery}
+      onSearchQueryChange={setSearchQuery}
+      placeholder={"Select parent group"}
+      searchInputProps={{ placeholder: "Find by name" }}
     />
   );
 };

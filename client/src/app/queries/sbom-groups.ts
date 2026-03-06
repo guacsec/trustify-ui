@@ -1,17 +1,3 @@
-import type { HubRequestParams } from "@app/api/models";
-import { client } from "@app/axios-config/apiInit";
-import {
-  type CreateResponse,
-  createSbomGroup,
-  deleteSbomGroup,
-  type Group,
-  type GroupRequest,
-  listSbomGroups,
-  type ListSbomGroupsData,
-  readSbomGroup,
-  updateSbomGroup,
-} from "@app/client";
-import { requestParamsQuery } from "@app/hooks/table-controls";
 import {
   queryOptions,
   useMutation,
@@ -21,6 +7,26 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
+
+import type { HubRequestParams } from "@app/api/models";
+import { client } from "@app/axios-config/apiInit";
+import type {
+  CreateResponse,
+  Group,
+  GroupRequest,
+  ListSbomGroupsData,
+  SbomHead,
+} from "@app/client";
+import {
+  bulkUpdateSbomGroupAssignments,
+  createSbomGroup,
+  deleteSbomGroup,
+  listSbomGroups,
+  readSbomGroup,
+  updateSbomGroup,
+} from "@app/client";
+import { requestParamsQuery } from "@app/hooks/table-controls/getHubRequestParams";
+import { FILTER_NULL_VALUE } from "@app/Constants";
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
@@ -53,30 +59,34 @@ export const useSuspenseSBOMGroupById = (id: string) => {
 };
 
 export const useFetchSBOMGroups = (
+  parentId: string | null,
   params: HubRequestParams = {},
   extraQueryParams: Pick<
     NonNullable<ListSbomGroupsData["query"]>,
     "parents" | "totals"
   > = {},
-  disableQuery: boolean = false,
 ) => {
+  const { q, ...rest } = requestParamsQuery(params);
+  const parentQuery = `parent=${parentId ?? FILTER_NULL_VALUE}`;
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMGroupsQueryKey, params, extraQueryParams],
+    queryKey: [SBOMGroupsQueryKey, parentId, { params, extraQueryParams }],
     queryFn: () =>
       listSbomGroups({
         client,
-        query: { ...requestParamsQuery(params), ...extraQueryParams },
+        query: {
+          ...rest,
+          ...extraQueryParams,
+          q: [q, parentQuery].filter((e) => e).join("&"),
+        },
       }),
-    enabled: !disableQuery,
   });
 
   return {
     result: {
       data: data?.data?.items || [],
       total: data?.data?.total ?? 0,
-      params,
     },
-    rawData: data?.data,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,
@@ -194,5 +204,28 @@ export const useDeleteSbomGroupMutation = (
         queryKey: [SBOMGroupsQueryKey],
       });
     },
+  });
+};
+
+export const useAddSBOMsToGroupsMutation = (
+  onSuccess: (payload: { groups: Group[]; sboms: SbomHead[] }) => void,
+  onError: (err: AxiosError) => void,
+) => {
+  return useMutation({
+    mutationFn: async (payload: { groups: Group[]; sboms: SbomHead[] }) => {
+      const { sboms, groups } = payload;
+      const response = await bulkUpdateSbomGroupAssignments({
+        client,
+        body: {
+          group_ids: groups.map((e) => e.id),
+          sbom_ids: sboms.map((e) => e.id),
+        },
+      });
+      return response.data;
+    },
+    onSuccess: async (_response, payload) => {
+      onSuccess(payload);
+    },
+    onError: onError,
   });
 };

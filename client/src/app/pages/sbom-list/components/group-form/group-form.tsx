@@ -23,7 +23,7 @@ import {
 import { LABEL_VALIDATION_REGEX, PRODUCT_LABEL_KEY } from "@app/Constants";
 import { getString } from "@app/utils/utils";
 
-import { GroupSelect } from "../sbom-group-select/sbom-group-select";
+import { SbomGroupSelect } from "../sbom-group-select/sbom-group-select";
 import type { useGroupForm } from "./useGroupForm";
 import type { useGroupFormData } from "./useGroupFormData";
 
@@ -53,7 +53,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ form }) => {
         fieldId="parent-group-id"
         helperText="Leave blank if this group does not have a parent"
         renderInput={({ field: { onChange, value } }) => (
-          <GroupSelect
+          <SbomGroupSelect
             value={value || undefined}
             onChange={onChange}
             placeholder={"Select parent group"}
