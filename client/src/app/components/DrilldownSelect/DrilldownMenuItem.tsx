@@ -1,54 +1,47 @@
-import { Divider, DrilldownMenu, MenuItem } from "@patternfly/react-core";
+import { MenuItem, MenuItemAction } from "@patternfly/react-core";
+import AngleRightIcon from "@patternfly/react-icons/dist/esm/icons/angle-right-icon";
 
-import type { DrilldownOption } from "./DrilldownSelect";
+import type { DrilldownOption, SearchQuery } from "./DrilldownSelect";
 
-export const DrilldownMenuItem = <TData = unknown>({
+export const DrilldownMenuItem = ({
+  searchQuery,
   option,
-  onChange,
-  getItemId,
+  hasChildren,
+  onDrillIn,
 }: {
-  option: DrilldownOption<TData>;
-  onChange?: (option: DrilldownOption<TData>) => void;
-  getItemId: (option: DrilldownOption<TData>, hasChildren: boolean) => string;
+  searchQuery: SearchQuery;
+  option: DrilldownOption;
+  hasChildren: boolean;
+  onDrillIn: (option: DrilldownOption) => void;
 }) => {
-  const hasChildren = !!option.children?.length;
-  const itemId = getItemId(option, hasChildren);
-
-  if (!hasChildren) {
-    return (
-      <MenuItem
-        itemId={itemId}
-        description={option.description}
-        onClick={() => onChange?.(option)}
-      >
-        {option.name}
-      </MenuItem>
-    );
+  switch (searchQuery.type) {
+    case "filterText":
+      return (
+        <MenuItem {...option.itemProps} itemId={option.id}>
+          {option.name}
+        </MenuItem>
+      );
+    case "drillIn":
+      return (
+        <MenuItem
+          {...option.itemProps}
+          itemId={option.id}
+          actions={
+            hasChildren && (
+              <MenuItemAction
+                icon={<AngleRightIcon />}
+                actionId="drillIn"
+                aria-label="Drill in"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDrillIn(option);
+                }}
+              />
+            )
+          }
+        >
+          {option.name}
+        </MenuItem>
+      );
   }
-
-  return (
-    <MenuItem
-      itemId={itemId}
-      description={option.description}
-      direction="down"
-      drilldownMenu={
-        <DrilldownMenu id={`drilldown-menu-${option.id}`}>
-          <MenuItem itemId={`${itemId}_breadcrumb`} direction="up">
-            {option.name}
-          </MenuItem>
-          <Divider component="li" />
-          {option.children?.map((child) => (
-            <DrilldownMenuItem
-              key={child.id}
-              option={child}
-              onChange={onChange}
-              getItemId={getItemId}
-            />
-          ))}
-        </DrilldownMenu>
-      }
-    >
-      {option.name}
-    </MenuItem>
-  );
 };
