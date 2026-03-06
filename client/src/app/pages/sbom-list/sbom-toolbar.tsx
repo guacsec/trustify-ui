@@ -43,7 +43,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   const [isAddToGroupModalOpen, setIsAddToGroupModalOpen] =
     React.useState(false);
 
-  //
+  // Table controls
 
   const {
     tableControls,

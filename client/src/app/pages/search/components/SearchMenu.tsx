@@ -336,9 +336,9 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
       isVisible={(isAutocompleteOpen && entityList.length > 0) || isFetching}
       enableFlip={false}
       // append the autocomplete menu to the search input in the DOM for the sake of the keyboard navigation experience
-      // appendTo={() =>
-      //   document.querySelector("#autocomplete-search") as HTMLElement
-      // }
+      appendTo={() =>
+        document.querySelector("#autocomplete-search") as HTMLElement
+      }
     />
   );
 };
