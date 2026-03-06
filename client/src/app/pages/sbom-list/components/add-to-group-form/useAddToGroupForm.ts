@@ -28,7 +28,7 @@ export const useAddToGroupForm = ({
       targetGroup: null,
     },
     resolver: yupResolver(validationSchema),
-    mode: "all",
+    mode: "onChange",
     shouldUnregister: true,
   });
 
