@@ -17,10 +17,8 @@ import type {
   Group,
   GroupRequest,
   ListSbomGroupsData,
-  SbomHead,
 } from "@app/client";
 import {
-  bulkUpdateSbomGroupAssignments,
   createSbomGroup,
   deleteSbomGroup,
   listSbomGroups,
@@ -216,28 +214,5 @@ export const useDeleteSbomGroupMutation = (
         queryKey: [SBOMGroupsQueryKey],
       });
     },
-  });
-};
-
-export const useAddSBOMsToGroupsMutation = (
-  onSuccess: (payload: { groups: Group[]; sboms: SbomHead[] }) => void,
-  onError: (err: AxiosError) => void,
-) => {
-  return useMutation({
-    mutationFn: async (payload: { groups: Group[]; sboms: SbomHead[] }) => {
-      const { sboms, groups } = payload;
-      const response = await bulkUpdateSbomGroupAssignments({
-        client,
-        body: {
-          group_ids: groups.map((e) => e.id),
-          sbom_ids: sboms.map((e) => e.id),
-        },
-      });
-      return response.data;
-    },
-    onSuccess: async (_response, payload) => {
-      onSuccess(payload);
-    },
-    onError: onError,
   });
 };

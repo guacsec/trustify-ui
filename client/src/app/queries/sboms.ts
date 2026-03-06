@@ -11,9 +11,12 @@ import type { HubRequestParams, Label } from "@app/api/models";
 import { uploadSbom } from "@app/api/rest";
 import { client } from "@app/axios-config/apiInit";
 import {
+  type Group,
   type IngestResult,
   type Labels,
+  type SbomHead,
   type SbomSummary,
+  bulkUpdateSbomGroupAssignments,
   deleteSbom,
   downloadSbom,
   getSbom,
@@ -269,4 +272,31 @@ export const useFetchSbomsLicenseIds = (sbomId: string) => {
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
   };
+};
+
+export const useAddSBOMsToGroupsMutation = (
+  onSuccess: (payload: { groups: Group[]; sboms: SbomHead[] }) => void,
+  onError: (err: AxiosError) => void,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { groups: Group[]; sboms: SbomHead[] }) => {
+      const { sboms, groups } = payload;
+      const response = await bulkUpdateSbomGroupAssignments({
+        client,
+        body: {
+          group_ids: groups.map((e) => e.id),
+          sbom_ids: sboms.map((e) => e.id),
+        },
+      });
+      return response.data;
+    },
+    onSuccess: async (_response, payload) => {
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey],
+      });
+      onSuccess(payload);
+    },
+    onError: onError,
+  });
 };

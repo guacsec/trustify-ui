@@ -4,7 +4,7 @@ import type { AxiosError } from "axios";
 
 import type { Group, SbomHead } from "@app/client";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import { useAddSBOMsToGroupsMutation } from "@app/queries/sbom-groups";
+import { useAddSBOMsToGroupsMutation } from "@app/queries/sboms";
 
 export const useAddToGroupFormData = ({
   onActionSuccess = () => {},
