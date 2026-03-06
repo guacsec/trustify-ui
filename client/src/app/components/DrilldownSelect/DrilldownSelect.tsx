@@ -125,6 +125,7 @@ export const DrilldownSelect = ({
   const [activeMenu, setActiveMenu] = useState<string>(ROOT_MENU_ID);
 
   const parentIdMap = React.useRef(new Map<string, DrilldownOption>());
+  const drillDirection = React.useRef<"in" | "out" | null>(null);
 
   const currentParentId =
     searchQuery.type === "drillIn"
@@ -142,6 +143,7 @@ export const DrilldownSelect = ({
 
   const handleOnDrillIn = (option: DrilldownOption) => {
     if (searchQuery.type === "drillIn") {
+      drillDirection.current = "in";
       parentIdMap.current.set(option.id, option);
       onSearchQueryChange({
         type: "drillIn",
@@ -153,6 +155,7 @@ export const DrilldownSelect = ({
 
   const handleOnDrillOut = () => {
     if (searchQuery.type === "drillIn") {
+      drillDirection.current = "out";
       currentParentId && parentIdMap.current.delete(currentParentId);
 
       const newParentIds = searchQuery.parentIds.slice(0, -1);
@@ -181,6 +184,26 @@ export const DrilldownSelect = ({
     setIsOpen(!isOpen);
     setActiveMenu(ROOT_MENU_ID);
   };
+
+  // PF's built-in drilldown focus (containsDrilldown + DrilldownMenu) relies on CSS
+  // transitionend events between statically nested menus. Since we load data async and
+  // render a single flat MenuList, there are no nested menus to transition between.
+  // We manually focus the first item using PF's own selector from allowTabFirstItem().
+  // biome-ignore lint/correctness/useExhaustiveDependencies: options triggers focus after new data renders
+  React.useEffect(() => {
+    if (!drillDirection.current || isLoading || !menuRef.current) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      const firstItem = menuRef.current?.querySelector<HTMLElement>(
+        "ul button:not(:disabled), ul a:not(:disabled)",
+      );
+      if (firstItem) {
+        firstItem.focus();
+        drillDirection.current = null;
+      }
+    });
+  }, [options, isLoading]);
 
   const toggle = (
     <MenuToggle
@@ -234,6 +257,19 @@ export const DrilldownSelect = ({
       <Divider />
       <MenuContent maxMenuHeight={"300px"}>
         <MenuList>
+          {currentParentId && (
+            <>
+              <MenuItem
+                itemId={currentParentId}
+                component={"button"}
+                icon={<AngleLeftIcon />}
+              >
+                {parentIdMap.current.get(currentParentId)?.name ??
+                  currentParentId}
+              </MenuItem>
+              <Divider role="separator" component="li" />
+            </>
+          )}
           {isLoading ? (
             <MenuItem isDisabled>{loading}</MenuItem>
           ) : fetchError ? (
@@ -244,30 +280,15 @@ export const DrilldownSelect = ({
               title="Error while loading data"
             />
           ) : options.length > 0 ? (
-            <>
-              {currentParentId && (
-                <>
-                  <MenuItem
-                    itemId={currentParentId}
-                    component={"button"}
-                    icon={<AngleLeftIcon />}
-                  >
-                    {parentIdMap.current.get(currentParentId)?.name ??
-                      currentParentId}
-                  </MenuItem>
-                  <Divider role="separator" component="li" />
-                </>
-              )}
-              {options.map((option) => (
-                <DrilldownMenuItem
-                  key={option.id}
-                  searchQuery={searchQuery}
-                  option={option}
-                  hasChildren={option.hasChildren}
-                  onDrillIn={handleOnDrillIn}
-                />
-              ))}
-            </>
+            options.map((option) => (
+              <DrilldownMenuItem
+                key={option.id}
+                searchQuery={searchQuery}
+                option={option}
+                hasChildren={option.hasChildren}
+                onDrillIn={handleOnDrillIn}
+              />
+            ))
           ) : (
             <MenuItem isDisabled>{noResults}</MenuItem>
           )}
