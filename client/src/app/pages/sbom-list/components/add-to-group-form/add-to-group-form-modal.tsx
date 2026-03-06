@@ -10,9 +10,10 @@ import {
 } from "@patternfly/react-core";
 
 import type { SbomHead } from "@app/client";
+
+import { AddToGroupForm } from "./add-to-group-form";
 import { useAddToGroupForm } from "./useAddToGroupForm";
 import { useAddToGroupFormData } from "./useAddToGroupFormData";
-import { AddToGroupForm } from "./add-to-group-form";
 
 interface IAddToGroupModalProps {
   sboms: SbomHead[];
@@ -21,6 +22,20 @@ interface IAddToGroupModalProps {
 }
 
 export const AddToGroupModal: React.FC<IAddToGroupModalProps> = ({
+  sboms,
+  onClose,
+  isOpen,
+}) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <AddToGroupModalInner sboms={sboms} onClose={onClose} isOpen={isOpen} />
+  );
+};
+
+const AddToGroupModalInner: React.FC<IAddToGroupModalProps> = ({
   sboms,
   onClose,
   isOpen,
