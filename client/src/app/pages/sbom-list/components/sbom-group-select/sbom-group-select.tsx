@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useDebounceValue } from "usehooks-ts";
+
 import type { Group } from "@app/client";
 import {
   type DrilldownOption,
@@ -22,29 +24,37 @@ export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
     type: "drillIn",
     parentIds: [],
   });
+  const [debouncedSearchQuery] = useDebounceValue(searchQuery, 300);
+  const effectiveQuery =
+    searchQuery.type === "drillIn" ? searchQuery : debouncedSearchQuery;
 
   const parentIdQuery =
-    searchQuery.type === "filterText"
-      ? null
-      : (searchQuery.parentIds[searchQuery.parentIds.length - 1] ??
-        FILTER_NULL_VALUE);
+    effectiveQuery.type === "drillIn"
+      ? (effectiveQuery.parentIds[effectiveQuery.parentIds.length - 1] ??
+        FILTER_NULL_VALUE)
+      : null;
 
-  const paramsQuery = {
-    ...(searchQuery.type === "filterText" && {
-      filters: [{ field: FILTER_TEXT_CATEGORY_KEY, value: searchQuery.value }],
-      page: { pageNumber: 1, itemsPerPage: 10 },
-    }),
-  };
+  const paramsQuery =
+    effectiveQuery.type === "filterText"
+      ? {
+          filters: [
+            { field: FILTER_TEXT_CATEGORY_KEY, value: effectiveQuery.value },
+          ],
+          page: { pageNumber: 1, itemsPerPage: 10 },
+        }
+      : {};
+
+  const extraParamsQuery: { parents?: "resolve", totals?: boolean; } =
+    effectiveQuery.type === "filterText"
+      ? { parents: "resolve" }
+      : { totals: true };
 
   const {
     result: { data: groups },
     references,
     isFetching,
     fetchError,
-  } = useFetchSBOMGroups(parentIdQuery, paramsQuery, {
-    parents: "resolve",
-    totals: true,
-  });
+  } = useFetchSBOMGroups(parentIdQuery, paramsQuery, extraParamsQuery);
 
   const groupToOption = (
     group: Group & {
