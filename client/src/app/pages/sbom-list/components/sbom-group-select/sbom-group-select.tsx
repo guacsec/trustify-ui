@@ -44,7 +44,7 @@ export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
         }
       : {};
 
-  const extraParamsQuery: { parents?: "resolve", totals?: boolean; } =
+  const extraParamsQuery: { parents?: "resolve"; totals?: boolean } =
     effectiveQuery.type === "filterText"
       ? { parents: "resolve" }
       : { totals: true };
