@@ -39,8 +39,9 @@ export const useAddToGroupForm = ({
 
   const onValidSubmit = (formValues: FormValues) => {
     const targetGroup = formValues.targetGroup;
+    if (!targetGroup) return;
     return addToGroup({
-      groups: targetGroup ? [targetGroup] : [],
+      group: targetGroup,
       sboms,
     });
   };

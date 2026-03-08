@@ -57,7 +57,7 @@ export const useFetchSBOMLabels = (filterText: string) => {
 };
 
 export const useFetchSBOMs = (
-  groups: string[] = [],
+  groupId: string | null,
   params: HubRequestParams = {},
   labels: Label[] = [],
   disableQuery = false,
@@ -66,13 +66,13 @@ export const useFetchSBOMs = (
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMsQueryKey, groups, params, labelQuery],
+    queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
     queryFn: () =>
       listSboms({
         client,
         query: {
           ...rest,
-          group: groups,
+          group: groupId ? [groupId] : [],
           q: [q, labelQuery].filter((e) => e).join("&"),
         },
       }),
@@ -275,17 +275,17 @@ export const useFetchSbomsLicenseIds = (sbomId: string) => {
 };
 
 export const useAddSBOMsToGroupsMutation = (
-  onSuccess: (payload: { groups: Group[]; sboms: SbomHead[] }) => void,
+  onSuccess: (payload: { group: Group; sboms: SbomHead[] }) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { groups: Group[]; sboms: SbomHead[] }) => {
-      const { sboms, groups } = payload;
+    mutationFn: async (payload: { group: Group; sboms: SbomHead[] }) => {
+      const { sboms, group } = payload;
       const response = await bulkUpdateSbomGroupAssignments({
         client,
         body: {
-          group_ids: groups.map((e) => e.id),
+          group_ids: [group.id],
           sbom_ids: sboms.map((e) => e.id),
         },
       });
@@ -293,7 +293,7 @@ export const useAddSBOMsToGroupsMutation = (
     },
     onSuccess: async (_response, payload) => {
       await queryClient.invalidateQueries({
-        queryKey: [SBOMsQueryKey],
+        queryKey: [SBOMsQueryKey, payload.group.id],
       });
       onSuccess(payload);
     },

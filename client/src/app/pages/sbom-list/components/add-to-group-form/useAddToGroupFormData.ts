@@ -16,10 +16,10 @@ export const useAddToGroupFormData = ({
   const { pushNotification } = useContext(NotificationsContext);
 
   const onAddSuccess = useCallback(
-    (payload: { groups: Group[]; sboms: SbomHead[] }) => {
-      const { sboms, groups } = payload;
+    (payload: { group: Group; sboms: SbomHead[] }) => {
+      const { sboms, group } = payload;
       pushNotification({
-        title: `${sboms.length} SBOM(s) added to the group ${groups.map((e) => e.name).join(",")}`,
+        title: `${sboms.length} SBOM(s) added to the group ${group.name}`,
         variant: "success",
       });
       onActionSuccess();

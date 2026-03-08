@@ -52,7 +52,7 @@ export const SBOMGroupDetails: React.FC = () => {
         <Content component="p">{sbomGroup?.description} </Content>
       </PageSection>
       <PageSection>
-        <SbomSearchProvider sbomGroupIds={[sbomGroupId]}>
+        <SbomSearchProvider sbomGroupId={sbomGroupId}>
           <SbomToolbar showFilters />
           <SbomTable />
         </SbomSearchProvider>

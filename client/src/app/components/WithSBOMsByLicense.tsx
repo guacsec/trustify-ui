@@ -17,7 +17,7 @@ export const WithSBOMsByLicense: React.FC<WithSBOMsByLicenseProps> = ({
   children,
 }) => {
   const { result, isFetching, fetchError } = useFetchSBOMs(
-    undefined,
+    null,
     {
       filters: [{ field: "license", operator: "=", value: licenseId }],
       page: { itemsPerPage: 1, pageNumber: 1 },
