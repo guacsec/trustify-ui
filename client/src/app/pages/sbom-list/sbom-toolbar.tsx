@@ -116,7 +116,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 
       <GroupFormModal
         isOpen={isCreateUpdateGroupModalOpen}
-        group={createUpdateGroup ?? null}
+        group={createUpdateGroup}
         onClose={() => setSaveGroupModalState(null)}
       />
     </>

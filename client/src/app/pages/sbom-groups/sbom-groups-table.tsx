@@ -220,7 +220,7 @@ export const SbomGroupsTable: React.FC = () => {
       />
       <GroupFormModal
         isOpen={isCreateUpdateGroupModalOpen}
-        group={createUpdateGroup ?? null}
+        group={createUpdateGroup}
         onClose={() => setSaveGroupModalState(null)}
       />
       <ConfirmDialog
