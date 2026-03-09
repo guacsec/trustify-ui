@@ -55,6 +55,7 @@ const AddToGroupModalInner: React.FC<IAddToGroupModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       aria-label={"Add SBOMs to Group"}
+      style={{ overflow: "visible" }}
     >
       <ModalHeader title={"Add SBOM(s) to group"} />
       <ModalBody>

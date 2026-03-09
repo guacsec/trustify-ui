@@ -121,6 +121,8 @@ export const DrilldownSelect = ({
   const isOpen = controlledIsOpen ?? internalIsOpen;
   const setIsOpen = controlledSetIsOpen ?? setInternalIsOpen;
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const [activeMenu, setActiveMenu] = useState<string>(ROOT_MENU_ID);
@@ -241,10 +243,38 @@ export const DrilldownSelect = ({
       ref={menuRef}
       isScrollable
       onSelect={handleOnSelectMenu}
+      onKeyDown={(event) => {
+        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+
+        const target = event.target as HTMLElement;
+        const li = target.closest("li");
+        if (!li) return;
+
+        const focusable = Array.from(
+          li.querySelectorAll<HTMLElement>(
+            "button:not(:disabled), a:not(:disabled)",
+          ),
+        );
+        if (focusable.length <= 1) return;
+
+        const currentIndex = focusable.indexOf(target);
+        if (currentIndex === -1) return;
+
+        const nextIndex =
+          event.key === "ArrowRight"
+            ? Math.min(currentIndex + 1, focusable.length - 1)
+            : Math.max(currentIndex - 1, 0);
+
+        if (nextIndex !== currentIndex) {
+          event.preventDefault();
+          focusable[nextIndex].focus();
+        }
+      }}
     >
       <MenuSearch>
         <MenuSearchInput>
           <SearchInput
+            ref={searchInputRef}
             value={searchInputValue}
             onChange={(_event, value) => handleSearchInputChange(value)}
             onClear={(e) => {
@@ -307,6 +337,13 @@ export const DrilldownSelect = ({
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       onOpenChangeKeys={["Escape"]}
+      onToggleKeydown={(event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          searchInputRef?.current?.focus();
+        }
+      }}
+      popperProps={{ appendTo: "inline" }}
     />
   );
 };
