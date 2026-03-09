@@ -56,7 +56,7 @@ export const SbomGroupsToolbar: React.FC = () => {
       </Toolbar>
       <GroupFormModal
         isOpen={isCreateUpdateGroupModalOpen}
-        group={createUpdateGroup ?? null}
+        group={createUpdateGroup}
         onClose={() => setSaveGroupModalState(null)}
       />
     </>

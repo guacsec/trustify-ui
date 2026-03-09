@@ -25,12 +25,15 @@ export interface FormValues {
 export interface UseGroupFormArgs {
   /** The group being edited, or null for create mode */
   group: Group | null;
+  /** Preloaded parent group for edit mode */
+  initialParentGroup: Group | null;
   /** Data result from useGroupFormData */
   formData: ReturnType<typeof useGroupFormData>;
 }
 
 export const useGroupForm = ({
   group,
+  initialParentGroup,
   formData: { createGroup, updateGroup },
 }: UseGroupFormArgs) => {
   const siblingsRef = useRef<Group[]>([]);
@@ -79,16 +82,14 @@ export const useGroupForm = ({
     defaultValues: {
       name: group?.name || "",
       description: group?.description || "",
-      isProduct: group?.labels?.[PRODUCT_LABEL_KEY] === "true",
+      isProduct: typeof group?.labels?.[PRODUCT_LABEL_KEY] === "string",
       labels: Object.entries(group?.labels ?? {})
         .filter(([key]) => key !== PRODUCT_LABEL_KEY)
         .map(([key, value]) => joinKeyValueAsString({ key, value })),
-      // TODO infer parent group
-      parentGroup: null,
+      parentGroup: initialParentGroup,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
-    shouldUnregister: true,
   });
 
   // Watch parentGroupId to fetch siblings for that parent
@@ -141,7 +142,6 @@ export const useGroupForm = ({
       createGroup(payload);
     }
   };
-
   return {
     form,
     isSubmitDisabled: !isValid || isSubmitting || isValidating || !isDirty,
