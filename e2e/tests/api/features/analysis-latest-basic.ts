@@ -57,7 +57,7 @@ const spdxExpectedPublishedDateBinaryLatest = "2025-12-22 17:21:45+00";
 test.describe("Analysis / Latest / Basic", () => {
   test.describe.configure({ mode: "serial" });
 
-  var sbomIdsLatestBasicOlder: string[] = [];
+  const sbomIdsLatestBasicOlder: string[] = [];
 
   test.afterAll(async ({ axios }) => {
     await deleteSboms(axios, sbomIdsLatestBasicOlder);
@@ -286,7 +286,7 @@ test.describe("Analysis / Latest / Basic", () => {
     });
 
     test.describe("Latest SBOM", () => {
-      var sbomIdsLatestBasicLatest: string[] = [];
+      const sbomIdsLatestBasicLatest: string[] = [];
 
       test.beforeAll(async ({ axios }) => {
         const fullSbomPaths = getFullSbomPaths(sbomDir, sbomsCdxLatest);
@@ -516,7 +516,7 @@ test.describe("Analysis / Latest / Basic", () => {
   test.describe("SPDX", () => {
     test.describe.configure({ mode: "serial" });
 
-    var sbomIdsLatestBasicOlderSpdx: string[] = [];
+    const sbomIdsLatestBasicOlderSpdx: string[] = [];
 
     test.describe("Older SBOM", () => {
       test.beforeAll(async ({ axios }) => {
@@ -624,7 +624,7 @@ test.describe("Analysis / Latest / Basic", () => {
     });
 
     test.describe("Latest SBOM", () => {
-      var sbomIdsLatestBasicLatestSpdx: string[] = [];
+      const sbomIdsLatestBasicLatestSpdx: string[] = [];
 
       test.beforeAll(async ({ axios }) => {
         const fullSbomPaths = getFullSbomPaths(sbomDir, sbomsSpdxLatest);

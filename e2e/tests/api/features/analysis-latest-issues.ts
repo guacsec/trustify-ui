@@ -8,7 +8,7 @@ test.describe("Analysis / Latest / Issues", () => {
   test.describe.configure({ mode: "serial" });
 
   test.describe("Top-level ancestor is 'upstream'", () => {
-    var sbomIdsTopLevelAncestorIsUpstream: string[] = [];
+    const sbomIdsTopLevelAncestorIsUpstream: string[] = [];
 
     const topLevelAncestorIsUpstreamSboms = [
       "jboss-eap-7.4-els-on-rhel8-product.json.bz2",
@@ -142,7 +142,7 @@ test.describe("Analysis / Latest / Issues", () => {
   });
 
   test.describe("Creator is 'Red Hat'", () => {
-    var sbomIdsCreatorIsRedHat: string[] = [];
+    const sbomIdsCreatorIsRedHat: string[] = [];
 
     const creatorIsRedHatSboms = [
       "ocp-tools-4.12.json.bz2",
