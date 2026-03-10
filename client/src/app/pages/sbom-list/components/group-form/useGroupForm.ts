@@ -75,7 +75,22 @@ export const useGroupForm = ({
     description: string().trim().max(255),
     isProduct: boolean().required(),
     labels: array().of(string().defined()).defined().default([]),
-    parentGroup: mixed<Group>().nullable().defined().default(null),
+    parentGroup: mixed<Group>()
+      .nullable()
+      .defined()
+      .default(null)
+      .test(
+        "circular-parent",
+        "Circular dependency, a group cannot reference itself",
+        function (value) {
+          if (!value) return true;
+          if (value.id !== group?.id) return true;
+
+          return this.createError({
+            message: `Parent cannot reference itself`,
+          });
+        },
+      ),
   });
 
   const form = useForm<FormValues>({
