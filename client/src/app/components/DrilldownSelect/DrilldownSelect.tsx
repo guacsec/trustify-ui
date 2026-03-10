@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import type { AxiosError } from "axios";
 
@@ -341,6 +341,12 @@ export const DrilldownSelect = ({
         if (event.key === "ArrowDown") {
           event.preventDefault();
           searchInputRef?.current?.focus();
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault();
+          const lastItem = menuRef.current?.querySelector<HTMLElement>(
+            "ul li:last-child button:not(:disabled), ul li:last-child a:not(:disabled)",
+          );
+          lastItem?.focus();
         }
       }}
       popperProps={{ appendTo: "inline" }}
