@@ -81,7 +81,7 @@ export const useGroupForm = ({
       .default(null)
       .test(
         "circular-parent",
-        "A group with this name already exists",
+        "Circular dependency, a group cannot reference itself",
         function (value) {
           if (!value) return true;
           if (value.id !== group?.id) return true;
