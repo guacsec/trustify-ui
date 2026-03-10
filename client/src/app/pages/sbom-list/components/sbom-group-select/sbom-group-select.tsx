@@ -1,69 +1,103 @@
 import React from "react";
 
-import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
+import { useDebounceValue } from "usehooks-ts";
 
 import type { Group } from "@app/client";
+import {
+  type DrilldownOption,
+  DrilldownSelect,
+  type SearchQuery,
+} from "@app/components/DrilldownSelect/DrilldownSelect";
+import { FILTER_NULL_VALUE, FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
+import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
-import { DrilldownSelect } from "../../../../components/DrilldownSelect";
-import { buildHierarchy } from "./utils";
-
-interface GroupSelectProps {
-  value: Group | undefined;
-  onChange: (value: Group | undefined) => void;
-  placeholder?: string;
-  limit: number;
+interface ISbomGroupSelectProps {
+  value?: Group;
+  onChange: (value?: Group) => void;
 }
 
-export const GroupSelect: React.FC<GroupSelectProps> = ({
+export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
   value,
   onChange,
-  placeholder = "Select",
-  limit,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState<SearchQuery>({
+    type: "drillIn",
+    parentIds: [],
+  });
+  const [debouncedSearchQuery] = useDebounceValue(searchQuery, 300);
+  const effectiveQuery =
+    searchQuery.type === "drillIn" ? searchQuery : debouncedSearchQuery;
 
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const parentIdQuery =
+    effectiveQuery.type === "drillIn"
+      ? (effectiveQuery.parentIds[effectiveQuery.parentIds.length - 1] ??
+        FILTER_NULL_VALUE)
+      : null;
 
-  const { rawData: groups } = useFetchSBOMGroups(
-    {
-      page: { pageNumber: 1, itemsPerPage: limit },
-      ...(searchQuery && {
-        filters: [{ field: "name", operator: "~", value: searchQuery }],
-      }),
+  const paramsQuery =
+    effectiveQuery.type === "filterText"
+      ? {
+          filters: [
+            { field: FILTER_TEXT_CATEGORY_KEY, value: effectiveQuery.value },
+          ],
+          page: { pageNumber: 1, itemsPerPage: 10 },
+        }
+      : {};
+
+  const extraParamsQuery: { parents?: "resolve"; totals?: boolean } =
+    effectiveQuery.type === "filterText"
+      ? { parents: "resolve" }
+      : { totals: true };
+
+  const {
+    result: { data: groups },
+    references,
+    isFetching,
+    fetchError,
+  } = useFetchSBOMGroups(parentIdQuery, paramsQuery, extraParamsQuery);
+
+  const groupToOption = (
+    group: Group & {
+      number_of_groups?: number | null;
+      parents?: Array<string> | null;
     },
-    { parents: "resolve" },
-  );
+  ): DrilldownOption => {
+    const option: DrilldownOption = {
+      id: group.id,
+      name: group.name,
+      hasChildren: (group.number_of_groups ?? 0) > 0,
+      value: group,
+    };
 
-  const mappedGroups = groups
-    ? buildHierarchy(groups, searchQuery.length < 1)
-    : [];
-
-  const onClear = (_event: React.SyntheticEvent) => {
-    _event.stopPropagation();
-    onChange(undefined);
-    setSearchQuery("");
-  };
-
-  const onSelect = (group: Group) => {
-    onChange(group);
-    setSearchQuery("");
-    setIsOpen(false);
+    switch (searchQuery.type) {
+      case "filterText": {
+        const parentsChain = (group.parents || [])
+          .map((parentId) => references.get(parentId)?.name ?? parentId)
+          .join(" > ");
+        return {
+          ...option,
+          itemProps: {
+            description: parentsChain,
+          },
+        };
+      }
+      case "drillIn": {
+        return option;
+      }
+    }
   };
 
   return (
     <DrilldownSelect
-      options={mappedGroups.map((gr) => ({
-        ...gr,
-        description: gr.parentsNames,
-      }))}
-      value={value}
-      onChange={onSelect}
-      placeholder={placeholder}
-      onInputChange={setSearchQuery}
-      inputValue={searchQuery}
-      onClear={onClear}
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
+      options={groups.map(groupToOption)}
+      isLoading={isFetching}
+      fetchError={fetchError ?? undefined}
+      value={value ? groupToOption(value) : undefined}
+      onChange={(option) => onChange(option?.value)}
+      searchQuery={searchQuery}
+      onSearchQueryChange={setSearchQuery}
+      placeholder={"Select parent group"}
+      searchInputProps={{ placeholder: "Find by name" }}
     />
   );
 };

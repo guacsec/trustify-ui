@@ -1,6 +1,7 @@
 import React from "react";
 import type { AxiosError } from "axios";
 import {
+  FILTER_NULL_VALUE,
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
@@ -110,8 +111,8 @@ export const SbomGroupsProvider: React.FunctionComponent<
     isFetching: isRootsFetching,
     fetchError,
   } = useFetchSBOMGroups(
+    FILTER_NULL_VALUE,
     {
-      filters: [{ field: "parent", operator: "=", value: "\0" }],
       ...getHubRequestParams({
         ...tableControlState,
         hubSortFieldKeys: {

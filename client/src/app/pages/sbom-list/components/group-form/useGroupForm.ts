@@ -9,7 +9,7 @@ import {
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
-import { PRODUCT_LABEL_KEY } from "@app/Constants";
+import { FILTER_NULL_VALUE, PRODUCT_LABEL_KEY } from "@app/Constants";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
@@ -94,12 +94,9 @@ export const useGroupForm = ({
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");
-  const { result, isFetching } = useFetchSBOMGroups({
-    page: { pageNumber: 1, itemsPerPage: 1000 },
-    filters: [
-      { field: "parent", operator: "=", value: parentGroup?.id || "\0" },
-    ],
-  });
+  const { result, isFetching } = useFetchSBOMGroups(
+    parentGroup?.id || FILTER_NULL_VALUE,
+  );
 
   siblingsRef.current = result.data;
 
