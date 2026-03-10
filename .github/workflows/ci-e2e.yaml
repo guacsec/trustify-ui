@@ -28,7 +28,7 @@ jobs:
           docker save -o /tmp/trustify-ui.tar ghcr.io/guacsec/trustify-ui:pr-test
 
       - name: Upload trustify-ui image as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: trustify-ui
           path: /tmp/trustify-ui.tar
