@@ -9,12 +9,15 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 
+import type { Group } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
 
+import { AddToGroupModal } from "./components/add-to-group-form";
+import { GroupFormModal } from "./components/group-form";
 import { SbomSearchContext } from "./sbom-context";
 
 interface SbomToolbarProps {
@@ -27,6 +30,20 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
+
+  // Create Form Modal
+  const [saveGroupModalState, setSaveGroupModalState] = React.useState<
+    "create" | Group | null
+  >(null);
+  const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
+  const createUpdateGroup =
+    saveGroupModalState !== "create" ? saveGroupModalState : null;
+
+  // Add to group Modal
+  const [isAddToGroupModalOpen, setIsAddToGroupModalOpen] =
+    React.useState(false);
+
+  // Table controls
 
   const {
     tableControls,
@@ -46,57 +63,80 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   } = tableControls;
 
   const {
+    selectedItems,
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
 
   return (
-    <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
-      <ToolbarContent>
-        {showBulkSelector && (
-          <ToolbarBulkSelector {...toolbarBulkSelectorProps} />
-        )}
-        {showFilters && <FilterToolbar {...filterToolbarProps} />}
-        {showActions && (
-          <>
-            <ToolbarItem>
-              <Button variant="primary">Create group</Button>
-            </ToolbarItem>
-            <ToolbarItem>
-              <Button variant="secondary" isDisabled>
-                Add to group
-              </Button>
-            </ToolbarItem>
-            <ToolbarItem>
-              <KebabDropdown
-                ariaLabel="SBOM actions"
-                dropdownItems={[
-                  <DropdownItem
-                    key="upload-sbom"
-                    component="button"
-                    onClick={() => navigate(Paths.sbomUpload)}
-                  >
-                    Upload SBOM
-                  </DropdownItem>,
-                  <DropdownItem
-                    key="scan-sbom"
-                    component="button"
-                    onClick={() => navigate(Paths.sbomScan)}
-                  >
-                    Generate vulnerability report
-                  </DropdownItem>,
-                ]}
-              />
-            </ToolbarItem>
-          </>
-        )}
-        <ToolbarItem {...paginationToolbarItemProps}>
-          <SimplePagination
-            idPrefix="sbom-table"
-            isTop
-            paginationProps={paginationProps}
-          />
-        </ToolbarItem>
-      </ToolbarContent>
-    </Toolbar>
+    <>
+      <Toolbar {...toolbarProps} aria-label="sbom-toolbar">
+        <ToolbarContent>
+          {showBulkSelector && (
+            <ToolbarBulkSelector {...toolbarBulkSelectorProps} />
+          )}
+          {showFilters && <FilterToolbar {...filterToolbarProps} />}
+          {showActions && (
+            <>
+              <ToolbarItem>
+                <Button
+                  variant="primary"
+                  onClick={() => setSaveGroupModalState("create")}
+                >
+                  Create group
+                </Button>
+              </ToolbarItem>
+              <ToolbarItem>
+                <Button
+                  variant="secondary"
+                  isDisabled={selectedItems.length === 0}
+                  onClick={() => setIsAddToGroupModalOpen(true)}
+                >
+                  Add to group
+                </Button>
+              </ToolbarItem>
+              <ToolbarItem>
+                <KebabDropdown
+                  ariaLabel="SBOM actions"
+                  dropdownItems={[
+                    <DropdownItem
+                      key="upload-sbom"
+                      component="button"
+                      onClick={() => navigate(Paths.sbomUpload)}
+                    >
+                      Upload SBOM
+                    </DropdownItem>,
+                    <DropdownItem
+                      key="scan-sbom"
+                      component="button"
+                      onClick={() => navigate(Paths.sbomScan)}
+                    >
+                      Generate vulnerability report
+                    </DropdownItem>,
+                  ]}
+                />
+              </ToolbarItem>
+            </>
+          )}
+          <ToolbarItem {...paginationToolbarItemProps}>
+            <SimplePagination
+              idPrefix="sbom-table"
+              isTop
+              paginationProps={paginationProps}
+            />
+          </ToolbarItem>
+        </ToolbarContent>
+      </Toolbar>
+
+      <GroupFormModal
+        isOpen={isCreateUpdateGroupModalOpen}
+        group={createUpdateGroup}
+        onClose={() => setSaveGroupModalState(null)}
+      />
+      <AddToGroupModal
+        sboms={selectedItems}
+        isOpen={isAddToGroupModalOpen}
+        onClose={() => setIsAddToGroupModalOpen(false)}
+      />
+    </>
   );
 };

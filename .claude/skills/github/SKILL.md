@@ -2,22 +2,28 @@
 name: github
 description: Create and manage GitHub issues, pull requests, and interact with repositories. Use when creating issues, PRs, viewing GitHub resources, managing labels, or checking CI status.
 argument-hint: [ message ]
-disable-model-invocation: false
-allowed-tools: Bash(gh *)
+disable-model-invocation: true
+allowed-tools:
+  - Bash(gh issue view *)
+  - Bash(gh issue create *)
+  - Bash(gh issue list *)
+  - Bash(gh pr view *)
+  - Bash(gh pr create *)
+  - Bash(gh pr comment *)
 ---
 
 # GitHub Assistant
 
 - Interact with GitHub repositories using the GitHub CLI (`gh`).
-- In all interactions and commit messages, be extremelly concise and sacrifice
+- In all interactions and commit messages, be extremely concise and sacrifice
   grammar for the sake of concision.
 
 ## Gather context
 
 - Infer the type of resource being requested from $ARGUMENTS: issue, pull
   request, labels, etc.
-- Evaluate $ARGUMENTS to see if all mandatory parameters from "gh" are defined,
-  if not ask more questions to define them
+- Evaluate $ARGUMENTS to see if all mandatory parameters from "gh" are defined;
+  if not, ask more questions to define them
 
 ## Take action
 

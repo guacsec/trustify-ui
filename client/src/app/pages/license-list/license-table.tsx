@@ -38,7 +38,7 @@ export const LicenseTable: React.FC = () => {
 
   return (
     <>
-      <Table {...tableProps} aria-label="License table">
+      <Table {...tableProps} aria-label="license-table">
         <Thead>
           <Tr>
             <TableHeaderContentWithControls {...tableControls}>

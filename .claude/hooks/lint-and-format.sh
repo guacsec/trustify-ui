@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Check if jq is available, exit gracefully if not
+if ! command -v jq &> /dev/null; then
+  echo "⚠️  jq is not installed, skipping lint and format checks" >&2
+  exit 0
+fi
+
 # Read hook input from stdin
 INPUT=$(cat)
 
