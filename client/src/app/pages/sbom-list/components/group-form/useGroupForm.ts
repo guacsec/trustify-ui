@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -87,7 +87,7 @@ export const useGroupForm = ({
           if (value.id !== group?.id) return true;
 
           return this.createError({
-            message: `Parent cannot reference itself`,
+            message: "Parent cannot reference itself",
           });
         },
       ),
@@ -109,20 +109,32 @@ export const useGroupForm = ({
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");
-  const { result, isFetching } = useFetchSBOMGroups(
+  const { result: siblingGroups, isFetching } = useFetchSBOMGroups(
     parentGroup?.id || FILTER_NULL_VALUE,
   );
 
-  siblingsRef.current = result.data;
+  const siblingsKey = useMemo(() => {
+    return siblingGroups.data.map((g) => g.id).join(",");
+  }, [siblingGroups]);
+  siblingsRef.current = siblingGroups.data;
 
-  // Re-validate name when fetch completes (isFetching transitions true → false)
-  const wasFetchingRef = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: siblingsKey is an intentional trigger dependency
   useEffect(() => {
-    if (wasFetchingRef.current && !isFetching) {
-      form.trigger("name");
+    form.trigger("name");
+  }, [siblingsKey, form]);
+
+  const prevParentRef = useRef<Group | null>(null);
+  useEffect(() => {
+    const isInitial = prevParentRef.current === null;
+    const hasChanged = prevParentRef.current !== parentGroup;
+    prevParentRef.current = parentGroup;
+
+    // Mark name as touched so validation errors display even when only the
+    // parent changed (the UI gates error visibility on isDirty || isTouched)
+    if (hasChanged && !isInitial) {
+      form.setValue("name", form.getValues("name"), { shouldTouch: true });
     }
-    wasFetchingRef.current = isFetching;
-  }, [isFetching, form]);
+  }, [parentGroup, form]);
 
   const {
     handleSubmit,
@@ -156,7 +168,8 @@ export const useGroupForm = ({
   };
   return {
     form,
-    isSubmitDisabled: !isValid || isSubmitting || isValidating || !isDirty,
+    isSubmitDisabled:
+      !isValid || isSubmitting || isValidating || !isDirty || isFetching,
     isCancelDisabled: isSubmitting || isValidating,
     onSubmit: handleSubmit(onValidSubmit),
   };
