@@ -106,12 +106,27 @@ export const SbomGroupsProvider: React.FunctionComponent<
   // Expansion state stored in React state (transient UI state, not URL-worthy)
   const [expandedNodeIds, setExpandedNodeIds] = React.useState<string[]>([]);
 
+  // When a search filter is active, pass null to search across ALL groups
+  // (regardless of hierarchy). When no search is active, pass FILTER_NULL_VALUE
+  // to show only root-level groups.
+  const searchTerm =
+    tableControlState.filterState.filterValues[FILTER_TEXT_CATEGORY_KEY]?.[0] ??
+    "";
+  const isSearchActive = searchTerm.trim().length > 0;
+  const parentFilter = isSearchActive ? null : FILTER_NULL_VALUE;
+
+  // Reset expanded nodes when the search term changes so stale children
+  // from a previous browse/search don't pollute the current results.
+  React.useEffect(() => {
+    setExpandedNodeIds([]);
+  }, [searchTerm]);
+
   const {
     result: { data: rootGroups, total: totalItemCount },
     isFetching: isRootsFetching,
     fetchError,
   } = useFetchSBOMGroups(
-    FILTER_NULL_VALUE,
+    parentFilter,
     {
       ...getHubRequestParams({
         ...tableControlState,
