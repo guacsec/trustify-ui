@@ -117,6 +117,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
 
   // Reset expanded nodes when the search term changes so stale children
   // from a previous browse/search don't pollute the current results.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on searchTerm change
   React.useEffect(() => {
     setExpandedNodeIds([]);
   }, [searchTerm]);
