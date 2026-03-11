@@ -1,40 +1,37 @@
 import React from "react";
-import { ButtonVariant, Skeleton } from "@patternfly/react-core";
 
+import type { AxiosError } from "axios";
+
+import { ButtonVariant, Skeleton } from "@patternfly/react-core";
 import {
   ActionsColumn,
   Table,
   Tbody,
   Td,
-  type TdProps,
   TreeRowWrapper,
   type IAction,
+  type TdProps,
 } from "@patternfly/react-table";
+
+import type { Group } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { TableCellError } from "@app/components/TableCellError";
 import { ConditionalTableBody } from "@app/components/TableControls";
-import type { Group } from "@app/client";
+import { childGroupDeleteDialogProps } from "@app/Constants";
+import { useDeleteSbomGroupMutation } from "@app/queries/sbom-groups";
+
+import { SbomGroupTableData } from "./sbom-group-table-data";
 import {
   SbomGroupsContext,
   type SbomGroupTreeNode,
 } from "./sbom-groups-context";
-import { SbomGroupTableData } from "./sbom-group-table-data";
-import type { AxiosError } from "axios";
-import { useDeleteSbomGroupMutation } from "@app/queries/sbom-groups";
-import { childGroupDeleteDialogProps } from "@app/Constants";
-import { GroupFormModal } from "../sbom-list/components/group-form";
 
 export const SbomGroupsTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const [saveGroupModalState, setSaveGroupModalState] = React.useState<
-    "create" | Group | null
-  >(null);
-  const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
-  const createUpdateGroup =
-    saveGroupModalState !== "create" ? saveGroupModalState : null;
+
   const {
     isFetching,
     fetchError,
@@ -42,6 +39,7 @@ export const SbomGroupsTable: React.FC = () => {
     tableControls,
     treeExpansion: { expandedNodeIds, setExpandedNodeIds, childrenNodeStatus },
     treeData,
+    setGroupCreateUpdateModalState,
   } = React.useContext(SbomGroupsContext);
 
   const {
@@ -161,7 +159,7 @@ export const SbomGroupsTable: React.FC = () => {
     const lastRowActions = (node: SbomGroupTreeNode): IAction[] => [
       {
         title: "Edit",
-        onClick: () => setSaveGroupModalState(node),
+        onClick: () => setGroupCreateUpdateModalState(node),
       },
       {
         title: "Delete",
@@ -218,11 +216,7 @@ export const SbomGroupsTable: React.FC = () => {
         isTop={false}
         paginationProps={paginationProps}
       />
-      <GroupFormModal
-        isOpen={isCreateUpdateGroupModalOpen}
-        group={createUpdateGroup}
-        onClose={() => setSaveGroupModalState(null)}
-      />
+
       <ConfirmDialog
         {...childGroupDeleteDialogProps(childGroupToDelete)}
         inProgress={isDeletingChildGroup}

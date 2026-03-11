@@ -1,10 +1,13 @@
 import React from "react";
+
 import type { AxiosError } from "axios";
+
 import {
   FILTER_NULL_VALUE,
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
+import type { Group, PaginatedResultsGroupDetails } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   getHubRequestParams,
@@ -13,12 +16,11 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useSelectionState } from "@app/hooks/useSelectionState";
-
-import type { PaginatedResultsGroupDetails } from "@app/client";
 import {
   useFetchSbomGroupChildren,
   useFetchSBOMGroups,
 } from "@app/queries/sbom-groups";
+
 import { buildSbomGroupTree } from "./utils";
 
 export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];
@@ -66,6 +68,10 @@ interface ISbomGroupsContext {
   treeExpansion: ITreeExpansionState;
   treeSelection: ITreeSelectionState;
   treeData: SbomGroupTreeNode[];
+
+  // Group Form Modal
+  groupCreateUpdateModalState: "create" | Group | null;
+  setGroupCreateUpdateModalState: (value: "create" | Group | null) => void;
 }
 
 const contextDefaultValue = {} as ISbomGroupsContext;
@@ -161,6 +167,10 @@ export const SbomGroupsProvider: React.FunctionComponent<
     hasActionsColumn: true,
   });
 
+  // Create/Edit states
+  const [groupCreateUpdateModalState, setGroupCreateUpdateModalState] =
+    React.useState<"create" | Group | null>(null);
+
   return (
     <SbomGroupsContext.Provider
       value={{
@@ -182,6 +192,8 @@ export const SbomGroupsProvider: React.FunctionComponent<
           selectAllNodes,
         },
         treeData: roots,
+        groupCreateUpdateModalState,
+        setGroupCreateUpdateModalState,
       }}
     >
       {children}
