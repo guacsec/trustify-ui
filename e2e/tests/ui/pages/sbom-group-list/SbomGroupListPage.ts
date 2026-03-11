@@ -68,6 +68,10 @@ export class SbomGroupListPage {
           this._page,
           "Confirm dialog",
         )) as TableActionReturnMap[T];
+      default: {
+        const exhaustiveCheck: never = actionName;
+        throw new Error(`Unhandled action: ${exhaustiveCheck}`);
+      }
     }
   }
 }
