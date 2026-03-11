@@ -196,9 +196,7 @@ When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
-    await expect(dialog).toHaveDialogTitle(
-      "Warning alert:Permanently delete SBOM?",
-    );
+    await expect(dialog).toHaveDialogTitle("Permanently delete SBOM?");
     await dialog.clickConfirm();
   },
 );

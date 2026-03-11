@@ -43,8 +43,8 @@ export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
           page: { pageNumber: 1, itemsPerPage: 10 },
         }
       : {
-         page: { pageNumber: 1, itemsPerPage: 0 },
-      };
+          page: { pageNumber: 1, itemsPerPage: 0 },
+        };
 
   const extraParamsQuery: { parents?: "resolve"; totals?: boolean } =
     effectiveQuery.type === "filterText"

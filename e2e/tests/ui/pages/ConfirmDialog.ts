@@ -14,7 +14,9 @@ export class DeletionConfirmDialog {
   }
 
   getDeletionConfirmDialogHeading() {
-    return this._deleteConfirmationDialog.getByRole("heading", { level: 1 });
+    return this._deleteConfirmationDialog.locator(
+      ".pf-v6-c-modal-box__title-text",
+    );
   }
 
   async clickConfirm() {

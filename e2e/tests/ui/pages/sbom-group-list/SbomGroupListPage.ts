@@ -2,7 +2,6 @@ import type { Page } from "@playwright/test";
 
 import { Navigation } from "../Navigation";
 import { Pagination } from "../Pagination";
-import { Table } from "../Table";
 import { Toolbar } from "../Toolbar";
 import { GroupFormModal } from "./GroupFormModal";
 import { DeletionConfirmDialog } from "../ConfirmDialog";
@@ -45,7 +44,7 @@ export class SbomGroupListPage {
   async toolbarOpenCreateGroupModal() {
     await this._page.getByRole("button", { name: "Create group" }).click();
     return await GroupFormModal.build(this._page, "Create group");
-  }  
+  }
 
   async tableClickAction<T extends keyof TableActionReturnMap>(
     actionName: T,

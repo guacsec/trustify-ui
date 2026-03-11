@@ -1,8 +1,11 @@
 // @ts-check
 
+import type { Page } from "@playwright/test";
+
 import { expect } from "../../assertions";
 import { test } from "../../fixtures";
 import { login } from "../../helpers/Auth";
+import type { GroupFormModal } from "./GroupFormModal";
 import { SbomGroupListPage } from "./SbomGroupListPage";
 
 const filterByGroupName = async (
@@ -11,6 +14,43 @@ const filterByGroupName = async (
 ) => {
   const toolbar = await listPage.getToolbar();
   await toolbar.applyFilter({ Filter: groupName });
+};
+
+const createGroup = async (
+  listPage: SbomGroupListPage,
+  name: string,
+  options?: { parentGroup?: string },
+) => {
+  const modal = await listPage.toolbarOpenCreateGroupModal();
+  await modal.fillName(name);
+  if (options?.parentGroup) {
+    await modal.selectParentGroup(options.parentGroup);
+  }
+  await modal.submit();
+};
+
+const expectDuplicateNameError = async (
+  modal: GroupFormModal,
+  name: string,
+) => {
+  await expect(
+    modal._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
+  ).toContainText(`${name} already exists in group`);
+  const submitButton = modal._dialog.getByRole("button", { name: "submit" });
+  await expect(submitButton).not.toBeEnabled();
+};
+
+const expandParentAndEditChild = async (
+  page: Page,
+  listPage: SbomGroupListPage,
+  parentName: string,
+  childName: string,
+) => {
+  await filterByGroupName(listPage, parentName);
+  const treegrid = page.getByRole("treegrid");
+  await treegrid.getByRole("button", { name: /expand row/i }).click();
+  await expect(treegrid.getByRole("link", { name: childName })).toBeVisible();
+  return await listPage.tableClickAction("Edit", 1);
 };
 
 test.describe("Create", { tag: ["@tier1", "@crud"] }, () => {
@@ -22,10 +62,7 @@ test.describe("Create", { tag: ["@tier1", "@crud"] }, () => {
     const groupName = `test-group-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create group
-    const modal = await listPage.toolbarOpenCreateGroupModal();
-    await modal.fillName(groupName);
-    await modal.submit();
+    await createGroup(listPage, groupName);
 
     // Verify group appears in table
     await filterByGroupName(listPage, groupName);
@@ -100,28 +137,17 @@ test.describe("Create", { tag: ["@tier1", "@crud"] }, () => {
     const groupName = `test-group-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create group1
-    const modal1 = await listPage.toolbarOpenCreateGroupModal();
-    await modal1.fillName(groupName);
-    await modal1.submit();
+    await createGroup(listPage, groupName);
 
     await filterByGroupName(listPage, groupName);
     await expect(
       page.getByRole("treegrid").getByRole("link", { name: groupName }),
     ).toBeVisible();
 
-    // Create group2
+    // Attempt to create duplicate
     const modal2 = await listPage.toolbarOpenCreateGroupModal();
     await modal2.fillName(groupName);
-
-    // Verify error message
-    await expect(
-      modal2._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
-    ).toContainText(`${groupName} already exists in group`);
-
-    // Verify submit button
-    const submitButton = modal2._dialog.getByRole("button", { name: "submit" });
-    await expect(submitButton).not.toBeEnabled();
+    await expectDuplicateNameError(modal2, groupName);
   });
 
   test("Create Group with same name inside child node", async ({ page }) => {
@@ -129,32 +155,14 @@ test.describe("Create", { tag: ["@tier1", "@crud"] }, () => {
     const childName = `test-child-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create parent group
-    const parentModal = await listPage.toolbarOpenCreateGroupModal();
-    await parentModal.fillName(parentName);
-    await parentModal.submit();
+    await createGroup(listPage, parentName);
+    await createGroup(listPage, childName, { parentGroup: parentName });
 
-    // Create first child under parent
-    const child1Modal = await listPage.toolbarOpenCreateGroupModal();
-    await child1Modal.fillName(childName);
-    await child1Modal.selectParentGroup(parentName);
-    await child1Modal.submit();
-
-    // Attempt to create second child with same name under same parent
+    // Attempt to create duplicate child under same parent
     const child2Modal = await listPage.toolbarOpenCreateGroupModal();
     await child2Modal.fillName(childName);
     await child2Modal.selectParentGroup(parentName);
-
-    // Verify error message
-    await expect(
-      child2Modal._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
-    ).toContainText(`${childName} already exists in group`);
-
-    // Verify submit button is disabled
-    const submitButton = child2Modal._dialog.getByRole("button", {
-      name: "submit",
-    });
-    await expect(submitButton).not.toBeEnabled();
+    await expectDuplicateNameError(child2Modal, childName);
   });
 });
 
@@ -169,10 +177,7 @@ test.describe("Edit", { tag: ["@tier1", "@crud"] }, () => {
     const updatedDescription = "Updated description";
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create group first
-    const createModal = await listPage.toolbarOpenCreateGroupModal();
-    await createModal.fillName(groupName);
-    await createModal.submit();
+    await createGroup(listPage, groupName);
 
     // Filter to isolate the created group
     await filterByGroupName(listPage, groupName);
@@ -196,29 +201,14 @@ test.describe("Edit", { tag: ["@tier1", "@crud"] }, () => {
     const groupB = `test-editB-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create two root-level groups
-    const modalA = await listPage.toolbarOpenCreateGroupModal();
-    await modalA.fillName(groupA);
-    await modalA.submit();
-
-    const modalB = await listPage.toolbarOpenCreateGroupModal();
-    await modalB.fillName(groupB);
-    await modalB.submit();
+    await createGroup(listPage, groupA);
+    await createGroup(listPage, groupB);
 
     // Filter to groupA and open edit
     await filterByGroupName(listPage, groupA);
     const editModal = await listPage.tableClickAction("Edit", 0);
     await editModal.clearAndFillName(groupB);
-
-    // Verify error
-    await expect(
-      editModal._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
-    ).toContainText(`${groupB} already exists in group`);
-
-    const submitButton = editModal._dialog.getByRole("button", {
-      name: "submit",
-    });
-    await expect(submitButton).not.toBeEnabled();
+    await expectDuplicateNameError(editModal, groupB);
   });
 
   test("Edit Group with same name inside child node", async ({ page }) => {
@@ -227,43 +217,19 @@ test.describe("Edit", { tag: ["@tier1", "@crud"] }, () => {
     const childB = `test-childB-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create parent
-    const parentModal = await listPage.toolbarOpenCreateGroupModal();
-    await parentModal.fillName(parentName);
-    await parentModal.submit();
+    await createGroup(listPage, parentName);
+    await createGroup(listPage, childA, { parentGroup: parentName });
+    await createGroup(listPage, childB, { parentGroup: parentName });
 
-    // Create childA and childB under parent
-    const modalA = await listPage.toolbarOpenCreateGroupModal();
-    await modalA.fillName(childA);
-    await modalA.selectParentGroup(parentName);
-    await modalA.submit();
-
-    const modalB = await listPage.toolbarOpenCreateGroupModal();
-    await modalB.fillName(childB);
-    await modalB.selectParentGroup(parentName);
-    await modalB.submit();
-
-    // Filter by parent name to isolate the parent row
-    await filterByGroupName(listPage, parentName);
-
-    // Expand the parent to show children
-    const treegrid = page.getByRole("treegrid");
-    await treegrid.getByRole("button", { name: /expand row/i }).click();
-
-    // Wait for children to load, then edit childA (kebab index 1)
-    await expect(treegrid.getByRole("link", { name: childA })).toBeVisible();
-    const editModal = await listPage.tableClickAction("Edit", 1);
+    // Expand parent, edit childA to childB's name
+    const editModal = await expandParentAndEditChild(
+      page,
+      listPage,
+      parentName,
+      childA,
+    );
     await editModal.clearAndFillName(childB);
-
-    // Verify error
-    await expect(
-      editModal._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
-    ).toContainText(`${childB} already exists in group`);
-
-    const submitButton = editModal._dialog.getByRole("button", {
-      name: "submit",
-    });
-    await expect(submitButton).not.toBeEnabled();
+    await expectDuplicateNameError(editModal, childB);
   });
 
   test("Edit Group - clear parent causes duplicate at root level", async ({
@@ -273,41 +239,21 @@ test.describe("Edit", { tag: ["@tier1", "@crud"] }, () => {
     const parentName = `test-parent-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create root-level group with sameName
-    const rootModal = await listPage.toolbarOpenCreateGroupModal();
-    await rootModal.fillName(sameName);
-    await rootModal.submit();
+    await createGroup(listPage, sameName);
+    await createGroup(listPage, parentName);
+    await createGroup(listPage, sameName, { parentGroup: parentName });
 
-    // Create parent group
-    const parentModal = await listPage.toolbarOpenCreateGroupModal();
-    await parentModal.fillName(parentName);
-    await parentModal.submit();
-
-    // Create child under parent with sameName
-    const childModal = await listPage.toolbarOpenCreateGroupModal();
-    await childModal.fillName(sameName);
-    await childModal.selectParentGroup(parentName);
-    await childModal.submit();
-
-    // Filter by parent, expand it, edit the child (kebab index 1)
-    await filterByGroupName(listPage, parentName);
-    const treegrid = page.getByRole("treegrid");
-    await treegrid.getByRole("button", { name: /expand row/i }).click();
-    await expect(treegrid.getByRole("link", { name: sameName })).toBeVisible();
-    const editModal = await listPage.tableClickAction("Edit", 1);
+    // Expand parent, edit the child
+    const editModal = await expandParentAndEditChild(
+      page,
+      listPage,
+      parentName,
+      sameName,
+    );
 
     // Clear the parent group selection → child moves to root level
     await editModal.clearParentGroup();
-
-    // Verify duplicate-name error (root already has sameName)
-    await expect(
-      editModal._dialog.locator(".pf-v6-c-helper-text__item.pf-m-error"),
-    ).toContainText(`${sameName} already exists in group`);
-
-    const submitButton = editModal._dialog.getByRole("button", {
-      name: "submit",
-    });
-    await expect(submitButton).not.toBeEnabled();
+    await expectDuplicateNameError(editModal, sameName);
   });
 });
 
@@ -320,18 +266,14 @@ test.describe("Delete", { tag: ["@tier1", "@crud"] }, () => {
     const groupName = `test-delete-${Date.now()}`;
     const listPage = await SbomGroupListPage.build(page);
 
-    // Create group first
-    const createModal = await listPage.toolbarOpenCreateGroupModal();
-    await createModal.fillName(groupName);
-    await createModal.submit();
+    await createGroup(listPage, groupName);
 
     // Filter to isolate the created group
     await filterByGroupName(listPage, groupName);
 
     // Delete group via kebab on the filtered row 0
     const deleteModal = await listPage.tableClickAction("Delete", 0);
-    const heading = deleteModal.getDeletionConfirmDialogHeading();
-    await expect(heading).toContainText("Permanently delete Group?");
+    await expect(deleteModal).toHaveDialogTitle("Permanently delete Group?");
     await deleteModal.clickConfirm();
 
     // Verify group is removed
