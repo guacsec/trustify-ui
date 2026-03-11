@@ -93,7 +93,7 @@ export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
       isLoading={isFetching}
       fetchError={fetchError ?? undefined}
       value={value ? groupToOption(value) : undefined}
-      onChange={(option) => onChange(option?.value)}
+      onChange={(option) => onChange(option?.value ?? null)}
       searchQuery={searchQuery}
       onSearchQueryChange={setSearchQuery}
       placeholder={"Select parent group"}
