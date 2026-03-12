@@ -115,15 +115,9 @@ export const SbomGroupsProvider: React.FunctionComponent<
   const isSearchActive = searchTerm.trim().length > 0;
   const parentFilter = isSearchActive ? null : FILTER_NULL_VALUE;
 
-  // Reset expanded nodes when the search term changes so stale children
-  // from a previous browse/search don't pollute the current results.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on searchTerm change
-  React.useEffect(() => {
-    setExpandedNodeIds([]);
-  }, [searchTerm]);
-
   const {
     result: { data: rootGroups, total: totalItemCount },
+    references,
     isFetching: isRootsFetching,
     fetchError,
   } = useFetchSBOMGroups(
@@ -136,18 +130,50 @@ export const SbomGroupsProvider: React.FunctionComponent<
         },
       }),
     },
-    { totals: true },
+    {
+      totals: true,
+      parents: isSearchActive ? "resolve" : undefined,
+    },
   );
+
+  // When searching, auto-expand ancestor nodes so matched items are visible.
+  // When not searching (or search changes), reset expanded nodes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: react to searchTerm and rootGroups changes
+  React.useEffect(() => {
+    if (isSearchActive && rootGroups.length > 0) {
+      const ancestorIds = new Set<string>();
+      for (const group of rootGroups) {
+        let parentId = group.parent;
+        while (parentId) {
+          ancestorIds.add(parentId);
+          const parentGroup = references.get(parentId);
+          parentId = parentGroup?.parent;
+        }
+      }
+      setExpandedNodeIds(Array.from(ancestorIds));
+    } else {
+      setExpandedNodeIds([]);
+    }
+  }, [searchTerm, rootGroups]);
 
   // Fetch children for all expanded groups
   const { data: childGroups, nodeStatus: childrenNodeStatus } =
     useFetchSbomGroupChildren(expandedNodeIds);
 
-  // Merge root groups + children into a flat list, then build tree
-  const allGroups = React.useMemo(
-    () => [...rootGroups, ...childGroups],
-    [rootGroups, childGroups],
-  );
+  // Merge references (ancestor groups from search), root groups, and children
+  const allGroups = React.useMemo(() => {
+    if (!isSearchActive) {
+      return [...rootGroups, ...childGroups];
+    }
+    const merged = new Map<string, SbomGroupItem>();
+    for (const [id, group] of references) {
+      merged.set(id, group as SbomGroupItem);
+    }
+    for (const group of childGroups) {
+      merged.set(group.id, group);
+    }
+    return Array.from(merged.values());
+  }, [isSearchActive, rootGroups, childGroups, references]);
 
   const roots = React.useMemo(() => {
     return buildSbomGroupTree(allGroups);
