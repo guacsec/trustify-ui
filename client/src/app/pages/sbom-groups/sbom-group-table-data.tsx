@@ -1,12 +1,6 @@
 import { generatePath, NavLink } from "react-router-dom";
 
-import {
-  Content,
-  Flex,
-  FlexItem,
-  Stack,
-  StackItem,
-} from "@patternfly/react-core";
+import { Content, Flex, FlexItem } from "@patternfly/react-core";
 
 import { Paths } from "@app/Routes";
 
@@ -15,8 +9,8 @@ import type { SbomGroupTreeNode } from "./sbom-groups-context";
 
 export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
   return (
-    <Stack hasGutter>
-      <StackItem isFilled>
+    <Flex direction={{ default: "column" }}>
+      <FlexItem>
         <Flex
           alignItems={{ default: "alignItemsCenter" }}
           gap={{ default: "gapSm" }}
@@ -35,17 +29,17 @@ export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
             <SbomGroupLabels labels={item.labels} />
           </FlexItem>
         </Flex>
-      </StackItem>
+      </FlexItem>
       {item.description && (
-        <StackItem>
+        <FlexItem>
           <Content component="p">{item.description}</Content>
-        </StackItem>
+        </FlexItem>
       )}
       {item.number_of_sboms != null && item.number_of_sboms > 0 && (
-        <StackItem>
+        <FlexItem>
           <Content component="small">{item.number_of_sboms} SBOMs</Content>
-        </StackItem>
+        </FlexItem>
       )}
-    </Stack>
+    </Flex>
   );
 };
