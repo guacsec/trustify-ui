@@ -52,11 +52,11 @@ export const useGroupFormData = ({
   );
 
   // Mutations
-  const { mutate: createGroup } = useCreateSBOMGroupMutation(
+  const { mutateAsync: createGroup } = useCreateSBOMGroupMutation(
     onCreateGroupSuccess,
     onCreateUpdateGroupError,
   );
-  const { mutate: updateGroup } = useUpdateSBOMGroupMutation(
+  const { mutateAsync: updateGroup } = useUpdateSBOMGroupMutation(
     onUpdateGroupSuccess,
     onCreateUpdateGroupError,
   );
