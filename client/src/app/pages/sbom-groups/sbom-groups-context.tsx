@@ -15,9 +15,8 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-
-import type { PaginatedResultsGroupDetails } from "@app/client";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
+
 import { findRootGroups } from "./utils";
 
 export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];

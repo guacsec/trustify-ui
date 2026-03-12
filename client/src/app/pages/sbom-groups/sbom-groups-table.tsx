@@ -26,27 +26,111 @@ import {
   useFetchSBOMGroups,
 } from "@app/queries/sbom-groups";
 
-import { GroupFormModal } from "../sbom-list/components/group-form";
 import { SbomGroupTableData } from "./sbom-group-table-data";
 import { SbomGroupsContext, type SbomGroupItem } from "./sbom-groups-context";
+
+export const SbomGroupsTable: React.FC = () => {
+  const { pushNotification } = React.useContext(NotificationsContext);
+
+  const {
+    isFetching,
+    fetchError,
+    totalItemCount,
+    tableControls,
+    setGroupCreateUpdateModalState,
+  } = React.useContext(SbomGroupsContext);
+
+  const {
+    numRenderedColumns,
+    propHelpers: { paginationProps, tableProps },
+    currentPageItems,
+  } = tableControls;
+
+  // Delete action
+  const [groupToDelete, setGroupToDelete] =
+    React.useState<SbomGroupItem | null>(null);
+
+  const onDeleteGroupSuccess = (group: Group) => {
+    setGroupToDelete(null);
+    pushNotification({
+      title: `The group ${group.name} was deleted`,
+      variant: "success",
+    });
+  };
+
+  const onDeleteGroupError = (_error: AxiosError) => {
+    pushNotification({
+      title: "Error occurred while deleting group",
+      variant: "danger",
+    });
+  };
+
+  const { mutate: deleteGroup, isPending: isDeletingGroup } =
+    useDeleteSbomGroupMutation(onDeleteGroupSuccess, onDeleteGroupError);
+
+  return (
+    <>
+      <Table
+        {...tableProps}
+        isTreeTable
+        isExpandable={false}
+        aria-label="sbom-groups-table"
+      >
+        <ConditionalTableBody
+          isLoading={isFetching}
+          isError={!!fetchError}
+          isNoData={totalItemCount === 0}
+          numRenderedColumns={numRenderedColumns}
+        >
+          <Tbody>
+            {currentPageItems.map((node, i) => (
+              <SbomGroupRow
+                key={node.id}
+                node={node}
+                level={1}
+                posinset={i + 1}
+                numRenderedColumns={numRenderedColumns}
+                onEdit={setGroupCreateUpdateModalState}
+                onDelete={setGroupToDelete}
+              />
+            ))}
+          </Tbody>
+        </ConditionalTableBody>
+      </Table>
+      <SimplePagination
+        idPrefix="sbom-groups-table"
+        isTop={false}
+        paginationProps={paginationProps}
+      />
+
+      <ConfirmDialog
+        {...groupDeleteDialogProps(groupToDelete)}
+        inProgress={isDeletingGroup}
+        titleIconVariant="warning"
+        isOpen={!!groupToDelete}
+        confirmBtnVariant={ButtonVariant.danger}
+        confirmBtnLabel="Delete"
+        cancelBtnLabel="Cancel"
+        onCancel={() => setGroupToDelete(null)}
+        onClose={() => setGroupToDelete(null)}
+        onConfirm={() => {
+          if (groupToDelete) {
+            deleteGroup(groupToDelete);
+          }
+        }}
+      />
+    </>
+  );
+};
 
 const SbomGroupRow: React.FC<{
   node: SbomGroupItem;
   level: number;
   posinset: number;
-  isHidden: boolean;
   numRenderedColumns: number;
   onEdit: (node: SbomGroupItem) => void;
   onDelete: (node: SbomGroupItem) => void;
-}> = ({
-  node,
-  level,
-  posinset,
-  isHidden,
-  numRenderedColumns,
-  onEdit,
-  onDelete,
-}) => {
+}> = ({ node, level, posinset, numRenderedColumns, onEdit, onDelete }) => {
   const {
     treeExpansion: { isNodeExpanded, toggleExpandedNodes },
   } = React.useContext(SbomGroupsContext);
@@ -85,7 +169,7 @@ const SbomGroupRow: React.FC<{
     rowIndex: 0,
     props: {
       isExpanded,
-      isHidden,
+      isHidden: false,
       "aria-level": level,
       "aria-posinset": posinset,
       "aria-setsize": node.number_of_groups || 0,
@@ -148,107 +232,12 @@ const SbomGroupRow: React.FC<{
             node={child}
             level={level + 1}
             posinset={i + 1}
-            isHidden={false}
             numRenderedColumns={numRenderedColumns}
             onEdit={onEdit}
             onDelete={onDelete}
           />
         ))}
       </LoadingWrapper>
-    </>
-  );
-};
-
-export const SbomGroupsTable: React.FC = () => {
-  const { pushNotification } = React.useContext(NotificationsContext);
-  const [saveGroupModalState, setSaveGroupModalState] = React.useState<
-    "create" | Group | null
-  >(null);
-  const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
-  const createUpdateGroup =
-    saveGroupModalState !== "create" ? saveGroupModalState : null;
-  const { isFetching, fetchError, totalItemCount, tableControls } =
-    React.useContext(SbomGroupsContext);
-
-  const {
-    numRenderedColumns,
-    propHelpers: { paginationProps, tableProps },
-    currentPageItems,
-  } = tableControls;
-
-  // Delete action
-  const [groupToDelete, setGroupToDelete] =
-    React.useState<SbomGroupItem | null>(null);
-  const onDeleteGroupSuccess = (group: Group) => {
-    setGroupToDelete(null);
-    pushNotification({
-      title: `The group ${group.name} was deleted`,
-      variant: "success",
-    });
-  };
-
-  const onDeleteGroupError = (_error: AxiosError) => {
-    pushNotification({
-      title: "Error occurred while deleting group",
-      variant: "danger",
-    });
-  };
-
-  const { mutate: deleteGroup, isPending: isDeletingGroup } =
-    useDeleteSbomGroupMutation(onDeleteGroupSuccess, onDeleteGroupError);
-
-  return (
-    <>
-      <Table
-        {...tableProps}
-        isTreeTable
-        isExpandable={false}
-        aria-label="sbom-groups-table"
-      >
-        <ConditionalTableBody
-          isLoading={isFetching}
-          isError={!!fetchError}
-          isNoData={totalItemCount === 0}
-          numRenderedColumns={numRenderedColumns}
-        >
-          <Tbody>
-            {currentPageItems.map((node, i) => (
-              <SbomGroupRow
-                key={node.id}
-                node={node}
-                level={1}
-                posinset={i + 1}
-                isHidden={false}
-                numRenderedColumns={numRenderedColumns}
-                onEdit={(n) => setSaveGroupModalState(n)}
-                onDelete={(n) => setGroupToDelete(n)}
-              />
-            ))}
-          </Tbody>
-        </ConditionalTableBody>
-      </Table>
-      <SimplePagination
-        idPrefix="sbom-groups-table"
-        isTop={false}
-        paginationProps={paginationProps}
-      />
-
-      <ConfirmDialog
-        {...groupDeleteDialogProps(groupToDelete)}
-        inProgress={isDeletingGroup}
-        titleIconVariant="warning"
-        isOpen={!!groupToDelete}
-        confirmBtnVariant={ButtonVariant.danger}
-        confirmBtnLabel="Delete"
-        cancelBtnLabel="Cancel"
-        onCancel={() => setGroupToDelete(null)}
-        onClose={() => setGroupToDelete(null)}
-        onConfirm={() => {
-          if (groupToDelete) {
-            deleteGroup(groupToDelete);
-          }
-        }}
-      />
     </>
   );
 };
