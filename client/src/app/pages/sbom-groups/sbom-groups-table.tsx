@@ -165,14 +165,14 @@ const SbomGroupRow: React.FC<{
   ];
 
   const treeRow: TdProps["treeRow"] = {
-    onCollapse: () => toggleExpandedNodes([node], !isExpanded),
+    onCollapse: () => toggleExpandedNodes(node),
     rowIndex: 0,
     props: {
       isExpanded,
       isHidden: false,
       "aria-level": level,
       "aria-posinset": posinset,
-      "aria-setsize": node.number_of_groups || 0,
+      "aria-setsize": node.number_of_groups ?? 1,
     },
   };
 
@@ -186,58 +186,60 @@ const SbomGroupRow: React.FC<{
           <ActionsColumn items={actions} />
         </Td>
       </TreeRowWrapper>
-      <LoadingWrapper
-        isFetching={isExpanded && isFetching}
-        fetchError={isExpanded ? fetchError : null}
-        isFetchingState={
-          <TreeRowWrapper
-            row={{
-              props: {
-                isHidden: false,
-                "aria-level": level + 1,
-                "aria-posinset": 1,
-                "aria-setsize": 1,
-              },
-            }}
-          >
-            <Td colSpan={numRenderedColumns}>
-              <Skeleton
-                screenreaderText="Loading child groups"
-                fontSize="lg"
-                width="60%"
-              />
-            </Td>
-          </TreeRowWrapper>
-        }
-        fetchErrorState={(error) => (
-          <TreeRowWrapper
-            row={{
-              props: {
-                isHidden: false,
-                "aria-level": level + 1,
-                "aria-posinset": 1,
-                "aria-setsize": 1,
-              },
-            }}
-          >
-            <Td colSpan={numRenderedColumns}>
-              <TableCellError error={error} />
-            </Td>
-          </TreeRowWrapper>
-        )}
-      >
-        {children.map((child, i) => (
-          <SbomGroupRow
-            key={child.id}
-            node={child}
-            level={level + 1}
-            posinset={i + 1}
-            numRenderedColumns={numRenderedColumns}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
-      </LoadingWrapper>
+      {isExpanded && (
+        <LoadingWrapper
+          isFetching={isFetching}
+          fetchError={fetchError}
+          isFetchingState={
+            <TreeRowWrapper
+              row={{
+                props: {
+                  isHidden: false,
+                  "aria-level": level + 1,
+                  "aria-posinset": 1,
+                  "aria-setsize": 1,
+                },
+              }}
+            >
+              <Td colSpan={numRenderedColumns}>
+                <Skeleton
+                  screenreaderText="Loading child groups"
+                  fontSize="lg"
+                  width="60%"
+                />
+              </Td>
+            </TreeRowWrapper>
+          }
+          fetchErrorState={(error) => (
+            <TreeRowWrapper
+              row={{
+                props: {
+                  isHidden: false,
+                  "aria-level": level + 1,
+                  "aria-posinset": 1,
+                  "aria-setsize": 1,
+                },
+              }}
+            >
+              <Td colSpan={numRenderedColumns}>
+                <TableCellError error={error} />
+              </Td>
+            </TreeRowWrapper>
+          )}
+        >
+          {children.map((child, i) => (
+            <SbomGroupRow
+              key={child.id}
+              node={child}
+              level={level + 1}
+              posinset={i + 1}
+              numRenderedColumns={numRenderedColumns}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </LoadingWrapper>
+      )}
     </>
   );
 };

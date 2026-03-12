@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import type { AxiosError } from "axios";
 
@@ -23,7 +23,7 @@ export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];
 
 interface ITreeExpansionState {
   isNodeExpanded: (node: SbomGroupItem) => boolean;
-  toggleExpandedNodes: (nodes: SbomGroupItem[], isExpanded: boolean) => void;
+  toggleExpandedNodes: (node: SbomGroupItem) => void;
 }
 
 interface ISbomGroupsContext {
@@ -75,38 +75,35 @@ export const SbomGroupsProvider: React.FunctionComponent<
     expandableVariant: "single",
   });
 
-  // Track expanded node IDs in React state (transient UI state)
-  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
-
-  const isNodeExpanded = React.useCallback(
-    (node: SbomGroupItem) => expandedIds.has(node.id),
-    [expandedIds],
+  // Track manually expanded node IDs (browse mode only)
+  const [expandedNodeIds, setExpandedNodeIds] = React.useState<Set<string>>(
+    new Set(),
   );
 
-  const toggleExpandedNodes = React.useCallback(
-    (nodes: SbomGroupItem[], isExpanded: boolean) => {
-      setExpandedIds((prev) => {
-        const next = new Set(prev);
-        for (const node of nodes) {
-          if (isExpanded) {
-            next.add(node.id);
-          } else {
-            next.delete(node.id);
-          }
-        }
-        return next;
-      });
-    },
-    [],
-  );
+  const toggleExpandedNodes = React.useCallback((node: SbomGroupItem) => {
+    setExpandedNodeIds((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(node.id)) {
+        next.delete(node.id);
+      } else {
+        next.add(node.id);
+      }
+
+      return next;
+    });
+  }, []);
 
   // When a search filter is active, pass null to search across ALL groups
   // (regardless of hierarchy). When no search is active, pass FILTER_NULL_VALUE
   // to show only root-level groups.
-  const searchTerm =
-    tableControlState.filterState.filterValues[FILTER_TEXT_CATEGORY_KEY]?.[0] ??
-    "";
-  const isSearchActive = searchTerm.trim().length > 0;
+  const isSearchActive = useMemo(() => {
+    const searchTerm =
+      tableControlState.filterState.filterValues[
+        FILTER_TEXT_CATEGORY_KEY
+      ]?.[0] ?? "";
+    return searchTerm.trim().length > 0;
+  }, [tableControlState.filterState]);
   const parentFilter = isSearchActive ? null : FILTER_NULL_VALUE;
 
   const {
@@ -130,25 +127,45 @@ export const SbomGroupsProvider: React.FunctionComponent<
     },
   );
 
-  // When searching, auto-expand ancestor nodes so matched items are visible.
-  // When not searching (or search changes), reset expanded nodes.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `references` excluded to avoid re-running when the same fetch updates both `fetchedGroups` and `references` simultaneously
-  React.useEffect(() => {
-    if (isSearchActive && fetchedGroups.length > 0) {
-      const ancestorIds = new Set<string>();
-      for (const group of fetchedGroups) {
-        let parentId = group.parent;
-        while (parentId) {
-          ancestorIds.add(parentId);
-          const parentGroup = references.get(parentId);
-          parentId = parentGroup?.parent;
-        }
+  // Reset manual expansion when transitioning between search and browse modes so both start with a clean slate (no stale expansions)
+  const prevIsSearchActive = React.useRef(isSearchActive);
+  if (isSearchActive !== prevIsSearchActive.current) {
+    setExpandedNodeIds(new Set());
+  }
+  prevIsSearchActive.current = isSearchActive;
+
+  ///
+
+  const activeExpandedIds = React.useMemo<Set<string>>(() => {
+    if (!isSearchActive) return expandedNodeIds;
+    if (fetchedGroups.length === 0) return new Set<string>();
+
+    // Auto-expand all ancestor nodes of search results
+    const ancestorIds = new Set<string>();
+    for (const group of fetchedGroups) {
+      let parentId = group.parent;
+      while (parentId) {
+        ancestorIds.add(parentId);
+        const parentGroup = references.get(parentId);
+        parentId = parentGroup?.parent;
       }
-      setExpandedIds(ancestorIds);
-    } else {
-      setExpandedIds(new Set());
     }
-  }, [searchTerm, fetchedGroups]);
+
+    // Apply user toggles: symmetric difference with expandedNodeIds
+    for (const id of expandedNodeIds) {
+      if (ancestorIds.has(id)) {
+        ancestorIds.delete(id);
+      } else {
+        ancestorIds.add(id);
+      }
+    }
+    return ancestorIds;
+  }, [isSearchActive, expandedNodeIds, fetchedGroups, references]);
+
+  const isNodeExpanded = React.useCallback(
+    (node: SbomGroupItem) => activeExpandedIds.has(node.id),
+    [activeExpandedIds],
+  );
 
   // In search mode, find root ancestors from references; otherwise use fetchedGroups directly
   const currentPageItems = React.useMemo(() => {
