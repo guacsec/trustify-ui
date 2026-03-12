@@ -7,6 +7,7 @@ import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
+import type { Group, PaginatedResultsGroupDetails } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   getHubRequestParams,
@@ -34,6 +35,10 @@ interface ISbomGroupsContext {
   fetchError: AxiosError | null;
 
   treeExpansion: ITreeExpansionState;
+
+  // Group Form Modal
+  groupCreateUpdateModalState: "create" | Group | null;
+  setGroupCreateUpdateModalState: (value: "create" | Group | null) => void;
 }
 
 const contextDefaultValue = {} as ISbomGroupsContext;
@@ -164,6 +169,10 @@ export const SbomGroupsProvider: React.FunctionComponent<
     hasActionsColumn: true,
   });
 
+  // Create/Edit states
+  const [groupCreateUpdateModalState, setGroupCreateUpdateModalState] =
+    React.useState<"create" | Group | null>(null);
+
   return (
     <SbomGroupsContext.Provider
       value={{
@@ -175,6 +184,8 @@ export const SbomGroupsProvider: React.FunctionComponent<
           isNodeExpanded,
           toggleExpandedNodes,
         },
+        groupCreateUpdateModalState,
+        setGroupCreateUpdateModalState,
       }}
     >
       {children}

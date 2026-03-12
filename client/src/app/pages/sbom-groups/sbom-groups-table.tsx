@@ -154,7 +154,7 @@ const SbomGroupRow: React.FC<{
             onDelete={onDelete}
           />
         ))}
-      </LoadingWrapper>      
+      </LoadingWrapper>
     </>
   );
 };
@@ -232,11 +232,7 @@ export const SbomGroupsTable: React.FC = () => {
         isTop={false}
         paginationProps={paginationProps}
       />
-      <GroupFormModal
-        isOpen={isCreateUpdateGroupModalOpen}
-        group={createUpdateGroup}
-        onClose={() => setSaveGroupModalState(null)}
-      />
+
       <ConfirmDialog
         {...groupDeleteDialogProps(groupToDelete)}
         inProgress={isDeletingGroup}

@@ -25,6 +25,7 @@ import {
   updateSbomGroup,
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls/getHubRequestParams";
+import { SBOMsQueryKey } from "./sboms";
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
@@ -168,11 +169,19 @@ export const useDeleteSbomGroupMutation = (
       await queryClient.invalidateQueries({
         queryKey: [SBOMGroupsQueryKey],
       });
+      // Invalidate SBOMs that belong to this group
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey, payload.id],
+      });
     },
-    onError: async (err: AxiosError) => {
+    onError: async (err: AxiosError, payload) => {
       onError(err);
       await queryClient.invalidateQueries({
         queryKey: [SBOMGroupsQueryKey],
+      });
+      // Invalidate SBOMs that belong to this group
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey, payload.id],
       });
     },
   });
