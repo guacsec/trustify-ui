@@ -1,5 +1,7 @@
 import React from "react";
+
 import type { AxiosError } from "axios";
+
 import {
   FILTER_NULL_VALUE,
   FILTER_TEXT_CATEGORY_KEY,
@@ -12,60 +14,26 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
-import { useSelectionState } from "@app/hooks/useSelectionState";
 
 import type { PaginatedResultsGroupDetails } from "@app/client";
-import {
-  useFetchSbomGroupChildren,
-  useFetchSBOMGroups,
-} from "@app/queries/sbom-groups";
-import { buildSbomGroupTree } from "./utils";
+import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
+import { findRootGroups } from "./utils";
 
 export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];
 
-export type SbomGroupTreeNode = SbomGroupItem & {
-  children: SbomGroupTreeNode[];
-};
-
 interface ITreeExpansionState {
-  expandedNodeIds: string[];
-  setExpandedNodeIds: React.Dispatch<React.SetStateAction<string[]>>;
-  childrenNodeStatus: Map<
-    string,
-    { isFetching: boolean; fetchError: AxiosError | null }
-  >;
-}
-
-interface ITreeSelectionState {
-  selectedNodes: SbomGroupItem[];
-  isNodeSelected(node: SbomGroupTreeNode): boolean;
-  areAllSelected: boolean;
-  selectNodes: (nodes: SbomGroupTreeNode[], isSelected: boolean) => void;
-  selectOnlyNodes: (nodes: SbomGroupTreeNode[]) => void;
-  selectAllNodes: (isSelected: boolean) => void;
+  isNodeExpanded: (node: SbomGroupItem) => boolean;
+  toggleExpandedNodes: (nodes: SbomGroupItem[], isExpanded: boolean) => void;
 }
 
 interface ISbomGroupsContext {
-  tableControls: ITableControls<
-    SbomGroupTreeNode,
-    // Column keys
-    "name",
-    // Sortable column keys
-    "name",
-    // Filter categories
-    "",
-    // Persistence key prefix
-    string
-  >;
+  tableControls: ITableControls<SbomGroupItem, "name", "name", "", string>;
 
   totalItemCount: number;
   isFetching: boolean;
   fetchError: AxiosError | null;
 
-  // Tree fields
   treeExpansion: ITreeExpansionState;
-  treeSelection: ITreeSelectionState;
-  treeData: SbomGroupTreeNode[];
 }
 
 const contextDefaultValue = {} as ISbomGroupsContext;
@@ -103,8 +71,30 @@ export const SbomGroupsProvider: React.FunctionComponent<
     expandableVariant: "single",
   });
 
-  // Expansion state stored in React state (transient UI state, not URL-worthy)
-  const [expandedNodeIds, setExpandedNodeIds] = React.useState<string[]>([]);
+  // Track expanded node IDs in React state (transient UI state)
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
+
+  const isNodeExpanded = React.useCallback(
+    (node: SbomGroupItem) => expandedIds.has(node.id),
+    [expandedIds],
+  );
+
+  const toggleExpandedNodes = React.useCallback(
+    (nodes: SbomGroupItem[], isExpanded: boolean) => {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        for (const node of nodes) {
+          if (isExpanded) {
+            next.add(node.id);
+          } else {
+            next.delete(node.id);
+          }
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
   // When a search filter is active, pass null to search across ALL groups
   // (regardless of hierarchy). When no search is active, pass FILTER_NULL_VALUE
@@ -116,9 +106,9 @@ export const SbomGroupsProvider: React.FunctionComponent<
   const parentFilter = isSearchActive ? null : FILTER_NULL_VALUE;
 
   const {
-    result: { data: rootGroups, total: totalItemCount },
+    result: { data: fetchedGroups, total: totalItemCount },
     references,
-    isFetching: isRootsFetching,
+    isFetching,
     fetchError,
   } = useFetchSBOMGroups(
     parentFilter,
@@ -138,11 +128,11 @@ export const SbomGroupsProvider: React.FunctionComponent<
 
   // When searching, auto-expand ancestor nodes so matched items are visible.
   // When not searching (or search changes), reset expanded nodes.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: react to searchTerm and rootGroups changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `references` excluded to avoid re-running when the same fetch updates both `fetchedGroups` and `references` simultaneously
   React.useEffect(() => {
-    if (isSearchActive && rootGroups.length > 0) {
+    if (isSearchActive && fetchedGroups.length > 0) {
       const ancestorIds = new Set<string>();
-      for (const group of rootGroups) {
+      for (const group of fetchedGroups) {
         let parentId = group.parent;
         while (parentId) {
           ancestorIds.add(parentId);
@@ -150,54 +140,25 @@ export const SbomGroupsProvider: React.FunctionComponent<
           parentId = parentGroup?.parent;
         }
       }
-      setExpandedNodeIds(Array.from(ancestorIds));
+      setExpandedIds(ancestorIds);
     } else {
-      setExpandedNodeIds([]);
+      setExpandedIds(new Set());
     }
-  }, [searchTerm, rootGroups]);
+  }, [searchTerm, fetchedGroups]);
 
-  // Fetch children for all expanded groups
-  const { data: childGroups, nodeStatus: childrenNodeStatus } =
-    useFetchSbomGroupChildren(expandedNodeIds);
-
-  // Merge references (ancestor groups from search), root groups, and children
-  const allGroups = React.useMemo(() => {
+  // In search mode, find root ancestors from references; otherwise use fetchedGroups directly
+  const currentPageItems = React.useMemo(() => {
     if (!isSearchActive) {
-      return [...rootGroups, ...childGroups];
+      return fetchedGroups;
     }
-    const merged = new Map<string, SbomGroupItem>();
-    for (const [id, group] of references) {
-      merged.set(id, group as SbomGroupItem);
-    }
-    for (const group of childGroups) {
-      merged.set(group.id, group);
-    }
-    return Array.from(merged.values());
-  }, [isSearchActive, rootGroups, childGroups, references]);
-
-  const roots = React.useMemo(() => {
-    return buildSbomGroupTree(allGroups);
-  }, [allGroups]);
-
-  // Only use root-fetching for the table loading state.
-  const isFetching = isRootsFetching;
-
-  const {
-    selectedItems: selectedNodes,
-    isItemSelected: isNodeSelected,
-    areAllSelected,
-    selectItems: selectNodes,
-    selectOnly: selectOnlyNodes,
-    selectAll: selectAllNodes,
-  } = useSelectionState({
-    items: allGroups,
-    isEqual: (a, b) => a.id === b.id,
-  });
+    const allReferenced = Array.from(references.values()) as SbomGroupItem[];
+    return findRootGroups(allReferenced);
+  }, [isSearchActive, fetchedGroups, references]);
 
   const tableControls = useTableControlProps({
     ...tableControlState,
     idProperty: "id",
-    currentPageItems: roots,
+    currentPageItems,
     totalItemCount,
     isLoading: isFetching,
     hasActionsColumn: true,
@@ -211,19 +172,9 @@ export const SbomGroupsProvider: React.FunctionComponent<
         fetchError,
         totalItemCount,
         treeExpansion: {
-          expandedNodeIds,
-          setExpandedNodeIds,
-          childrenNodeStatus,
+          isNodeExpanded,
+          toggleExpandedNodes,
         },
-        treeSelection: {
-          selectedNodes,
-          isNodeSelected,
-          areAllSelected,
-          selectNodes,
-          selectOnlyNodes,
-          selectAllNodes,
-        },
-        treeData: roots,
       }}
     >
       {children}

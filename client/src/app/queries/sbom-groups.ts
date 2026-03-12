@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import {
   queryOptions,
   useMutation,
-  useQueries,
   useQuery,
   useQueryClient,
   useSuspenseQuery,
@@ -65,6 +64,7 @@ export const useFetchSBOMGroups = (
     NonNullable<ListSbomGroupsData["query"]>,
     "parents" | "totals"
   > = {},
+  enabled = true,
 ) => {
   const { q, ...rest } = requestParamsQuery(params);
   const parentQuery = parentId ? `parent=${parentId}` : "";
@@ -80,6 +80,7 @@ export const useFetchSBOMGroups = (
           q: [q, parentQuery].filter((e) => e).join("&"),
         },
       }),
+    enabled,
   });
 
   const references = useMemo(() => {
@@ -142,47 +143,6 @@ export const useUpdateSBOMGroupMutation = (
     },
     onError: onError,
   });
-};
-
-/**
- * Fetch children for multiple parent groups in parallel.
- *
- * Issues one query per parent ID using `useQueries`. Each query fetches all
- * direct children of the given parent (no pagination limit).
- */
-export const useFetchSbomGroupChildren = (parentIds: string[]) => {
-  const results = useQueries({
-    queries: parentIds.map((parentId) => ({
-      queryKey: [SBOMGroupsQueryKey, "children", parentId],
-      queryFn: () =>
-        listSbomGroups({
-          client,
-          query: {
-            q: `parent=${parentId}`,
-            totals: true,
-            limit: 0,
-          },
-        }),
-    })),
-  });
-
-  const nodeStatus = new Map<
-    string,
-    { isFetching: boolean; fetchError: AxiosError | null }
-  >();
-  parentIds.forEach((id, index) => {
-    nodeStatus.set(id, {
-      isFetching: results[index].isLoading,
-      fetchError: (results[index].error as AxiosError) ?? null,
-    });
-  });
-
-  return {
-    data: results.flatMap((r) => r.data?.data?.items ?? []),
-    isFetching: results.some((r) => r.isLoading),
-    isError: results.some((r) => r.isError),
-    nodeStatus,
-  };
 };
 
 export const useDeleteSbomGroupMutation = (

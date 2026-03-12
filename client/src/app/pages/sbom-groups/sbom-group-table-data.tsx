@@ -11,9 +11,9 @@ import {
 import { Paths } from "@app/Routes";
 
 import { SbomGroupLabels } from "./sbom-group-labels";
-import type { SbomGroupTreeNode } from "./sbom-groups-context";
+import type { SbomGroupItem } from "./sbom-groups-context";
 
-export const SbomGroupTableData = ({ item }: { item: SbomGroupTreeNode }) => {
+export const SbomGroupTableData = ({ item }: { item: SbomGroupItem }) => {
   return (
     <Stack hasGutter>
       <StackItem isFilled>
