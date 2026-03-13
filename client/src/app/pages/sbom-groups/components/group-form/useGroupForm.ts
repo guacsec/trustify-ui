@@ -159,12 +159,12 @@ export const useGroupForm = ({
     };
 
     if (group) {
-      updateGroup({
+      return updateGroup({
         id: group.id,
         body: { ...payload },
       });
     } else {
-      createGroup(payload);
+      return createGroup(payload);
     }
   };
   return {

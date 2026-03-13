@@ -17,7 +17,7 @@ import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
 
 import { AddToGroupModal } from "./components/add-to-group-form";
-import { GroupFormModal } from "./components/group-form";
+import { GroupFormModal } from "../sbom-groups/components/group-form";
 import { SbomSearchContext } from "./sbom-context";
 
 interface SbomToolbarProps {

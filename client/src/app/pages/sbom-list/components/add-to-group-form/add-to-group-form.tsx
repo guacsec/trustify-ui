@@ -4,7 +4,7 @@ import { Form } from "@patternfly/react-core";
 
 import { HookFormPFGroupController } from "@app/components/HookFormPFFields";
 
-import { SbomGroupSelect } from "../sbom-group-select/sbom-group-select";
+import { SbomGroupSelect } from "@app/pages/sbom-groups/components/sbom-group-select/sbom-group-select";
 import type { useAddToGroupForm } from "./useAddToGroupForm";
 import type { useAddToGroupFormData } from "./useAddToGroupFormData";
 
