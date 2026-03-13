@@ -111,6 +111,7 @@ export const useGroupForm = ({
   const parentGroup = form.watch("parentGroup");
   const { result: siblingGroups, isFetching } = useFetchSBOMGroups(
     parentGroup?.id || FILTER_NULL_VALUE,
+    { page: { pageNumber: 1, itemsPerPage: 0 } },
   );
 
   const siblingsKey = useMemo(() => {
