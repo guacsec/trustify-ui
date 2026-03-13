@@ -4,7 +4,7 @@ import { Content, PageSection } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
-import { GroupFormModal } from "../sbom-list/components/group-form";
+import { GroupFormModal } from "./components/group-form";
 import { SbomGroupsContext, SbomGroupsProvider } from "./sbom-groups-context";
 import { SbomGroupsTable } from "./sbom-groups-table";
 import { SbomGroupsToolbar } from "./sbom-groups-toolbar";
