@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { exec } from "node:child_process";
+import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { DetailsPage } from "../helpers/DetailsPage";
 import { clickAndDownload } from "./Helpers";
@@ -19,9 +19,12 @@ export const downloadLicenseReport = async (page: Page): Promise<string> => {
         .click(),
   );
 
+  const sanitizedFilename = download
+    .suggestedFilename()
+    .replace(/[/\\.]/g, "_");
   const savePath = path.join(
     os.tmpdir(),
-    `license-report-${Date.now()}-${download.suggestedFilename()}`,
+    `license-report-${Date.now()}-${sanitizedFilename}`,
   );
   await download.saveAs(savePath);
   return savePath;
@@ -30,7 +33,7 @@ export const downloadLicenseReport = async (page: Page): Promise<string> => {
 export const extractLicenseReport = async (
   downloadedFilePath: string,
 ): Promise<string> => {
-  const execAsync = promisify(exec);
+  const execFileAsync = promisify(execFile);
   const extractionPath = path.join(
     path.dirname(downloadedFilePath),
     "extracted",
@@ -39,7 +42,12 @@ export const extractLicenseReport = async (
     fs.mkdirSync(extractionPath);
   }
 
-  await execAsync(`tar -xzf ${downloadedFilePath} -C ${extractionPath}`);
+  await execFileAsync("tar", [
+    "-xzf",
+    downloadedFilePath,
+    "-C",
+    extractionPath,
+  ]);
   return extractionPath;
 };
 
