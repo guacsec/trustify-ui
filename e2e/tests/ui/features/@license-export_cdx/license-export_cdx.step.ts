@@ -73,7 +73,7 @@ When('User Clicks "Action" button', async ({ page }) => {
 
 Then('"Download License Report" Option should be visible', async ({ page }) => {
   const detailsPage = new DetailsPage(page);
-  await detailsPage.verifyActionIsVisibleInMenu("Download License Report");
+  await expect(detailsPage).toHaveVisibleAction("Download License Report");
 });
 
 When('Selects "Download License Report" option', async ({ page }) => {

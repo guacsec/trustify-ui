@@ -37,13 +37,7 @@ export class DetailsPage {
   }
 
   async verifyActionIsAvailable(actionName: string) {
-    await this.page.getByRole("button", { name: "Actions" }).click();
-    await expect(
-      this.page.getByRole("menuitem", { name: actionName }),
-    ).toBeVisible();
-  }
-
-  async verifyActionIsVisibleInMenu(actionName: string) {
+    await this.openActionsMenu();
     await expect(
       this.page.getByRole("menuitem", { name: actionName }),
     ).toBeVisible();
