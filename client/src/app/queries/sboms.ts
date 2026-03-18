@@ -22,6 +22,7 @@ import {
   getSbom,
   getSbomAdvisories,
   listAllLicenseIds,
+  listModels,
   listRelatedSboms,
   listSbomLabels,
   listSboms,
@@ -271,6 +272,32 @@ export const useFetchSbomsLicenseIds = (sbomId: string) => {
     licenseIds: data?.data || [],
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
+  };
+};
+
+export const useFetchModelsBySbomId = (
+  sbomId: string,
+  params: HubRequestParams = {},
+) => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: [SBOMsQueryKey, sbomId, "models", params],
+    queryFn: () => {
+      return listModels({
+        client,
+        path: { id: sbomId },
+        query: { ...requestParamsQuery(params) },
+      });
+    },
+  });
+  return {
+    result: {
+      data: data?.data?.items || [],
+      total: data?.data?.total ?? 0,
+      params: params ?? params,
+    },
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+    refetch,
   };
 };
 
