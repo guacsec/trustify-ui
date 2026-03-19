@@ -51,8 +51,9 @@ Then(
 );
 
 Then("Search by FilterText {string}", async ({ page }, filterText: string) => {
-  const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
-  await toolbarTable.filterByText(filterText);
+  const listPage = await SbomListPage.build(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.applyFilter({ "Filter text": filterText });
 });
 
 Then(
