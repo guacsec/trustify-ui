@@ -20,6 +20,13 @@ export class PackagesTab {
     return new PackagesTab(page, detailsPage);
   }
 
+  static async fromCurrentPage(page: Page, sbomName?: string) {
+    const detailsPage = await SbomDetailsPage.fromCurrentPage(page, sbomName);
+    await detailsPage._layout.selectTab("Packages");
+
+    return new PackagesTab(page, detailsPage);
+  }
+
   async getToolbar() {
     return await Toolbar.build(this._page, "Package toolbar", {
       "Filter text": "string",
