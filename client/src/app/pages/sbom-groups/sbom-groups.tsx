@@ -1,12 +1,13 @@
-import type React from "react";
+import React from "react";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
-import { SbomGroupsProvider } from "./sbom-groups-context";
-import { SbomGroupsToolbar } from "./sbom-groups-toolbar";
+import { GroupFormModal } from "./components/group-form";
+import { SbomGroupsContext, SbomGroupsProvider } from "./sbom-groups-context";
 import { SbomGroupsTable } from "./sbom-groups-table";
+import { SbomGroupsToolbar } from "./sbom-groups-toolbar";
 
 export const SbomGroups: React.FC = () => {
   return (
@@ -22,9 +23,29 @@ export const SbomGroups: React.FC = () => {
           <SbomGroupsProvider>
             <SbomGroupsToolbar />
             <SbomGroupsTable />
+            <SbomGroupsActions />
           </SbomGroupsProvider>
         </div>
       </PageSection>
     </>
+  );
+};
+
+const SbomGroupsActions: React.FC = () => {
+  const { groupCreateUpdateModalState, setGroupCreateUpdateModalState } =
+    React.useContext(SbomGroupsContext);
+
+  const isCreateUpdateGroupModalOpen = groupCreateUpdateModalState !== null;
+  const createUpdateGroup =
+    groupCreateUpdateModalState !== "create"
+      ? groupCreateUpdateModalState
+      : null;
+
+  return (
+    <GroupFormModal
+      isOpen={isCreateUpdateGroupModalOpen}
+      group={createUpdateGroup}
+      onClose={() => setGroupCreateUpdateModalState(null)}
+    />
   );
 };

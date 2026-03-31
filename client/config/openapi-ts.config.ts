@@ -5,7 +5,6 @@ export default defineConfig({
   input: "./openapi/trustd.yaml",
   output: {
     path: "src/app/client",
-    format: "prettier",
-    lint: "eslint",
+    postProcess: ["prettier", "eslint"],
   },
 });

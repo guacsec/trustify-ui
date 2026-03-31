@@ -1,26 +1,31 @@
-import type { HubRequestParams } from "@app/api/models";
-import { client } from "@app/axios-config/apiInit";
-import {
-  type CreateResponse,
-  createSbomGroup,
-  deleteSbomGroup,
-  type Group,
-  type GroupRequest,
-  listSbomGroups,
-  type ListSbomGroupsData,
-  readSbomGroup,
-  updateSbomGroup,
-} from "@app/client";
-import { requestParamsQuery } from "@app/hooks/table-controls";
+import { useMemo } from "react";
+
 import {
   queryOptions,
   useMutation,
-  useQueries,
   useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
+
+import type { HubRequestParams } from "@app/api/models";
+import { client } from "@app/axios-config/apiInit";
+import type {
+  CreateResponse,
+  Group,
+  GroupRequest,
+  ListSbomGroupsData,
+} from "@app/client";
+import {
+  createSbomGroup,
+  deleteSbomGroup,
+  listSbomGroups,
+  readSbomGroup,
+  updateSbomGroup,
+} from "@app/client";
+import { requestParamsQuery } from "@app/hooks/table-controls/getHubRequestParams";
+import { SBOMsQueryKey } from "./sboms";
 
 export const SBOMGroupsQueryKey = "sbom-groups";
 
@@ -54,30 +59,47 @@ export const useSuspenseSBOMGroupById = (id: string) => {
 };
 
 export const useFetchSBOMGroups = (
+  parentId: string | null,
   params: HubRequestParams = {},
   extraQueryParams: Pick<
     NonNullable<ListSbomGroupsData["query"]>,
     "parents" | "totals"
   > = {},
-  disableQuery: boolean = false,
+  enabled = true,
 ) => {
+  const { q, ...rest } = requestParamsQuery(params);
+  const parentQuery = parentId ? `parent=${parentId}` : "";
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMGroupsQueryKey, params, extraQueryParams],
+    queryKey: [SBOMGroupsQueryKey, parentId, { params, extraQueryParams }],
     queryFn: () =>
       listSbomGroups({
         client,
-        query: { ...requestParamsQuery(params), ...extraQueryParams },
+        query: {
+          ...rest,
+          ...extraQueryParams,
+          q: [q, parentQuery].filter((e) => e).join("&"),
+        },
       }),
-    enabled: !disableQuery,
+    enabled,
   });
+
+  const references = useMemo(() => {
+    return [
+      ...(data?.data?.items || []),
+      ...(data?.data?.referenced || []),
+    ].reduce((prev, current) => {
+      prev.set(current.id, current);
+      return prev;
+    }, new Map<string, Group>());
+  }, [data?.data]);
 
   return {
     result: {
       data: data?.data?.items || [],
       total: data?.data?.total ?? 0,
-      params,
     },
-    rawData: data?.data,
+    references,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,
@@ -124,47 +146,6 @@ export const useUpdateSBOMGroupMutation = (
   });
 };
 
-/**
- * Fetch children for multiple parent groups in parallel.
- *
- * Issues one query per parent ID using `useQueries`. Each query fetches all
- * direct children of the given parent (no pagination limit).
- */
-export const useFetchSbomGroupChildren = (parentIds: string[]) => {
-  const results = useQueries({
-    queries: parentIds.map((parentId) => ({
-      queryKey: [SBOMGroupsQueryKey, "children", parentId],
-      queryFn: () =>
-        listSbomGroups({
-          client,
-          query: {
-            q: `parent=${parentId}`,
-            totals: true,
-            limit: 0,
-          },
-        }),
-    })),
-  });
-
-  const nodeStatus = new Map<
-    string,
-    { isFetching: boolean; fetchError: AxiosError | null }
-  >();
-  parentIds.forEach((id, index) => {
-    nodeStatus.set(id, {
-      isFetching: results[index].isLoading,
-      fetchError: (results[index].error as AxiosError) ?? null,
-    });
-  });
-
-  return {
-    data: results.flatMap((r) => r.data?.data?.items ?? []),
-    isFetching: results.some((r) => r.isLoading),
-    isError: results.some((r) => r.isError),
-    nodeStatus,
-  };
-};
-
 export const useDeleteSbomGroupMutation = (
   onSuccess: (payload: Group) => void,
   onError: (err: AxiosError) => void,
@@ -188,11 +169,19 @@ export const useDeleteSbomGroupMutation = (
       await queryClient.invalidateQueries({
         queryKey: [SBOMGroupsQueryKey],
       });
+      // Invalidate SBOMs that belong to this group
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey, payload.id],
+      });
     },
-    onError: async (err: AxiosError) => {
+    onError: async (err: AxiosError, payload) => {
       onError(err);
       await queryClient.invalidateQueries({
         queryKey: [SBOMGroupsQueryKey],
+      });
+      // Invalidate SBOMs that belong to this group
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey, payload.id],
       });
     },
   });

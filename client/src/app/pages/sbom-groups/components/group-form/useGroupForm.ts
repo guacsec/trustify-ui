@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -9,7 +9,7 @@ import {
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
-import { PRODUCT_LABEL_KEY } from "@app/Constants";
+import { FILTER_NULL_VALUE, PRODUCT_LABEL_KEY } from "@app/Constants";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
@@ -75,7 +75,22 @@ export const useGroupForm = ({
     description: string().trim().max(255),
     isProduct: boolean().required(),
     labels: array().of(string().defined()).defined().default([]),
-    parentGroup: mixed<Group>().nullable().defined().default(null),
+    parentGroup: mixed<Group>()
+      .nullable()
+      .defined()
+      .default(null)
+      .test(
+        "circular-parent",
+        "Circular dependency, a group cannot reference itself",
+        function (value) {
+          if (!value) return true;
+          if (value.id !== group?.id) return true;
+
+          return this.createError({
+            message: "Parent cannot reference itself",
+          });
+        },
+      ),
   });
 
   const form = useForm<FormValues>({
@@ -94,23 +109,33 @@ export const useGroupForm = ({
 
   // Watch parentGroupId to fetch siblings for that parent
   const parentGroup = form.watch("parentGroup");
-  const { result, isFetching } = useFetchSBOMGroups({
-    page: { pageNumber: 1, itemsPerPage: 1000 },
-    filters: [
-      { field: "parent", operator: "=", value: parentGroup?.id || "\0" },
-    ],
-  });
+  const { result: siblingGroups, isFetching } = useFetchSBOMGroups(
+    parentGroup?.id || FILTER_NULL_VALUE,
+    { page: { pageNumber: 1, itemsPerPage: 0 } },
+  );
 
-  siblingsRef.current = result.data;
+  const siblingsKey = useMemo(() => {
+    return siblingGroups.data.map((g) => g.id).join(",");
+  }, [siblingGroups]);
+  siblingsRef.current = siblingGroups.data;
 
-  // Re-validate name when fetch completes (isFetching transitions true → false)
-  const wasFetchingRef = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: siblingsKey is an intentional trigger dependency
   useEffect(() => {
-    if (wasFetchingRef.current && !isFetching) {
-      form.trigger("name");
+    form.trigger("name");
+  }, [siblingsKey, form]);
+
+  const prevParentRef = useRef<Group | null>(null);
+  useEffect(() => {
+    const isInitial = prevParentRef.current === null;
+    const hasChanged = prevParentRef.current !== parentGroup;
+    prevParentRef.current = parentGroup;
+
+    // Mark name as touched so validation errors display even when only the
+    // parent changed (the UI gates error visibility on isDirty || isTouched)
+    if (hasChanged && !isInitial) {
+      form.setValue("name", form.getValues("name"), { shouldTouch: true });
     }
-    wasFetchingRef.current = isFetching;
-  }, [isFetching, form]);
+  }, [parentGroup, form]);
 
   const {
     handleSubmit,
@@ -134,17 +159,18 @@ export const useGroupForm = ({
     };
 
     if (group) {
-      updateGroup({
+      return updateGroup({
         id: group.id,
         body: { ...payload },
       });
     } else {
-      createGroup(payload);
+      return createGroup(payload);
     }
   };
   return {
     form,
-    isSubmitDisabled: !isValid || isSubmitting || isValidating || !isDirty,
+    isSubmitDisabled:
+      !isValid || isSubmitting || isValidating || !isDirty || isFetching,
     isCancelDisabled: isSubmitting || isValidating,
     onSubmit: handleSubmit(onValidSubmit),
   };

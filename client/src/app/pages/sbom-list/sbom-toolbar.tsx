@@ -16,7 +16,8 @@ import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
 
-import { GroupFormModal } from "./components/group-form";
+import { AddToGroupModal } from "./components/add-to-group-form";
+import { GroupFormModal } from "../sbom-groups/components/group-form";
 import { SbomSearchContext } from "./sbom-context";
 
 interface SbomToolbarProps {
@@ -30,12 +31,19 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  // Create Form Modal
   const [saveGroupModalState, setSaveGroupModalState] = React.useState<
     "create" | Group | null
   >(null);
   const isCreateUpdateGroupModalOpen = saveGroupModalState !== null;
   const createUpdateGroup =
     saveGroupModalState !== "create" ? saveGroupModalState : null;
+
+  // Add to group Modal
+  const [isAddToGroupModalOpen, setIsAddToGroupModalOpen] =
+    React.useState(false);
+
+  // Table controls
 
   const {
     tableControls,
@@ -55,6 +63,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   } = tableControls;
 
   const {
+    selectedItems,
     propHelpers: { toolbarBulkSelectorProps },
   } = bulkSelectionControls;
 
@@ -77,7 +86,11 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                 </Button>
               </ToolbarItem>
               <ToolbarItem>
-                <Button variant="secondary" isDisabled>
+                <Button
+                  variant="secondary"
+                  isDisabled={selectedItems.length === 0}
+                  onClick={() => setIsAddToGroupModalOpen(true)}
+                >
                   Add to group
                 </Button>
               </ToolbarItem>
@@ -118,6 +131,11 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
         isOpen={isCreateUpdateGroupModalOpen}
         group={createUpdateGroup}
         onClose={() => setSaveGroupModalState(null)}
+      />
+      <AddToGroupModal
+        sboms={selectedItems}
+        isOpen={isAddToGroupModalOpen}
+        onClose={() => setIsAddToGroupModalOpen(false)}
       />
     </>
   );

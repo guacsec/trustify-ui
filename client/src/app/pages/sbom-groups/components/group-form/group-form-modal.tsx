@@ -110,6 +110,7 @@ const GroupFormModalReady: React.FC<GroupFormModalReadyProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       aria-label={group ? "Edit group" : "Create group"}
+      style={{ overflow: "visible" }}
     >
       <ModalHeader title={group ? "Edit group" : "Create group"} />
       <ModalBody>
