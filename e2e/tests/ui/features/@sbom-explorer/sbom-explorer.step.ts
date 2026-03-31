@@ -16,6 +16,7 @@ import { SbomsTab as PackageSbomsTab } from "../../pages/package-details/sboms/S
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
+import { PackagesTab } from "../../pages/sbom-details/packages/PackagesTab";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -51,8 +52,9 @@ Then(
 );
 
 Then("Search by FilterText {string}", async ({ page }, filterText: string) => {
-  const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
-  await toolbarTable.filterByText(filterText);
+  const detailsPage = await PackagesTab.fromCurrentPage(page);
+  const toolbar = await detailsPage.getToolbar();
+  await toolbar.applyFilter({ "Filter text": filterText });
 });
 
 Then(
