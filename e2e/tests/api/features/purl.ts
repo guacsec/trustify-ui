@@ -1,4 +1,8 @@
 import { expect, test } from "../fixtures";
+import {
+  testBasicSort,
+  validateSortDirectionDiffers,
+} from "../helpers/sorting-helpers";
 
 test.skip("Purl by alias - vanilla", async ({ axios }) => {
   const vanillaResponse = await axios.get(
@@ -35,4 +39,53 @@ test.skip("Purl by alias - vanilla", async ({ axios }) => {
       }),
     ]),
   );
+});
+
+test.describe("PURL sorting validation", () => {
+  test("Sort PURLs by name ascending", async ({ axios }) => {
+    await testBasicSort(axios, "/api/v2/purl", "name", "asc");
+  });
+
+  test("Sort PURLs by name descending", async ({ axios }) => {
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "name",
+      (item) => {
+        // Extract name from purl string
+        const match = item.purl.match(/pkg:[^/]+\/(?:[^/]+\/)?([^@?]+)/);
+        return match ? match[1] : item.purl;
+      },
+    );
+  });
+
+  test("Sort PURLs by namespace ascending", async ({ axios }) => {
+    await testBasicSort(axios, "/api/v2/purl", "namespace", "asc");
+  });
+
+  test("Sort PURLs by namespace descending", async ({ axios }) => {
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "namespace",
+      (item) => {
+        // Extract namespace from purl string
+        const match = item.purl.match(/pkg:[^/]+\/([^/]+)/);
+        return match ? match[1] : null;
+      },
+    );
+  });
+
+  test("Sort PURLs by version ascending", async ({ axios }) => {
+    await testBasicSort(axios, "/api/v2/purl", "version", "asc");
+  });
+
+  test("Sort PURLs by version descending", async ({ axios }) => {
+    await validateSortDirectionDiffers(
+      axios,
+      "/api/v2/purl",
+      "version",
+      (item) => item.version.version,
+    );
+  });
 });
