@@ -23,8 +23,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "1.55.0",
-    "axios": "^1.11.0",
+    "@playwright/test": "^1.57.0",
+    "axios": "^1.13.5",
     "playwright-bdd": "^8.3.1"
   }
 }
