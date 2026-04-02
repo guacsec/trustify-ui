@@ -23,6 +23,6 @@ export const oidcClientSettings: OidcClientSettings = {
   redirect_uri: window.location.origin,
   post_logout_redirect_uri: window.location.origin,
   response_type: "code",
-  loadUserInfo: true,
+  loadUserInfo: false,
   scope: ENV.OIDC_SCOPE || "openid",
 };
