@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { logger, SETUP_TIMEOUT } from "../../common/constants";
 import { test as setup } from "../fixtures";
-import { uploadFiles } from "../helpers";
+import { uploadFiles } from "../helpers/general-helpers";
 
 setup.describe("Ingest initial data", () => {
   setup.skip(
