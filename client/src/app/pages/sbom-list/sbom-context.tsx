@@ -159,7 +159,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
   });
 
   const {
-    result: { data: advisories, total: totalItemCount },
+    result: { data: sboms, total: totalItemCount },
     isFetching,
     fetchError,
   } = useFetchSBOMs(
@@ -179,7 +179,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
   const tableControls = useTableControlProps({
     ...tableControlState,
     idProperty: "id",
-    currentPageItems: advisories,
+    currentPageItems: sboms,
     totalItemCount,
     isLoading: isFetching,
   });
