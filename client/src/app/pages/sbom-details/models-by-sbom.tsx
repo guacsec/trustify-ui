@@ -136,7 +136,9 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
                             </Button>
                           </FlexItem>
                           <FlexItem>
-                            <small>{model?.purl as string}</small>
+                            <small>
+                              {model?.purls.map((e) => e.purl).join(",")}
+                            </small>
                           </FlexItem>
                           <FlexItem>
                             <Flex spaceItems={{ default: "spaceItemsSm" }}>
