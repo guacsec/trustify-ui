@@ -116,8 +116,6 @@ Feature: SBOM Groups - Manage SBOM groups
     And A group "Searchable Group" exists
     When User searches for group "Searchable"
     Then The SBOM Groups table contains "Searchable Group"
-    When User clears all filters
-    Then The SBOM Groups table shows all groups
 
   Scenario: Clear filter shows all groups
     Given User navigates to SBOM Groups page
