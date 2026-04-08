@@ -1,6 +1,6 @@
 import type { AxiosInstance } from "axios";
 import fs from "node:fs";
-import { logger } from "../common/constants";
+import { logger } from "../../common/constants";
 
 export async function uploadFiles(
   axios: AxiosInstance,

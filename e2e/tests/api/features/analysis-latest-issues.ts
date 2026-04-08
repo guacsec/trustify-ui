@@ -1,5 +1,9 @@
 import { expect, test } from "../fixtures";
-import { deleteSboms, getFullSbomPaths, uploadFiles } from "../helpers";
+import {
+  deleteSboms,
+  getFullSbomPaths,
+  uploadFiles,
+} from "../helpers/general-helpers";
 
 // SBOMs to upload
 const sbomDir = "tests/common/assets/sbom";
