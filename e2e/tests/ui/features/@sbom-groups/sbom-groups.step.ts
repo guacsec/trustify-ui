@@ -35,15 +35,13 @@ Then("The SBOM Groups table is visible", async ({ page }) => {
 });
 
 Then("The SBOM Groups table shows group data", async ({ page }) => {
-  // Tree table doesn't have visible column headers
-  // Verify table structure by checking it's not showing empty state
+  // Verify the tree table is rendered
   const table = page.getByRole("treegrid", { name: "sbom-groups-table" });
   await expect(table).toBeVisible();
 
-  // Verify it's not showing empty state (which would mean no data structure)
-  // Table is valid if either it has rows OR it's empty (both are valid states)
-  // We're just verifying the table structure exists
-  expect(await table.isVisible()).toBe(true);
+  // Verify that at least one data row is present (not showing empty state)
+  const rows = table.getByRole("row");
+  await expect(rows.first()).toBeVisible();
 });
 
 // Create group
@@ -351,15 +349,19 @@ Then(
 
 // Filtering
 When("User clears all filters", async ({ page }) => {
-  await page.getByRole("button", { name: "Clear all filters" }).click();
+  const listPage = await SbomGroupListPage.fromCurrentPage(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.clearAllFilters(); // This waits for filter chips to be removed
 });
 
 Then("The SBOM Groups table shows all groups", async ({ page }) => {
-  // Verify table has content
-  await page.waitForTimeout(1000);
-  const rows = page.getByRole("row");
-  const count = await rows.count();
-  expect(count).toBeGreaterThan(1); // At least header + 1 data row
+  // Verify table has content after clearing filters
+  const table = page.getByRole("treegrid", { name: "sbom-groups-table" });
+  await expect(table).toBeVisible();
+
+  // Wait for at least one row to be visible (indicating data has loaded)
+  const rows = table.getByRole("row");
+  await expect(rows.first()).toBeVisible();
 });
 
 When(
