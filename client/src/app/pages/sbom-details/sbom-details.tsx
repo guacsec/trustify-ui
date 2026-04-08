@@ -281,7 +281,7 @@ export const SbomDetails: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => {
           if (sbom) {
-            deleteSbom(sbom.id);
+            deleteSbom(sbom);
           }
         }}
       />

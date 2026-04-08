@@ -296,7 +296,7 @@ export const SbomTable: React.FC = () => {
         onClose={() => setSbomToDelete(null)}
         onConfirm={() => {
           if (sbomToDelete) {
-            deleteSbom(sbomToDelete.id);
+            deleteSbom(sbomToDelete);
           }
         }}
       />
