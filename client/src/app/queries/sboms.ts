@@ -24,8 +24,8 @@ import {
   listAllLicenseIds,
   listRelatedSboms,
   listSbomLabels,
-  listSboms,
   updateSbomLabels,
+  v2ListSboms,
 } from "@app/client";
 import { useUpload } from "@app/hooks/useUpload";
 
@@ -68,7 +68,7 @@ export const useFetchSBOMs = (
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
     queryFn: () =>
-      listSboms({
+      v2ListSboms({
         client,
         query: {
           ...rest,
@@ -119,20 +119,19 @@ export const useFetchSBOMById = (
 };
 
 export const useDeleteSbomMutation = (
-  onSuccess: (payload: SbomSummary, id: string) => void,
+  onSuccess: (sbom: SbomSummary) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await deleteSbom({ client, path: { id } });
-      return response.data as SbomSummary;
+    mutationFn: async (sbom: SbomSummary) => {
+      await deleteSbom({ client, path: { id: sbom.id } });
     },
-    onSuccess: async (response, id) => {
-      onSuccess(response, id);
+    onSuccess: async (_, sbom) => {
+      onSuccess(sbom);
       await queryClient.invalidateQueries({ queryKey: [SBOMsQueryKey] });
 
-      queryClient.removeQueries({ queryKey: [SBOMsQueryKey, id] });
+      queryClient.removeQueries({ queryKey: [SBOMsQueryKey, sbom.id] });
     },
     onError: async (err: AxiosError) => {
       onError(err);
