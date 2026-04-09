@@ -6,6 +6,8 @@ import { downloadSbomLicense } from "@app/api/rest";
 import { client } from "@app/axios-config/apiInit";
 import { downloadAdvisory, downloadSbom } from "@app/client";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import type { AxiosError } from "axios";
+
 import {
   getAxiosErrorMessage,
   getFilenameFromContentDisposition,
@@ -16,7 +18,7 @@ export const useDownload = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
 
   /** Pushes a danger toast notification with the given title and the error message extracted from the error. */
-  const notifyDownloadError = (title: string, error: unknown) => {
+  const notifyDownloadError = (title: string, error: AxiosError) => {
     pushNotification({
       title,
       variant: "danger",
