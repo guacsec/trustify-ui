@@ -9,7 +9,7 @@ test.describe("Advisory sorting validation", () => {
   test("Sort advisories by ID ascending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/advisory",
+      "/api/v3/advisory",
       "identifier",
       "asc",
     );
@@ -19,7 +19,7 @@ test.describe("Advisory sorting validation", () => {
   test("Sort advisories by ID descending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/advisory",
+      "/api/v3/advisory",
       "identifier",
       "desc",
     );
@@ -29,7 +29,7 @@ test.describe("Advisory sorting validation", () => {
   test("Sort advisories by modified date ascending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/advisory",
+      "/api/v3/advisory",
       "modified",
       "asc",
     );
@@ -39,7 +39,7 @@ test.describe("Advisory sorting validation", () => {
   test("Sort advisories by modified date descending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/advisory",
+      "/api/v3/advisory",
       "modified",
       "desc",
     );
