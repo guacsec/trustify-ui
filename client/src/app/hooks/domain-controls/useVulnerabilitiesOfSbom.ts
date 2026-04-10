@@ -90,8 +90,8 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
         );
 
         const vulnerabilityWithHighestScore =
-          existingElement.vulnerability.average_score >
-          current.vulnerability.average_score
+          (existingElement.vulnerability.base_score?.score ?? 0) >
+          (current.vulnerability.base_score?.score ?? 0)
             ? existingElement
             : current;
 
@@ -128,7 +128,7 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
     (prev, current) => {
       const vulnStatus = current.vulnerabilityStatus;
       const severity = extendedSeverityFromSeverity(
-        current.vulnerability.average_severity,
+        current.vulnerability.base_score?.severity,
       );
 
       const prevVulnStatusValue = prev.vulnerabilityStatus[vulnStatus];

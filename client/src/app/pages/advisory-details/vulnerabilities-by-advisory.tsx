@@ -166,10 +166,12 @@ export const VulnerabilitiesByAdvisory: React.FC<
                       modifier="truncate"
                       {...getTdProps({ columnKey: "score" })}
                     >
-                      {item.severity && (
+                      {item.base_score && (
                         <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(item.severity)}
-                          score={item.score ?? null}
+                          value={extendedSeverityFromSeverity(
+                            item.base_score.severity,
+                          )}
+                          score={item.base_score.score ?? null}
                           showLabel
                           showScore
                         />
