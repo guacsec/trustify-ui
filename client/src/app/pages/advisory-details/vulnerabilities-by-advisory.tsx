@@ -168,7 +168,9 @@ export const VulnerabilitiesByAdvisory: React.FC<
                     >
                       {item.base_score && (
                         <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(item.base_score.severity)}
+                          value={extendedSeverityFromSeverity(
+                            item.base_score.severity,
+                          )}
                           score={item.base_score.score ?? null}
                           showLabel
                           showScore
