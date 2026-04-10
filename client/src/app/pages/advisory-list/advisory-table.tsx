@@ -132,7 +132,7 @@ export const AdvisoryTable: React.FC = () => {
 
             const severities = item.vulnerabilities.reduce((prev, current) => {
               const extendedSeverity = extendedSeverityFromSeverity(
-                current.severity,
+                current.base_score?.severity,
               );
               prev[extendedSeverity] = prev[extendedSeverity] + 1;
               return prev;
