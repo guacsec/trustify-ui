@@ -28,6 +28,9 @@ pub struct UI {
 
     #[serde(rename(serialize = "OIDC_SCOPE"))]
     pub oidc_scope: String,
+
+    #[serde(rename(serialize = "OIDC_LOAD_USER"))]
+    pub oidc_load_user: String,
 }
 
 pub fn trustify_ui_resources() -> HashMap<&'static str, Resource> {
