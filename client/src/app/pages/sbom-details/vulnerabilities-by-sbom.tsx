@@ -147,7 +147,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     ],
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
-      cvss: item.vulnerability.average_score,
+      cvss: item.vulnerability.base_score?.score ?? 0,
       affectedDependencies: item.summary.totalPackages,
       published: item.vulnerability?.published
         ? dayjs(item.vulnerability.published).valueOf()
@@ -307,9 +307,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <Td width={10} {...getTdProps({ columnKey: "cvss" })}>
                         <SeverityShieldAndText
                           value={extendedSeverityFromSeverity(
-                            item.vulnerability.average_severity,
+                            item.vulnerability.base_score?.severity,
                           )}
-                          score={item.vulnerability.average_score}
+                          score={item.vulnerability.base_score?.score ?? null}
                           showLabel
                           showScore
                         />
