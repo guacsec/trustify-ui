@@ -171,7 +171,7 @@ export class DetailsPage {
         keyof typeof counts
       >) {
         const cvssLocator = await this.page
-          .locator(`xpath=//td[@data-label='CVSS']//div[.='${cvssType}']`)
+          .locator(`xpath=//td[@data-label='CVSS']//div[text()='${cvssType}']`)
           .all();
         counts[cvssType] += await cvssLocator.length;
       }
