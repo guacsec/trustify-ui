@@ -18,6 +18,7 @@ import {
 } from "@app/hooks/table-controls";
 import { useFetchSbomsByPackageId } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
+import { formatDate } from "@app/utils/utils";
 
 interface SbomsByPackageProps {
   purl: string;
@@ -31,10 +32,11 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
       name: "Name",
       version: "Version",
       supplier: "Supplier",
+      published: "Created on",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
-    sortableColumns: ["name"],
+    sortableColumns: ["name", "published"],
     isFilterEnabled: true,
     filterCategories: [
       {
@@ -56,6 +58,7 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
+        published: "published",
       },
     }),
   );
@@ -103,6 +106,7 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
               <Th {...getThProps({ columnKey: "name" })} />
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "supplier" })} />
+              <Th {...getThProps({ columnKey: "published" })} />
             </TableHeaderContentWithControls>
           </Tr>
         </Thead>
@@ -117,7 +121,7 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
               <Tbody key={item.id}>
                 <Tr {...getTrProps({ item })}>
                   <Td
-                    width={35}
+                    width={30}
                     modifier="breakWord"
                     {...getTdProps({ columnKey: "name" })}
                   >
@@ -135,11 +139,18 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
                     {item.described_by.map((item) => item.version).join(", ")}
                   </Td>
                   <Td
-                    width={50}
+                    width={30}
                     modifier="truncate"
                     {...getTdProps({ columnKey: "supplier" })}
                   >
                     {item.suppliers.join(", ")}
+                  </Td>
+                  <Td
+                    width={20}
+                    modifier="truncate"
+                    {...getTdProps({ columnKey: "published" })}
+                  >
+                    {formatDate(item.published)}
                   </Td>
                 </Tr>
               </Tbody>
