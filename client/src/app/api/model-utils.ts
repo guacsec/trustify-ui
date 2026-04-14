@@ -151,13 +151,13 @@ const getScoreTypePriority = (val: ScoreType | null) => {
   }
 
   switch (val) {
-    case "3.1":
-      return 1;
-    case "3.0":
-      return 2;
-    case "4.0":
-      return 3;
     case "2.0":
+      return 1;
+    case "3.1":
+      return 2;
+    case "3.0":
+      return 3;
+    case "4.0":
       return 4;
     default:
       return 0;
@@ -181,4 +181,19 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
   }
 
   return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
+};
+
+export const extractPriorityItemBasedOnScoresType = <T>(
+  items: T[],
+  getScoreType: (item: T) => ScoreType | null,
+): T | null => {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return [...items].sort((a, b) => {
+    const scoreTypeA = getScoreType(a);
+    const scoreTypeB = getScoreType(b);
+    return getScoreTypePriority(scoreTypeA) - getScoreTypePriority(scoreTypeB);
+  })[0];
 };

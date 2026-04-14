@@ -367,7 +367,7 @@ export class ToolbarTable {
    * @returns true if the given input is in CVSS format
    */
   isCVSS(cvssString: string): boolean {
-    const cvssRegex = /^.+\((\d*\.*\d+?)\)$/;
+    const cvssRegex = /^.+\((\d*\.*\d+?)\)/;
     return !!cvssRegex.test(cvssString);
   }
 
@@ -387,7 +387,7 @@ export class ToolbarTable {
    * @returns CVSS score if the given input is in CVSS format
    */
   getCVSS(cvssString: string): number {
-    const cvssRegex = /^.+\((\d*\.*\d+?)\)$/;
+    const cvssRegex = /^.+\((\d*\.*\d+?)\)/;
     const cvssScore = cvssString.match(cvssRegex);
     if (!cvssScore) {
       return 0;
