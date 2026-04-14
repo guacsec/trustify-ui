@@ -27,7 +27,9 @@ export class DetailsPage {
   }
 
   async verifyPageHeader(header: string) {
-    await expect(this.page.getByRole("heading")).toContainText(header);
+    await expect(this.page.getByRole("heading", { level: 1 })).toContainText(
+      header,
+    );
   }
 
   async verifyActionIsAvailable(actionName: string) {
