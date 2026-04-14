@@ -5,7 +5,12 @@ import {
   type VulnerabilityStatus,
   extendedSeverityFromSeverity,
 } from "@app/api/models";
-import type { SbomAdvisory, SbomPackage, SbomStatus } from "@app/client";
+import type {
+  SbomAdvisory,
+  SbomPackage,
+  SbomStatus,
+  ScoredVector,
+} from "@app/client";
 import {
   useFetchSbomsAdvisory,
   useFetchSbomsAdvisoryBatch,
@@ -63,6 +68,15 @@ export const DEFAULT_SUMMARY: VulnerabilityOfSbomSummary = {
   },
 };
 
+const deduplicateScores = (scores: ScoredVector[]): ScoredVector[] => {
+  const seen = new Set<string>();
+  return scores.filter((s) => {
+    if (seen.has(s.vector)) return false;
+    seen.add(s.vector);
+    return true;
+  });
+};
+
 const advisoryToModels = (advisories: SbomAdvisory[]) => {
   const vulnerabilities = advisories
     .flatMap((advisory) => {
@@ -97,6 +111,13 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
 
         const updatedItemInArray: VulnerabilityOfSbom = {
           ...vulnerabilityWithHighestScore,
+          vulnerability: {
+            ...vulnerabilityWithHighestScore.vulnerability,
+            scores: deduplicateScores([
+              ...existingElement.vulnerability.scores,
+              ...current.vulnerability.scores,
+            ]),
+          },
           relatedPackages: [
             ...existingElement.relatedPackages,
             {

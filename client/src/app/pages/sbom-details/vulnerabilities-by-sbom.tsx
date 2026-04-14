@@ -42,6 +42,7 @@ import type {
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
+import { CvssScoreExpandedContent } from "@app/components/CvssScoreExpandedContent";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
@@ -304,7 +305,15 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={10} {...getTdProps({ columnKey: "cvss" })}>
+                      <Td
+                        width={10}
+                        {...getTdProps({
+                          columnKey: "cvss",
+                          isCompoundExpandToggle: true,
+                          item: item,
+                          rowIndex,
+                        })}
+                      >
                         <SeverityShieldAndText
                           value={extendedSeverityFromSeverity(
                             item.vulnerability.base_score?.severity,
@@ -350,6 +359,11 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         })}
                       >
                         <ExpandableRowContent>
+                          {isCellExpanded(item, "cvss") ? (
+                            <CvssScoreExpandedContent
+                              scores={item.vulnerability.scores}
+                            />
+                          ) : null}
                           {isCellExpanded(item, "affectedDependencies") ? (
                             <Table variant="compact">
                               <Thead>

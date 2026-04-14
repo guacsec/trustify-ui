@@ -44,6 +44,12 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       idIndex,
     );
 
+    // CVSS expanded content
+    const expandedCvssCell = await table.expandCell("CVSS", idIndex);
+    await expect(expandedCvssCell).toContainText("3.1");
+    await expect(expandedCvssCell).toContainText("8.1");
+
+    // Affected dependencies expanded content (clicking collapses CVSS due to compound expansion)
     const expandedCell = await table.expandCell(
       "Affected dependencies",
       idIndex,
