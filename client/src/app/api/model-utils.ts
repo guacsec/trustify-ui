@@ -1,14 +1,12 @@
 import type React from "react";
 
 import type { LabelProps, ProgressProps } from "@patternfly/react-core";
-import {
-  SeverityCriticalIcon,
-  SeverityImportantIcon,
-  SeverityMinorIcon,
-  SeverityModerateIcon,
-  SeverityNoneIcon,
-  SeverityUndefinedIcon,
-} from "@patternfly/react-icons";
+import SeverityCriticalIcon from "@patternfly/react-icons/dist/esm/icons/severity-critical-icon";
+import SeverityImportantIcon from "@patternfly/react-icons/dist/esm/icons/severity-important-icon";
+import SeverityMinorIcon from "@patternfly/react-icons/dist/esm/icons/severity-minor-icon";
+import SeverityModerateIcon from "@patternfly/react-icons/dist/esm/icons/severity-moderate-icon";
+import SeverityNoneIcon from "@patternfly/react-icons/dist/esm/icons/severity-none-icon";
+import SeverityUndefinedIcon from "@patternfly/react-icons/dist/esm/icons/severity-undefined-icon";
 import {
   t_global_icon_color_severity_critical_default as criticalColor,
   t_global_icon_color_severity_important_default as importantColor,
