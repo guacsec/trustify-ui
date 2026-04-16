@@ -131,7 +131,6 @@ export const useDeleteSbomMutation = (
     onSuccess: async (_, sbom) => {
       onSuccess(sbom);
       await queryClient.invalidateQueries({ queryKey: [SBOMsQueryKey] });
-
       queryClient.removeQueries({ queryKey: [SBOMsQueryKey, sbom.id] });
     },
     onError: async (err: AxiosError) => {
