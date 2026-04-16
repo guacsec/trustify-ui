@@ -4,14 +4,18 @@ import { generatePath, Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
+  Button,
   Card,
   CardBody,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Flex,
+  FlexItem,
   Grid,
   GridItem,
+  Popover,
   Stack,
   StackItem,
   Toolbar,
@@ -29,16 +33,6 @@ import {
   Tr,
 } from "@patternfly/react-table";
 
-import {
-  type VulnerabilityStatus,
-  extendedSeverityFromSeverity,
-} from "@app/api/models";
-import type {
-  PurlSummary,
-  SbomAdvisory,
-  SbomPackage,
-  SbomStatus,
-} from "@app/client";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
@@ -57,19 +51,7 @@ import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
-
-interface TableData {
-  vulnerability: SbomStatus;
-  vulnerabilityStatus: VulnerabilityStatus;
-  relatedPackages: {
-    advisory: SbomAdvisory;
-    packages: SbomPackage[];
-  }[];
-  summary: {
-    totalPackages: number;
-    allPackages: SbomPackage[];
-  };
-}
+import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -95,31 +77,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     );
   }, [vulnerabilities]);
 
-  const tableData = React.useMemo(() => {
-    return affectedVulnerabilities.map((item) => {
-      const allPackages = item.relatedPackages
-        .flatMap((i) => i.packages)
-        .reduce((prev, current) => {
-          const existingElement = prev.find((item) => item.id === current.id);
-          if (!existingElement) {
-            prev.push(current);
-          }
-          return prev;
-        }, [] as SbomPackage[]);
-      const result: TableData = {
-        ...item,
-        summary: {
-          totalPackages: allPackages.length,
-          allPackages,
-        },
-      };
-
-      return result;
-    });
-  }, [affectedVulnerabilities]);
-
   const tableDataWithUiId = useWithUiId(
-    tableData,
+    affectedVulnerabilities,
     (d) => `${d.vulnerability.identifier}-${d.vulnerabilityStatus}`,
   );
 
@@ -147,8 +106,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     ],
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
-      cvss: item.vulnerability.base_score?.score ?? 0,
-      affectedDependencies: item.summary.totalPackages,
+      cvss: item.opinionatedAdvisory.score?.value ?? 0,
+      affectedDependencies: item.purls.size,
       published: item.vulnerability?.published
         ? dayjs(item.vulnerability.published).valueOf()
         : 0,
@@ -269,7 +228,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       rowIndex={rowIndex}
                     >
                       <Td
-                        width={15}
+                        width={10}
                         modifier="breakWord"
                         {...getTdProps({ columnKey: "id" })}
                       >
@@ -284,7 +243,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={35}
+                            width={40}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -304,18 +263,48 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={10} {...getTdProps({ columnKey: "cvss" })}>
-                        <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(
-                            item.vulnerability.base_score?.severity,
-                          )}
-                          score={item.vulnerability.base_score?.score ?? null}
-                          showLabel
-                          showScore
-                        />
+                      <Td width={20} {...getTdProps({ columnKey: "cvss" })}>
+                        <Flex>
+                          <FlexItem>
+                            <SeverityShieldAndText
+                              value={item.opinionatedAdvisory.extendedSeverity}
+                              score={
+                                item.opinionatedAdvisory.score?.value ?? null
+                              }
+                              showLabel
+                              showScore
+                            />
+                          </FlexItem>
+                          <FlexItem>
+                            <Popover
+                              hasAutoWidth
+                              aria-label="CVSS Score Breakdown"
+                              headerContent={<div>CVSS Score Breakdown</div>}
+                              bodyContent={
+                                <VulnerabilityScoreBreakdown
+                                  opinionatedAdvisory={{
+                                    advisory: item.opinionatedAdvisory.advisory,
+                                    score: item.opinionatedAdvisory.score,
+                                    extendedSeverity:
+                                      item.opinionatedAdvisory.extendedSeverity,
+                                  }}
+                                  advisories={Array.from(
+                                    item.advisories.values(),
+                                  )}
+                                />
+                              }
+                            >
+                              <Button
+                                variant="link"
+                                disabled
+                                size="sm"
+                              >{`${item.advisories.size} Sources`}</Button>
+                            </Popover>
+                          </FlexItem>
+                        </Flex>
                       </Td>
                       <Td
-                        width={15}
+                        width={10}
                         modifier="truncate"
                         {...getTdProps({
                           columnKey: "affectedDependencies",
@@ -324,7 +313,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           rowIndex,
                         })}
                       >
-                        {item.summary.totalPackages}
+                        {item.purls.size}
                       </Td>
                       <Td
                         width={10}
@@ -363,34 +352,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                 </Tr>
                               </Thead>
                               <Tbody>
-                                {item.summary.allPackages
-                                  .flatMap((item) => {
-                                    // Some packages do not have purl neither ID. So we render only the parent name meanwhile
-                                    type EnrichedPurlSummary = {
-                                      parentName: string;
-                                      purlSummary?: PurlSummary;
-                                    };
-
-                                    const hasNoPurlsButOnlyName =
-                                      item.name && item.purl.length === 0;
-
-                                    if (hasNoPurlsButOnlyName) {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                      };
-                                      return [result];
-                                    }
-
-                                    return item.purl.map((i) => {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                        purlSummary: i,
-                                      };
-                                      return result;
-                                    });
-                                  })
-                                  .map((purl, index) => {
-                                    if (purl.purlSummary) {
+                                {Array.from(item.purls.values()).map(
+                                  (purl, index) => {
+                                    if (!purl.isOrphan) {
                                       const decomposedPurl = decomposePurl(
                                         purl.purlSummary.purl,
                                       );
@@ -424,21 +388,22 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                           </Td>
                                         </Tr>
                                       );
+                                    } else {
+                                      return (
+                                        <Tr
+                                          key={`${purl.parentName}-${index}-name`}
+                                        >
+                                          <Td />
+                                          <Td />
+                                          <Td>{purl.parentName}</Td>
+                                          <Td />
+                                          <Td />
+                                          <Td />
+                                        </Tr>
+                                      );
                                     }
-
-                                    return (
-                                      <Tr
-                                        key={`${purl.parentName}-${index}-name`}
-                                      >
-                                        <Td />
-                                        <Td />
-                                        <Td>{purl.parentName}</Td>
-                                        <Td />
-                                        <Td />
-                                        <Td />
-                                      </Tr>
-                                    );
-                                  })}
+                                  },
+                                )}
                               </Tbody>
                             </Table>
                           ) : null}
