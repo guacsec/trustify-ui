@@ -28,6 +28,7 @@ import {
   Stack,
   StackItem,
 } from "@patternfly/react-core";
+import { t_global_text_color_link_default } from "@patternfly/react-tokens";
 
 import { severityList } from "@app/api/model-utils";
 import type { ExtendedSeverity } from "@app/api/models";
@@ -154,8 +155,13 @@ export const MonitoringSection: React.FC = () => {
                           }
                           tickLabelComponent={
                             <ChartLabel
-                              className="pf-v6-c-button pf-m-link pf-m-inline"
-                              style={[{ fill: "#0066cc" }]}
+                              style={[
+                                {
+                                  fill: t_global_text_color_link_default.var,
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                },
+                              ]}
                               events={{
                                 onClick: (event) => {
                                   // biome-ignore lint/suspicious/noExplicitAny: allowed
