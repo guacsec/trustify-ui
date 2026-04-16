@@ -15,7 +15,7 @@ jobs:
   # Auto-merge trustify-ci-bot PRs that only change the OpenAPI spec
   auto-merge-openapi:
     runs-on: ubuntu-latest
-    if: github.actor == 'trustify-ci-bot[bot]'
+    if: github.actor == 'trustify-ci-bot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Check changed files
         id: check-files
@@ -61,7 +61,7 @@ jobs:
   # Auto-merge Dependabot PRs for patch and minor updates
   auto-merge-dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
