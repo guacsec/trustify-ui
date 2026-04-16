@@ -43,7 +43,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           gh pr review "$PR_NUMBER" --repo "${{ github.repository }}" --approve \
-            --body "Auto-approved: only client/openapi/trustd.yaml changed."
+            --body "$(cat <<'EOF'
+          🤖 **Auto-approved**
+
+          Only `client/openapi/trustd.yaml` changed — no manual review required.
+          EOF
+          )"
 
       - name: Enable auto-merge
         if: steps.check-files.outputs.auto_merge == 'true'
@@ -71,7 +76,12 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           gh pr review "$PR_NUMBER" --repo "${{ github.repository }}" --approve \
-            --body "Auto-approved: Dependabot ${{ steps.metadata.outputs.update-type }}"
+            --body "$(cat <<EOF
+          🤖 **Auto-approved**
+
+          Dependabot \`${{ steps.metadata.outputs.update-type }}\` — no manual review required.
+          EOF
+          )"
 
       - name: Enable auto-merge (patch and minor only)
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
