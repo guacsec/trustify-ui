@@ -13,6 +13,10 @@ export class AdvisoryUploadPage {
     return new AdvisoryUploadPage(page);
   }
 
+  static fromCurrentPage(page: Page) {
+    return new AdvisoryUploadPage(page);
+  }
+
   async getFileUploader() {
     return await FileUpload.build(this._page, "advisory-uploader");
   }
