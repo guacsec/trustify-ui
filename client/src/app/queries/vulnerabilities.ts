@@ -7,7 +7,7 @@ import {
   type AnalysisResponse,
   analyze,
   getVulnerability,
-  GetVulnerabilityData,
+  type GetVulnerabilityData,
   listVulnerabilities,
 } from "@app/client";
 import { requestParamsQuery } from "@app/hooks/table-controls";
