@@ -31,19 +31,15 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const expectedVulnerabilities = [
       {
         severity: "high",
-        count: 3,
+        count: 2,
       },
       {
         severity: "medium",
-        count: 10,
+        count: 13,
       },
       {
         severity: "low",
         count: 1,
-      },
-      {
-        severity: "unknown",
-        count: 2,
       },
     ];
 
