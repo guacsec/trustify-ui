@@ -7,6 +7,7 @@ import { ThemeProvider, type ThemeMode } from "tsd-ui";
 import { useLocalStorage } from "@app/hooks/useStorage";
 
 import { NotificationsProvider } from "./components/NotificationsContext";
+import { ReadOnlyProvider } from "./components/ReadOnlyContext";
 import { DefaultLayout } from "./layout";
 
 import "@patternfly/patternfly/patternfly.css";
@@ -23,11 +24,13 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider mode={mode} setMode={setMode}>
-      <NotificationsProvider>
-        <DefaultLayout>
-          <Outlet />
-        </DefaultLayout>
-      </NotificationsProvider>
+      <ReadOnlyProvider>
+        <NotificationsProvider>
+          <DefaultLayout>
+            <Outlet />
+          </DefaultLayout>
+        </NotificationsProvider>
+      </ReadOnlyProvider>
     </ThemeProvider>
   );
 };

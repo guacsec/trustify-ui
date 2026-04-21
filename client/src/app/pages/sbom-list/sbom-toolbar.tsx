@@ -2,16 +2,21 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Button,
   DropdownItem,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from "@patternfly/react-core";
 
 import type { Group } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
+import {
+  READ_ONLY_TOOLTIP,
+  useReadOnlyContext,
+} from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";
@@ -30,6 +35,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly } = useReadOnlyContext();
 
   // Create Form Modal
   const [saveGroupModalState, setSaveGroupModalState] = React.useState<
@@ -78,33 +84,40 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
           {showActions && (
             <>
               <ToolbarItem>
-                <Button
+                <ReadOnlyButton
                   variant="primary"
                   onClick={() => setSaveGroupModalState("create")}
                 >
                   Create group
-                </Button>
+                </ReadOnlyButton>
               </ToolbarItem>
               <ToolbarItem>
-                <Button
+                <ReadOnlyButton
                   variant="secondary"
                   isDisabled={selectedItems.length === 0}
                   onClick={() => setIsAddToGroupModalOpen(true)}
                 >
                   Add to group
-                </Button>
+                </ReadOnlyButton>
               </ToolbarItem>
               <ToolbarItem>
                 <KebabDropdown
                   ariaLabel="SBOM actions"
                   dropdownItems={[
-                    <DropdownItem
-                      key="upload-sbom"
-                      component="button"
-                      onClick={() => navigate(Paths.sbomUpload)}
+                    <Tooltip
+                      key="upload-sbom-tooltip"
+                      content={READ_ONLY_TOOLTIP}
+                      trigger={isReadOnly ? "mouseenter focus" : "manual"}
                     >
-                      Upload SBOM
-                    </DropdownItem>,
+                      <DropdownItem
+                        key="upload-sbom"
+                        component="button"
+                        isAriaDisabled={isReadOnly}
+                        onClick={() => navigate(Paths.sbomUpload)}
+                      >
+                        Upload SBOM
+                      </DropdownItem>
+                    </Tooltip>,
                     <DropdownItem
                       key="scan-sbom"
                       component="button"
