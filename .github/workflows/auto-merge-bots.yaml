@@ -1,0 +1,92 @@
+name: Auto-merge bot PRs
+
+on:
+  # Use pull_request_target because PRs created by GitHub Apps
+  # do NOT trigger pull_request events (to prevent infinite loops).
+  # pull_request_target always fires and runs in the base branch context.
+  pull_request_target:
+    types: [ opened, synchronize ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Auto-merge trustify-ci-bot PRs that only change the OpenAPI spec
+  auto-merge-openapi:
+    runs-on: ubuntu-latest
+    if: github.actor == 'trustify-ci-bot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Check changed files
+        id: check-files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          files=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --json files --jq '.files[].path')
+
+          if [ "$files" != "client/openapi/trustd.yaml" ]; then
+            echo "::notice::PR changes files beyond client/openapi/trustd.yaml — manual review required"
+            echo "$files"
+            echo "auto_merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Only client/openapi/trustd.yaml changed."
+          echo "auto_merge=true" >> "$GITHUB_OUTPUT"
+
+      - name: Approve PR
+        if: steps.check-files.outputs.auto_merge == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr review "$PR_NUMBER" --repo "${{ github.repository }}" --approve \
+            --body "$(cat <<'EOF'
+          🤖 **Auto-approved**
+
+          Only `client/openapi/trustd.yaml` changed — no manual review required.
+          EOF
+          )"
+
+      - name: Enable auto-merge
+        if: steps.check-files.outputs.auto_merge == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash
+
+  # Auto-merge Dependabot PRs for patch and minor updates
+  auto-merge-dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Approve PR (patch and minor only)
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr review "$PR_NUMBER" --repo "${{ github.repository }}" --approve \
+            --body "$(cat <<EOF
+          🤖 **Auto-approved**
+
+          Dependabot \`${{ steps.metadata.outputs.update-type }}\` — no manual review required.
+          EOF
+          )"
+
+      - name: Enable auto-merge (patch and minor only)
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash

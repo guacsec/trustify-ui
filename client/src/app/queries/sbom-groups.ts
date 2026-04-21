@@ -166,23 +166,23 @@ export const useDeleteSbomGroupMutation = (
     },
     onSuccess: async (_res, payload) => {
       onSuccess(payload);
-      await queryClient.invalidateQueries({
-        queryKey: [SBOMGroupsQueryKey],
-      });
-      // Invalidate SBOMs that belong to this group
-      await queryClient.invalidateQueries({
-        queryKey: [SBOMsQueryKey, payload.id],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [SBOMGroupsQueryKey] }),
+        // Invalidate SBOMs that belong to this group
+        queryClient.invalidateQueries({
+          queryKey: [SBOMsQueryKey, payload.id],
+        }),
+      ]);
     },
     onError: async (err: AxiosError, payload) => {
       onError(err);
-      await queryClient.invalidateQueries({
-        queryKey: [SBOMGroupsQueryKey],
-      });
-      // Invalidate SBOMs that belong to this group
-      await queryClient.invalidateQueries({
-        queryKey: [SBOMsQueryKey, payload.id],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [SBOMGroupsQueryKey] }),
+        // Invalidate SBOMs that belong to this group
+        queryClient.invalidateQueries({
+          queryKey: [SBOMsQueryKey, payload.id],
+        }),
+      ]);
     },
   });
 };

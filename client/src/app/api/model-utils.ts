@@ -1,14 +1,12 @@
 import type React from "react";
 
 import type { LabelProps, ProgressProps } from "@patternfly/react-core";
-import {
-  SeverityCriticalIcon,
-  SeverityImportantIcon,
-  SeverityMinorIcon,
-  SeverityModerateIcon,
-  SeverityNoneIcon,
-  SeverityUndefinedIcon,
-} from "@patternfly/react-icons";
+import SeverityCriticalIcon from "@patternfly/react-icons/dist/esm/icons/severity-critical-icon";
+import SeverityImportantIcon from "@patternfly/react-icons/dist/esm/icons/severity-important-icon";
+import SeverityMinorIcon from "@patternfly/react-icons/dist/esm/icons/severity-minor-icon";
+import SeverityModerateIcon from "@patternfly/react-icons/dist/esm/icons/severity-moderate-icon";
+import SeverityNoneIcon from "@patternfly/react-icons/dist/esm/icons/severity-none-icon";
+import SeverityUndefinedIcon from "@patternfly/react-icons/dist/esm/icons/severity-undefined-icon";
 import {
   t_global_icon_color_severity_critical_default as criticalColor,
   t_global_icon_color_severity_important_default as importantColor,
@@ -151,13 +149,13 @@ const getScoreTypePriority = (val: ScoreType | null) => {
   }
 
   switch (val) {
-    case "3.1":
-      return 1;
-    case "3.0":
-      return 2;
-    case "4.0":
-      return 3;
     case "2.0":
+      return 1;
+    case "3.1":
+      return 2;
+    case "3.0":
+      return 3;
+    case "4.0":
       return 4;
     default:
       return 0;
@@ -181,4 +179,19 @@ export const extractPriorityScoreFromScores = (scores: Score[]) => {
   }
 
   return [...scores].sort(compareByScoreTypeFn((item) => item.type))[0];
+};
+
+export const extractPriorityItemBasedOnScoresType = <T>(
+  items: T[],
+  getScoreType: (item: T) => ScoreType | null,
+): T | null => {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return [...items].sort((a, b) => {
+    const scoreTypeA = getScoreType(a);
+    const scoreTypeB = getScoreType(b);
+    return getScoreTypePriority(scoreTypeA) - getScoreTypePriority(scoreTypeB);
+  })[0];
 };

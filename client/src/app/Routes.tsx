@@ -256,7 +256,7 @@ export const AppRoutes = createBrowserRouter([
             PathParam.VULNERABILITY_ID,
           );
           const response = await queryClient.ensureQueryData(
-            vulnerabilityByIdQueryOptions(vulnerabilityId),
+            vulnerabilityByIdQueryOptions(vulnerabilityId, { scores: true }),
           );
           return {
             vulnerability: response.data,

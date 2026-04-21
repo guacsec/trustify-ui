@@ -28,7 +28,7 @@ export interface VulnerabilityOfSbomFromAnalysis {
   status: VulnerabilityStatus;
   advisories: Map<string, AdvisoryFromAnalysis>;
   purls: Set<string>;
-  opinionatedAvisory: {
+  opinionatedAdvisory: {
     advisory: AdvisoryHead | null;
     score: Score | null;
     extendedSeverity: ExtendedSeverity;
@@ -115,11 +115,11 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
           // new opinionated advisory
           let opinionatedAdvisory: AdvisoryHead | null = null;
           let opinionatedScore: Score | null = null;
-          if (existingElement.opinionatedAvisory.score?.type !== score?.type) {
+          if (existingElement.opinionatedAdvisory.score?.type !== score?.type) {
             const preferedAdvisoryScore = [
               {
-                advisory: existingElement.opinionatedAvisory.advisory,
-                score: existingElement.opinionatedAvisory.score,
+                advisory: existingElement.opinionatedAdvisory.advisory,
+                score: existingElement.opinionatedAdvisory.score,
               },
               {
                 advisory: current.advisory,
@@ -135,14 +135,14 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
               score: newOpinionatedScore,
             } =
               (score?.value ?? 0) >
-              (existingElement.opinionatedAvisory.score?.value ?? 0)
+              (existingElement.opinionatedAdvisory.score?.value ?? 0)
                 ? {
                     score: score,
                     advisory: current.advisory,
                   }
                 : {
-                    score: existingElement.opinionatedAvisory.score,
-                    advisory: existingElement.opinionatedAvisory.advisory,
+                    score: existingElement.opinionatedAdvisory.score,
+                    advisory: existingElement.opinionatedAdvisory.advisory,
                   };
 
             opinionatedAdvisory = newOpinionatedAdvisory;
@@ -160,7 +160,7 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
             // new values,
             advisories,
             purls,
-            opinionatedAvisory: {
+            opinionatedAdvisory: {
               advisory: opinionatedAdvisory,
               score: opinionatedScore,
               extendedSeverity: opinionatedExtendedSeverity,
@@ -192,7 +192,7 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
             status: current.status,
             advisories,
             purls,
-            opinionatedAvisory: {
+            opinionatedAdvisory: {
               advisory: current.advisory,
               score: score,
               extendedSeverity: extendedSeverity,
@@ -207,7 +207,7 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
     const summary = vulnerabilities.reduce(
       (prev, current) => {
         const vulnStatus = current.status as VulnerabilityStatus;
-        const severity = current.opinionatedAvisory.extendedSeverity;
+        const severity = current.opinionatedAdvisory.extendedSeverity;
 
         const prevVulnStatusValue = prev.vulnerabilityStatus[vulnStatus];
 
