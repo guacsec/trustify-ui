@@ -66,6 +66,12 @@ export const proxyMap = {
       },
     },
   },
+  wellKnown: {
+    pathFilter: "/.well-known/trustify",
+    target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",
+    logger,
+    changeOrigin: true,
+  },
   openapi: {
     pathFilter: "/openapi",
     target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",
