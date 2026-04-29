@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-import type { TrustifyInfo } from "@app/api/trustifyInfo";
 import { client } from "@app/axios-config/apiInit";
 import { info } from "@app/client";
 
@@ -19,7 +18,7 @@ export const useFetchTrustifyInfo = () => {
   });
 
   return {
-    trustifyInfo: data?.data as TrustifyInfo | undefined,
+    trustifyInfo: data?.data,
     isLoading,
     error,
   };
