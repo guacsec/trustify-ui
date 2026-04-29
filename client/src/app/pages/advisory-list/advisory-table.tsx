@@ -28,6 +28,10 @@ import type { AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LabelsAsList } from "@app/components/LabelsAsList.tsx";
 import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
+import {
+  readOnlyActionProps,
+  useReadOnlyContext,
+} from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -46,6 +50,7 @@ import { advisoryDeleteDialogProps } from "@app/Constants";
 
 export const AdvisoryTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { isReadOnly } = useReadOnlyContext();
 
   const { isFetching, fetchError, totalItemCount, tableControls } =
     React.useContext(AdvisorySearchContext);
@@ -218,6 +223,7 @@ export const AdvisoryTable: React.FC = () => {
                             onClick: () => {
                               setEditLabelsModalState(item);
                             },
+                            ...readOnlyActionProps(isReadOnly),
                           },
                           {
                             title: "Download",
@@ -234,6 +240,7 @@ export const AdvisoryTable: React.FC = () => {
                             onClick: () => {
                               setAdvisoryToDelete(item);
                             },
+                            ...readOnlyActionProps(isReadOnly),
                           },
                         ]}
                       />
