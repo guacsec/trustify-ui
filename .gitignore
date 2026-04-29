@@ -53,3 +53,5 @@ test-results/
 managed_context/
 test_suite_analysis/
 .claude/settings.local.json
+.serena/
+.playwright-mcp/

@@ -1,13 +1,9 @@
 import React from "react";
 
-import {
-  Button,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-} from "@patternfly/react-core";
+import { Toolbar, ToolbarContent, ToolbarItem } from "@patternfly/react-core";
 
 import { FilterToolbar } from "@app/components/FilterToolbar";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { SimplePagination } from "@app/components/SimplePagination";
 
 import { SbomGroupsContext } from "./sbom-groups-context";
@@ -30,12 +26,12 @@ export const SbomGroupsToolbar: React.FC = () => {
       <ToolbarContent>
         <FilterToolbar {...filterToolbarProps} />
         <ToolbarItem>
-          <Button
+          <ReadOnlyButton
             variant="primary"
             onClick={() => setGroupCreateUpdateModalState("create")}
           >
             Create group
-          </Button>
+          </ReadOnlyButton>
         </ToolbarItem>
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination

@@ -37,6 +37,10 @@ import {
 } from "@app/components/ConfirmDialog";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
+  readOnlyActionProps,
+  useReadOnlyContext,
+} from "@app/components/ReadOnlyContext";
+import {
   useFetchImporterReports,
   useFetchImporters,
   useUpdateImporterMutation,
@@ -83,6 +87,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { isReadOnly } = useReadOnlyContext();
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -392,6 +397,7 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
+                                      ...readOnlyActionProps(isReadOnly),
                                     },
                                   ]
                                 : [
@@ -400,13 +406,17 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("run", item);
                                       },
-                                      isDisabled: importerStatus === "running",
+                                      isAriaDisabled:
+                                        isReadOnly ||
+                                        importerStatus === "running",
+                                      ...readOnlyActionProps(isReadOnly),
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
+                                      ...readOnlyActionProps(isReadOnly),
                                     },
                                   ]),
                             ]}
