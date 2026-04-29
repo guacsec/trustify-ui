@@ -53,7 +53,7 @@ jobs:
       - name: Enable auto-merge
         if: steps.check-files.outputs.auto_merge == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash
@@ -86,7 +86,7 @@ jobs:
       - name: Enable auto-merge (patch and minor only)
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash
