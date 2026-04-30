@@ -60,7 +60,7 @@ Then(
   "The advisory {string} shows in the results",
   async ({ page }, advisoryID) => {
     await expect(
-      page.getByRole("gridcell").filter({ hasText: advisoryID }),
+      page.locator('td[data-label="ID"]').filter({ hasText: advisoryID }),
     ).toBeVisible();
   },
 );
