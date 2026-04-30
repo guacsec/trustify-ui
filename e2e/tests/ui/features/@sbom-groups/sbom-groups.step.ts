@@ -321,15 +321,22 @@ When(
 );
 
 When("User submits add to group form", async ({ page }) => {
-  // Button has aria-label="submit" (displays "Add" as text)
-  const submitButton = page
-    .getByRole("dialog")
-    .getByRole("button", { name: "submit" });
+  const dialog = page.getByRole("dialog");
+  const submitButton = dialog.getByRole("button", { name: "submit" });
 
-  // Wait for form validation to enable the button
   await expect(submitButton).toBeEnabled({ timeout: 10000 });
   await submitButton.click();
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
 });
+
+Then(
+  "Success notification {string} is displayed",
+  async ({ page }, message: string) => {
+    const escaped = message.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const notification = page.getByText(new RegExp(escaped, "i"));
+    await expect(notification).toBeVisible({ timeout: 10000 });
+  },
+);
 
 Then(
   "The SBOM {string} is visible in the group member list",
@@ -347,8 +354,14 @@ Then(
   },
 );
 
+When("User clears all filters on SBOM List page", async ({ page }) => {
+  const listPage = await SbomListPage.fromCurrentPage(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.clearAllFilters();
+});
+
 // Filtering
-When("User clears all filters", async ({ page }) => {
+When("User clears all filters on SBOM Groups page", async ({ page }) => {
   const listPage = await SbomGroupListPage.fromCurrentPage(page);
   const toolbar = await listPage.getToolbar();
   await toolbar.clearAllFilters(); // This waits for filter chips to be removed

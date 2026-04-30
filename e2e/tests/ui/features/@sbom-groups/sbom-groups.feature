@@ -37,7 +37,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User fills group name with unique timestamp for edit
     And User fills group description with "Updated test description"
     And User submits the group form
-    And User clears all filters
+    And User clears all filters on SBOM Groups page
     Then The group edit is successful
 
   # CRUD Operations - Delete
@@ -93,6 +93,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User clicks "Add to group" button
     And User selects group "<groupName>" in the modal
     And User submits add to group form
+    Then Success notification "1 SBOM(s) added to the group Correlation Test" is displayed
     When User navigates to SBOM Groups page
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is visible in the group member list
@@ -122,46 +123,45 @@ Feature: SBOM Groups - Manage SBOM groups
     And A group "Filter Group name" exists
     When User applies filter "Filter" with value "Filter Group name"
     Then The SBOM Groups table shows filtered results containing "Filter Group name"
-    And User clears all filters
+    And User clears all filters on SBOM Groups page
     Then The SBOM Groups table shows all groups
 
-  # JIRA Bug: https://redhat.atlassian.net/browse/TC-4012
-  # Scenario Outline: Add SBOM to group from SBOM list page
-  #   Given User navigates to SBOM Groups page
-  #   And A group "<groupName>" exists
-  #   Given An ingested SBOM "<sbomName>" is available
-  #   When User navigates to SBOM list page
-  #   And User selects SBOM "<sbomName>" for bulk action
-  #   And User clicks "Add to group" button
-  #   And User selects group "<groupName>" in the modal
-  #   And User submits add to group form
-  #   Then Success notification "added to the group" is displayed
-  #   When User navigates to SBOM Groups page
-  #   And User clicks on group "<groupName>"
-  #   Then The SBOM "<sbomName>" is visible in the group member list
+  Scenario Outline: Add SBOM to group from SBOM list page
+    Given User navigates to SBOM Groups page
+    And A group "<groupName>" exists
+    Given An ingested SBOM "<sbomName>" is available
+    When User navigates to SBOM list page
+    And User selects SBOM "<sbomName>" for bulk action
+    And User clicks "Add to group" button
+    And User selects group "<groupName>" in the modal
+    And User submits add to group form
+    Then Success notification "1 SBOM(s) added to the group Critical Group" is displayed
+    When User navigates to SBOM Groups page
+    And User clicks on group "<groupName>"
+    Then The SBOM "<sbomName>" is visible in the group member list
 
-  #   Examples:
-  #     | groupName        | sbomName     |
-  #     | Critical Group   | curl  |
+    Examples:
+      | groupName        | sbomName     |
+      | Critical Group   | openssl-3  |
 
-  # Issue: https://github.com/guacsec/trustify-ui/issues/977
-  # Scenario Outline: Add multiple SBOMs to group from SBOM list page
-  #   Given User navigates to SBOM Groups page
-  #   And A group "Multi SBOM Group" exists
-  #   Given An ingested SBOM "<sbomName1>" is available
-  #   And An ingested SBOM "<sbomName2>" is available
-  #   When User navigates to SBOM list page
-  #   And User selects SBOM "<sbomName1>" for bulk action
-  #   And User selects SBOM "<sbomName2>" for bulk action
-  #   And User clicks "Add to group" button
-  #   And User selects group "Multi SBOM Group" in the modal
-  #   And User submits add to group form
-  #   Then Success notification "added to the group" is displayed
-  #   When User navigates to SBOM Groups page
-  #   And User clicks on group "Multi SBOM Group"
-  #   Then The SBOM "<sbomName1>" is visible in the group member list
-  #   And The SBOM "<sbomName2>" is visible in the group member list
+  Scenario Outline: Add multiple SBOMs to group from SBOM list page
+    Given User navigates to SBOM Groups page
+    And A group "Multi SBOM Group" exists
+    Given An ingested SBOM "<sbomName1>" is available
+    And An ingested SBOM "<sbomName2>" is available
+    When User navigates to SBOM list page
+    And User selects SBOM "<sbomName1>" for bulk action
+    And User selects SBOM "<sbomName2>" for bulk action
+    And User clears all filters on SBOM List page
+    And User clicks "Add to group" button
+    And User selects group "Multi SBOM Group" in the modal
+    And User submits add to group form
+    Then Success notification "2 SBOM(s) added to the group Multi SBOM Group" is displayed
+    When User navigates to SBOM Groups page
+    And User clicks on group "Multi SBOM Group"
+    Then The SBOM "<sbomName1>" is visible in the group member list
+    And The SBOM "<sbomName2>" is visible in the group member list
 
-  #   Examples:
-  #     | groupName        | sbomName1 | sbomName2 |
-  #     | Multi SBOM Group   | curl  | liboqs  |
+    Examples:
+      | groupName        | sbomName1 | sbomName2 |
+      | Multi SBOM Group   | curl  | liboqs  |
