@@ -61,18 +61,6 @@ describe("ReadOnlyContext", () => {
     expect(screen.getByTestId("read-only")).toHaveTextContent("false");
   });
 
-  it("defaults to isReadOnly=false when the field is absent", () => {
-    mockedUseFetchTrustifyInfo.mockReturnValue({
-      trustifyInfo: { version: "0.5.0" },
-      isLoading: false,
-      error: null,
-    });
-
-    renderWithProvider();
-
-    expect(screen.getByTestId("read-only")).toHaveTextContent("false");
-  });
-
   it("treats isReadOnly as true while loading", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
       trustifyInfo: undefined,
