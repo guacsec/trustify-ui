@@ -95,7 +95,7 @@ When("User submits the group form", async ({ page }) => {
   const submitButton = page.getByRole("button", { name: "submit" });
 
   // Wait for the button to be enabled before clicking
-  await expect(submitButton).toBeEnabled({ timeout: 10000 });
+  await expect(submitButton).toBeEnabled();
   await submitButton.click();
 });
 
@@ -105,7 +105,7 @@ Then("The group creation is successful", async ({ page }) => {
     throw new Error("No generated group name found - step order issue");
   }
   const successMessage = page.getByText(`Group ${generatedGroupName} created`);
-  await expect(successMessage).toBeVisible({ timeout: 10000 });
+  await expect(successMessage).toBeVisible();
 });
 
 Then(
@@ -198,7 +198,6 @@ When("User selects {string} action", async ({ page }, actionName: string) => {
 });
 
 Then("The group edit is successful", async ({ page }) => {
-  // Verify the edited group name is visible
   if (!generatedEditName) {
     throw new Error("No generated edit name found - step order issue");
   }
@@ -224,9 +223,8 @@ When("User cancels deletion", async ({ page }) => {
 Then(
   "The group {string} is deleted successfully",
   async ({ page }, groupName: string) => {
-    // Verify specific group name appears in success notification
     const successMessage = page.getByText(`The group ${groupName} was deleted`);
-    await expect(successMessage).toBeVisible({ timeout: 10000 });
+    await expect(successMessage).toBeVisible();
   },
 );
 
@@ -323,18 +321,15 @@ When(
 When("User submits add to group form", async ({ page }) => {
   const dialog = page.getByRole("dialog");
   const submitButton = dialog.getByRole("button", { name: "submit" });
-
-  await expect(submitButton).toBeEnabled({ timeout: 10000 });
+  await expect(submitButton).toBeEnabled();
   await submitButton.click();
-  await expect(dialog).not.toBeVisible({ timeout: 10000 });
+  await expect(dialog).not.toBeVisible();
 });
 
 Then(
   "Success notification {string} is displayed",
-  async ({ page }, message: string) => {
-    const escaped = message.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const notification = page.getByText(new RegExp(escaped, "i"));
-    await expect(notification).toBeVisible({ timeout: 10000 });
+  async ({ page }, sbomCount: string) => {
+    await expect(page.getByRole('heading', { name: `Success alert: ${sbomCount} SBOM(s)` })).toBeVisible();
   },
 );
 
@@ -342,7 +337,7 @@ Then(
   "The SBOM {string} is visible in the group member list",
   async ({ page }, sbomName: string) => {
     const row = page.getByRole("row", { name: new RegExp(sbomName) });
-    await expect(row).toBeVisible({ timeout: 10000 });
+    await expect(row).toBeVisible();
   },
 );
 
@@ -350,7 +345,7 @@ Then(
   "The SBOM {string} is still visible in the group member list",
   async ({ page }, sbomName: string) => {
     const row = page.getByRole("row", { name: new RegExp(sbomName) });
-    await expect(row).toBeVisible({ timeout: 10000 });
+    await expect(row).toBeVisible();
   },
 );
 

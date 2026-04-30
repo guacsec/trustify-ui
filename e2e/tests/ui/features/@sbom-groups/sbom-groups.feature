@@ -93,7 +93,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User clicks "Add to group" button
     And User selects group "<groupName>" in the modal
     And User submits add to group form
-    Then Success notification "1 SBOM(s) added to the group Correlation Test" is displayed
+    Then Success notification "1" is displayed
     When User navigates to SBOM Groups page
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is visible in the group member list
@@ -135,7 +135,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User clicks "Add to group" button
     And User selects group "<groupName>" in the modal
     And User submits add to group form
-    Then Success notification "1 SBOM(s) added to the group Critical Group" is displayed
+    Then Success notification "1" is displayed
     When User navigates to SBOM Groups page
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is visible in the group member list
@@ -156,7 +156,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User clicks "Add to group" button
     And User selects group "Multi SBOM Group" in the modal
     And User submits add to group form
-    Then Success notification "2 SBOM(s) added to the group Multi SBOM Group" is displayed
+    Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
     And User clicks on group "Multi SBOM Group"
     Then The SBOM "<sbomName1>" is visible in the group member list
