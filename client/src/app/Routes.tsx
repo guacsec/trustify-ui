@@ -43,6 +43,7 @@ const SBOMGroupDetails = lazy(() => import("./pages/sbom-group-details"));
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
+const ModelList = lazy(() => import("./pages/model-list"));
 const NotFound = lazy(() => import("./pages/not-found"));
 
 export enum PathParam {
@@ -69,6 +70,7 @@ export const Paths = {
   search: "/search",
   importers: "/importers",
   licenses: "/licenses",
+  models: "/models",
   sbomGroups: "/sbom-groups",
   sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
 } as const;
@@ -148,6 +150,12 @@ export const AppRoutes = createBrowserRouter([
             identifier="license-list"
             component={<LicenseList />}
           />
+        ),
+      },
+      {
+        path: Paths.models,
+        element: (
+          <LazyRouteElement identifier="model-list" component={<ModelList />} />
         ),
       },
       {
