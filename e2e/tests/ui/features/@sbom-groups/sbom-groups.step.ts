@@ -52,6 +52,7 @@ When("User clicks {string} button", async ({ page }, buttonName: string) => {
 // Store generated unique names for assertions
 let generatedGroupName: string | null = null;
 let generatedEditName: string | null = null;
+let pickedSbomNames: string[] = [];
 
 When("User fills group name with unique timestamp", async ({ page }) => {
   // Generate unique name with timestamp
@@ -295,6 +296,51 @@ When(
 );
 
 When(
+  "User picks {int} SBOMs from the list for bulk action",
+  async ({ page }, count: number) => {
+    const listPage = await SbomListPage.fromCurrentPage(page);
+    const table = await listPage.getTable();
+    await table.waitUntilDataIsLoaded();
+
+    const nameColumn = table._table.locator('td[data-label="Name"]');
+    const availableCount = await nameColumn.count();
+    if (availableCount < count) {
+      throw new Error(
+        `Need ${count} SBOMs but only ${availableCount} available on the page`,
+      );
+    }
+
+    pickedSbomNames = [];
+    const rows = table._table.locator("tbody tr");
+    for (let i = 0; i < availableCount && pickedSbomNames.length < count; i++) {
+      const name = await nameColumn.nth(i).textContent();
+      if (!name) {
+        continue;
+      }
+      const trimmedName = name.trim();
+
+      // Skip if this name conflicts with any already-picked name
+      const hasConflict = pickedSbomNames.some(
+        (picked) =>
+          trimmedName.includes(picked) || picked.includes(trimmedName),
+      );
+      if (hasConflict) {
+        continue;
+      }
+
+      pickedSbomNames.push(trimmedName);
+      await rows.nth(i).getByRole("checkbox").click();
+    }
+
+    if (pickedSbomNames.length < count) {
+      throw new Error(
+        `Need ${count} non-conflicting SBOMs but only found ${pickedSbomNames.length} on the page`,
+      );
+    }
+  },
+);
+
+When(
   "User selects group {string} in the modal",
   async ({ page }, groupName: string) => {
     // Wait for modal to be visible
@@ -350,6 +396,19 @@ Then(
   async ({ page }, sbomName: string) => {
     const row = page.getByRole("row", { name: new RegExp(sbomName) });
     await expect(row).toBeVisible();
+  },
+);
+
+Then(
+  "The picked SBOMs are visible in the group member list",
+  async ({ page }) => {
+    if (pickedSbomNames.length === 0) {
+      throw new Error("No SBOMs were picked - step order issue");
+    }
+    for (const sbomName of pickedSbomNames) {
+      const row = page.getByRole("row", { name: new RegExp(sbomName) });
+      await expect(row).toBeVisible();
+    }
   },
 );
 

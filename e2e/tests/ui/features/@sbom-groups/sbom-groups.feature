@@ -144,24 +144,15 @@ Feature: SBOM Groups - Manage SBOM groups
       | groupName        | sbomName     |
       | Critical Group   | openssl-3  |
 
-  Scenario Outline: Add multiple SBOMs to group from SBOM list page
+  Scenario: Add multiple SBOMs to group from SBOM list page
     Given User navigates to SBOM Groups page
     And A group "Multi SBOM Group" exists
-    Given An ingested SBOM "<sbomName1>" is available
-    And An ingested SBOM "<sbomName2>" is available
     When User navigates to SBOM list page
-    And User selects SBOM "<sbomName1>" for bulk action
-    And User selects SBOM "<sbomName2>" for bulk action
-    And User clears all filters on SBOM List page
+    And User picks 2 SBOMs from the list for bulk action
     And User clicks "Add to group" button
     And User selects group "Multi SBOM Group" in the modal
     And User submits add to group form
     Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
     And User clicks on group "Multi SBOM Group"
-    Then The SBOM "<sbomName1>" is visible in the group member list
-    And The SBOM "<sbomName2>" is visible in the group member list
-
-    Examples:
-      | groupName        | sbomName1 | sbomName2 |
-      | Multi SBOM Group   | curl  | liboqs  |
+    Then The picked SBOMs are visible in the group member list
