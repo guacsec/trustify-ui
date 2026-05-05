@@ -72,6 +72,8 @@ interface HubRequestParamsQuery {
    * NOTE: The order of items is defined by the API being called.
    */
   offset?: number;
+  /** Whether to compute and return the total count of matching items. */
+  total?: boolean;
   q?: string;
   sort?: string;
 }
@@ -84,9 +86,11 @@ export const requestParamsQuery = (
 ): HubRequestParamsQuery => {
   let limit = undefined as number | undefined;
   let offset = undefined as number | undefined;
+  let total = undefined as boolean | undefined;
   if (p.page) {
     limit = p.page.itemsPerPage;
     offset = (p.page.pageNumber - 1) * p.page.itemsPerPage;
+    total = true;
   }
 
   let sort = undefined as string | undefined;
@@ -108,7 +112,7 @@ export const requestParamsQuery = (
       .join("&");
   }
 
-  return { limit, offset, q, sort };
+  return { limit, offset, total, q, sort };
 };
 
 export const labelRequestParamsQuery = (labels: Label[] = []) => {
