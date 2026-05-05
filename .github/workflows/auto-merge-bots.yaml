@@ -56,7 +56,7 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash
+          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
 
   # Auto-merge Dependabot PRs for patch and minor updates
   auto-merge-dependabot:
@@ -89,4 +89,4 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto --squash
+          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
