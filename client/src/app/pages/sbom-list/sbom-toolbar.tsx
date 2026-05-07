@@ -1,14 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-} from "@patternfly/react-core";
+import { Toolbar, ToolbarContent, ToolbarItem } from "@patternfly/react-core";
 
 import { FilterToolbar } from "@app/components/FilterToolbar";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { Paths } from "@app/Routes";
 
@@ -43,20 +39,20 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
         {showActions && (
           <>
             <ToolbarItem>
-              <Button
+              <ReadOnlyButton
                 variant="primary"
                 onClick={() => navigate(Paths.sbomUpload)}
               >
                 Upload SBOM
-              </Button>
+              </ReadOnlyButton>
             </ToolbarItem>
             <ToolbarItem>
-              <Button
+              <ReadOnlyButton
                 variant="secondary"
                 onClick={() => navigate(Paths.sbomScan)}
               >
                 Generate vulnerability report
-              </Button>
+              </ReadOnlyButton>
             </ToolbarItem>
           </>
         )}

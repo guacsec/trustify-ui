@@ -2,14 +2,10 @@ import React from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-} from "@patternfly/react-core";
+import { Toolbar, ToolbarContent, ToolbarItem } from "@patternfly/react-core";
 
 import { FilterToolbar } from "@app/components/FilterToolbar";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { Paths } from "@app/Routes";
 
@@ -40,12 +36,12 @@ export const AdvisoryToolbar: React.FC<AdvisoryToolbarProps> = ({
       <ToolbarContent>
         {showFilters && <FilterToolbar {...filterToolbarProps} />}
         <ToolbarItem>
-          <Button
+          <ReadOnlyButton
             variant="primary"
             onClick={() => navigate(Paths.advisoryUpload)}
           >
             Upload Advisory
-          </Button>
+          </ReadOnlyButton>
         </ToolbarItem>
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination

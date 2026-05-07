@@ -161,6 +161,10 @@ export default defineConfig({
         target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",
         changeOrigin: true,
       },
+      "/.well-known/trustify": {
+        target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",
+        changeOrigin: true,
+      },
     },
   },
 });
