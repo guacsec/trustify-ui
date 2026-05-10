@@ -23,7 +23,7 @@ export const useFetchVulnerabilities = (
     queryFn: () => {
       return listVulnerabilities({
         client,
-        query: { ...requestParamsQuery(params) },
+        query: { total: true, ...requestParamsQuery(params) },
       });
     },
     enabled: !disableQuery,

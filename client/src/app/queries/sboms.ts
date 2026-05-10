@@ -72,6 +72,7 @@ export const useFetchSBOMs = (
       v2ListSboms({
         client,
         query: {
+          total: true,
           ...rest,
           group: groupId ? [groupId] : [],
           q: [q, labelQuery].filter((e) => e).join("&"),
@@ -200,7 +201,7 @@ export const useFetchSbomsByPackageId = (
     queryFn: () => {
       return listRelatedSboms({
         client,
-        query: { purl, ...requestParamsQuery(params) },
+        query: { purl, total: true, ...requestParamsQuery(params) },
       });
     },
   });

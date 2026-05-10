@@ -17,7 +17,7 @@ export const useFetchLicenses = (
     queryFn: () => {
       return listLicenses({
         client,
-        query: { ...requestParamsQuery(params) },
+        query: { total: true, ...requestParamsQuery(params) },
       });
     },
     enabled: !disableQuery,

@@ -17,7 +17,7 @@ export const useFetchAllModels = (
     queryFn: () => {
       return listAllModels({
         client,
-        query: { ...requestParamsQuery(params) },
+        query: { total: true, ...requestParamsQuery(params) },
       });
     },
     enabled: !disableQuery,
