@@ -39,7 +39,6 @@ export const SbomGroupsTable: React.FC = () => {
   const {
     isFetching,
     fetchError,
-    totalItemCount,
     tableControls,
     setGroupCreateUpdateModalState,
   } = React.useContext(SbomGroupsContext);

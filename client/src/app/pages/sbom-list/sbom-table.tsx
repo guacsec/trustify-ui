@@ -51,7 +51,6 @@ export const SbomTable: React.FC = () => {
   const {
     isFetching,
     fetchError,
-    totalItemCount,
     tableControls,
     bulkSelection: {
       isEnabled: showBulkSelector,

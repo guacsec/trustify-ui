@@ -14,7 +14,7 @@ import { getModelProperties } from "@app/pages/sbom-details/model-detail-drawer"
 import { ModelSearchContext } from "./model-context";
 
 export const ModelTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(ModelSearchContext);
 
   const {

@@ -21,7 +21,7 @@ import { getSbomFilteredByLicenseUrl } from "@app/pages/sbom-list/helpers";
 import { LicenseSearchContext } from "./license-context";
 
 export const LicenseTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(LicenseSearchContext);
 
   const {

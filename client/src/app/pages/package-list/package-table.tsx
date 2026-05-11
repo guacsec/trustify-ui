@@ -26,7 +26,7 @@ import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 
 export const PackageTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(PackageSearchContext);
 
   const {

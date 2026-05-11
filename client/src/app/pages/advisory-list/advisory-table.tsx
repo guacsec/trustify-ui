@@ -52,8 +52,9 @@ export const AdvisoryTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
   const { isReadOnly } = useReadOnlyContext();
 
-  const { isFetching, fetchError, totalItemCount, tableControls } =
-    React.useContext(AdvisorySearchContext);
+  const { isFetching, fetchError, tableControls } = React.useContext(
+    AdvisorySearchContext,
+  );
 
   const [editLabelsModalState, setEditLabelsModalState] =
     React.useState<AdvisorySummary | null>(null);
