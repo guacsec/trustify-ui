@@ -16,10 +16,10 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
     const toolbar = await listPage.getToolbar();
     const table = await listPage.getTable();
 
-    await toolbar.applyFilter({ Name: "Apache-2.0" });
+    await toolbar.applyFilter({ Name: "APACHE-2.0" });
 
     // Name
-    await expect(table).toHaveColumnWithValue("Name", "Apache-2.0");
+    await expect(table).toHaveColumnWithValue("Name", "APACHE-2.0");
 
     // Packages
     await expect(table).toHaveColumnWithValue("Packages", /\d+ Package(s)?/);
