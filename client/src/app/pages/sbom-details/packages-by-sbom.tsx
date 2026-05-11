@@ -99,15 +99,15 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackagesBySbomId(
-    sbomId,
-    getHubRequestParams({
+  } = useFetchPackagesBySbomId(sbomId, {
+    ...getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
       },
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,

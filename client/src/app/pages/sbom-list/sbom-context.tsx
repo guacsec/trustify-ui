@@ -164,13 +164,16 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     fetchError,
   } = useFetchSBOMs(
     sbomGroupId ?? null,
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "name",
-        published: "published",
-      },
-    }),
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "name",
+          published: "published",
+        },
+      }),
+      total: true,
+    },
     (tableControlState.filterState.filterValues.labels ?? []).map((label) =>
       splitStringAsKeyValue(label),
     ),

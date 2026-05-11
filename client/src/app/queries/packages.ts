@@ -18,7 +18,7 @@ export const useFetchPackages = (
     queryFn: () =>
       listPurl({
         client: client,
-        query: { total: true, ...requestParamsQuery(params) },
+        query: { ...requestParamsQuery(params) },
       }),
     enabled: !disableQuery,
   });
@@ -60,7 +60,7 @@ export const useFetchPackagesBySbomId = (
       listPackages({
         client,
         path: { id: sbomId },
-        query: { total: true, ...requestParamsQuery(params) },
+        query: { ...requestParamsQuery(params) },
       }),
   });
 

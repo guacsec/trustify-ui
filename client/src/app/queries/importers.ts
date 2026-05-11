@@ -133,12 +133,7 @@ export const useFetchImporterReports = (
 ) => {
   const { data, isLoading, refetch, error } = useQuery({
     queryKey: [ImportersQueryKey, id, "reports"],
-    queryFn: () =>
-      listImporterReports({
-        client,
-        path: { name: id },
-        query: { total: true },
-      }),
+    queryFn: () => listImporterReports({ client, path: { name: id } }),
     refetchInterval: !refetchDisabled ? DEFAULT_REFETCH_INTERVAL : false,
   });
 

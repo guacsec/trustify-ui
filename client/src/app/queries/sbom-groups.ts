@@ -76,7 +76,6 @@ export const useFetchSBOMGroups = (
       listSbomGroups({
         client,
         query: {
-          total: true,
           ...rest,
           ...extraQueryParams,
           q: [q, parentQuery].filter((e) => e).join("&"),

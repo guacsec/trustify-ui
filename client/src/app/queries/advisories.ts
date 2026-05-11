@@ -70,7 +70,6 @@ export const useFetchAdvisories = (
         client,
         query: {
           ...rest,
-          total: true,
           q: [q, labelQuery].filter((e) => e).join("&"),
         },
       });
