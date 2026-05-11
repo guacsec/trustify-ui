@@ -55,6 +55,7 @@ services:
   trustify:
     image: ${TRUSTIFY_IMAGE}
     environment:
+      TRUSTD_PAGINATION_TOTAL_CACHE_TTL: "0s"
       TRUSTD_DB_HOST: trustify-db
       HTTP_SERVER_BIND_ADDR: "::"
       AUTH_DISABLED: true
