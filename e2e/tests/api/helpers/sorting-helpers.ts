@@ -134,6 +134,7 @@ export async function testBasicSort(
 ) {
   const response = await axios.get(endpoint, {
     params: {
+      total: true,
       offset: 0,
       limit: 100,
       sort: `${sortField}:${order}`,
