@@ -87,7 +87,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         logicOperator: "OR",
         selectOptions: licenseIds.map((license) => ({
           value: license.license_id,
-          label: license.license_name,
+          label: license.license_name.toUpperCase(),
         })),
       },
     ],

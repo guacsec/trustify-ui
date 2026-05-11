@@ -131,7 +131,7 @@ export const PackageSearchProvider: React.FunctionComponent<
         selectOptions: licenses.map((e) => {
           return {
             value: e.license,
-            label: e.license,
+            label: e.license.toUpperCase(),
           };
         }),
         onInputValueChange: setInputValueLicense,
