@@ -16,7 +16,7 @@ test("Generated from / CDX / Source has descendants that include binaries / Get 
   const urlEncodedSourcePurl = encodeURIComponent(cdxSourcePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedSourcePurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedSourcePurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -41,7 +41,7 @@ test("Generated from / CDX / Binary has ancestors that include the source / Get 
   const urlEncodedBinaryPurl = encodeURIComponent(cdxBinaryPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedBinaryPurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedBinaryPurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -66,7 +66,7 @@ test("Generated from / SPDX / Source has descendants that include binaries / Get
   const urlEncodedSourcePurl = encodeURIComponent(spdxSourcePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedSourcePurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedSourcePurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -91,7 +91,7 @@ test("Generated from / SPDX / Binary has ancestors that include the source / Get
   const urlEncodedBinaryPurl = encodeURIComponent(spdxBinaryPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedBinaryPurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedBinaryPurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(

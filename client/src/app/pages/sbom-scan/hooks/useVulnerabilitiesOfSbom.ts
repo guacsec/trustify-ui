@@ -54,19 +54,15 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
     const vulnerabilities = Object.entries(analysisResponse)
       .flatMap(([purl, analysisDetails]) => {
         return analysisDetails.details.flatMap((vulnerability) => {
-          return Object.entries(vulnerability.status).flatMap(
-            ([status, advisories]) => {
-              return advisories.map((advisory) => {
-                return {
-                  purl,
-                  vulnerability,
-                  status: status as VulnerabilityStatus,
-                  advisory,
-                  scores: advisory.scores,
-                };
-              });
-            },
-          );
+          return vulnerability.purl_statuses.flatMap((status) => {
+            return {
+              purl,
+              vulnerability: status.vulnerability,
+              status: status.status as VulnerabilityStatus,
+              advisory: status.advisory,
+              scores: status.scores,
+            };
+          });
         });
       })
       //group

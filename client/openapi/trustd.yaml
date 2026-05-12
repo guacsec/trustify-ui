@@ -27,7 +27,249 @@ paths:
                     type: boolean
                   version:
                     type: string
-  /api/v2/advisory:
+  /api/v2/sbom:
+    get:
+      tags:
+      - sbom
+      summary: List SBOMs
+      operationId: v2/listSboms
+      parameters:
+      - name: q
+        in: query
+        description: |
+          EBNF grammar for the _q_ parameter:
+          ```text
+              q = ( values | filter ) { '&' q }
+              values = value { '|', values }
+              filter = field, operator, values
+              operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<"
+              value = (* any text but escape special characters with '\' *)
+              field = (* must match an entity attribute name *)
+          ```
+          Any values in a _q_ will result in a case-insensitive "full
+          text search", effectively producing an OR clause of LIKE
+          clauses for every string-ish field in the resource being
+          queried.
+
+          Examples:
+          - `foo` - any field containing 'foo'
+          - `foo|bar` - any field containing either 'foo' OR 'bar'
+          - `foo&bar` - some field contains 'foo' AND some field contains 'bar'
+
+          A _filter_ may also be used to constrain the results. The
+          filter's field name must correspond to one of the resource's
+          attributes. If it doesn't, an error will be returned
+          containing a list of the valid fields for that resource.
+
+          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
+          to find resources on which a particular field isn't set. For
+          example, `name=%00` and `name!=%00` yield the WHERE clauses,
+          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
+
+          Examples:
+          - `name=foo` - entity's _name_ matches 'foo' exactly
+          - `name~foo` - entity's _name_ contains 'foo', case-insensitive
+          - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
+          - `name=` - entity's _name_ is the empty string, ''
+          - `name=%00` - entity's _name_ isn't set
+          - `published>3 days ago` - date values can be "human time"
+
+          Multiple full text searches and/or filters should be
+          '&'-delimited -- they are logically AND'd together.
+
+          - `red hat|fedora&labels:type=cve|osv&published>last wednesday 17:00`
+
+          Fields corresponding to JSON objects in the database may use a
+          ':' to delimit the column name and the object key,
+          e.g. `purl:qualifiers:type=pom`
+
+          Any operator or special character, e.g. '|', '&', within a
+          value should be escaped by prefixing it with a backslash.
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |
+          EBNF grammar for the _sort_ parameter:
+          ```text
+              sort = field [ ':', order ] { ',' sort }
+              order = ( "asc" | "desc" )
+              field = (* must match the name of entity's attributes *)
+          ```
+          The optional _order_ should be one of "asc" or "desc". If
+          omitted, the order defaults to "asc".
+
+          Each _field_ name must correspond to one of the columns of the
+          table holding the entities being queried. Those corresponding
+          to JSON objects in the database may use a ':' to delimit the
+          column name and the object key,
+          e.g. `purl:qualifiers:type:desc`
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: |-
+          The first item to return, skipping all that come before it.
+
+          NOTE: The order of items is defined by the API being called.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        description: |-
+          The maximum number of entries to return.
+
+          Zero means: return no items (the total count is still computed if requested).
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
+      - name: group
+        in: query
+        description: |-
+          Filter by group IDs. Only SBOMs assigned to any of the provided groups will be returned.
+          Can be specified multiple times. Malformed IDs are silently ignored.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Matching SBOMs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults_SbomSummary'
+      deprecated: true
+  /api/v2/vulnerability/analyze:
+    post:
+      tags:
+      - vulnerability
+      summary: Analyze the provided purls for the known vulnerabilities
+      operationId: v2/analyze
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalysisRequest'
+        required: true
+      responses:
+        '200':
+          description: Analyze the provided purls to search for known vulnerabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResponse'
+      deprecated: true
+  /api/v3/advisory:
+    get:
+      tags:
+      - advisory
+      summary: List advisories
+      operationId: listAdvisories
+      parameters:
+      - name: q
+        in: query
+        description: |
+          Query for advisories defined using the following EBNF grammar (ISO/IEC 14977):
+          ```text
+          (* Query Grammar - EBNF Compliant *)
+          query = ( values | filter ) , { "&" , query } ;
+          values = value , { "|" , value } ;
+          filter = field , operator , values ;
+          operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<" ;
+          field = ("id" | "identifier" | "version" | "document_id" | "deprecated" | "issuer_id" | "published" | "modified" | "withdrawn" | "title" | "ingested" | "label")
+          value = { value_char } ;
+          value_char = escaped_char | normal_char ;
+          escaped_char = "\" , special_char ;
+          normal_char = ? any character except '&', '|', '=', '!', '~', '>', '<', '\' ? ;
+          special_char = "&" | "|" | "=" | "!" | "~" | ">" | "<" | "\" ;
+          ```
+          Examples:
+          - Simple filter: title=example
+          - Multiple values filter: title=foo|bar|baz
+          - Complex filter: modified>2024-01-01
+          - Combined query: title=foo&average_severity=high
+          - Escaped characters: title=foo\\&bar
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |-
+          EBNF grammar for the _sort_ parameter:
+          ```text
+              sort = field [ ':', order ] { ',' sort }
+              order = ( "asc" | "desc" )
+              field = ("id" | "identifier" | "version" | "document_id" | "deprecated" | "issuer_id" | "published" | "modified" | "withdrawn" | "title" | "ingested" | "label")
+          ```
+          The optional _order_ should be one of "asc" or "desc". If
+          omitted, the order defaults to "asc".
+
+          Each _field_ name must correspond to one of the columns of the
+          table holding the entities being queried. Those corresponding
+          to JSON objects in the database may use a ':' to delimit the
+          column name and the object key,
+          e.g. `purl:qualifiers:type:desc`
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: |-
+          The first item to return, skipping all that come before it.
+
+          NOTE: The order of items is defined by the API being called.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        description: |-
+          The maximum number of entries to return.
+
+          Zero means: return no items (the total count is still computed if requested).
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
+      - name: deprecated
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - Ignore
+          - Consider
+      responses:
+        '200':
+          description: Matching vulnerabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults_AdvisorySummary'
     post:
       tags:
       - advisory
@@ -81,7 +323,7 @@ paths:
           description: Upload a file
         '400':
           description: The file could not be parsed as an advisory
-  /api/v2/advisory-labels:
+  /api/v3/advisory-labels:
     get:
       tags:
       - advisory
@@ -108,7 +350,7 @@ paths:
               schema:
                 type: array
                 items: {}
-  /api/v2/advisory/{id}/label:
+  /api/v3/advisory/{id}/label:
     put:
       tags:
       - advisory
@@ -155,7 +397,27 @@ paths:
           description: Modified the labels of the advisory
         '404':
           description: The advisory could not be found
-  /api/v2/advisory/{key}:
+  /api/v3/advisory/{key}:
+    get:
+      tags:
+      - advisory
+      summary: Get an advisory
+      operationId: getAdvisory
+      parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      responses:
+        '200':
+          description: Matching advisory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvisoryDetails'
+        '404':
+          description: The advisory could not be found
     delete:
       tags:
       - advisory
@@ -176,7 +438,7 @@ paths:
                 $ref: '#/components/schemas/AdvisoryDetails'
         '404':
           description: The advisory could not be found
-  /api/v2/advisory/{key}/download:
+  /api/v3/advisory/{key}/download:
     get:
       tags:
       - advisory
@@ -199,7 +461,7 @@ paths:
                 format: binary
         '404':
           description: The document could not be found
-  /api/v2/analysis/component:
+  /api/v3/analysis/component:
     get:
       tags:
       - analysis
@@ -296,7 +558,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -351,7 +613,7 @@ paths:
           description: The user did not provide valid authentication credentials
         '403':
           description: The user lacks the required permission
-  /api/v2/analysis/component/{key}:
+  /api/v3/analysis/component/{key}:
     get:
       tags:
       - analysis
@@ -380,7 +642,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -435,7 +697,7 @@ paths:
           description: The user did not provide valid authentication credentials
         '403':
           description: The user lacks the required permission
-  /api/v2/analysis/latest/component:
+  /api/v3/analysis/latest/component:
     get:
       tags:
       - analysis
@@ -532,7 +794,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -587,7 +849,7 @@ paths:
           description: The user did not provide valid authentication credentials
         '403':
           description: The user lacks the required permission
-  /api/v2/analysis/latest/component/{key}:
+  /api/v3/analysis/latest/component/{key}:
     get:
       tags:
       - analysis
@@ -616,7 +878,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -671,7 +933,7 @@ paths:
           description: The user did not provide valid authentication credentials
         '403':
           description: The user lacks the required permission
-  /api/v2/analysis/sbom/{sbom}/render.{ext}:
+  /api/v3/analysis/sbom/{sbom}/render.{ext}:
     get:
       tags:
       - analysis
@@ -707,7 +969,7 @@ paths:
           description: The SBOM could not be found
         '415':
           description: Unsupported rendering format
-  /api/v2/analysis/status:
+  /api/v3/analysis/status:
     get:
       tags:
       - analysis
@@ -730,7 +992,7 @@ paths:
           description: The user did not provide valid authentication credentials
         '403':
           description: The user lacks the required permission
-  /api/v2/dataset:
+  /api/v3/dataset:
     post:
       tags:
       - dataset
@@ -758,7 +1020,7 @@ paths:
           description: Uploaded the dataset
         '400':
           description: The file could not be parsed as an dataset
-  /api/v2/group/sbom:
+  /api/v3/group/sbom:
     get:
       tags:
       - sbomGroup
@@ -797,7 +1059,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -927,7 +1189,7 @@ paths:
           description: The user authenticated, but not authorized for this operation
         '409':
           description: The name of the group is not unique within the parent
-  /api/v2/group/sbom-assignment:
+  /api/v3/group/sbom-assignment:
     put:
       tags:
       - sbomGroup
@@ -948,7 +1210,7 @@ paths:
           description: The user was not authenticated
         '403':
           description: The user authenticated, but not authorized for this operation
-  /api/v2/group/sbom-assignment/{id}:
+  /api/v3/group/sbom-assignment/{id}:
     get:
       tags:
       - sbomGroup
@@ -1011,7 +1273,7 @@ paths:
           description: The user authenticated, but not authorized for this operation
         '412':
           description: The requested revision is not the current revision
-  /api/v2/group/sbom/{id}:
+  /api/v3/group/sbom/{id}:
     get:
       tags:
       - sbomGroup
@@ -1120,7 +1382,7 @@ paths:
           description: The group has child groups and cannot be deleted
         '412':
           description: The requested revision is not the current revision of the group
-  /api/v2/importer:
+  /api/v3/importer:
     get:
       tags:
       - importer
@@ -1135,7 +1397,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Importer'
-  /api/v2/importer/{name}:
+  /api/v3/importer/{name}:
     get:
       tags:
       - importer
@@ -1273,7 +1535,7 @@ paths:
           description: The importer could not be found
         '412':
           description: The provided if-match header did not match the stored revision
-  /api/v2/importer/{name}/enabled:
+  /api/v3/importer/{name}/enabled:
     put:
       tags:
       - importer
@@ -1307,7 +1569,7 @@ paths:
           description: The importer could not be found
         '412':
           description: The provided if-match header did not match the stored revision
-  /api/v2/importer/{name}/force:
+  /api/v3/importer/{name}/force:
     post:
       tags:
       - importer
@@ -1341,7 +1603,7 @@ paths:
           description: The importer could not be found
         '412':
           description: The provided if-match header did not match the stored revision
-  /api/v2/importer/{name}/report:
+  /api/v3/importer/{name}/report:
     get:
       tags:
       - importer
@@ -1438,7 +1700,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -1462,7 +1724,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_ImporterReport'
-  /api/v2/license:
+  /api/v3/license:
     get:
       tags:
       - license
@@ -1531,7 +1793,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -1550,7 +1812,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_LicenseText'
-  /api/v2/license/spdx/license:
+  /api/v3/license/spdx/license:
     get:
       tags:
       - spdx license
@@ -1647,7 +1909,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -1666,7 +1928,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_SpdxLicenseSummary'
-  /api/v2/license/spdx/license/{id}:
+  /api/v3/license/spdx/license/{id}:
     get:
       tags:
       - spdx license
@@ -1685,7 +1947,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SpdxLicenseDetails'
-  /api/v2/organization:
+  /api/v3/organization:
     get:
       tags:
       - organization
@@ -1782,7 +2044,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -1801,7 +2063,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrganizationSummary'
-  /api/v2/organization/{id}:
+  /api/v3/organization/{id}:
     get:
       tags:
       - organization
@@ -1824,7 +2086,7 @@ paths:
                 $ref: '#/components/schemas/OrganizationDetails'
         '404':
           description: The organization could not be found
-  /api/v2/product:
+  /api/v3/product:
     get:
       tags:
       - product
@@ -1920,7 +2182,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -1939,7 +2201,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_ProductSummary'
-  /api/v2/product/{id}:
+  /api/v3/product/{id}:
     get:
       tags:
       - product
@@ -1982,7 +2244,7 @@ paths:
                 $ref: '#/components/schemas/ProductDetails'
         '404':
           description: The product could not be found
-  /api/v2/purl:
+  /api/v3/purl:
     get:
       tags:
       - purl
@@ -2079,7 +2341,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -2098,7 +2360,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_PurlSummary'
-  /api/v2/purl/base:
+  /api/v3/purl/base:
     get:
       tags:
       - purl
@@ -2195,7 +2457,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -2214,7 +2476,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_BasePurlSummary'
-  /api/v2/purl/base/{key}:
+  /api/v3/purl/base/{key}:
     get:
       tags:
       - purl
@@ -2234,7 +2496,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasePurlDetails'
-  /api/v2/purl/recommend:
+  /api/v3/purl/recommend:
     post:
       tags:
       - purl
@@ -2252,12 +2514,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendResponse'
-  /api/v2/sbom:
+  /api/v3/purl/{key}:
+    get:
+      tags:
+      - purl
+      summary: Retrieve details of a fully-qualified pURL
+      operationId: getPurl
+      parameters:
+      - name: deprecated
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - Ignore
+          - Consider
+      - name: key
+        in: path
+        description: opaque identifier for a fully-qualified PURL, or URL-encoded pURL itself
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Details for the qualified PURL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurlDetails'
+  /api/v3/sbom:
     get:
       tags:
       - sbom
       summary: List SBOMs
-      operationId: v2/listSboms
+      operationId: listSboms
       parameters:
       - name: q
         in: query
@@ -2349,7 +2639,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -2377,8 +2667,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedResults_SbomSummary'
-      deprecated: true
+                $ref: '#/components/schemas/PaginatedResults_SbomPackageSummary'
     post:
       tags:
       - sbom
@@ -2453,7 +2742,7 @@ paths:
                 $ref: '#/components/schemas/IngestResult'
         '400':
           description: One or more group IDs are invalid or do not exist
-  /api/v2/sbom-labels:
+  /api/v3/sbom-labels:
     get:
       tags:
       - sbom
@@ -2480,7 +2769,7 @@ paths:
               schema:
                 type: array
                 items: {}
-  /api/v2/sbom/by-package:
+  /api/v3/sbom/by-package:
     get:
       tags:
       - sbom
@@ -2580,7 +2869,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -2615,7 +2904,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_SbomSummary'
-  /api/v2/sbom/count-by-package:
+  /api/v3/sbom/count-by-package:
     get:
       tags:
       - sbom
@@ -2659,7 +2948,7 @@ paths:
                 items:
                   type: integer
                   format: int64
-  /api/v2/sbom/models:
+  /api/v3/sbom/models:
     get:
       tags:
       - sbom
@@ -2756,7 +3045,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -2768,6 +3057,12 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: counts
+        in: query
+        description: Include SBOM counts for each model
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: AI Models
@@ -2775,7 +3070,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_SbomModel'
-  /api/v2/sbom/{id}:
+  /api/v3/sbom/{id}:
     get:
       tags:
       - sbom
@@ -2812,7 +3107,30 @@ paths:
           description: Matching SBOM as deleted
         '404':
           description: The SBOM could not be found
-  /api/v2/sbom/{id}/all-license-ids:
+  /api/v3/sbom/{id}/advisory:
+    get:
+      tags:
+      - sbom
+      summary: Get advisories for an SBOM
+      operationId: getSbomAdvisories
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      responses:
+        '200':
+          description: Matching SBOM
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SbomAdvisory'
+        '404':
+          description: The SBOM could not be found
+  /api/v3/sbom/{id}/all-license-ids:
     get:
       tags:
       - sbom
@@ -2835,7 +3153,7 @@ paths:
                   $ref: '#/components/schemas/LicenseRefMapping'
         '400':
           description: Invalid UUID format.
-  /api/v2/sbom/{id}/label:
+  /api/v3/sbom/{id}/label:
     put:
       tags:
       - sbom
@@ -2882,7 +3200,7 @@ paths:
           description: Modified the labels of the SBOM
         '404':
           description: The SBOM could not be found
-  /api/v2/sbom/{id}/license-export:
+  /api/v3/sbom/{id}/license-export:
     get:
       tags:
       - sbom
@@ -2906,7 +3224,7 @@ paths:
                   minimum: 0
         '404':
           description: The document could not be found
-  /api/v2/sbom/{id}/models:
+  /api/v3/sbom/{id}/models:
     get:
       tags:
       - sbom
@@ -3010,7 +3328,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -3022,6 +3340,12 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: counts
+        in: query
+        description: Include SBOM counts for each model
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: AI Models
@@ -3029,7 +3353,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_SbomModel'
-  /api/v2/sbom/{id}/packages:
+  /api/v3/sbom/{id}/packages:
     get:
       tags:
       - sbom
@@ -3132,7 +3456,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -3153,7 +3477,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResults_SbomPackage'
         '404':
           description: The SBOM could not be found
-  /api/v2/sbom/{id}/related:
+  /api/v3/sbom/{id}/related:
     get:
       tags:
       - sbom
@@ -3281,7 +3605,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -3302,7 +3626,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResults_SbomPackageRelation_SbomPackage'
         '404':
           description: The SBOM could not be found
-  /api/v2/sbom/{key}/download:
+  /api/v3/sbom/{key}/download:
     get:
       tags:
       - sbom
@@ -3325,7 +3649,7 @@ paths:
                 format: binary
         '404':
           description: The document could not be found
-  /api/v2/ui/extract-sbom-purls:
+  /api/v3/ui/extract-sbom-purls:
     post:
       tags:
       - ui
@@ -3358,7 +3682,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorInformation'
-  /api/v2/userPreference/{key}:
+  /api/v3/userPreference/{key}:
     get:
       tags:
       - userPreferences
@@ -3449,12 +3773,99 @@ paths:
           description: User preferences are deleted
         '412':
           description: The provided If-Match revision did not match the actual revision
-  /api/v2/vulnerability/analyze:
+  /api/v3/vulnerability:
+    get:
+      tags:
+      - vulnerability
+      summary: List vulnerabilities
+      operationId: listVulnerabilities
+      parameters:
+      - name: q
+        in: query
+        description: |
+          Query for advisories defined using the following EBNF grammar (ISO/IEC 14977):
+          ```text
+          (* Query Grammar - EBNF Compliant *)
+          query = ( values | filter ) , { "&" , query } ;
+          values = value , { "|" , value } ;
+          filter = field , operator , values ;
+          operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<" ;
+          field = ("id" | "title" | "reserved" | "published" | "modified" | "withdrawn" | "cwes" | "base_score" | "base_severity")
+          value = { value_char } ;
+          value_char = escaped_char | normal_char ;
+          escaped_char = "\" , special_char ;
+          normal_char = ? any character except '&', '|', '=', '!', '~', '>', '<', '\' ? ;
+          special_char = "&" | "|" | "=" | "!" | "~" | ">" | "<" | "\" ;
+          ```
+          Examples:
+          - Simple filter: title=example
+          - Multiple values filter: title=foo|bar|baz
+          - Complex filter: modified>2024-01-01
+          - Combined query: title=foo&average_severity=high
+          - Escaped characters: title=foo\\&bar
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: |-
+          EBNF grammar for the _sort_ parameter:
+          ```text
+              sort = field [ ':', order ] { ',' sort }
+              order = ( "asc" | "desc" )
+              field = ("id" | "title" | "reserved" | "published" | "modified" | "withdrawn" | "cwes" | "base_score" | "base_severity")
+          ```
+          The optional _order_ should be one of "asc" or "desc". If
+          omitted, the order defaults to "asc".
+
+          Each _field_ name must correspond to one of the columns of the
+          table holding the entities being queried. Those corresponding
+          to JSON objects in the database may use a ':' to delimit the
+          column name and the object key,
+          e.g. `purl:qualifiers:type:desc`
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: |-
+          The first item to return, skipping all that come before it.
+
+          NOTE: The order of items is defined by the API being called.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        description: |-
+          The maximum number of entries to return.
+
+          Zero means: return no items (the total count is still computed if requested).
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Matching vulnerabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults_VulnerabilitySummary'
+  /api/v3/vulnerability/analyze:
     post:
       tags:
       - vulnerability
-      summary: Analyze the provided purls for the known vulnerabilities
-      operationId: analyze
+      operationId: analyze_v3
       requestBody:
         content:
           application/json:
@@ -3467,8 +3878,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnalysisResponse'
-  /api/v2/weakness:
+                $ref: '#/components/schemas/AnalysisResponseV3'
+  /api/v3/vulnerability/{id}:
+    get:
+      tags:
+      - vulnerability
+      summary: Retrieve vulnerability details
+      operationId: getVulnerability
+      parameters:
+      - name: id
+        in: path
+        description: ID of the vulnerability
+        required: true
+        schema:
+          type: string
+      - name: scores
+        in: query
+        description: Include the full scores array from the advisory that contributed the base_score.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Specified vulnerability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityDetails'
+        '404':
+          description: The vulnerability could not be found
+  /api/v3/weakness:
     get:
       tags:
       - weakness
@@ -3565,7 +4004,7 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
@@ -3584,7 +4023,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResults_LicenseSummary'
-  /api/v2/weakness/{id}:
+  /api/v3/weakness/{id}:
     get:
       tags:
       - weakness
@@ -3605,434 +4044,6 @@ paths:
                 $ref: '#/components/schemas/LicenseSummary'
         '404':
           description: The weakness could not be found
-  /api/v3/advisory:
-    get:
-      tags:
-      - advisory
-      summary: List advisories
-      operationId: listAdvisories
-      parameters:
-      - name: q
-        in: query
-        description: |
-          Query for advisories defined using the following EBNF grammar (ISO/IEC 14977):
-          ```text
-          (* Query Grammar - EBNF Compliant *)
-          query = ( values | filter ) , { "&" , query } ;
-          values = value , { "|" , value } ;
-          filter = field , operator , values ;
-          operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<" ;
-          field = ("id" | "identifier" | "version" | "document_id" | "deprecated" | "issuer_id" | "published" | "modified" | "withdrawn" | "title" | "ingested" | "label")
-          value = { value_char } ;
-          value_char = escaped_char | normal_char ;
-          escaped_char = "\" , special_char ;
-          normal_char = ? any character except '&', '|', '=', '!', '~', '>', '<', '\' ? ;
-          special_char = "&" | "|" | "=" | "!" | "~" | ">" | "<" | "\" ;
-          ```
-          Examples:
-          - Simple filter: title=example
-          - Multiple values filter: title=foo|bar|baz
-          - Complex filter: modified>2024-01-01
-          - Combined query: title=foo&average_severity=high
-          - Escaped characters: title=foo\\&bar
-        required: false
-        schema:
-          type: string
-      - name: sort
-        in: query
-        description: |-
-          EBNF grammar for the _sort_ parameter:
-          ```text
-              sort = field [ ':', order ] { ',' sort }
-              order = ( "asc" | "desc" )
-              field = ("id" | "identifier" | "version" | "document_id" | "deprecated" | "issuer_id" | "published" | "modified" | "withdrawn" | "title" | "ingested" | "label")
-          ```
-          The optional _order_ should be one of "asc" or "desc". If
-          omitted, the order defaults to "asc".
-
-          Each _field_ name must correspond to one of the columns of the
-          table holding the entities being queried. Those corresponding
-          to JSON objects in the database may use a ':' to delimit the
-          column name and the object key,
-          e.g. `purl:qualifiers:type:desc`
-        required: false
-        schema:
-          type: string
-      - name: offset
-        in: query
-        description: |-
-          The first item to return, skipping all that come before it.
-
-          NOTE: The order of items is defined by the API being called.
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: limit
-        in: query
-        description: |-
-          The maximum number of entries to return.
-
-          Zero means: no limit
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: total
-        in: query
-        description: Whether to compute and return the total count of matching items.
-        required: false
-        schema:
-          type: boolean
-      - name: deprecated
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - Ignore
-          - Consider
-      responses:
-        '200':
-          description: Matching vulnerabilities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResults_AdvisorySummary'
-  /api/v3/advisory/{key}:
-    get:
-      tags:
-      - advisory
-      summary: Get an advisory
-      operationId: getAdvisory
-      parameters:
-      - name: key
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/Id'
-      responses:
-        '200':
-          description: Matching advisory
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AdvisoryDetails'
-        '404':
-          description: The advisory could not be found
-  /api/v3/purl/{key}:
-    get:
-      tags:
-      - purl
-      summary: Retrieve details of a fully-qualified pURL
-      operationId: getPurl
-      parameters:
-      - name: deprecated
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - Ignore
-          - Consider
-      - name: key
-        in: path
-        description: opaque identifier for a fully-qualified PURL, or URL-encoded pURL itself
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Details for the qualified PURL
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PurlDetails'
-  /api/v3/sbom:
-    get:
-      tags:
-      - sbom
-      summary: List SBOMs
-      operationId: listSboms
-      parameters:
-      - name: q
-        in: query
-        description: |
-          EBNF grammar for the _q_ parameter:
-          ```text
-              q = ( values | filter ) { '&' q }
-              values = value { '|', values }
-              filter = field, operator, values
-              operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<"
-              value = (* any text but escape special characters with '\' *)
-              field = (* must match an entity attribute name *)
-          ```
-          Any values in a _q_ will result in a case-insensitive "full
-          text search", effectively producing an OR clause of LIKE
-          clauses for every string-ish field in the resource being
-          queried.
-
-          Examples:
-          - `foo` - any field containing 'foo'
-          - `foo|bar` - any field containing either 'foo' OR 'bar'
-          - `foo&bar` - some field contains 'foo' AND some field contains 'bar'
-
-          A _filter_ may also be used to constrain the results. The
-          filter's field name must correspond to one of the resource's
-          attributes. If it doesn't, an error will be returned
-          containing a list of the valid fields for that resource.
-
-          An ASCII value of `NUL`, percent-encoded as `%00`, may be used
-          to find resources on which a particular field isn't set. For
-          example, `name=%00` and `name!=%00` yield the WHERE clauses,
-          'NAME IS NULL' and 'NAME IS NOT NULL', respectively.
-
-          Examples:
-          - `name=foo` - entity's _name_ matches 'foo' exactly
-          - `name~foo` - entity's _name_ contains 'foo', case-insensitive
-          - `name~foo|bar` - entity's _name_ contains either 'foo' OR 'bar', case-insensitive
-          - `name=` - entity's _name_ is the empty string, ''
-          - `name=%00` - entity's _name_ isn't set
-          - `published>3 days ago` - date values can be "human time"
-
-          Multiple full text searches and/or filters should be
-          '&'-delimited -- they are logically AND'd together.
-
-          - `red hat|fedora&labels:type=cve|osv&published>last wednesday 17:00`
-
-          Fields corresponding to JSON objects in the database may use a
-          ':' to delimit the column name and the object key,
-          e.g. `purl:qualifiers:type=pom`
-
-          Any operator or special character, e.g. '|', '&', within a
-          value should be escaped by prefixing it with a backslash.
-        required: false
-        schema:
-          type: string
-      - name: sort
-        in: query
-        description: |
-          EBNF grammar for the _sort_ parameter:
-          ```text
-              sort = field [ ':', order ] { ',' sort }
-              order = ( "asc" | "desc" )
-              field = (* must match the name of entity's attributes *)
-          ```
-          The optional _order_ should be one of "asc" or "desc". If
-          omitted, the order defaults to "asc".
-
-          Each _field_ name must correspond to one of the columns of the
-          table holding the entities being queried. Those corresponding
-          to JSON objects in the database may use a ':' to delimit the
-          column name and the object key,
-          e.g. `purl:qualifiers:type:desc`
-        required: false
-        schema:
-          type: string
-      - name: offset
-        in: query
-        description: |-
-          The first item to return, skipping all that come before it.
-
-          NOTE: The order of items is defined by the API being called.
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: limit
-        in: query
-        description: |-
-          The maximum number of entries to return.
-
-          Zero means: no limit
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: total
-        in: query
-        description: Whether to compute and return the total count of matching items.
-        required: false
-        schema:
-          type: boolean
-      - name: group
-        in: query
-        description: |-
-          Filter by group IDs. Only SBOMs assigned to any of the provided groups will be returned.
-          Can be specified multiple times. Malformed IDs are silently ignored.
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-      responses:
-        '200':
-          description: Matching SBOMs
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResults_SbomPackageSummary'
-  /api/v3/sbom/{id}/advisory:
-    get:
-      tags:
-      - sbom
-      summary: Get advisories for an SBOM
-      operationId: getSbomAdvisories
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/Id'
-      responses:
-        '200':
-          description: Matching SBOM
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SbomAdvisory'
-        '404':
-          description: The SBOM could not be found
-  /api/v3/vulnerability:
-    get:
-      tags:
-      - vulnerability
-      summary: List vulnerabilities
-      operationId: listVulnerabilities
-      parameters:
-      - name: q
-        in: query
-        description: |
-          Query for advisories defined using the following EBNF grammar (ISO/IEC 14977):
-          ```text
-          (* Query Grammar - EBNF Compliant *)
-          query = ( values | filter ) , { "&" , query } ;
-          values = value , { "|" , value } ;
-          filter = field , operator , values ;
-          operator = "=" | "!=" | "~" | "!~" | ">=" | ">" | "<=" | "<" ;
-          field = ("id" | "title" | "reserved" | "published" | "modified" | "withdrawn" | "cwes" | "base_score" | "base_severity")
-          value = { value_char } ;
-          value_char = escaped_char | normal_char ;
-          escaped_char = "\" , special_char ;
-          normal_char = ? any character except '&', '|', '=', '!', '~', '>', '<', '\' ? ;
-          special_char = "&" | "|" | "=" | "!" | "~" | ">" | "<" | "\" ;
-          ```
-          Examples:
-          - Simple filter: title=example
-          - Multiple values filter: title=foo|bar|baz
-          - Complex filter: modified>2024-01-01
-          - Combined query: title=foo&average_severity=high
-          - Escaped characters: title=foo\\&bar
-        required: false
-        schema:
-          type: string
-      - name: sort
-        in: query
-        description: |-
-          EBNF grammar for the _sort_ parameter:
-          ```text
-              sort = field [ ':', order ] { ',' sort }
-              order = ( "asc" | "desc" )
-              field = ("id" | "title" | "reserved" | "published" | "modified" | "withdrawn" | "cwes" | "base_score" | "base_severity")
-          ```
-          The optional _order_ should be one of "asc" or "desc". If
-          omitted, the order defaults to "asc".
-
-          Each _field_ name must correspond to one of the columns of the
-          table holding the entities being queried. Those corresponding
-          to JSON objects in the database may use a ':' to delimit the
-          column name and the object key,
-          e.g. `purl:qualifiers:type:desc`
-        required: false
-        schema:
-          type: string
-      - name: offset
-        in: query
-        description: |-
-          The first item to return, skipping all that come before it.
-
-          NOTE: The order of items is defined by the API being called.
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: limit
-        in: query
-        description: |-
-          The maximum number of entries to return.
-
-          Zero means: no limit
-        required: false
-        schema:
-          type: integer
-          format: int64
-          minimum: 0
-      - name: total
-        in: query
-        description: Whether to compute and return the total count of matching items.
-        required: false
-        schema:
-          type: boolean
-      responses:
-        '200':
-          description: Matching vulnerabilities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResults_VulnerabilitySummary'
-  /api/v3/vulnerability/analyze:
-    post:
-      tags:
-      - vulnerability
-      operationId: analyze_v3
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AnalysisRequest'
-        required: true
-      responses:
-        '200':
-          description: Analyze the provided purls to search for known vulnerabilities
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AnalysisResponseV3'
-  /api/v3/vulnerability/{id}:
-    get:
-      tags:
-      - vulnerability
-      summary: Retrieve vulnerability details
-      operationId: getVulnerability
-      parameters:
-      - name: id
-        in: path
-        description: ID of the vulnerability
-        required: true
-        schema:
-          type: string
-      - name: scores
-        in: query
-        description: Include the full scores array from the advisory that contributed the base_score.
-        required: false
-        schema:
-          type: boolean
-      responses:
-        '200':
-          description: Specified vulnerability
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VulnerabilityDetails'
-        '404':
-          description: The vulnerability could not be found
 components:
   schemas:
     AdvisoryDetails:
@@ -5336,6 +5347,7 @@ components:
             - name
             - purls
             - properties
+            - sbom_count
             properties:
               id:
                 type: string
@@ -5354,6 +5366,9 @@ components:
                 items:
                   $ref: '#/components/schemas/PurlSummary'
                 description: The model's PURL
+              sbom_count:
+                $ref: '#/components/schemas/RequestedField_i64_i64'
+                description: Number of SBOMs containing this model
         total:
           type:
           - integer
@@ -5996,6 +6011,11 @@ components:
             value: 7.5
             severity: high
             vector: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+    RequestedField_i64_i64:
+      oneOf:
+      - type: 'null'
+      - type: integer
+        format: int64
     Revisioned_Importer:
       type: object
       description: |-
@@ -6117,6 +6137,7 @@ components:
       - name
       - purls
       - properties
+      - sbom_count
       properties:
         id:
           type: string
@@ -6135,6 +6156,9 @@ components:
           items:
             $ref: '#/components/schemas/PurlSummary'
           description: The model's PURL
+        sbom_count:
+          $ref: '#/components/schemas/RequestedField_i64_i64'
+          description: Number of SBOMs containing this model
     SbomPackage:
       type: object
       required:

@@ -12,7 +12,7 @@ export async function uploadFiles(
     const contentType = file.endsWith(".bz2")
       ? "application/json+bzip2"
       : "application/json";
-    return axios.post(`/api/v2/${type}`, fileStream, {
+    return axios.post(`/api/v3/${type}`, fileStream, {
       headers: { "Content-Type": contentType },
     });
   });
@@ -28,7 +28,7 @@ export async function deleteSboms(axios: AxiosInstance, sbomIds: string[]) {
 
   const deletes = sbomIds.map((id) => {
     logger.info(`Teardown: deleting SBOM with ID ${id}`);
-    return axios.delete(`/api/v2/sbom/${id}`).catch((error) => {
+    return axios.delete(`/api/v3/sbom/${id}`).catch((error) => {
       if (error.response?.status === 404) {
         logger.warn(`Teardown: SBOM ${id} not found during cleanup.`);
       } else {

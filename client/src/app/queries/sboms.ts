@@ -25,6 +25,7 @@ import {
   listModels,
   listRelatedSboms,
   listSbomLabels,
+  listSboms,
   updateSbomLabels,
   v2ListSboms,
 } from "@app/client";
@@ -69,7 +70,8 @@ export const useFetchSBOMs = (
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
     queryFn: () =>
-      v2ListSboms({
+      // v2ListSboms({
+      listSboms({
         client,
         query: {
           ...rest,
