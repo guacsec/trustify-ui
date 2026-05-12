@@ -18,7 +18,7 @@ import type { SbomModel } from "@app/client";
 interface IModelSearchContext {
   tableControls: ITableControls<
     SbomModel,
-    "name" | "suppliedBy" | "licenses",
+    "name" | "suppliedBy" | "licenses" | "sboms",
     "name",
     "",
     string
@@ -41,13 +41,7 @@ interface IModelProvider {
 export const ModelSearchProvider: React.FunctionComponent<IModelProvider> = ({
   children,
 }) => {
-  const tableControlState = useTableControlState<
-    SbomModel,
-    "name" | "suppliedBy" | "licenses",
-    "name",
-    "",
-    string
-  >({
+  const tableControlState = useTableControlState({
     tableName: "model",
     persistenceKeyPrefix: TablePersistenceKeyPrefixes.models,
     persistTo: "urlParams",
@@ -55,6 +49,7 @@ export const ModelSearchProvider: React.FunctionComponent<IModelProvider> = ({
       name: "Name",
       suppliedBy: "Supplied by",
       licenses: "License",
+      sboms: "SBOMs",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
