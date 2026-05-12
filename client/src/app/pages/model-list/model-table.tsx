@@ -14,7 +14,7 @@ import { getModelProperties } from "@app/pages/sbom-details/model-detail-drawer"
 import { ModelSearchContext } from "./model-context";
 
 export const ModelTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(ModelSearchContext);
 
   const {
@@ -44,7 +44,7 @@ export const ModelTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {

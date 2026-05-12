@@ -80,12 +80,15 @@ export const LicenseSearchProvider: React.FunctionComponent<
     isFetching,
     fetchError,
   } = useFetchLicenses(
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "license",
-      },
-    }),
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "license",
+        },
+      }),
+      total: true,
+    },
     false,
   );
 

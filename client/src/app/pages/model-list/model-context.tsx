@@ -80,12 +80,15 @@ export const ModelSearchProvider: React.FunctionComponent<IModelProvider> = ({
     isFetching,
     fetchError,
   } = useFetchAllModels(
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "name",
-      },
-    }),
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "name",
+        },
+      }),
+      total: true,
+    },
     false,
   );
 

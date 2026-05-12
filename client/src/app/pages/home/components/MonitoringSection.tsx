@@ -65,6 +65,7 @@ export const MonitoringSection: React.FC = () => {
   } = useFetchSBOMs(null, {
     page: { pageNumber: 1, itemsPerPage: 10 },
     sort: { field: "ingested", direction: "desc" },
+    total: true,
   });
 
   const {
@@ -90,6 +91,7 @@ export const MonitoringSection: React.FC = () => {
   } = useFetchAdvisories({
     page: { pageNumber: 1, itemsPerPage: 10 },
     sort: { field: "ingested", direction: "desc" },
+    total: true,
   });
 
   return (

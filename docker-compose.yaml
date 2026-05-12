@@ -58,7 +58,7 @@ services:
       TRUSTD_DB_HOST: trustify-db
       HTTP_SERVER_BIND_ADDR: "::"
       AUTH_DISABLED: true
-      RUST_LOG: "error"    
+      RUST_LOG: "error"
     entrypoint: /usr/local/bin/trustd
     command: api --sample-data
     ports:
@@ -70,7 +70,7 @@ services:
     depends_on:
       trustify-migrate:
         condition: service_completed_successfully
-  
+
   trustify-ui:
     image: ${TRUSTIFY_UI_IMAGE}
     environment:
@@ -83,7 +83,7 @@ services:
     depends_on:
       trustify:
         condition: service_started
-  
+
   playwright:
     image: ${PLAYWRIGHT_IMAGE:?PLAYWRIGHT_IMAGE is required}:${PLAYWRIGHT_VERSION:?PLAYWRIGHT_VERSION is required}${UBUNTU_VERSION_ALIAS}
     ports:

@@ -28,6 +28,7 @@ export interface HubRequestParams {
     pageNumber: number; // 1-indexed
     itemsPerPage: number;
   };
+  total?: boolean;
 }
 
 export interface HubPaginatedResult<T> {
