@@ -61,12 +61,12 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
     result: { data: models, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchModelsBySbomId(
-    sbomId,
-    getHubRequestParams({
+  } = useFetchModelsBySbomId(sbomId, {
+    ...getHubRequestParams({
       ...tableControlState,
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
