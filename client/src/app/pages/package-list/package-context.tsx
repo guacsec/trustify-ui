@@ -131,7 +131,7 @@ export const PackageSearchProvider: React.FunctionComponent<
         selectOptions: licenses.map((e) => {
           return {
             value: e.license,
-            label: e.license,
+            label: e.license.toUpperCase(),
           };
         }),
         onInputValueChange: setInputValueLicense,
@@ -145,8 +145,8 @@ export const PackageSearchProvider: React.FunctionComponent<
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackages(
-    getHubRequestParams({
+  } = useFetchPackages({
+    ...getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
@@ -154,7 +154,8 @@ export const PackageSearchProvider: React.FunctionComponent<
         version: "version",
       },
     }),
-  );
+    total: true,
+  });
 
   const enrichedPackages = React.useMemo(() => {
     return packages.map((item) => {

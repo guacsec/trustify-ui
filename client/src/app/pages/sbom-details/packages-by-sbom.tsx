@@ -87,7 +87,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         logicOperator: "OR",
         selectOptions: licenseIds.map((license) => ({
           value: license.license_id,
-          label: license.license_name,
+          label: license.license_name.toUpperCase(),
         })),
       },
     ],
@@ -99,15 +99,15 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackagesBySbomId(
-    sbomId,
-    getHubRequestParams({
+  } = useFetchPackagesBySbomId(sbomId, {
+    ...getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
       },
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -165,7 +165,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
