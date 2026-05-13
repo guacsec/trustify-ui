@@ -9,6 +9,9 @@ Trustify UI is a React-based web application for software supply chain
 security (SBOMs, advisories, vulnerabilities). It uses a monorepo structure with
 npm workspaces and connects to the Trustify backend API.
 
+See [CONVENTIONS.md](CONVENTIONS.md) for coding standards (naming conventions,
+file organization, import order, page patterns, error handling idioms).
+
 ## Workspace Structure
 
 This monorepo uses 4 npm workspaces:
@@ -139,36 +142,7 @@ OidcProvider (auth)
               └─ Outlet (page content)
 ```
 
-### Directory Organization
-
-```
-client/src/app/
-├── client/             # Auto-generated OpenAPI client (hey-api)
-├── queries/            # TanStack Query hooks per domain (advisories.ts, sboms.ts, etc.)
-├── hooks/              # Custom React hooks
-│   ├── table-controls/ # 36 hooks for table state management
-│   ├── domain-controls/# Domain-specific data hooks
-│   └── tab-controls/   # Tab state management
-├── pages/              # Route-specific page components
-│   └── [page-name]/    # Each page: component + context + table + toolbar
-├── components/         # Reusable React components
-├── layout/             # App shell (header, sidebar, default layout)
-├── utils/              # Utility functions
-├── Routes.tsx          # Route definitions
-└── env.ts              # Environment config decoder
-```
-
 ### Key Patterns
-
-#### **Page Structure Pattern**
-
-Every page follows this consistent structure:
-
-```
-pages/[page-name]/
-├── [page-name].tsx          # Main page component
-└── components/              # Page-specific components
-```
 
 #### **State Management**
 
@@ -254,50 +228,6 @@ const tableControls = useTableControlProps({
   totalItemCount,
 });
 ```
-
-### Code Quality Standards
-
-- **Linter**: Biome (replaces ESLint/Prettier)
-  - Config: `biome.json`
-  - Double quotes for strings
-  - Space indentation
-  - Import organization disabled (manual control)
-
-- **TypeScript**: Strict mode enabled
-  - Path alias: `@app/*` → `src/app/*`
-  - **Import Order**: Group imports alphabetically and follow the order below,
-    with each block separated by a blank line:
-    1. **React/Router block**: Dependencies from `react`, `react-dom`,
-       `react-router`, `react-router-dom`, `react-oidc-context`,
-       `react-hook-form`, etc.
-    2. **Package dependencies block**: Any dependency declared in
-       `package.json` (e.g., `axios`, `dayjs`, `yup`, `lodash`, etc.)
-    3. **PatternFly block**: Any `@patternfly/*` dependency
-    4. **App imports block**: Any `@app/*` dependency
-    5. **Relative imports block**: Local relative imports (`./`, `../`, etc.)
-
-**Example:**
-
-```ts
-import React from "react";
-import {Link, useNavigate} from "react-router-dom";
-
-import type {AxiosError} from "axios";
-import dayjs from "dayjs";
-import arraySupport from "dayjs/plugin/arraySupport";
-
-import {
-  Breadcrumb,
-  Tab,
-} from "@patternfly/react-core";
-
-import {PathParam, Paths, useRouteParams} from "@app/Routes";
-import {LoadingWrapper} from "@app/components/LoadingWrapper";
-
-import {Overview} from "./overview";
-```
-
-- **CSS Modules**: Enabled for component-scoped styles
 
 ### Backend Integration
 
