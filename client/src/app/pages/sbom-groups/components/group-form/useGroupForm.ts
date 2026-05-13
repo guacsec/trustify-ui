@@ -9,7 +9,11 @@ import {
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
 import type { Group, GroupRequest } from "@app/client";
-import { FILTER_NULL_VALUE, PRODUCT_LABEL_KEY } from "@app/Constants";
+import {
+  FILTER_NULL_VALUE,
+  MAX_ITEMS_PER_PAGE,
+  PRODUCT_LABEL_KEY,
+} from "@app/Constants";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 import type { useGroupFormData } from "./useGroupFormData";
@@ -111,7 +115,7 @@ export const useGroupForm = ({
   const parentGroup = form.watch("parentGroup");
   const { result: siblingGroups, isFetching } = useFetchSBOMGroups(
     parentGroup?.id || FILTER_NULL_VALUE,
-    { page: { pageNumber: 1, itemsPerPage: 0 } },
+    { page: { pageNumber: 1, itemsPerPage: MAX_ITEMS_PER_PAGE } },
   );
 
   const siblingsKey = useMemo(() => {

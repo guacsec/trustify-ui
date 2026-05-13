@@ -71,7 +71,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
       "Filter text": "text",
       "Created on": { from: "03/26/2025", to: "03/28/2025" },
       Label: ["type=spdx"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await SbomListPage.build(page);
@@ -89,7 +89,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
       "Filter text": "text",
       "Created on": { from: "03/26/2025", to: "03/28/2025" },
       Label: ["type=spdx"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await SbomListPage.build(page);
@@ -207,7 +207,7 @@ test.describe("Filter state persistence", { tag: ["@filtering"] }, () => {
       "Filter text": "quarkus",
       "Created on": { from: "03/26/2025", to: "03/28/2025" },
       Label: ["type=spdx"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await SbomListPage.build(page);
@@ -225,7 +225,7 @@ test.describe("Filter state persistence", { tag: ["@filtering"] }, () => {
       "Filter text": "quarkus",
       "Created on": { from: "03/26/2025", to: "03/28/2025" },
       Label: ["type=spdx"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await SbomListPage.build(page);

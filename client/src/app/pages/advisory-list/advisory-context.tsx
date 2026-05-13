@@ -115,13 +115,16 @@ export const AdvisorySearchProvider: React.FunctionComponent<
     isFetching,
     fetchError,
   } = useFetchAdvisories(
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        identifier: "document_id",
-        modified: "modified",
-      },
-    }),
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          identifier: "document_id",
+          modified: "modified",
+        },
+      }),
+      total: true,
+    },
     (tableControlState.filterState.filterValues.labels ?? []).map((label) =>
       splitStringAsKeyValue(label),
     ),

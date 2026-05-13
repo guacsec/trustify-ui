@@ -120,6 +120,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
           name: "name",
         },
       }),
+      total: true,
     },
     {
       totals: true,
