@@ -22,6 +22,38 @@
 - Run `npm run check` (biome check with `--error-on-warnings`) before committing
 - Run `npm run format:fix` to auto-format
 - Organize imports: disabled in Biome config (manual ordering)
+- **Import Order**: Group imports alphabetically and follow the order below,
+  with each block separated by a blank line:
+  1. **React/Router block**: Dependencies from `react`, `react-dom`,
+     `react-router`, `react-router-dom`, `react-oidc-context`,
+     `react-hook-form`, etc.
+  2. **Package dependencies block**: Any dependency declared in
+     `package.json` (e.g., `axios`, `dayjs`, `yup`, `lodash`, etc.)
+  3. **PatternFly block**: Any `@patternfly/*` dependency
+  4. **App imports block**: Any `@app/*` dependency
+  5. **Relative imports block**: Local relative imports (`./`, `../`, etc.)
+
+**Example:**
+
+```ts
+import React from "react";
+import {Link, useNavigate} from "react-router-dom";
+
+import type {AxiosError} from "axios";
+import dayjs from "dayjs";
+import arraySupport from "dayjs/plugin/arraySupport";
+
+import {
+  Breadcrumb,
+  Tab,
+} from "@patternfly/react-core";
+
+import {PathParam, Paths, useRouteParams} from "@app/Routes";
+import {LoadingWrapper} from "@app/components/LoadingWrapper";
+
+import {Overview} from "./overview";
+```
+
 - The `client/src/app/client/` directory is auto-generated — never edit directly; regenerate with `npm run generate -w client`
 - CSS modules enabled for `.module.css` files
 
@@ -141,7 +173,7 @@ common/                 # shared test assets
 - API errors are typed as `AxiosError` and propagated through query hooks via `fetchError` return values
 - Mutation hooks accept `onSuccess` and `onError` callbacks, handling query invalidation internally
 - Top-level error boundary via `react-error-boundary` with `ErrorFallback` component
-- Query hooks return a normalized shape: `{ result: { data, total, params }, isFetching, fetchError, refetch }`
+- Query hooks return a normalized shape: `{ result: { data, total }, isFetching, fetchError, refetch }`
 - Components display errors using `StateError` component for failed data fetches
 - `StateNoData` and `StateNoResults` for empty states
 
