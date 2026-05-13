@@ -8,8 +8,9 @@ import type {
 } from "../FilterToolbar";
 import type { IFilterControlProps } from "./FilterControl";
 
-export interface IMultiselectFilterControlProps<TItem>
-  extends IFilterControlProps<TItem, string> {
+export interface IMultiselectFilterControlProps<
+  TItem,
+> extends IFilterControlProps<TItem, string> {
   category: IMultiselectFilterCategory<TItem, string>;
 }
 

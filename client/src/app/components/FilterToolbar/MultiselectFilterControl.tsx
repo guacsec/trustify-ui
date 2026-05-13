@@ -25,8 +25,9 @@ import type {
 
 import "./select-overrides.css";
 
-export interface IMultiselectFilterControlProps<TItem>
-  extends IFilterControlProps<TItem, string> {
+export interface IMultiselectFilterControlProps<
+  TItem,
+> extends IFilterControlProps<TItem, string> {
   category: IMultiselectFilterCategory<TItem, string>;
   isScrollable?: boolean;
 }
