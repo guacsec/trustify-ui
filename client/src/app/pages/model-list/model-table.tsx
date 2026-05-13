@@ -2,6 +2,12 @@ import React from "react";
 
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
+import type { SbomModel } from "@app/client";
+import {
+  AIModelDetails,
+  getModelProperties,
+} from "@app/components/AIModelDetails";
+import { PageDrawerContent } from "@app/components/PageDrawerContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -9,11 +15,14 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 
-import { getModelProperties } from "@app/pages/sbom-details/model-detail-drawer";
-
+import { Button, Content } from "@patternfly/react-core";
 import { ModelSearchContext } from "./model-context";
 
 export const ModelTable: React.FC = () => {
+  const [selectedModel, setSelectedModel] = React.useState<SbomModel | null>(
+    null,
+  );
+
   const { isFetching, fetchError, tableControls } =
     React.useContext(ModelSearchContext);
 
@@ -67,7 +76,13 @@ export const ModelTable: React.FC = () => {
                         rowIndex,
                       })}
                     >
-                      {item.name}
+                      <Button
+                        variant="link"
+                        isInline
+                        onClick={() => setSelectedModel(item)}
+                      >
+                        {item.name}
+                      </Button>
                     </Td>
                     <Td
                       width={30}
@@ -114,6 +129,15 @@ export const ModelTable: React.FC = () => {
         isTop={false}
         paginationProps={paginationProps}
       />
+
+      <PageDrawerContent
+        isExpanded={selectedModel !== null}
+        onCloseClick={() => setSelectedModel(null)}
+        header={<Content component="h2">{selectedModel?.name}</Content>}
+        pageKey="sbom-details-models"
+      >
+        {selectedModel && <AIModelDetails model={selectedModel} />}
+      </PageDrawerContent>
     </>
   );
 };

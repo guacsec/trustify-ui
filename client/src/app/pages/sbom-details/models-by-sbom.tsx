@@ -17,6 +17,10 @@ import {
 import text from "@patternfly/react-styles/css/utilities/Text/text";
 
 import type { SbomModel } from "@app/client";
+import {
+  AIModelDetails,
+  getModelProperties,
+} from "@app/components/AIModelDetails";
 import { ConditionalDataListBody } from "@app/components/DataListControls";
 import { FilterToolbar, FilterType } from "@app/components/FilterToolbar";
 import { PageDrawerContent } from "@app/components/PageDrawerContext";
@@ -28,8 +32,6 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchModelsBySbomId } from "@app/queries/sboms";
-
-import { getModelProperties, ModelDetailDrawer } from "./model-detail-drawer";
 
 interface ModelsProps {
   sbomId: string;
@@ -187,7 +189,7 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
         header={<Content component="h2">{selectedModel?.name}</Content>}
         pageKey="sbom-details-models"
       >
-        {selectedModel && <ModelDetailDrawer model={selectedModel} />}
+        {selectedModel && <AIModelDetails model={selectedModel} />}
       </PageDrawerContent>
     </>
   );
