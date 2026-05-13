@@ -296,12 +296,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: ancestors
         in: query
         description: |-
@@ -374,12 +380,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: ancestors
         in: query
         description: |-
@@ -520,12 +532,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: ancestors
         in: query
         description: |-
@@ -598,12 +616,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: ancestors
         in: query
         description: |-
@@ -773,12 +797,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: q
         in: query
         description: |
@@ -1408,12 +1438,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: name
         in: path
         required: true
@@ -1495,12 +1531,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching licenses
@@ -1605,12 +1647,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching licenses
@@ -1734,12 +1782,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching organizations
@@ -1866,12 +1920,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching products
@@ -2019,12 +2079,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: All relevant matching qualified PURLs
@@ -2129,12 +2195,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: All relevant matching versionless base PURL
@@ -2277,12 +2349,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: group
         in: query
         description: |-
@@ -2502,12 +2580,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: purl
         in: query
         description: Find by PURL
@@ -2672,12 +2756,24 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
+      - name: counts
+        in: query
+        description: Include SBOM counts for each model
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: AI Models
@@ -2920,12 +3016,24 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
+      - name: counts
+        in: query
+        description: Include SBOM counts for each model
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: AI Models
@@ -3036,12 +3144,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Packages
@@ -3179,12 +3293,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Packages
@@ -3457,12 +3577,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching weaknesses
@@ -3560,12 +3686,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: deprecated
         in: query
         required: false
@@ -3727,12 +3859,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       - name: group
         in: query
         description: |-
@@ -3842,12 +3980,18 @@ paths:
         description: |-
           The maximum number of entries to return.
 
-          Zero means: no limit
+          Zero means: return no items (the total count is still computed if requested).
         required: false
         schema:
           type: integer
           format: int64
           minimum: 0
+      - name: total
+        in: query
+        description: Whether to compute and return the total count of matching items.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Matching vulnerabilities
@@ -4900,7 +5044,6 @@ components:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -4919,14 +5062,15 @@ components:
                     $ref: '#/components/schemas/AdvisoryVulnerabilityHead'
                   description: Vulnerabilities addressed within this advisory.
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_BasePurlSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -4934,14 +5078,15 @@ components:
             allOf:
             - $ref: '#/components/schemas/BasePurlHead'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_GroupDetails:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -4982,14 +5127,15 @@ components:
                     This information is only present when requested.
             description: Detailed group information, extends [`Group`]
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_ImporterReport:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5021,14 +5167,15 @@ components:
                 - $ref: '#/components/schemas/Report'
                   description: Detailed report information
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_LicenseSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5058,14 +5205,15 @@ components:
                 items:
                   type: string
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_LicenseText:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5077,14 +5225,15 @@ components:
               license:
                 type: string
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_Node:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5118,14 +5267,15 @@ components:
                     type: string
                   description: Warnings when processing this node.
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_ProductSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5146,14 +5296,15 @@ components:
                   items:
                     $ref: '#/components/schemas/ProductVersionHead'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_PurlSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5178,14 +5329,15 @@ components:
                 version:
                   $ref: '#/components/schemas/VersionedPurlHead'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SbomModel:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5196,6 +5348,7 @@ components:
             - name
             - purls
             - properties
+            - sbom_count
             properties:
               id:
                 type: string
@@ -5214,15 +5367,19 @@ components:
                 items:
                   $ref: '#/components/schemas/PurlSummary'
                 description: The model's PURL
+              sbom_count:
+                $ref: '#/components/schemas/RequestedField_i64_i64'
+                description: Number of SBOMs containing this model
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SbomPackage:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5279,14 +5436,15 @@ components:
                 - 'null'
                 description: An optional version for an SBOM package
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SbomPackageRelation_SbomPackage:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5351,14 +5509,15 @@ components:
               relationship:
                 $ref: '#/components/schemas/Relationship'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SbomPackageSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5385,14 +5544,15 @@ components:
                 - 'null'
                 description: An optional version for an SBOM package
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SbomSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5409,14 +5569,15 @@ components:
                   items:
                     $ref: '#/components/schemas/SbomPackage'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_SpdxLicenseSummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5431,14 +5592,15 @@ components:
               name:
                 type: string
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     PaginatedResults_VulnerabilitySummary:
       type: object
       required:
       - items
-      - total
       properties:
         items:
           type: array
@@ -5446,7 +5608,9 @@ components:
             allOf:
             - $ref: '#/components/schemas/VulnerabilityHead'
         total:
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
           minimum: 0
     ProductDetails:
@@ -5848,6 +6012,11 @@ components:
             value: 7.5
             severity: high
             vector: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+    RequestedField_i64_i64:
+      oneOf:
+      - type: 'null'
+      - type: integer
+        format: int64
     Revisioned_Importer:
       type: object
       description: |-
@@ -5969,6 +6138,7 @@ components:
       - name
       - purls
       - properties
+      - sbom_count
       properties:
         id:
           type: string
@@ -5987,6 +6157,9 @@ components:
           items:
             $ref: '#/components/schemas/PurlSummary'
           description: The model's PURL
+        sbom_count:
+          $ref: '#/components/schemas/RequestedField_i64_i64'
+          description: Number of SBOMs containing this model
     SbomPackage:
       type: object
       required:

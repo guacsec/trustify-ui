@@ -52,16 +52,16 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
     result: { data: sboms, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchSbomsByPackageId(
-    purl,
-    getHubRequestParams({
+  } = useFetchSbomsByPackageId(purl, {
+    ...getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
         published: "published",
       },
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -113,7 +113,7 @@ export const SbomsByPackage: React.FC<SbomsByPackageProps> = ({ purl }) => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item) => {

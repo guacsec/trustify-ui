@@ -26,7 +26,7 @@ import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 
 export const PackageTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(PackageSearchContext);
 
   const {
@@ -63,7 +63,7 @@ export const PackageTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {

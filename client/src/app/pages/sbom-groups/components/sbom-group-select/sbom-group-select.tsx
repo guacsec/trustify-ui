@@ -8,7 +8,11 @@ import {
   DrilldownSelect,
   type SearchQuery,
 } from "@app/components/DrilldownSelect/DrilldownSelect";
-import { FILTER_NULL_VALUE, FILTER_TEXT_CATEGORY_KEY } from "@app/Constants";
+import {
+  FILTER_NULL_VALUE,
+  FILTER_TEXT_CATEGORY_KEY,
+  MAX_ITEMS_PER_PAGE,
+} from "@app/Constants";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
 interface ISbomGroupSelectProps {
@@ -43,7 +47,7 @@ export const SbomGroupSelect: React.FC<ISbomGroupSelectProps> = ({
           page: { pageNumber: 1, itemsPerPage: 10 },
         }
       : {
-          page: { pageNumber: 1, itemsPerPage: 0 },
+          page: { pageNumber: 1, itemsPerPage: MAX_ITEMS_PER_PAGE },
         };
 
   const extraParamsQuery: { parents?: "resolve"; totals?: boolean } =

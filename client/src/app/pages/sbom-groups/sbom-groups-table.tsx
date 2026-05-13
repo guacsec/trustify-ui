@@ -39,7 +39,6 @@ export const SbomGroupsTable: React.FC = () => {
   const {
     isFetching,
     fetchError,
-    totalItemCount,
     tableControls,
     setGroupCreateUpdateModalState,
   } = React.useContext(SbomGroupsContext);
@@ -83,7 +82,7 @@ export const SbomGroupsTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           <Tbody>

@@ -14,7 +14,7 @@ import { getModelProperties } from "@app/pages/sbom-details/model-detail-drawer"
 import { ModelSearchContext } from "./model-context";
 
 export const ModelTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(ModelSearchContext);
 
   const {
@@ -38,13 +38,14 @@ export const ModelTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "name" })} />
               <Th {...getThProps({ columnKey: "suppliedBy" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "sboms" })} />
             </TableHeaderContentWithControls>
           </Tr>
         </Thead>
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
@@ -80,7 +81,7 @@ export const ModelTable: React.FC = () => {
                       {props.suppliedBy || "-"}
                     </Td>
                     <Td
-                      width={30}
+                      width={15}
                       modifier="breakWord"
                       {...getTdProps({
                         columnKey: "licenses",
@@ -89,6 +90,17 @@ export const ModelTable: React.FC = () => {
                       })}
                     >
                       {props.licenses || "-"}
+                    </Td>
+                    <Td
+                      width={15}
+                      modifier="breakWord"
+                      {...getTdProps({
+                        columnKey: "sboms",
+                        item: item,
+                        rowIndex,
+                      })}
+                    >
+                      {item.sbom_count}
                     </Td>
                   </TableRowContentWithControls>
                 </Tr>

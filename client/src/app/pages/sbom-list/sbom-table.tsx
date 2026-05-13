@@ -51,7 +51,6 @@ export const SbomTable: React.FC = () => {
   const {
     isFetching,
     fetchError,
-    totalItemCount,
     tableControls,
     bulkSelection: {
       isEnabled: showBulkSelector,
@@ -131,7 +130,7 @@ export const SbomTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {

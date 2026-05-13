@@ -61,12 +61,12 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
     result: { data: models, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchModelsBySbomId(
-    sbomId,
-    getHubRequestParams({
+  } = useFetchModelsBySbomId(sbomId, {
+    ...getHubRequestParams({
       ...tableControlState,
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -104,7 +104,7 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
       <ConditionalDataListBody
         isLoading={isFetching}
         isError={!!fetchError}
-        isNoData={totalItemCount === 0}
+        isNoData={currentPageItems.length === 0}
         noDataEmptyState={
           <Content component="p">No models found for this SBOM.</Content>
         }

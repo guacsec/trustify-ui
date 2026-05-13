@@ -148,7 +148,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
         selectOptions: licenses.map((e) => {
           return {
             value: e.license,
-            label: e.license,
+            label: e.license.toUpperCase(),
           };
         }),
         onInputValueChange: setInputValueLicense,
@@ -164,13 +164,16 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     fetchError,
   } = useFetchSBOMs(
     sbomGroupId ?? null,
-    getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "name",
-        published: "published",
-      },
-    }),
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "name",
+          published: "published",
+        },
+      }),
+      total: true,
+    },
     (tableControlState.filterState.filterValues.labels ?? []).map((label) =>
       splitStringAsKeyValue(label),
     ),
