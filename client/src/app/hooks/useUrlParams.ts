@@ -110,7 +110,6 @@ export const useUrlParams = <
     params = allParamsEmpty ? defaultValue : deserialize(serializedParams);
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: allowed
   React.useEffect(() => {
     if (allParamsEmpty) setParams(defaultValue);
     // Leaving this rule enabled results in a cascade of unnecessary useCallbacks:

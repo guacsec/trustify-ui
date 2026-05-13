@@ -5,15 +5,15 @@ import { expect } from "../fixtures";
  * Generic helper to validate sorting with optional value transformation
  */
 function validateSorting(
-  // biome-ignore lint/suspicious/noExplicitAny: Generic helper accepts any API response type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic helper accepts any API response type
   items: any[],
   field: string,
   order: "ascending" | "descending",
-  // biome-ignore lint/suspicious/noExplicitAny: Transform function accepts any value type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Transform function accepts any value type
   transform?: (value: any) => any,
 ) {
   // Extract values and optionally transform them
-  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
   const values = items.map((item: any) => {
     const value = item[field];
     return transform ? transform(value) : value;
@@ -44,7 +44,7 @@ function validateSorting(
  * Helper to validate that dates in an array are sorted in the specified order
  */
 export function validateDateSorting(
-  // biome-ignore lint/suspicious/noExplicitAny: Generic helper accepts any API response type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic helper accepts any API response type
   items: any[],
   dateField: string,
   order: "ascending" | "descending",
@@ -58,7 +58,7 @@ export function validateDateSorting(
  * Helper to validate that numeric scores in an array are sorted in the specified order
  */
 export function validateNumericSorting(
-  // biome-ignore lint/suspicious/noExplicitAny: Generic helper accepts any API response type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic helper accepts any API response type
   items: any[],
   scoreField: string,
   order: "ascending" | "descending",
@@ -75,15 +75,14 @@ export function validateNumericSorting(
  * correctly according to its configured collation.
  */
 export function validateStringSorting(
-  // biome-ignore lint/suspicious/noExplicitAny: Generic helper accepts any API response type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic helper accepts any API response type
   items: any[],
   field: string,
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: Kept for API consistency, order validation happens at integration level
   order: "ascending" | "descending",
-  // biome-ignore lint/suspicious/noExplicitAny: Optional custom extractor accepts any item type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Optional custom extractor accepts any item type
   extractValue?: (item: any) => string,
 ) {
-  // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
   const values = items.map((item: any) =>
     extractValue ? extractValue(item) : item[field],
   );
@@ -105,7 +104,7 @@ export async function validateSortDirectionDiffers(
   axios: AxiosInstance,
   endpoint: string,
   sortField: string,
-  // biome-ignore lint/suspicious/noExplicitAny: Generic helper accepts any API response type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic helper accepts any API response type
   extractValue: (item: any) => any,
 ) {
   const [ascResponse, descResponse] = await Promise.all([

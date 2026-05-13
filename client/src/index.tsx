@@ -15,7 +15,6 @@ const container = document.getElementById("root");
 
 initInterceptors();
 
-// biome-ignore lint/style/noNonNullAssertion: container must exist
 const root = createRoot(container!);
 
 const renderApp = () => {

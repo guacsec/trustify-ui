@@ -25,7 +25,7 @@ type ListType = {
     color: { name: string; value: string; var: string };
     progressProps: Pick<ProgressProps, "variant">;
 
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     icon: React.ComponentType<any>;
   };
 };

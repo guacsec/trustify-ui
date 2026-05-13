@@ -117,7 +117,7 @@ Then(
 
 Then(
   "Tooltip on the {string} column should display {string}",
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   async ({ page }, column: any, tooltipMessage: string) => {
     const table = await Table.build(
       page,

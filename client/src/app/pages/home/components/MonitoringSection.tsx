@@ -166,7 +166,7 @@ export const MonitoringSection: React.FC = () => {
                               ]}
                               events={{
                                 onClick: (event) => {
-                                  // biome-ignore lint/suspicious/noExplicitAny: allowed
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
                                   const sbomName = (event.target as any)
                                     .innerHTML as string | null;
                                   const sbom = barchartSboms.find(

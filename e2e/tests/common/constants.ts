@@ -23,7 +23,7 @@ export const AUTH_PASSWORD = process.env.PLAYWRIGHT_AUTH_PASSWORD ?? "admin";
  */
 const LOG_LEVELS = { debug: 4, info: 3, warn: 2, error: 1, none: 0 };
 const CURRENT_LOG_LEVEL =
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   (LOG_LEVELS as any)[process.env.LOG_LEVEL ?? "info"] || LOG_LEVELS.info;
 
 export const logger = {
