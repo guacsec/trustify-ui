@@ -55,13 +55,11 @@ const parseExternalReferences = (json?: string): ExternalReference[] => {
   }
 };
 
-interface ModelDetailDrawerProps {
+interface IAIModelDetailsProps {
   model: SbomModel;
 }
 
-export const ModelDetailDrawer: React.FC<ModelDetailDrawerProps> = ({
-  model,
-}) => {
+export const AIModelDetails: React.FC<IAIModelDetailsProps> = ({ model }) => {
   const props = getModelProperties(model.properties);
   const externalRefs = parseExternalReferences(props.external_references);
 
