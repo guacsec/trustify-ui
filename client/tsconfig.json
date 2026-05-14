@@ -17,10 +17,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
 
-    "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@mocks/*": ["src/mocks/*"]
+      "@app/*": ["./src/app/*"],
+      "@mocks/*": ["./src/mocks/*"]
     },
     "esModuleInterop": true
   },
