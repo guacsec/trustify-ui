@@ -41,9 +41,16 @@
     "typescript": "~6.0.3"
   },
   "peerDependencies": {
-    "react": "^19.1.1",
+    "react": "19.1.1",
     "react-dom": "19.1.1",
     "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom",
+    "@rsbuild/core": "1.5.11",
+    "@rsbuild/plugin-react": "1.4.0",
+    "@rsbuild/plugin-type-check": "1.2.4"
   },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "^5.7.7",
