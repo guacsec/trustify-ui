@@ -14,10 +14,10 @@
     "test:ui:host": "npx bddgen && npx playwright test --ui-host 127.0.0.1",
     "test:bdd": "npx bddgen && npx playwright test --project='bdd'",
     "test:bdd:trace": "npx bddgen && npx playwright test --project='bdd' --trace on",
-    "check": "biome check --error-on-warnings . && npx tsc --noEmit",
-    "check:write": "biome check --write .",
-    "format": "biome format .",
-    "format:fix": "biome format --write ."
+    "lint": "eslint --max-warnings 0 . && npx tsc --noEmit",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check --ignore-path ../.prettierignore './tests/**/*.{ts,tsx,js,json}'",
+    "format:fix": "prettier --write --ignore-path ../.prettierignore './tests/**/*.{ts,tsx,js,json}'"
   },
   "keywords": [],
   "author": "",

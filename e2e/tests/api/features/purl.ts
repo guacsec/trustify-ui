@@ -48,7 +48,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract name from purl string
         // Format: pkg:type/[namespace/]name@version[?qualifiers][#subpath]
@@ -65,7 +65,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract name from purl string
         // Format: pkg:type/[namespace/]name@version[?qualifiers][#subpath]
@@ -87,7 +87,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract namespace from purl string
         // Format: pkg:type/[namespace/]name - if no / after first /, namespace is the name
@@ -114,7 +114,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract namespace from purl string
         // Format: pkg:type/[namespace/]name - if no / after first /, namespace is the name
@@ -136,7 +136,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "version",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => item.version.version,
     );
   });
@@ -147,7 +147,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "version",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => item.version.version,
     );
   });

@@ -7,7 +7,6 @@ export class Table<
   private readonly _page: Page;
   readonly _table: Locator;
   readonly _columns: TColumns;
-  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: allowed
   private readonly _actions: TActions;
 
   private constructor(

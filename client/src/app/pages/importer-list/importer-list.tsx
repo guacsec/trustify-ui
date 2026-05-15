@@ -74,7 +74,7 @@ type ImporterStatus = "disabled" | "scheduled" | "running";
 
 const getImporterStatus = (importer: Importer): ImporterStatus => {
   const importerType = Object.keys(importer.configuration ?? {})[0];
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   const configValues = (importer.configuration as any)[
     importerType
   ] as SbomImporter;
@@ -118,7 +118,7 @@ export const ImporterList: React.FC = () => {
 
   const execEnableDisableImporter = (row: Importer, enable: boolean) => {
     const importerType = Object.keys(row.configuration ?? {})[0];
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     const currentConfigValues = (row.configuration as any)[
       importerType
     ] as SbomImporter;
@@ -324,7 +324,7 @@ export const ImporterList: React.FC = () => {
             >
               {currentPageItems?.map((item, rowIndex) => {
                 const importerType = Object.keys(item.configuration ?? {})[0];
-                // biome-ignore lint/suspicious/noExplicitAny: allowed
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
                 const configValues = (item.configuration as any)[
                   importerType
                 ] as SbomImporter;

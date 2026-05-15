@@ -115,7 +115,6 @@ Then(
     const match = totalText?.match(/of\s+(\d+)/);
     expect(match, "unable to parse pagination total").not.toBeNull();
 
-    // biome-ignore lint/style/noNonNullAssertion: allowed
     const total = Number(match![1]);
     expect(total).toBeGreaterThan(0);
   },

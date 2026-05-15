@@ -13,11 +13,11 @@ declare module "@hookform/resolvers/yup" {
   import type * as Yup from "yup";
   import type Lazy from "yup/lib/Lazy";
 
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   declare type Options<T extends Yup.AnyObjectSchema | Lazy<any>> = Parameters<
     T["validate"]
   >[1];
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   export declare type Resolver = <T extends Yup.AnyObjectSchema | Lazy<any>>(
     schema: T,
     schemaOptions?: Options<T>,

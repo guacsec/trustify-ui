@@ -60,7 +60,13 @@ const config: JestConfigWithTsJest = {
     "^.+\\.(js|mjs|ts|mts)x?$": [
       "ts-jest",
       {
-        tsconfig: "tsconfig.json", // 👈 Use custom tsconfig here
+        tsconfig: "tsconfig.json",
+        diagnostics: {
+          // TS5107: ts-jest hardcodes moduleResolution=node10 internally
+          // (node_modules/ts-jest/dist/legacy/compiler/ts-compiler.js:111)
+          // regardless of tsconfig. Our tsconfig correctly uses "Bundler".
+          ignoreCodes: [5107],
+        },
       },
     ],
   },
