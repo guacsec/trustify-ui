@@ -177,6 +177,122 @@ common/                 # shared test assets
 - Components display errors using `StateError` component for failed data fetches
 - `StateNoData` and `StateNoResults` for empty states
 
+## API Client Pipeline
+
+API types and SDK functions are auto-generated from the OpenAPI spec
+(`client/openapi/trustd.yaml`) using `@hey-api/openapi-ts` with Axios. The
+generated output at `client/src/app/client/` must never be edited manually.
+
+### Generated vs. manual types
+
+| Layer | Location | Examples | Ownership |
+|---|---|---|---|
+| Generated | `client/types.gen.ts`, `sdk.gen.ts` | `PaginatedResultsAdvisorySummary`, `ListAdvisoriesData` | Auto-generated — never edit |
+| Manual (request) | `api/models.ts` | `HubRequestParams`, `HubFilter` | Hand-maintained |
+| Manual (response) | `api/models.ts`, `api/rest.ts` | `HubPaginatedResult<T>`, `PaginatedResponse<T>` | Hand-maintained |
+
+Query hooks in `queries/` bridge the two layers: they call generated SDK
+functions and normalize responses into the `HubPaginatedResult<T>` shape.
+
+### Regenerating the client
+
+1. Update `client/openapi/trustd.yaml` with the new backend spec
+2. Run `npm run generate -w client`
+3. Review `types.gen.ts` for changed response shapes (e.g., fields becoming nullable)
+4. Update query hooks in `queries/` if the response shape changed — use `?? defaultValue` for newly nullable fields
+5. Update manual types in `api/models.ts` and `api/rest.ts` if the response contract diverged
+6. Run `npm run check` to verify the build compiles
+
+### Legacy REST helpers
+
+- `getHubPaginatedResult` in `api/rest.ts` and `serializeRequestParamsForHub` in `hooks/table-controls/getHubRequestParams.ts` are the legacy serialization path (URLSearchParams). They do **not** serialize the `total` query parameter.
+- Only used for upload/download flows — all paginated list queries use `requestParamsQuery` (plain object, includes `total`).
+- New paginated endpoints must use the `requestParamsQuery` path.
+
+## Server-Side Pagination
+
+All list pages use server-side pagination. The frontend requests one page at a
+time from the backend and displays the server-reported total in the PatternFly
+`Pagination` component.
+
+### Request flow
+
+```
+Context provider (e.g., pages/advisory-list/advisory-context.tsx)
+  └─ useTableControlState() → { pageNumber (1-indexed), itemsPerPage }
+  └─ getHubRequestParams(tableControlState) → HubRequestParams { page, sort, filters }
+  └─ Spread extra params: { ...hubRequestParams, total: true }
+                                                  ^^^^^^^^^^^^
+                                                  MUST be added per-page
+  ↓
+Query hook (e.g., queries/advisories.ts → useFetchAdvisories)
+  └─ requestParamsQuery(params)
+     → { offset: (pageNumber-1)*itemsPerPage, limit: itemsPerPage, q, sort, total }
+  └─ Generated SDK function (e.g., listAdvisories({ client, query: {...} }))
+  ↓
+GET /api/v2/advisory?offset=0&limit=10&sort=modified:desc&total=true
+```
+
+**Key rule**: `getHubRequestParams` does **not** include `total`. Each context
+provider must explicitly add `total: true` onto the params object. Omitting it
+means the server skips the COUNT query and returns `total: null`.
+
+### Response flow
+
+```
+HTTP response: { items: T[], total: number | null }
+  ↓
+Query hook normalizes (e.g., queries/advisories.ts):
+  data:  data?.data?.items || []
+  total: data?.data?.total ?? 0          ← standard nullable guard
+  → returns { result: { data, total, params }, isFetching, fetchError, refetch }
+  ↓
+Context provider destructures:
+  { data: advisories, total: totalItemCount } = result
+  → passes totalItemCount to useTableControlProps(...)
+  ↓
+useTableControlProps → usePaginationPropHelpers
+  → paginationProps: { itemCount: totalItemCount, perPage, page, onSetPage, ... }
+  ↓
+<SimplePagination paginationProps={paginationProps} />
+  → renders PatternFly <Pagination>
+```
+
+**Key rule**: the `?? 0` fallback in query hooks is the standard pattern for
+nullable `total`. If the backend makes a field nullable, add a `??` guard in
+the query hook — do not change the manual types to optional.
+
+### Pagination constants
+
+- `MAX_ITEMS_PER_PAGE = 1000` in `Constants.ts` — mirrors the server's default max pagination limit (`TRUSTD_PAGINATION_MAX_LIMIT`). Update when the server default changes.
+- Default `itemsPerPage` is `10` (from `usePaginationState`).
+- `pageNumber` is 1-indexed. Conversion to 0-indexed `offset` happens in `requestParamsQuery`: `offset = (pageNumber - 1) * itemsPerPage`.
+
+### Axios interceptors
+
+Response interceptors are registered in `axios-config/apiInit.ts`:
+
+- Read-only detection (503) — invalidates trustify info cache
+- Auth token refresh (401) — silent re-auth with one retry
+
+No centralized 400 handler exists — errors propagate via `fetchError` in query
+hooks. To add centralized handling for a new HTTP error code, add a response
+interceptor in `initInterceptors()`.
+
+### Adapting to upstream API changes
+
+When the backend OpenAPI spec changes:
+
+1. Update `client/openapi/trustd.yaml` with the new spec
+2. Regenerate: `npm run generate -w client`
+3. Check generated types for changed shapes (nullable fields, new params)
+4. Update query hooks (`queries/`) — add `?? defaultValue` for nullable fields
+5. Update context providers (`pages/`) if new request params need passing (e.g., a new opt-in flag like `total: true`)
+6. Update `Constants.ts` if server limits changed
+7. Add interceptor in `apiInit.ts` if new error codes need centralized handling
+8. Update manual types in `api/models.ts` and `api/rest.ts` if needed
+9. Run `npm run check` and verify the build
+
 ## Testing Conventions
 
 ### Unit tests (Jest)
