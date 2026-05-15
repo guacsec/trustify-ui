@@ -31,9 +31,9 @@ jobs:
         run: npm run build
       - name: Test
         run: npm run test -- --coverage --watchAll=false
-      - name: Lint sources
+      - name: Lint
         run: npm run lint
-      - name: Check formatting
+      - name: Format
         run: npm run format
       - name: Crate Format
         working-directory: ./crate
