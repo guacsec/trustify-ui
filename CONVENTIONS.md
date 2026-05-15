@@ -196,12 +196,10 @@ functions and normalize responses into the `HubPaginatedResult<T>` shape.
 
 ### Regenerating the client
 
-1. Update `client/openapi/trustd.yaml` with the new backend spec
-2. Run `npm run generate -w client`
-3. Review `types.gen.ts` for changed response shapes (e.g., fields becoming nullable)
-4. Update query hooks in `queries/` if the response shape changed — use `?? defaultValue` for newly nullable fields
-5. Update manual types in `api/models.ts` and `api/rest.ts` if the response contract diverged
-6. Run `npm run check` to verify the build compiles
+Update `client/openapi/trustd.yaml` with the new backend spec, then run
+`npm run generate -w client`. Follow the full
+[Adapting to upstream API changes](#adapting-to-upstream-api-changes) checklist
+to reconcile generated types, query hooks, manual types, and constants.
 
 ### Legacy REST helpers
 
