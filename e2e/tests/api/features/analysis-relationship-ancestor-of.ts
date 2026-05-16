@@ -16,7 +16,7 @@ test("Ancestor of / CDX / Upstream component has descendants that include downst
   const urlEncodedUpstreamPurl = encodeURIComponent(cdxUpstreamPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -39,7 +39,7 @@ test.skip("Ancestor of / CDX / Upstream component has descendants that include d
   axios,
 }) => {
   const response = await axios.get(
-    `/api/v2/analysis/component?q=${query}?descendants=10`,
+    `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -63,7 +63,7 @@ test("Ancestor of / CDX / Downstream component has ancestors that include upstre
   const urlEncodedDownstreamPurl = encodeURIComponent(cdxDownstreamPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -86,7 +86,7 @@ test.skip("Ancestor of / CDX / Downstream component has ancestors that include u
   axios,
 }) => {
   const response = await axios.get(
-    `/api/v2/analysis/component?q=${query}?descendants=10`,
+    `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -110,7 +110,7 @@ test("Ancestor of / SPDX / Upstream component has descendants that include downs
   const urlEncodedUpstreamPurl = encodeURIComponent(spdxUpstreamPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -133,7 +133,7 @@ test.skip("Ancestor of / SPDX / Upstream component has descendants that include 
   axios,
 }) => {
   const response = await axios.get(
-    `/api/v2/analysis/component?q=${query}?descendants=10`,
+    `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -157,7 +157,7 @@ test("Ancestor of / SPDX / Downstream component has ancestors that include upstr
   const urlEncodedDownstreamPurl = encodeURIComponent(spdxDownstreamPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -180,7 +180,7 @@ test.skip("Ancestor of / SPDX / Downstream component has ancestors that include 
   axios,
 }) => {
   const response = await axios.get(
-    `/api/v2/analysis/component?q=${query}?descendants=10`,
+    `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
