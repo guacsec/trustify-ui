@@ -160,6 +160,22 @@ export default defineConfig({
       "/api": {
         target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",
         changeOrigin: true,
+        // Buffer responses to avoid chunked encoding truncation under
+        // concurrent load (connection: close + chunked = data loss).
+        selfHandleResponse: true,
+        onProxyRes: (proxyRes, _req, res) => {
+          const chunks: Buffer[] = [];
+          proxyRes.on("data", (chunk: Buffer) => chunks.push(chunk));
+          proxyRes.on("end", () => {
+            const body = Buffer.concat(chunks);
+            const headers = { ...proxyRes.headers };
+            delete headers["transfer-encoding"];
+            delete headers["connection"];
+            headers["content-length"] = String(body.length);
+            res.writeHead(proxyRes.statusCode ?? 200, headers);
+            res.end(body);
+          });
+        },
       },
       "/.well-known/trustify": {
         target: TRUSTIFICATION_ENV.TRUSTIFY_API_URL || "http://localhost:8080",

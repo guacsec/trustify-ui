@@ -16,7 +16,7 @@ import {
 } from "@patternfly/react-table";
 
 import { joinKeyValueAsString } from "@app/api/model-utils";
-import type { SbomSummary } from "@app/client";
+import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -59,7 +59,7 @@ export const SbomTable: React.FC = () => {
   } = React.useContext(SbomSearchContext);
 
   const [editLabelsModalState, setEditLabelsModalState] =
-    React.useState<SbomSummary | null>(null);
+    React.useState<SbomHead | null>(null);
   const isEditLabelsModalOpen = editLabelsModalState !== null;
   const rowLabelsToUpdate = editLabelsModalState;
 
@@ -89,11 +89,9 @@ export const SbomTable: React.FC = () => {
 
   // Delete action
 
-  const [sbomToDelete, setSbomToDelete] = React.useState<SbomSummary | null>(
-    null,
-  );
+  const [sbomToDelete, setSbomToDelete] = React.useState<SbomHead | null>(null);
 
-  const onDeleteSbomSuccess = (sbom: SbomSummary) => {
+  const onDeleteSbomSuccess = (sbom: SbomHead) => {
     setSbomToDelete(null);
     pushNotification({
       title: sbomDeletedSuccessMessage(sbom),
