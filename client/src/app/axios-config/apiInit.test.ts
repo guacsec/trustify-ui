@@ -1,27 +1,29 @@
+import { type MockedFunction, vi } from "vitest";
+
 import { queryClient } from "@app/queries/config";
 import { TrustifyInfoQueryKey } from "@app/queries/trustifyInfo";
 
 import { readOnlyRejectionHandler } from "./apiInit";
 
-jest.mock("@app/queries/config", () => ({
+vi.mock("@app/queries/config", () => ({
   queryClient: {
-    invalidateQueries: jest.fn(),
+    invalidateQueries: vi.fn(),
   },
 }));
 
-jest.mock("@app/queries/trustifyInfo", () => ({
+vi.mock("@app/queries/trustifyInfo", () => ({
   TrustifyInfoQueryKey: "trustifyInfo",
 }));
 
-jest.mock("@app/Constants", () => ({
+vi.mock("@app/Constants", () => ({
   isAuthRequired: false,
 }));
 
-jest.mock("@app/client/client", () => ({
-  createClient: jest.fn(() => ({})),
+vi.mock("@app/client/client", () => ({
+  createClient: vi.fn(() => ({})),
 }));
 
-jest.mock("@app/oidc", () => ({
+vi.mock("@app/oidc", () => ({
   OIDC_CLIENT_ID: "test",
   OIDC_SERVER_URL: "http://localhost",
   oidcClientSettings: {},
@@ -29,7 +31,7 @@ jest.mock("@app/oidc", () => ({
 }));
 
 const mockInvalidateQueries =
-  queryClient.invalidateQueries as jest.MockedFunction<
+  queryClient.invalidateQueries as MockedFunction<
     typeof queryClient.invalidateQueries
   >;
 

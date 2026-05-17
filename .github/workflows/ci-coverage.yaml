@@ -35,6 +35,8 @@ jobs:
           server_db_image: ${{ inputs.server_db_image }}
 
       - name: trustify-ui - start in dev mode
+        env:
+          COVERAGE: "true"
         run: |
           AUTH_REQUIRED=false npm run start:dev & echo "dev ui started"
       - name: trustify-ui - wait
