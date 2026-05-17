@@ -30,10 +30,9 @@ vi.mock("@app/oidc", () => ({
   oidcSignoutArgs: {},
 }));
 
-const mockInvalidateQueries =
-  queryClient.invalidateQueries as MockedFunction<
-    typeof queryClient.invalidateQueries
-  >;
+const mockInvalidateQueries = queryClient.invalidateQueries as MockedFunction<
+  typeof queryClient.invalidateQueries
+>;
 
 describe("readOnlyRejectionHandler", () => {
   beforeEach(() => {

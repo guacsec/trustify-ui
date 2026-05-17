@@ -25,8 +25,6 @@ export default defineConfig([
       parserOptions: {
         projectService: {
           allowDefaultProject: [
-            "client/vite.config.ts",
-            "client/test-setup.ts",
             "e2e/playwright.config.ts",
           ],
         },
