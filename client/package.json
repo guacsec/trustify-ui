@@ -14,7 +14,7 @@
     "format:fix": "prettier --write --ignore-path ../.prettierignore './src/**/*.{ts,tsx,js,json}'",
     "start:dev": "npm run generate && vite --port 3000 --host",
     "start": "vite preview",
-    "test": "vitest run --coverage",
+    "test": "vitest --run",
     "generate": "openapi-ts -f ./config/openapi-ts.config.ts",
     "preview": "vite preview"
   },
