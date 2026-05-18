@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { type MockedFunction, vi } from "vitest";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -7,10 +7,10 @@ import { ReadOnlyProvider, useReadOnlyContext } from "./ReadOnlyContext";
 
 import * as trustifyInfoModule from "@app/queries/trustifyInfo";
 
-jest.mock("@app/queries/trustifyInfo");
+vi.mock("@app/queries/trustifyInfo");
 
 const mockedUseFetchTrustifyInfo =
-  trustifyInfoModule.useFetchTrustifyInfo as jest.MockedFunction<
+  trustifyInfoModule.useFetchTrustifyInfo as MockedFunction<
     typeof trustifyInfoModule.useFetchTrustifyInfo
   >;
 

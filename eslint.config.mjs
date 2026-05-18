@@ -25,8 +25,6 @@ export default defineConfig([
       parserOptions: {
         projectService: {
           allowDefaultProject: [
-            "client/rsbuild.config.ts",
-            "client/setupTests.ts",
             "e2e/playwright.config.ts",
           ],
         },
