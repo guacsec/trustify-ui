@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import type { AdvisorySummary, SbomSummary } from "./client";
+import type { AdvisorySummary, SbomHead } from "./client";
 import ENV from "./env";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
@@ -68,7 +68,7 @@ export const ANSICOLOR = {
   red: "\x1b[31m",
 };
 
-export const sbomDeleteDialogProps = (sbom?: SbomSummary | null) => ({
+export const sbomDeleteDialogProps = (sbom?: SbomHead | null) => ({
   title: "Permanently delete SBOM?",
   message: `This action permanently deletes the ${sbom?.name} SBOM.`,
 });
@@ -85,7 +85,7 @@ export const groupDeleteDialogProps = (group?: { name?: string } | null) => ({
   message: `This action permanently deletes the ${group?.name} group.`,
 });
 
-export const sbomDeletedSuccessMessage = (sbom: SbomSummary) =>
+export const sbomDeletedSuccessMessage = (sbom: SbomHead) =>
   `The SBOM ${sbom.name} was deleted`;
 
 export const sbomDeletedErrorMessage = (_error: AxiosError) =>

@@ -6,7 +6,7 @@ import {
 
 test.skip("Purl by alias - vanilla", async ({ axios }) => {
   const vanillaResponse = await axios.get(
-    "/api/v2/purl?offset=0&limit=10&q=openssl",
+    "/api/v3/purl?offset=0&limit=10&q=openssl",
   );
 
   expect(vanillaResponse.data.items).toEqual(
@@ -43,7 +43,7 @@ test.skip("Purl by alias - vanilla", async ({ axios }) => {
 
 test.describe("PURL sorting validation", () => {
   test("Sort PURLs by name ascending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "name", "asc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "name", "asc");
     validateStringSorting(
       items,
       "purl",
@@ -60,7 +60,7 @@ test.describe("PURL sorting validation", () => {
   });
 
   test("Sort PURLs by name descending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "name", "desc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "name", "desc");
     validateStringSorting(
       items,
       "purl",
@@ -79,7 +79,7 @@ test.describe("PURL sorting validation", () => {
   test("Sort PURLs by namespace ascending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/purl",
+      "/api/v3/purl",
       "namespace",
       "asc",
     );
@@ -106,7 +106,7 @@ test.describe("PURL sorting validation", () => {
   test("Sort PURLs by namespace descending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/purl",
+      "/api/v3/purl",
       "namespace",
       "desc",
     );
@@ -131,7 +131,7 @@ test.describe("PURL sorting validation", () => {
   });
 
   test("Sort PURLs by version ascending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "version", "asc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "version", "asc");
     validateStringSorting(
       items,
       "version",
@@ -142,7 +142,7 @@ test.describe("PURL sorting validation", () => {
   });
 
   test("Sort PURLs by version descending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "version", "desc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "version", "desc");
     validateStringSorting(
       items,
       "version",

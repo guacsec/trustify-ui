@@ -24,7 +24,7 @@ test("Product-Component / CDX / Product SBOM provides information from component
   const urlEncodedProductCpe = encodeURIComponent(cdxProductCpeNoSpecialChars);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedProductCpe}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedProductCpe}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -62,7 +62,7 @@ test("Product-Component / SPDX / Product SBOM provides information from componen
   const urlEncodedProductCpe = encodeURIComponent(spdxProductCpeNoSpecialChars);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedProductCpe}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedProductCpe}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -87,7 +87,7 @@ test.skip("Product-Component / SPDX / Component SBOM provides information from p
   const urlEncodedComponentPurl = encodeURIComponent(spdxComponentPurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedComponentPurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedComponentPurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(

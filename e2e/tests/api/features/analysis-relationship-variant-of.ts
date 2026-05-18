@@ -17,7 +17,7 @@ test("Variant of / CDX / Binary image has ancestors that include index image / G
   const urlEncodedBinaryImagePurl = encodeURIComponent(cdxBinaryImagePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -41,7 +41,7 @@ test("Variant of / CDX / Index image has descendants that include binary image /
   const urlEncodedIndexImagePurl = encodeURIComponent(cdxIndexImagePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -65,7 +65,7 @@ test("Variant of / SPDX / Binary image has ancestors that include index image / 
   const urlEncodedBinaryImagePurl = encodeURIComponent(spdxBinaryImagePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
+    `/api/v3/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
   );
 
   expect(response.data.items).toEqual(
@@ -89,7 +89,7 @@ test("Variant of / SPDX / Index image has descendants that include binary image 
   const urlEncodedIndexImagePurl = encodeURIComponent(spdxIndexImagePurl);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
+    `/api/v3/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
   );
 
   expect(response.data.items).toEqual(

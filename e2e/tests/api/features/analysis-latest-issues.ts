@@ -54,7 +54,7 @@ test.describe("Analysis / Latest / Issues", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component/${urlEncodedComponentCpe}?descendants=100`,
+          `/api/v3/analysis/latest/component/${urlEncodedComponentCpe}?descendants=100`,
         );
 
         expect(response.data.items).toEqual(
@@ -106,7 +106,7 @@ test.describe("Analysis / Latest / Issues", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?ancestors=100&q=purl~${urlEncodedComponentPurl}&limit=100&offset=0`,
+          `/api/v3/analysis/latest/component?ancestors=100&q=purl~${urlEncodedComponentPurl}&limit=100&offset=0`,
         );
 
         expect(response.data.items).toEqual(
@@ -182,7 +182,7 @@ test.describe("Analysis / Latest / Issues", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&limit=100&ancestors=100`,
+          `/api/v3/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&limit=100&ancestors=100`,
         );
 
         // The SBOM containing this product has incorrect creator data and therefore should not be included in the results.

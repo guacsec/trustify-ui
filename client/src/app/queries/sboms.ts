@@ -15,7 +15,6 @@ import {
   type IngestResult,
   type Labels,
   type SbomHead,
-  type SbomSummary,
   bulkUpdateSbomGroupAssignments,
   deleteSbom,
   downloadSbom,
@@ -25,8 +24,8 @@ import {
   listModels,
   listRelatedSboms,
   listSbomLabels,
+  listSboms,
   updateSbomLabels,
-  v2ListSboms,
 } from "@app/client";
 import { useUpload } from "@app/hooks/useUpload";
 
@@ -69,7 +68,7 @@ export const useFetchSBOMs = (
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
     queryFn: () =>
-      v2ListSboms({
+      listSboms({
         client,
         query: {
           ...rest,
@@ -120,12 +119,12 @@ export const useFetchSBOMById = (
 };
 
 export const useDeleteSbomMutation = (
-  onSuccess: (sbom: SbomSummary) => void,
+  onSuccess: (sbom: SbomHead) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (sbom: SbomSummary) => {
+    mutationFn: async (sbom: SbomHead) => {
       await deleteSbom({ client, path: { id: sbom.id } });
     },
     onSuccess: async (_, sbom) => {

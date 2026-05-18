@@ -11,12 +11,7 @@ import {
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
-import type {
-  SbomHead,
-  SbomPackage,
-  SbomSummary,
-  SourceDocument,
-} from "@app/client";
+import type { SbomHead, SourceDocument } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   type BulkSelectionValues,
@@ -33,7 +28,15 @@ import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 
 interface ISbomSearchContext {
   tableControls: ITableControls<
-    SbomSummary,
+    SbomHead &
+      SourceDocument & {
+        described_by: Array<{
+          group?: string | null;
+          id: string;
+          name: string;
+          version?: string | null;
+        }>;
+      },
     | "name"
     | "version"
     | "packages"
@@ -51,7 +54,12 @@ interface ISbomSearchContext {
     controls: BulkSelectionValues<
       SbomHead &
         SourceDocument & {
-          described_by: Array<SbomPackage>;
+          described_by: Array<{
+            group?: string | null;
+            id: string;
+            name: string;
+            version?: string | null;
+          }>;
         }
     >;
   };
