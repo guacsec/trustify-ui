@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Test
-        run: npm run test -- run --coverage
+        run: npm run test
       - name: Lint
         run: npm run lint
       - name: Format
