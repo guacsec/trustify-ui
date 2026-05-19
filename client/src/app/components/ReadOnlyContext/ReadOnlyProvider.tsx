@@ -21,4 +21,3 @@ export const ReadOnlyProvider: React.FunctionComponent<IReadOnlyProvider> = ({
     </ReadOnlyContext.Provider>
   );
 };
-

@@ -21,7 +21,7 @@ import { useUploadAdvisory } from "@app/queries/advisories";
 import { Paths } from "@app/Routes";
 
 export const AdvisoryUpload: React.FC = () => {
-  const { isReadOnly } = React.useContext(ReadOnlyContext);;
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } = useUploadAdvisory();
 
   return (
