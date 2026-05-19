@@ -3,7 +3,7 @@ import { Content, PageSection } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
-import { ModelSearchProvider } from "./model-context";
+import { ModelSearchProvider } from "./model-provider";
 import { ModelTable } from "./model-table";
 import { ModelToolbar } from "./model-toolbar";
 

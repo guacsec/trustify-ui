@@ -1,49 +1,21 @@
 import React, { useMemo } from "react";
 
-import type { AxiosError } from "axios";
-
 import {
   FILTER_NULL_VALUE,
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
-import type { Group, PaginatedResultsGroupDetails } from "@app/client";
+import type { Group } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
   getHubRequestParams,
-  type ITableControls,
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchSBOMGroups } from "@app/queries/sbom-groups";
 
+import { type SbomGroupItem, SbomGroupsContext } from "./sbom-groups-context";
 import { findRootGroups } from "./utils";
-
-export type SbomGroupItem = PaginatedResultsGroupDetails["items"][number];
-
-interface ITreeExpansionState {
-  isNodeExpanded: (node: SbomGroupItem) => boolean;
-  toggleExpandedNodes: (node: SbomGroupItem) => void;
-}
-
-interface ISbomGroupsContext {
-  tableControls: ITableControls<SbomGroupItem, "name", "name", "", string>;
-
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-
-  treeExpansion: ITreeExpansionState;
-
-  // Group Form Modal
-  groupCreateUpdateModalState: "create" | Group | null;
-  setGroupCreateUpdateModalState: (value: "create" | Group | null) => void;
-}
-
-const contextDefaultValue = {} as ISbomGroupsContext;
-
-export const SbomGroupsContext =
-  React.createContext<ISbomGroupsContext>(contextDefaultValue);
 
 interface ISbomGroupsProvider {
   children: React.ReactNode;

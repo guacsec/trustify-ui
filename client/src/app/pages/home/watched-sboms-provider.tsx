@@ -9,18 +9,7 @@ import {
   useUpdateWatchedSbomsMutation,
 } from "@app/queries/dashboard";
 
-interface IWatchedSbomsContext {
-  sboms?: WatchedSboms;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-  mutatingKeys: ReadonlySet<string>;
-  patch: (key: string, value: string | null) => void;
-}
-
-const contextDefaultValue = {} as IWatchedSbomsContext;
-
-export const WatchedSbomsContext =
-  React.createContext<IWatchedSbomsContext>(contextDefaultValue);
+import { WatchedSbomsContext } from "./watched-sboms-context";
 
 interface IWatchedSbomsProvider {
   children: React.ReactNode;

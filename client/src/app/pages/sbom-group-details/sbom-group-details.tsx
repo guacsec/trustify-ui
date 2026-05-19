@@ -16,7 +16,7 @@ import { PathParam, Paths, useRouteParams } from "@app/Routes";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { useSuspenseSBOMGroupById } from "@app/queries/sbom-groups";
 
-import { SbomSearchProvider } from "../sbom-list/sbom-context";
+import { SbomSearchProvider } from "../sbom-list/sbom-provider";
 import { SbomTable } from "../sbom-list/sbom-table";
 import { SbomToolbar } from "../sbom-list/sbom-toolbar";
 

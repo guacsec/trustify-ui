@@ -1,38 +1,19 @@
 import React from "react";
-import type { AxiosError } from "axios";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
+import type { LicenseText } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
-  type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchLicenses } from "@app/queries/licenses";
-import type { LicenseText } from "@app/client";
 
-interface ILicenseSearchContext {
-  tableControls: ITableControls<
-    LicenseText,
-    "name" | "packages" | "sboms",
-    "name",
-    "" | "packages" | "sboms",
-    string
-  >;
-
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-}
-
-const contextDefaultValue = {} as ILicenseSearchContext;
-
-export const LicenseSearchContext =
-  React.createContext<ILicenseSearchContext>(contextDefaultValue);
+import { LicenseSearchContext } from "./license-context";
 
 interface ILicenseProvider {
   children: React.ReactNode;

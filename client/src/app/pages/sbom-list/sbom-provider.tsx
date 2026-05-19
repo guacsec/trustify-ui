@@ -1,6 +1,5 @@
 import React from "react";
 
-import type { AxiosError } from "axios";
 import { useDebounceValue } from "usehooks-ts";
 
 import {
@@ -11,14 +10,9 @@ import {
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
-import type { SbomHead, SourceDocument } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
+import { useBulkSelection } from "@app/hooks/selection";
 import {
-  type BulkSelectionValues,
-  useBulkSelection,
-} from "@app/hooks/selection";
-import {
-  type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
@@ -26,53 +20,7 @@ import {
 import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchSBOMLabels, useFetchSBOMs } from "@app/queries/sboms";
 
-interface ISbomSearchContext {
-  tableControls: ITableControls<
-    SbomHead &
-      SourceDocument & {
-        described_by: Array<{
-          group?: string | null;
-          id: string;
-          name: string;
-          version?: string | null;
-        }>;
-      },
-    | "name"
-    | "version"
-    | "packages"
-    | "published"
-    | "supplier"
-    | "labels"
-    | "vulnerabilities",
-    "name" | "published",
-    "" | "published" | "labels" | "license",
-    string
-  >;
-
-  bulkSelection: {
-    isEnabled: boolean;
-    controls: BulkSelectionValues<
-      SbomHead &
-        SourceDocument & {
-          described_by: Array<{
-            group?: string | null;
-            id: string;
-            name: string;
-            version?: string | null;
-          }>;
-        }
-    >;
-  };
-
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-}
-
-const contextDefaultValue = {} as ISbomSearchContext;
-
-export const SbomSearchContext =
-  React.createContext<ISbomSearchContext>(contextDefaultValue);
+import { SbomSearchContext } from "./sbom-context";
 
 interface ISbomProvider {
   sbomGroupId?: string;

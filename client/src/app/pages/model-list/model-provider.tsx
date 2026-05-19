@@ -1,5 +1,4 @@
 import React from "react";
-import type { AxiosError } from "axios";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
@@ -7,32 +6,13 @@ import {
 } from "@app/Constants";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
-  type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchAllModels } from "@app/queries/models";
-import type { SbomModel } from "@app/client";
 
-interface IModelSearchContext {
-  tableControls: ITableControls<
-    SbomModel,
-    "name" | "suppliedBy" | "licenses" | "sboms",
-    "name",
-    "",
-    string
-  >;
-
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-}
-
-const contextDefaultValue = {} as IModelSearchContext;
-
-export const ModelSearchContext =
-  React.createContext<IModelSearchContext>(contextDefaultValue);
+import { ModelSearchContext } from "./model-context";
 
 interface IModelProvider {
   children: React.ReactNode;

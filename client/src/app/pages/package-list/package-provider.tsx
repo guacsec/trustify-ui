@@ -1,17 +1,13 @@
 import React from "react";
 
-import type { AxiosError } from "axios";
 import { useDebounceValue } from "usehooks-ts";
 
 import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
 } from "@app/Constants";
-import type { DecomposedPurl } from "@app/api/models";
-import type { PurlSummary } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
-  type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
@@ -20,35 +16,7 @@ import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchPackages } from "@app/queries/packages";
 import { decomposePurl } from "@app/utils/utils";
 
-export interface PackageTableData extends PurlSummary {
-  decomposedPurl?: DecomposedPurl;
-}
-
-interface IPackageSearchContext {
-  tableControls: ITableControls<
-    PackageTableData,
-    | "name"
-    | "namespace"
-    | "version"
-    | "type"
-    | "licenses"
-    | "path"
-    | "qualifiers"
-    | "vulnerabilities",
-    "name" | "namespace" | "version",
-    "" | "type" | "arch" | "license",
-    string
-  >;
-
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-}
-
-const contextDefaultValue = {} as IPackageSearchContext;
-
-export const PackageSearchContext =
-  React.createContext<IPackageSearchContext>(contextDefaultValue);
+import { type PackageTableData, PackageSearchContext } from "./package-context";
 
 interface IPackageProvider {
   children: React.ReactNode;
