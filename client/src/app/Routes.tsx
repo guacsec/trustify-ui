@@ -12,6 +12,7 @@ import { LazyRouteElement } from "@app/components/LazyRouteElement";
 import App from "./App";
 import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 
+/* eslint-disable react-refresh/only-export-components */
 const Home = lazy(() => import("./pages/home"));
 
 // Advisory
@@ -45,6 +46,7 @@ const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
 const ModelList = lazy(() => import("./pages/model-list"));
 const NotFound = lazy(() => import("./pages/not-found"));
+/* eslint-enable react-refresh/only-export-components */
 
 export enum PathParam {
   ADVISORY_ID = "advisoryId",

@@ -16,10 +16,10 @@ import {
 import type { Group } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
-import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
+import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
   readOnlyActionProps,
-  useReadOnlyContext,
+  ReadOnlyContext,
 } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { TableCellError } from "@app/components/TableCellError";
@@ -155,7 +155,7 @@ const SbomGroupRow: React.FC<{
     isExpanded || hasBeenExpanded.current,
   );
 
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   const actions: IAction[] = [
     {

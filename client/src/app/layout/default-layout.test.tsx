@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { type MockedFunction, vi } from "vitest";
 
-import * as ReadOnlyContextModule from "@app/components/ReadOnlyContext";
+import * as ReadOnlyContextModule from "@app/components/ReadOnlyContext/ReadOnlyContext";
 
 import { DefaultLayout } from "./default-layout";
 

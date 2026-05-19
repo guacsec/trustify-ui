@@ -15,7 +15,7 @@ import { KebabDropdown } from "@app/components/KebabDropdown";
 import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import {
   READ_ONLY_TOOLTIP,
-  useReadOnlyContext,
+  ReadOnlyContext,
 } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
@@ -35,7 +35,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   // Create Form Modal
   const [saveGroupModalState, setSaveGroupModalState] = React.useState<

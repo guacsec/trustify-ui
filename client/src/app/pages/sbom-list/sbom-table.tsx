@@ -22,7 +22,7 @@ import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
   readOnlyActionProps,
-  useReadOnlyContext,
+  ReadOnlyContext,
 } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
@@ -46,7 +46,7 @@ import { SbomSearchContext } from "./sbom-context";
 
 export const SbomTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   const {
     isFetching,

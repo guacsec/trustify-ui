@@ -99,7 +99,7 @@ type FormValues = {
   onlyPatterns: { value: string }[];
 };
 
-export const ALL_IMPORTERS = ["sbom", "csaf", "osv", "cve"] as const;
+const ALL_IMPORTERS = ["sbom", "csaf", "osv", "cve"] as const;
 type ImporterType = (typeof ALL_IMPORTERS)[number];
 
 export interface IImporterFormProps {
