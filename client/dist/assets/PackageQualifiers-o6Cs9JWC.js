@@ -1,0 +1,1 @@
+import{t as e}from"./react-CZ6626r7.js";import{gt as t}from"./useBranding-DBkKVoct.js";var n=e(),r=({value:e})=>(0,n.jsx)(n.Fragment,{children:Object.entries(e).map(([e,r])=>(0,n.jsx)(t,{isCompact:!0,children:`${e}=${r}`},`${e}=${r}`))});export{r as t};

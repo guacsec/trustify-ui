@@ -1,1 +1,0 @@
-import{t as e}from"./react-CZ6626r7.js";import{cn as t,un as n}from"./useBranding-DRmeEJXg.js";import{a as r,s as i}from"./index-CKbg2GUm.js";var a=e(),o=e=>{let{isReadOnly:o}=i();return o?(0,a.jsx)(t,{content:r,children:(0,a.jsx)(n,{...e,isAriaDisabled:!0})}):(0,a.jsx)(n,{...e})};export{o as t};
