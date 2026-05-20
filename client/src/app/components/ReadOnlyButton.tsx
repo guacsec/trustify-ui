@@ -1,12 +1,12 @@
-import type React from "react";
+import React from "react";
 
 import { Button, type ButtonProps, Tooltip } from "@patternfly/react-core";
 
-import { READ_ONLY_TOOLTIP, useReadOnlyContext } from "./ReadOnlyContext";
+import { READ_ONLY_TOOLTIP, ReadOnlyContext } from "./ReadOnlyContext";
 
 /** Button that is automatically aria-disabled with a tooltip when the instance is in read-only mode. */
 export const ReadOnlyButton: React.FC<ButtonProps> = (props) => {
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   if (isReadOnly) {
     return (

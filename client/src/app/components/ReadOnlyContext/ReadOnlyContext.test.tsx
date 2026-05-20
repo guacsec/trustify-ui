@@ -1,9 +1,11 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { type MockedFunction, vi } from "vitest";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { ReadOnlyProvider, useReadOnlyContext } from "./ReadOnlyContext";
+import { ReadOnlyContext } from "./ReadOnlyContext";
+import { ReadOnlyProvider } from "./ReadOnlyProvider";
 
 import * as trustifyInfoModule from "@app/queries/trustifyInfo";
 
@@ -15,7 +17,7 @@ const mockedUseFetchTrustifyInfo =
   >;
 
 const ReadOnlyConsumer: React.FC = () => {
-  const { isReadOnly, isLoading } = useReadOnlyContext();
+  const { isReadOnly, isLoading } = React.useContext(ReadOnlyContext);
   return (
     <div>
       <span data-testid="read-only">{String(isReadOnly)}</span>

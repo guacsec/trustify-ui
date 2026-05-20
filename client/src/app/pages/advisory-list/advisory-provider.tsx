@@ -1,7 +1,5 @@
 import React from "react";
 
-import type { AxiosError } from "axios";
-
 import {
   FILTER_TEXT_CATEGORY_KEY,
   TablePersistenceKeyPrefixes,
@@ -10,10 +8,8 @@ import {
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
-import type { AdvisorySummary } from "@app/client";
 import { FilterType } from "@app/components/FilterToolbar";
 import {
-  type ITableControls,
   getHubRequestParams,
   useTableControlProps,
   useTableControlState,
@@ -22,24 +18,8 @@ import {
   useFetchAdvisories,
   useFetchAdvisoryLabels,
 } from "@app/queries/advisories";
-interface IAdvisorySearchContext {
-  tableControls: ITableControls<
-    AdvisorySummary,
-    "identifier" | "title" | "type" | "labels" | "modified" | "vulnerabilities",
-    "identifier" | "modified",
-    "" | "average_severity" | "modified" | "labels",
-    string
-  >;
 
-  totalItemCount: number;
-  isFetching: boolean;
-  fetchError: AxiosError | null;
-}
-
-const contextDefaultValue = {} as IAdvisorySearchContext;
-
-export const AdvisorySearchContext =
-  React.createContext<IAdvisorySearchContext>(contextDefaultValue);
+import { AdvisorySearchContext } from "./advisory-context";
 
 interface IAdvisoryProvider {
   children: React.ReactNode;

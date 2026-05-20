@@ -4,7 +4,7 @@ import { PageSection, Stack, StackItem } from "@patternfly/react-core";
 
 import { MonitoringSection } from "./components/MonitoringSection";
 import { WatchedSbomsSection } from "./components/WatchedSbomsSection";
-import { WatchedSbomsProvider } from "./watched-sboms-context";
+import { WatchedSbomsProvider } from "./watched-sboms-provider";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const Home: React.FC = () => {

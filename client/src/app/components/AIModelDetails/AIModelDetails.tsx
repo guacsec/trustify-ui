@@ -17,33 +17,13 @@ import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external
 
 import type { SbomModel } from "@app/client";
 
-export interface ModelProperties {
-  version?: string;
-  licenses?: string;
-  bomFormat?: string;
-  suppliedBy?: string;
-  specVersion?: string;
-  typeOfModel?: string;
-  serialNumber?: string;
-  primaryPurpose?: string;
-  downloadLocation?: string;
-  external_references?: string;
-  limitation?: string;
-  safetyRiskAssessment?: string;
-}
+import { getModelProperties } from "./utils";
 
 export interface ExternalReference {
   type: string;
   url: string;
   comment?: string;
 }
-
-export const getModelProperties = (properties: unknown): ModelProperties => {
-  if (properties && typeof properties === "object") {
-    return properties as ModelProperties;
-  }
-  return {};
-};
 
 const parseExternalReferences = (json?: string): ExternalReference[] => {
   if (!json) return [];

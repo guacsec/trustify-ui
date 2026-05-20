@@ -38,7 +38,7 @@ import {
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
   readOnlyActionProps,
-  useReadOnlyContext,
+  ReadOnlyContext,
 } from "@app/components/ReadOnlyContext";
 import {
   useFetchImporterReports,
@@ -87,7 +87,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";

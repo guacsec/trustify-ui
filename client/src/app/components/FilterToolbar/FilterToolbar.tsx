@@ -15,6 +15,7 @@ import FilterIcon from "@patternfly/react-icons/dist/esm/icons/filter-icon";
 
 import { FilterControl } from "./FilterControl";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export enum FilterType {
   select = "select",
   multiselect = "multiselect",
@@ -129,6 +130,7 @@ export type IFilterValues<TFilterCategoryKey extends string> = Partial<
   Record<TFilterCategoryKey, FilterValue>
 >;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const getFilterLogicOperator = <
   TItem,
   TFilterCategoryKey extends string,

@@ -1,11 +1,11 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
-import { type MockedFunction, vi } from "vitest";
+import { vi } from "vitest";
 
-import * as ReadOnlyContextModule from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 
 import { DefaultLayout } from "./default-layout";
 
-vi.mock("@app/components/ReadOnlyContext");
 vi.mock("./header", () => ({
   HeaderApp: () => <div data-testid="header" />,
 }));
@@ -33,39 +33,26 @@ vi.mock("@patternfly/react-core", async () => {
   };
 });
 
-const mockedUseReadOnlyContext =
-  ReadOnlyContextModule.useReadOnlyContext as MockedFunction<
-    typeof ReadOnlyContextModule.useReadOnlyContext
-  >;
-
-const renderLayout = () => {
+const renderLayout = (isReadOnly: boolean) => {
   return render(
-    <DefaultLayout>
-      <div data-testid="page-content">Page content</div>
-    </DefaultLayout>,
+    <ReadOnlyContext.Provider value={{ isReadOnly, isLoading: false }}>
+      <DefaultLayout>
+        <div data-testid="page-content">Page content</div>
+      </DefaultLayout>
+    </ReadOnlyContext.Provider>,
   );
 };
 
 describe("DefaultLayout", () => {
   it("shows a read-only banner when isReadOnly is true", () => {
-    mockedUseReadOnlyContext.mockReturnValue({
-      isReadOnly: true,
-      isLoading: false,
-    });
-
-    renderLayout();
+    renderLayout(true);
 
     expect(screen.getByText(/running in read-only mode/i)).toBeInTheDocument();
     expect(screen.getByTestId("page-content")).toBeInTheDocument();
   });
 
   it("does not show a banner when isReadOnly is false", () => {
-    mockedUseReadOnlyContext.mockReturnValue({
-      isReadOnly: false,
-      isLoading: false,
-    });
-
-    renderLayout();
+    renderLayout(false);
 
     expect(
       screen.queryByText(/running in read-only mode/i),

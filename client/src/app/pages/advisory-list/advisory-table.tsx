@@ -27,10 +27,10 @@ import {
 import type { AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LabelsAsList } from "@app/components/LabelsAsList.tsx";
-import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
+import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
   readOnlyActionProps,
-  useReadOnlyContext,
+  ReadOnlyContext,
 } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
@@ -50,7 +50,7 @@ import { advisoryDeleteDialogProps } from "@app/Constants";
 
 export const AdvisoryTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   const { isFetching, fetchError, tableControls } = React.useContext(
     AdvisorySearchContext,

@@ -56,7 +56,6 @@ export default defineConfig([
       "@tanstack/query/prefer-query-options": "off",
       "@tanstack/query/exhaustive-deps": "off",
       "@tanstack/query/no-void-query-fn": "off",
-      "react-refresh/only-export-components": "off",
     },
     ignores: [
       "client/config/**",
