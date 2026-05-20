@@ -23,7 +23,18 @@ dist/
 .env.test.local
 .env.production.local
 
+*.log
 npm-debug.log*
+
+# npm
+.npm/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# editor swap files
+*.swp
+*.swo
 
 .eslintcache
 
