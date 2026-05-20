@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-S-ySWqyJ.js";import{i as t,t as n}from"./react-CZ6626r7.js";import{cn as r,un as i}from"./useBranding-DBkKVoct.js";import{a,s as o}from"./index-DIKP4LEk.js";var s=e(t(),1),c=n(),l=e=>{let{isReadOnly:t}=s.useContext(o);return t?(0,c.jsx)(r,{content:a,children:(0,c.jsx)(i,{...e,isAriaDisabled:!0})}):(0,c.jsx)(i,{...e})};export{l as t};
