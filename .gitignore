@@ -55,3 +55,7 @@ test_suite_analysis/
 .claude/settings.local.json
 .serena/
 .playwright-mcp/
+
+# AgentReady
+.agentready/*.md
+.agentready/*.html
