@@ -43,11 +43,11 @@ npm ci
 # Development server (builds common, runs client on :3000)
 npm run start:dev
 
-# Type check and lint (runs Biome with --error-on-warnings)
-npm run check
+# Type check and lint
+npm run lint
 
 # Auto-fix lint and format
-npm run check:write
+npm run lint:fix
 npm run format:fix
 
 # Unit tests (Jest)
@@ -120,7 +120,7 @@ See [CONVENTIONS.md § Page Patterns](CONVENTIONS.md#page-patterns) for canonica
 
 ## Testing Expectations
 
-### Unit Tests (Jest)
+### Unit Tests (Vitest)
 
 - Run with `npm test`
 - Test files colocated with source code (`.test.ts`, `.test.tsx`)
@@ -160,7 +160,7 @@ Authentication is optional (controlled by `AUTH_REQUIRED` env var).
 
 ## Before Finishing Work
 
-- [ ] Run `npm run check` — must pass with no warnings
+- [ ] Run `npm run lint` — must pass with no warnings
 - [ ] Run `npm run format:fix` if formatting issues exist
 - [ ] Run `npm test` if touching shared code or hooks
 - [ ] Run `npm run e2e:test:ui` if touching UI flows (or relevant subset)
@@ -172,7 +172,7 @@ Authentication is optional (controlled by `AUTH_REQUIRED` env var).
 ## PR Definition of Done
 
 - [ ] Code follows existing architecture and naming conventions
-- [ ] All linting and formatting checks pass (`npm run check`)
+- [ ] All linting and formatting checks pass (`npm run lint`)
 - [ ] Tests pass (unit and/or E2E as appropriate)
 - [ ] No new dependencies added without justification
 - [ ] Auto-generated files not manually edited
