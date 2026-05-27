@@ -77,12 +77,12 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
           browseButtonText="Browse Files"
         />
       ) : (
-        Array.from(uploads.entries()).map(([file, upload], index) => {
+        Array.from(uploads.entries()).map((\1) => {
           if (upload.error) {
             if (upload.wasCancelled) {
               return (
                 <EmptyState
-                  key={`${file.name}-${index}-cancelled`}
+                  key={\`\${file.name}-\${file.size}-cancelled\`}
                   status="danger"
                   headingLevel="h4"
                   titleText="Upload cancelled"

@@ -15,13 +15,13 @@ export const TableHeaderContentWithControls: React.FC<
     {Array(numColumnsBeforeData)
       .fill(null)
       .map((_, i) => (
-        <Th screenReaderText={`before-data-${i}`} key={i} />
+        <Th screenReaderText={`before-data-${i}`} key={`before-data-${i}`} />
       ))}
     {children}
     {Array(numColumnsAfterData)
       .fill(null)
       .map((_, i) => (
-        <Th screenReaderText={`after-data-${i}`} key={i} />
+        <Th screenReaderText={`after-data-${i}`} key={`after-data-${i}`} />
       ))}
   </>
 );
