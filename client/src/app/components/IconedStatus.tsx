@@ -41,6 +41,60 @@ export interface IIconedStatusProps {
   tooltipCount?: number;
 }
 
+const presets: IconedStatusPresetType = {
+  Canceled: {
+    icon: <TimesCircleIcon />,
+    status: "info",
+    label: "Canceled",
+  },
+  Completed: {
+    icon: <CheckCircleIcon />,
+    status: "success",
+    label: "Completed",
+  },
+  Error: {
+    icon: <ExclamationCircleIcon />,
+    status: "danger",
+    label: "Error",
+  },
+  Failed: {
+    icon: <ExclamationCircleIcon />,
+    status: "danger",
+    label: "Failed",
+  },
+  InProgress: {
+    icon: <InProgressIcon />,
+    status: "info",
+    label: "In-progress",
+  },
+  NotStarted: {
+    icon: <TimesCircleIcon />,
+    label: "Not started",
+  },
+  Ok: {
+    icon: <CheckCircleIcon />,
+    status: "success",
+  },
+  Scheduled: {
+    icon: <PendingIcon />,
+    status: "info",
+    label: "Scheduled",
+  },
+  Unknown: {
+    icon: <UnknownIcon />,
+  },
+};
+
+const IconWithOptionalTooltip: React.FC<{
+  tooltipMessage?: string;
+  children: React.ReactElement;
+}> = ({ tooltipMessage, children }) =>
+  tooltipMessage ? (
+    <Tooltip content={tooltipMessage}>{children}</Tooltip>
+  ) : (
+    children
+  );
+
 export const IconedStatus: React.FC<IIconedStatusProps> = ({
   preset,
   status,
@@ -48,58 +102,7 @@ export const IconedStatus: React.FC<IIconedStatusProps> = ({
   className = "",
   label,
 }: IIconedStatusProps) => {
-  const presets: IconedStatusPresetType = {
-    Canceled: {
-      icon: <TimesCircleIcon />,
-      status: "info",
-      label: "Canceled",
-    },
-    Completed: {
-      icon: <CheckCircleIcon />,
-      status: "success",
-      label: "Completed",
-    },
-    Error: {
-      icon: <ExclamationCircleIcon />,
-      status: "danger",
-      label: "Error",
-    },
-    Failed: {
-      icon: <ExclamationCircleIcon />,
-      status: "danger",
-      label: "Failed",
-    },
-    InProgress: {
-      icon: <InProgressIcon />,
-      status: "info",
-      label: "In-progress",
-    },
-    NotStarted: {
-      icon: <TimesCircleIcon />,
-      label: "Not started",
-    },
-    Ok: {
-      icon: <CheckCircleIcon />,
-      status: "success",
-    },
-    Scheduled: {
-      icon: <PendingIcon />,
-      status: "info",
-      label: "Scheduled",
-    },
-    Unknown: {
-      icon: <UnknownIcon />,
-    },
-  };
   const presetProps = preset && presets[preset];
-  const IconWithOptionalTooltip: React.FC<{ children: React.ReactElement }> = ({
-    children,
-  }) =>
-    presetProps?.tooltipMessage ? (
-      <Tooltip content={presetProps?.tooltipMessage}>{children}</Tooltip>
-    ) : (
-      children
-    );
 
   return (
     <Flex
@@ -107,7 +110,7 @@ export const IconedStatus: React.FC<IIconedStatusProps> = ({
       spaceItems={{ default: "spaceItemsSm" }}
     >
       <FlexItem>
-        <IconWithOptionalTooltip>
+        <IconWithOptionalTooltip tooltipMessage={presetProps?.tooltipMessage}>
           <Icon status={status || presetProps?.status} className={className}>
             {icon || presetProps?.icon || <UnknownIcon />}
           </Icon>
