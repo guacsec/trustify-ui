@@ -13,7 +13,6 @@ Four npm workspaces:
 - **`common/`** — Shared ESM module for environment config and branding
   - Exports `TrustificationEnvType`, `encodeEnv`, `decodeEnv`, branding assets
   - Built with Rollup to both ESM (.mjs) and CommonJS (.cjs)
-  
 - **`client/`** — React SPA
   - Tech: React 19, TypeScript, Rsbuild (Rspack), PatternFly 6
   - Dev server: port 3000 with proxy to backend
@@ -26,9 +25,7 @@ Four npm workspaces:
     - `@app/api/` — custom REST calls (uploads, downloads)
     - `@app/client/` — **auto-generated API client (DO NOT EDIT)**
     - `@app/axios-config/` — Axios instance and interceptors
-  
 - **`server/`** — Express.js production server (proxying, env injection)
-  
 - **`e2e/`** — Playwright end-to-end tests
   - `tests/ui/features/` — BDD .feature files (Gherkin)
   - `tests/ui/pages/` — Page Object Model classes
@@ -120,13 +117,13 @@ See [CONVENTIONS.md § Page Patterns](CONVENTIONS.md#page-patterns) for canonica
 
 ## Testing Expectations
 
-### Unit Tests (Vitest)
+### Unit Tests
 
 - Run with `npm test`
 - Test files colocated with source code (`.test.ts`, `.test.tsx`)
 - Mock API calls and use React Testing Library for component tests
 
-### E2E Tests (Playwright)
+### E2E Tests
 
 - **Two test styles**:
   1. BDD features (`.feature` files + `.step.ts` step definitions)
