@@ -80,6 +80,7 @@ export const usePersistentState = <
     persistenceKeyPrefix ? `${persistenceKeyPrefix}:${key}` : key;
 
   const persistence = {
+    // eslint-disable-next-line @eslint-react/use-state -- intentionally stored as tuple in persistence map
     state: React.useState(defaultValue),
     urlParams: useUrlParams(
       isUrlParamsOptions(options)

@@ -20,7 +20,7 @@ export const WatchedSbomsProvider: React.FunctionComponent<
 > = ({ children }) => {
   const { pushNotification } = React.useContext(NotificationsContext);
   const [mutatingKeys, setMutatingKeys] = React.useState<ReadonlySet<string>>(
-    new Set(),
+    () => new Set(),
   );
   const { sboms, isFetching, fetchError } = useFetchWatchedSboms();
 
