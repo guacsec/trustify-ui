@@ -40,7 +40,6 @@ export default defineConfig([
       "@eslint-react/naming-convention-ref-name": "off",
       "@eslint-react/no-array-index-key": "off",
       "@eslint-react/use-state": "off",
-      "@eslint-react/no-unnecessary-use-prefix": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@eslint-react/static-components": "off",
       "@eslint-react/exhaustive-deps": "off",

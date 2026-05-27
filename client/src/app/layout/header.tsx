@@ -37,7 +37,7 @@ import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external
 import { ThemeSelector } from "tsd-ui";
 
 import { isAuthRequired } from "@app/Constants";
-import useBranding from "@app/hooks/useBranding";
+import getBranding from "@app/hooks/getBranding";
 import { oidcSignoutArgs } from "@app/oidc";
 
 import imgAvatar from "../images/avatar.svg";
@@ -46,7 +46,7 @@ import { AboutApp } from "./about";
 export const HeaderApp: React.FC = () => {
   const {
     masthead: { leftBrand, leftTitle, rightBrand, supportUrl },
-  } = useBranding();
+  } = getBranding();
 
   const auth = (isAuthRequired && useAuth()) || undefined;
 
