@@ -73,7 +73,7 @@ export const parseMaybeNumericString = (
   return Number.isNaN(num) ? numOrStr : num;
 };
 
-export const objectKeys = <T extends Object>(obj: T) =>
+export const objectKeys = <T extends object>(obj: T) =>
   Object.keys(obj) as (keyof T)[];
 
 export const getValidatedFromErrors = (
