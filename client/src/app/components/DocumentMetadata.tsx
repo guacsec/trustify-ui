@@ -1,4 +1,4 @@
-import getBranding from "@app/hooks/getBranding";
+import getBranding from "@app/hooks/useBranding";
 
 export const DocumentMetadata = ({ title }: { title?: string }) => {
   const branding = getBranding();
