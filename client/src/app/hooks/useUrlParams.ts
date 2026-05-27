@@ -111,8 +111,8 @@ export const useUrlParams = <
   }
 
   React.useEffect(() => {
+    // eslint-disable-next-line @eslint-react/exhaustive-deps -- setParams and defaultValue are stable per-mount; including them causes render loops
     if (allParamsEmpty) setParams(defaultValue);
-    // Leaving this rule enabled results in a cascade of unnecessary useCallbacks:
   }, [allParamsEmpty]);
 
   return [params, setParams];
