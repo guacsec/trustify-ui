@@ -36,7 +36,6 @@ export default defineConfig([
       "@eslint-react/set-state-in-effect": "off",
       "@eslint-react/no-use-context": "off",
       "@eslint-react/no-context-provider": "off",
-      "@eslint-react/rules-of-hooks": "off",
       "@eslint-react/naming-convention-ref-name": "off",
       "@eslint-react/no-array-index-key": "off",
       "@eslint-react/use-state": "off",

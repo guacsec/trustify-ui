@@ -48,7 +48,8 @@ export const HeaderApp: React.FC = () => {
     masthead: { leftBrand, leftTitle, rightBrand, supportUrl },
   } = useBranding();
 
-  const auth = (isAuthRequired && useAuth()) || undefined;
+  const authFromHook = useAuth();
+  const auth = isAuthRequired ? authFromHook : undefined;
 
   const navigate = useNavigate();
 
