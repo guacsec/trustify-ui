@@ -96,8 +96,8 @@ export const AdvisoryDetails: React.FC = () => {
     tabKeys: ["info", "vulnerabilities"],
   });
 
-  const infoTabRef = React.createRef<HTMLElement>();
-  const vulnerabilitiesTabRef = React.createRef<HTMLElement>();
+  const infoTabRef = React.useRef<HTMLElement>(null);
+  const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
 
   return (
     <>

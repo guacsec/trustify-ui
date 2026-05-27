@@ -105,10 +105,10 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
     tabKeys: ["sboms", "packages", "vulnerabilities", "advisories"],
   });
 
-  const sbomPopoverRef = React.createRef<HTMLElement>();
-  const packagePopoverRef = React.createRef<HTMLElement>();
-  const vulnerabilityPopoverRef = React.createRef<HTMLElement>();
-  const advisoryPopoverRef = React.createRef<HTMLElement>();
+  const sbomPopoverRef = React.useRef<HTMLElement>(null);
+  const packagePopoverRef = React.useRef<HTMLElement>(null);
+  const vulnerabilityPopoverRef = React.useRef<HTMLElement>(null);
+  const advisoryPopoverRef = React.useRef<HTMLElement>(null);
 
   return (
     <Split hasGutter>

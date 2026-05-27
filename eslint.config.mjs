@@ -34,7 +34,6 @@ export default defineConfig([
     rules: {
       // TODO: Remove these rules incrementally so we have default and more strict linting
       "@eslint-react/set-state-in-effect": "off",
-      "@eslint-react/no-create-ref": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@eslint-react/no-use-context": "off",
       "@eslint-react/no-context-provider": "off",
