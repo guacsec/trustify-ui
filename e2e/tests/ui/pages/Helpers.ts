@@ -34,7 +34,7 @@ export const verifyDownload = async (download: Download): Promise<string> => {
   try {
     filename = download.suggestedFilename();
   } catch (error) {
-    throw new Error(`Download verification failed: ${error}`);
+    throw new Error(`Download verification failed: ${error}`, { cause: error });
   }
   // Return the suggested filename for further assertions
   return filename;

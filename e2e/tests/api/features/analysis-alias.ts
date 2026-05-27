@@ -26,7 +26,7 @@ const componentCpe = ["cpe:/a:redhat:quarkus:2.13:*:el8:*"];
 const componentCpeAliases: string[] = [];
 
 test("Alias / Get aliases by pURL", async ({ axios }) => {
-  var urlEncodedPurl = encodeURIComponent(opensslPurl[0]);
+  const urlEncodedPurl = encodeURIComponent(opensslPurl[0]);
 
   const response = await axios.get(
     `/api/v3/analysis/component/${urlEncodedPurl}`,
@@ -42,7 +42,7 @@ test("Alias / Get aliases by pURL", async ({ axios }) => {
 });
 
 test("Alias / Get aliases by pURL alias", async ({ axios }) => {
-  var urlEncodedPurlAlias = encodeURIComponent(opensslPurlAliases[0]);
+  const urlEncodedPurlAlias = encodeURIComponent(opensslPurlAliases[0]);
 
   const response = await axios.get(
     `/api/v3/analysis/component/${urlEncodedPurlAlias}`,
@@ -59,7 +59,7 @@ test("Alias / Get aliases by pURL alias", async ({ axios }) => {
 
 test("Alias / Get aliases by CPE", async ({ axios }) => {
   // We currently don't have a suitable SBOM for this. At most we can verify that the CPE field is an array, which wasn't the case before this feature was implemented.
-  var urlEncodedCpe = encodeURIComponent("cpe:/a:redhat:quarkus:2.13::el8");
+  const urlEncodedCpe = encodeURIComponent("cpe:/a:redhat:quarkus:2.13::el8");
 
   const response = await axios.get(
     `/api/v3/analysis/component/${urlEncodedCpe}`,
