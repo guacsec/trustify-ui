@@ -48,7 +48,6 @@ export default defineConfig([
       "no-var": "off",
       "@eslint-react/static-components": "off",
       "@eslint-react/exhaustive-deps": "off",
-      "@eslint-react/jsx-no-key-after-spread": "off",
       "@eslint-react/purity": "off",
       "@typescript-eslint/no-wrapper-object-types": "off",
       "preserve-caught-error": "off",
