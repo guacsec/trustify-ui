@@ -440,13 +440,11 @@ export class ToolbarTable {
     for (const header of columnHeaders) {
       for (const order of [`ascending`, `descending`]) {
         const sorted = await this.sortColumn(header, order);
-        sorted
-          ? null
-          : (() => {
-              throw new Error(
-                `Sorting failed for the column ${header} with order ${order}`,
-              );
-            })();
+        if (!sorted) {
+          throw new Error(
+            `Sorting failed for the column ${header} with order ${order}`,
+          );
+        }
         const sourceData = await this.getTableRows(parentElem);
         const sortedData = await this.sortTable(
           await sourceData,

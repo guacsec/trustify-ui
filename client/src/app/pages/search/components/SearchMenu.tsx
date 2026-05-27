@@ -239,7 +239,7 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
           const firstElement = autocompleteRef.current?.querySelector(
             "li > button:not(:disabled)",
           );
-          firstElement && (firstElement as HTMLElement)?.focus();
+          if (firstElement) (firstElement as HTMLElement)?.focus();
           event.preventDefault(); // by default, the up and down arrow keys scroll the window
           // the tab, enter, and space keys will close the menu, and the tab key will move browser
           // focus forward one element (by default)
