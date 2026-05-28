@@ -17,6 +17,8 @@ import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useFetchAdvisoryCsafById } from "@app/queries/advisories";
 
+import { CsafVulnerabilities } from "./csaf-vulnerabilities";
+
 interface CsafAdvisoryDetailsProps {
   advisoryId: string;
 }
@@ -109,7 +111,9 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
             ref={vulnerabilitiesTabRef}
             aria-label="CSAF vulnerabilities"
           >
-            <ComingSoon label="Vulnerabilities" />
+            {csafDocument && (
+              <CsafVulnerabilities csafDocument={csafDocument} />
+            )}
           </TabContent>
           <TabContent
             {...getTabContentProps("product-tree")}
