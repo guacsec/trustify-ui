@@ -390,9 +390,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                       );
                                     } else {
                                       return (
-                                        <Tr
-                                          key={`orphan-${purl.parentName}`}
-                                        >
+                                        <Tr key={`orphan-${purl.parentName}`}>
                                           <Td />
                                           <Td />
                                           <Td>{purl.parentName}</Td>
