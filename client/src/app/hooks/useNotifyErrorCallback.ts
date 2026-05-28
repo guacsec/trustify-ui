@@ -10,8 +10,7 @@ export const useNotifyErrorCallback = <T>(
   const { pushNotification } = React.useContext(NotificationsContext);
 
   return (err: AxiosError, payload: T) => {
-    const title =
-      typeof message === "string" ? message : message(err, payload);
+    const title = typeof message === "string" ? message : message(err, payload);
 
     pushNotification({
       title,
