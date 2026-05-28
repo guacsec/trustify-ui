@@ -179,8 +179,8 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                       value={
                         doc.aggregate_severity.text.toLowerCase() as
                           | "critical"
-                          | "important"
-                          | "moderate"
+                          | "high"
+                          | "medium"
                           | "low"
                           | "none"
                       }
@@ -226,8 +226,8 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                                 value={
                                   severity.toLowerCase() as
                                     | "critical"
-                                    | "important"
-                                    | "moderate"
+                                    | "high"
+                                    | "medium"
                                     | "low"
                                     | "none"
                                 }
