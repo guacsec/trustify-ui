@@ -22,6 +22,11 @@ export const CsafSource: React.FC<CsafSourceProps> = ({ csafDocument }) => {
     (ref) => ref.category === "self",
   );
 
+  const formattedJson = React.useMemo(
+    () => JSON.stringify(csafDocument, null, 2),
+    [csafDocument],
+  );
+
   return (
     <Flex direction={{ default: "column" }} gap={{ default: "gapMd" }}>
       {selfRef && (
@@ -43,7 +48,7 @@ export const CsafSource: React.FC<CsafSourceProps> = ({ csafDocument }) => {
       <FlexItem>
         <Content component="h3">CSAF Document</Content>
         <CodeBlock>
-          <CodeBlockCode>{JSON.stringify(csafDocument, null, 2)}</CodeBlockCode>
+          <CodeBlockCode>{formattedJson}</CodeBlockCode>
         </CodeBlock>
       </FlexItem>
     </Flex>
