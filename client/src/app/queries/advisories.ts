@@ -148,9 +148,7 @@ export const useFetchAdvisoryCsafById = (id: string) => {
     queryKey: [AdvisoriesQueryKey, id, "csaf"],
     queryFn: async () => {
       const response = await downloadAdvisory({ client, path: { key: id } });
-      const blob = response.data as Blob;
-      const text = await blob.text();
-      return JSON.parse(text) as CsafDocument;
+      return response.data as CsafDocument;
     },
     enabled: !!id,
   });
