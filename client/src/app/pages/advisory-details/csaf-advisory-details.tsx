@@ -17,6 +17,8 @@ import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useFetchAdvisoryCsafById } from "@app/queries/advisories";
 
+import { CsafRelationshipTree } from "./csaf-relationship-tree";
+
 interface CsafAdvisoryDetailsProps {
   advisoryId: string;
 }
@@ -123,7 +125,9 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
             ref={relationshipTreeTabRef}
             aria-label="CSAF relationship tree"
           >
-            <ComingSoon label="Relationship Tree" />
+            {csafDocument && (
+              <CsafRelationshipTree csafDocument={csafDocument} />
+            )}
           </TabContent>
           <TabContent
             {...getTabContentProps("source")}
