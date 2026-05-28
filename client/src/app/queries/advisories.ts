@@ -19,6 +19,8 @@ import {
   updateAdvisoryLabels,
 } from "@app/client";
 
+import type { CsafDocument } from "@app/pages/csaf-visualizer";
+
 import { uploadAdvisory } from "@app/api/rest";
 import {
   labelRequestParamsQuery,
@@ -125,6 +127,27 @@ export const useDeleteAdvisoryMutation = (
       await queryClient.invalidateQueries({ queryKey: [AdvisoriesQueryKey] });
     },
   });
+};
+
+/** Fetches and parses the raw advisory source document as a typed CSAF document. */
+export const useFetchCsafSource = (id: string) => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: [AdvisoriesQueryKey, id, "csaf-source"],
+    queryFn: async () => {
+      const response = await downloadAdvisory({ client, path: { key: id } });
+      const rawData = response.data;
+      const parsed =
+        typeof rawData === "string" ? JSON.parse(rawData) : rawData;
+      return parsed as CsafDocument;
+    },
+    enabled: !!id,
+  });
+
+  return {
+    csafDocument: data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
 };
 
 export const useFetchAdvisorySourceById = (id: string) => {
