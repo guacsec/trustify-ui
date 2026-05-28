@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./client" },
+    { "path": "./common" },
+    { "path": "./e2e" },
+    { "path": "./server" }
+  ]
+}

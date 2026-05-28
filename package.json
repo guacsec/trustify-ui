@@ -17,7 +17,7 @@
     "format": "npm run format -ws --if-present",
     "format:fix": "npm run format:fix -ws --if-present",
     "build": "npm run build -ws --if-present",
-    "prepare": "npm run generate",
+    "prepare": "npm run generate && husky",
     "start:dev:common": "npm run start:dev -w common",
     "start:dev:server": "npm run start:dev -w server",
     "start:dev:client": "npm run start:dev -w client",
@@ -53,6 +53,8 @@
     "playwright-core": "1.57.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
     "@eslint-react/eslint-plugin": "^5.7.7",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-commonjs": "^29.0.2",
@@ -72,11 +74,22 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.0.1",
     "rollup": "^4.60.2",
     "rollup-plugin-copy": "^3.5.0",
     "ts-node": "^10.9.1",
     "typescript-eslint": "^8.59.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,json}": [
+      "prettier --write"
+    ]
   }
 }
