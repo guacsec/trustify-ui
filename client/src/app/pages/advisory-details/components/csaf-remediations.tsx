@@ -14,7 +14,7 @@ import {
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import type { CsafFullProductName, CsafRemediation } from "@app/types/csaf";
+import type { CsafRemediation } from "@app/types/csaf";
 
 interface CsafRemediationsProps {
   remediations: CsafRemediation[];
@@ -124,7 +124,7 @@ export const CsafRemediations: React.FC<CsafRemediationsProps> = ({
   );
 
   return (
-    <ExpandableSection toggleText="Remediations" isExpanded={false}>
+    <ExpandableSection toggleText="Remediations">
       <Flex direction={{ default: "column" }} gap={{ default: "gapMd" }}>
         {Array.from(grouped.entries()).map(([category, rems]) => (
           <FlexItem key={category}>
