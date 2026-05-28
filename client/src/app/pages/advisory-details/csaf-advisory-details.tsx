@@ -17,6 +17,8 @@ import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useFetchAdvisoryCsafById } from "@app/queries/advisories";
 
+import { CsafSource } from "./csaf-source";
+
 interface CsafAdvisoryDetailsProps {
   advisoryId: string;
 }
@@ -130,7 +132,7 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
             ref={sourceTabRef}
             aria-label="CSAF source document"
           >
-            <ComingSoon label="Source" />
+            {csafDocument && <CsafSource csafDocument={csafDocument} />}
           </TabContent>
         </LoadingWrapper>
       </PageSection>
