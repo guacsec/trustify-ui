@@ -18,6 +18,7 @@ import {
   listAdvisoryLabels,
   updateAdvisoryLabels,
 } from "@app/client";
+import type { CsafDocument } from "@app/types/csaf";
 
 import { uploadAdvisory } from "@app/api/rest";
 import {
@@ -136,6 +137,26 @@ export const useFetchAdvisorySourceById = (id: string) => {
 
   return {
     source: data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+/** Fetches the raw CSAF JSON document and parses it into a typed CsafDocument. */
+export const useFetchAdvisoryCsafById = (id: string) => {
+  const { data, isLoading, error } = useQuery<CsafDocument>({
+    queryKey: [AdvisoriesQueryKey, id, "csaf"],
+    queryFn: async () => {
+      const response = await downloadAdvisory({ client, path: { key: id } });
+      const blob = response.data as Blob;
+      const text = await blob.text();
+      return JSON.parse(text) as CsafDocument;
+    },
+    enabled: !!id,
+  });
+
+  return {
+    csafDocument: data,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
   };
