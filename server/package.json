@@ -19,9 +19,9 @@
   "dependencies": {
     "cookie": "^1.1.1",
     "cookie-parser": "^1.4.6",
-    "ejs": "^5.0.2",
+    "ejs": "^6.0.1",
     "express": "^5.2.1",
-    "http-proxy-middleware": "^3.0.5",
+    "http-proxy-middleware": "^4.0.0",
     "http-terminator": "^3.2.0"
   },
   "devDependencies": {
