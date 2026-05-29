@@ -37,7 +37,8 @@ export const logger = {
     if (CURRENT_LOG_LEVEL >= LOG_LEVELS.warn) console.warn("[WARN]", ...args);
   },
   error: (...args: unknown[]) => {
-    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.error) console.error("[ERROR]", ...args);
+    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.error)
+      console.error("[ERROR]", ...args);
   },
 };
 
