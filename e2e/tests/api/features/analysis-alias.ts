@@ -29,7 +29,7 @@ test("Alias / Get aliases by pURL", async ({ axios }) => {
   var urlEncodedPurl = encodeURIComponent(opensslPurl[0]);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedPurl}`,
+    `/api/v3/analysis/component/${urlEncodedPurl}`,
   );
 
   expect(response.data.items).toEqual(
@@ -45,7 +45,7 @@ test("Alias / Get aliases by pURL alias", async ({ axios }) => {
   var urlEncodedPurlAlias = encodeURIComponent(opensslPurlAliases[0]);
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedPurlAlias}`,
+    `/api/v3/analysis/component/${urlEncodedPurlAlias}`,
   );
 
   expect(response.data.items).toEqual(
@@ -62,7 +62,7 @@ test("Alias / Get aliases by CPE", async ({ axios }) => {
   var urlEncodedCpe = encodeURIComponent("cpe:/a:redhat:quarkus:2.13::el8");
 
   const response = await axios.get(
-    `/api/v2/analysis/component/${urlEncodedCpe}`,
+    `/api/v3/analysis/component/${urlEncodedCpe}`,
   );
 
   expect(response.data.items).toEqual(
@@ -77,7 +77,7 @@ test("Alias / Get aliases by CPE", async ({ axios }) => {
 // TODO: test.skip("Alias / Get aliases by CPE alias", async ({ axios }) => {});
 
 test.skip("Alias / Get aliases by query", async ({ axios }) => {
-  const response = await axios.get(`/api/v2/analysis/component?q=rhel`);
+  const response = await axios.get(`/api/v3/analysis/component?q=rhel`);
 
   expect(response.data.items).toEqual(
     expect.arrayContaining([

@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { AxiosError, AxiosHeaders } from "axios";
 import { saveAs } from "file-saver";
+import { type Mock, vi } from "vitest";
 
 import { downloadSbomLicense } from "@app/api/rest";
 import { downloadAdvisory, downloadSbom } from "@app/client";
@@ -8,22 +9,26 @@ import { getAxiosErrorMessage } from "@app/utils/utils";
 
 import { useDownload } from "./useDownload";
 
-jest.mock("file-saver", () => ({ saveAs: jest.fn() }));
-jest.mock("@app/api/rest", () => ({ downloadSbomLicense: jest.fn() }));
-jest.mock("@app/client", () => ({
-  downloadAdvisory: jest.fn(),
-  downloadSbom: jest.fn(),
-}));
-jest.mock("@app/utils/utils", () => ({
-  getAxiosErrorMessage: jest.fn((err: AxiosError) => err.message),
-  getFilenameFromContentDisposition: jest.fn(() => "license.tar.gz"),
+const { pushNotification } = vi.hoisted(() => ({
+  pushNotification: vi.fn(),
 }));
 
-const pushNotification = jest.fn();
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useContext: () => ({ pushNotification }),
+vi.mock("file-saver", () => ({ saveAs: vi.fn() }));
+vi.mock("@app/api/rest", () => ({ downloadSbomLicense: vi.fn() }));
+vi.mock("@app/client", () => ({
+  downloadAdvisory: vi.fn(),
+  downloadSbom: vi.fn(),
 }));
+vi.mock("@app/utils/utils", () => ({
+  getAxiosErrorMessage: vi.fn((err: AxiosError) => err.message),
+  getFilenameFromContentDisposition: vi.fn(() => "license.tar.gz"),
+}));
+vi.mock("@app/components/NotificationsContext", async () => {
+  const React = await vi.importActual<typeof import("react")>("react");
+  return {
+    NotificationsContext: React.createContext({ pushNotification }),
+  };
+});
 
 const createAxiosError = (message: string): AxiosError =>
   new AxiosError(message, "ERR_BAD_REQUEST", undefined, undefined, {
@@ -39,14 +44,14 @@ const flushPromises = () => act(() => new Promise((r) => setTimeout(r, 0)));
 
 describe("useDownload", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   /** Verifies that pushNotification is called with variant "danger" when downloadAdvisory rejects. */
   it("should notify with danger variant when downloadAdvisory fails", async () => {
     // Given a failing advisory download
     const error = createAxiosError("advisory download failed");
-    (downloadAdvisory as jest.Mock).mockRejectedValue(error);
+    (downloadAdvisory as Mock).mockRejectedValue(error);
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -66,7 +71,7 @@ describe("useDownload", () => {
   it("should notify with danger variant when downloadSbom fails", async () => {
     // Given a failing SBOM download
     const error = createAxiosError("sbom download failed");
-    (downloadSbom as jest.Mock).mockRejectedValue(error);
+    (downloadSbom as Mock).mockRejectedValue(error);
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -86,7 +91,7 @@ describe("useDownload", () => {
   it("should notify with danger variant when downloadSbomLicense fails", async () => {
     // Given a failing SBOM license download
     const error = createAxiosError("license download failed");
-    (downloadSbomLicense as jest.Mock).mockRejectedValue(error);
+    (downloadSbomLicense as Mock).mockRejectedValue(error);
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -106,7 +111,7 @@ describe("useDownload", () => {
   it("should use getAxiosErrorMessage to extract the error message", async () => {
     // Given a failing advisory download
     const error = createAxiosError("raw error");
-    (downloadAdvisory as jest.Mock).mockRejectedValue(error);
+    (downloadAdvisory as Mock).mockRejectedValue(error);
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -126,7 +131,7 @@ describe("useDownload", () => {
   it("should call saveAs on successful advisory download", async () => {
     // Given a successful advisory download
     const data = new ArrayBuffer(8);
-    (downloadAdvisory as jest.Mock).mockResolvedValue({ data });
+    (downloadAdvisory as Mock).mockResolvedValue({ data });
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -142,7 +147,7 @@ describe("useDownload", () => {
   it("should call saveAs on successful SBOM download", async () => {
     // Given a successful SBOM download
     const data = new ArrayBuffer(8);
-    (downloadSbom as jest.Mock).mockResolvedValue({ data });
+    (downloadSbom as Mock).mockResolvedValue({ data });
 
     // When triggering the download
     const { result } = renderHook(() => useDownload());
@@ -158,7 +163,7 @@ describe("useDownload", () => {
   it("should call saveAs on successful SBOM license download", async () => {
     // Given a successful SBOM license download
     const data = new ArrayBuffer(8);
-    (downloadSbomLicense as jest.Mock).mockResolvedValue({
+    (downloadSbomLicense as Mock).mockResolvedValue({
       data,
       headers: {
         "content-disposition": 'attachment; filename="license.tar.gz"',

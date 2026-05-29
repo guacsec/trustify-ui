@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import type { AxiosError, AxiosResponse } from "axios";
@@ -15,13 +15,13 @@ import {
 import LockIcon from "@patternfly/react-icons/dist/esm/icons/lock-icon";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
-import { useReadOnlyContext } from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { UploadFiles } from "@app/components/UploadFiles";
 import { useUploadAdvisory } from "@app/queries/advisories";
 import { Paths } from "@app/Routes";
 
 export const AdvisoryUpload: React.FC = () => {
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } = useUploadAdvisory();
 
   return (

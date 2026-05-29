@@ -23,7 +23,18 @@ dist/
 .env.test.local
 .env.production.local
 
+*.log
 npm-debug.log*
+
+# npm
+.npm/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# editor swap files
+*.swp
+*.swo
 
 .eslintcache
 
@@ -55,3 +66,7 @@ test_suite_analysis/
 .claude/settings.local.json
 .serena/
 .playwright-mcp/
+
+# AgentReady
+.agentready/*.md
+.agentready/*.html

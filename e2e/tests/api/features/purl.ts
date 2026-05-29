@@ -6,7 +6,7 @@ import {
 
 test.skip("Purl by alias - vanilla", async ({ axios }) => {
   const vanillaResponse = await axios.get(
-    "/api/v2/purl?offset=0&limit=10&q=openssl",
+    "/api/v3/purl?offset=0&limit=10&q=openssl",
   );
 
   expect(vanillaResponse.data.items).toEqual(
@@ -43,12 +43,12 @@ test.skip("Purl by alias - vanilla", async ({ axios }) => {
 
 test.describe("PURL sorting validation", () => {
   test("Sort PURLs by name ascending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "name", "asc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "name", "asc");
     validateStringSorting(
       items,
       "purl",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract name from purl string
         // Format: pkg:type/[namespace/]name@version[?qualifiers][#subpath]
@@ -60,12 +60,12 @@ test.describe("PURL sorting validation", () => {
   });
 
   test("Sort PURLs by name descending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "name", "desc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "name", "desc");
     validateStringSorting(
       items,
       "purl",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract name from purl string
         // Format: pkg:type/[namespace/]name@version[?qualifiers][#subpath]
@@ -79,7 +79,7 @@ test.describe("PURL sorting validation", () => {
   test("Sort PURLs by namespace ascending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/purl",
+      "/api/v3/purl",
       "namespace",
       "asc",
     );
@@ -87,7 +87,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract namespace from purl string
         // Format: pkg:type/[namespace/]name - if no / after first /, namespace is the name
@@ -106,7 +106,7 @@ test.describe("PURL sorting validation", () => {
   test("Sort PURLs by namespace descending", async ({ axios }) => {
     const items = await testBasicSort(
       axios,
-      "/api/v2/purl",
+      "/api/v3/purl",
       "namespace",
       "desc",
     );
@@ -114,7 +114,7 @@ test.describe("PURL sorting validation", () => {
       items,
       "purl",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => {
         // Extract namespace from purl string
         // Format: pkg:type/[namespace/]name - if no / after first /, namespace is the name
@@ -131,23 +131,23 @@ test.describe("PURL sorting validation", () => {
   });
 
   test("Sort PURLs by version ascending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "version", "asc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "version", "asc");
     validateStringSorting(
       items,
       "version",
       "ascending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => item.version.version,
     );
   });
 
   test("Sort PURLs by version descending", async ({ axios }) => {
-    const items = await testBasicSort(axios, "/api/v2/purl", "version", "desc");
+    const items = await testBasicSort(axios, "/api/v3/purl", "version", "desc");
     validateStringSorting(
       items,
       "version",
       "descending",
-      // biome-ignore lint/suspicious/noExplicitAny: API response types are not strictly typed in tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response types are not strictly typed in tests
       (item: any) => item.version.version,
     );
   });

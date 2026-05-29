@@ -1,29 +1,29 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
-import * as ReadOnlyContextModule from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 
 import { DefaultLayout } from "./default-layout";
 
-jest.mock("@app/components/ReadOnlyContext");
-jest.mock("./header", () => ({
+vi.mock("./header", () => ({
   HeaderApp: () => <div data-testid="header" />,
 }));
-jest.mock("./sidebar", () => ({
+vi.mock("./sidebar", () => ({
   SidebarApp: () => <div data-testid="sidebar" />,
 }));
-jest.mock("@app/components/Notifications", () => ({
+vi.mock("@app/components/Notifications", () => ({
   Notifications: () => null,
 }));
-jest.mock("@app/components/PageDrawerContext", () => ({
+vi.mock("@app/components/PageDrawerContext", () => ({
   PageContentWithDrawerProvider: ({
     children,
   }: {
     children: React.ReactNode;
   }) => <div>{children}</div>,
 }));
-jest.mock("@patternfly/react-core", () => {
-  const actual = jest.requireActual("@patternfly/react-core");
+vi.mock("@patternfly/react-core", async () => {
+  const actual = await vi.importActual("@patternfly/react-core");
   return {
     ...actual,
     Page: ({ children }: { children: React.ReactNode }) => (
@@ -33,39 +33,26 @@ jest.mock("@patternfly/react-core", () => {
   };
 });
 
-const mockedUseReadOnlyContext =
-  ReadOnlyContextModule.useReadOnlyContext as jest.MockedFunction<
-    typeof ReadOnlyContextModule.useReadOnlyContext
-  >;
-
-const renderLayout = () => {
+const renderLayout = (isReadOnly: boolean) => {
   return render(
-    <DefaultLayout>
-      <div data-testid="page-content">Page content</div>
-    </DefaultLayout>,
+    <ReadOnlyContext.Provider value={{ isReadOnly, isLoading: false }}>
+      <DefaultLayout>
+        <div data-testid="page-content">Page content</div>
+      </DefaultLayout>
+    </ReadOnlyContext.Provider>,
   );
 };
 
 describe("DefaultLayout", () => {
   it("shows a read-only banner when isReadOnly is true", () => {
-    mockedUseReadOnlyContext.mockReturnValue({
-      isReadOnly: true,
-      isLoading: false,
-    });
-
-    renderLayout();
+    renderLayout(true);
 
     expect(screen.getByText(/running in read-only mode/i)).toBeInTheDocument();
     expect(screen.getByTestId("page-content")).toBeInTheDocument();
   });
 
   it("does not show a banner when isReadOnly is false", () => {
-    mockedUseReadOnlyContext.mockReturnValue({
-      isReadOnly: false,
-      isLoading: false,
-    });
-
-    renderLayout();
+    renderLayout(false);
 
     expect(
       screen.queryByText(/running in read-only mode/i),

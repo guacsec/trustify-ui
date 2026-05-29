@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 
 import {
   Banner,
@@ -11,7 +11,8 @@ import InfoCircleIcon from "@patternfly/react-icons/dist/esm/icons/info-circle-i
 
 import { Notifications } from "@app/components/Notifications";
 import { PageContentWithDrawerProvider } from "@app/components/PageDrawerContext";
-import { useReadOnlyContext } from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
+
 import { HeaderApp } from "./header";
 import { SidebarApp } from "./sidebar";
 
@@ -20,7 +21,7 @@ interface DefaultLayoutProps {
 }
 
 export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
-  const { isReadOnly } = useReadOnlyContext();
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
   const pageId = "main-content-page-layout-horizontal-nav";
   const PageSkipToContent = (
     <SkipToContent href={`#${pageId}`}>Skip to content</SkipToContent>

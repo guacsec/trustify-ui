@@ -31,8 +31,8 @@ import {
 
 import EllipsisVIcon from "@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon";
 import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
-import BarsIcon from "@patternfly/react-icons/dist/js/icons/bars-icon";
-import ExternalLinkAltIcon from "@patternfly/react-icons/dist/js/icons/external-link-alt-icon";
+import BarsIcon from "@patternfly/react-icons/dist/esm/icons/bars-icon";
+import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
 import { ThemeSelector } from "tsd-ui";
 
@@ -48,7 +48,6 @@ export const HeaderApp: React.FC = () => {
     masthead: { leftBrand, leftTitle, rightBrand, supportUrl },
   } = useBranding();
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: allowed
   const auth = (isAuthRequired && useAuth()) || undefined;
 
   const navigate = useNavigate();

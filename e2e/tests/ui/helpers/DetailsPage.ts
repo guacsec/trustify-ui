@@ -97,7 +97,6 @@ export class DetailsPage {
     const tableVulnSev = await this.getCVSSCountFromVulnTable();
     let mismatch = false;
     await expect(
-      // biome-ignore lint/style/noNonNullAssertion: allowed
       parseInt(totalVulnPanel!, 10),
       `Total Vulnerabilities count ${totalVulnPanel} mismatches with sum of individual ${sumPanelVulnSev}`,
     ).toEqual(sumPanelVulnSev);

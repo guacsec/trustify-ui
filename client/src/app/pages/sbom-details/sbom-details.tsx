@@ -35,7 +35,7 @@ import {
   sbomDeletedSuccessMessage,
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
-import type { SbomSummary } from "@app/client";
+import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -70,7 +70,7 @@ export const SbomDetails: React.FC = () => {
   // Delete action
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
-  const onDeleteSbomSuccess = (sbom: SbomSummary) => {
+  const onDeleteSbomSuccess = (sbom: SbomHead) => {
     setIsDeleteDialogOpen(false);
     pushNotification({
       title: sbomDeletedSuccessMessage(sbom),

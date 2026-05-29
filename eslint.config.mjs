@@ -1,0 +1,66 @@
+import eslintReact from "@eslint-react/eslint-plugin";
+import eslintJs from "@eslint/js";
+import tseslint from "typescript-eslint";
+
+import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
+import reactRefresh from "eslint-plugin-react-refresh";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+import pluginQuery from "@tanstack/eslint-plugin-query";
+
+export default defineConfig([
+  globalIgnores(["**/dist", "**/coverage", "crate/**"]),
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    extends: [
+      eslintJs.configs.recommended,
+      tseslint.configs.recommended,
+      eslintReact.configs["recommended-typescript"],
+      ...pluginQuery.configs['flat/recommended-strict'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      globals: globals.browser,
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: [
+            "e2e/playwright.config.ts",
+          ],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      // TODO: Remove these rules incrementally so we have default and more strict linting
+      "@eslint-react/set-state-in-effect": "off",
+      "@eslint-react/no-create-ref": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@eslint-react/no-use-context": "off",
+      "@eslint-react/no-context-provider": "off",
+      "no-useless-assignment": "off",
+      "@eslint-react/rules-of-hooks": "off",
+      "@eslint-react/naming-convention-ref-name": "off",
+      "@eslint-react/no-array-index-key": "off",
+      "@eslint-react/use-state": "off",
+      "@eslint-react/no-unnecessary-use-prefix": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-var": "off",
+      "@eslint-react/static-components": "off",
+      "@eslint-react/exhaustive-deps": "off",
+      "@eslint-react/jsx-no-key-after-spread": "off",
+      "@eslint-react/purity": "off",
+      "@typescript-eslint/no-wrapper-object-types": "off",
+      "preserve-caught-error": "off",
+      "@eslint-react/no-nested-component-definitions": "off",
+      "@tanstack/query/prefer-query-options": "off",
+      "@tanstack/query/exhaustive-deps": "off",
+      "@tanstack/query/no-void-query-fn": "off",
+    },
+    ignores: [
+      "client/config/**",
+      "client/src/app/client/**",
+      "client/types/**",
+    ],
+  },
+]);

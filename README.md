@@ -14,6 +14,19 @@ Trustify UI Component
 | :----- | :---------------- | :------------- |
 | main   | [![CI (e2e Trustify CI)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-e2e.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-e2e.yaml?query=branch%3Amain+event%3Apush)               | [![Nightly CI (e2e trustify CI @main)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-e2e.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-e2e.yaml?query=branch%3Amain+event%3Aschedule)            |
 
+## Usage
+
+Trustify UI provides a web interface for software supply chain security:
+
+- **Advisories** — Browse, search, and filter security advisories (CVE, RHSA, GHSA) with severity and status tracking
+- **Vulnerabilities** — View vulnerability details, related advisories, and affected products
+- **SBOMs** — Upload and inspect Software Bills of Materials; explore package dependencies
+- **Packages** — Search packages across ecosystems and view associated SBOMs and vulnerabilities
+- **Products** — Manage product definitions and track their security posture
+- **Importers** — Configure and monitor data import jobs from external vulnerability and SBOM sources
+
+Access the application at `http://localhost:3000` (development) or your deployed URL. Authentication is optional and controlled by the `AUTH_REQUIRED` environment variable.
+
 ## Development
 
 ### Requisites

@@ -81,7 +81,7 @@ test.describe("Analysis / Latest / Basic", () => {
         const urlEncodedProductCpe = encodeURIComponent(productCdxCpe);
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
+          `/api/v3/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -124,7 +124,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl=${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl=${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -167,7 +167,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -210,7 +210,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name=${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name=${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -253,7 +253,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -308,7 +308,7 @@ test.describe("Analysis / Latest / Basic", () => {
         const urlEncodedProductCpe = encodeURIComponent(productCdxCpe);
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
+          `/api/v3/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -351,7 +351,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl=${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl=${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -394,7 +394,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -437,7 +437,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name=${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name=${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -480,7 +480,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -535,7 +535,7 @@ test.describe("Analysis / Latest / Basic", () => {
         const urlEncodedProductCpe = encodeURIComponent(productSpdxCpe);
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
+          `/api/v3/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -568,7 +568,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -601,7 +601,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -646,7 +646,7 @@ test.describe("Analysis / Latest / Basic", () => {
         const urlEncodedProductCpe = encodeURIComponent(productSpdxCpe);
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
+          `/api/v3/analysis/latest/component/${urlEncodedProductCpe}?descendants=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -679,7 +679,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=purl~${urlEncodedComponentPurl}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(
@@ -712,7 +712,7 @@ test.describe("Analysis / Latest / Basic", () => {
         );
 
         const response = await axios.get(
-          `/api/v2/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
+          `/api/v3/analysis/latest/component?q=name~${urlEncodedComponentName}&ancestors=10`,
         );
 
         expect(response.data.items).toEqual(

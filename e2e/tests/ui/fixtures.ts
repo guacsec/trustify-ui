@@ -20,7 +20,7 @@ interface IstanbulCoverage {
 async function collectCoverage(page: Page): Promise<IstanbulCoverage | null> {
   try {
     const coverage = await page.evaluate(() => {
-      // biome-ignore lint/suspicious/noExplicitAny: allowed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
       return (window as any).__coverage__ || null;
     });
 
@@ -30,7 +30,7 @@ async function collectCoverage(page: Page): Promise<IstanbulCoverage | null> {
 
       for (const [filePath, fileData] of Object.entries(coverage)) {
         if (fileData && typeof fileData === "object") {
-          // biome-ignore lint/suspicious/noExplicitAny: allowed
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
           validCoverage[filePath] = fileData as any;
         }
       }
@@ -72,7 +72,6 @@ async function saveCoverage(
 
 // Coverage fixtures type
 type CoverageFixtures = {
-  // biome-ignore lint/suspicious/noConfusingVoidType: allowed
   autoCoverage: void;
 };
 

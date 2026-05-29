@@ -123,7 +123,6 @@ export const useGroupForm = ({
   }, [siblingGroups]);
   siblingsRef.current = siblingGroups.data;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: siblingsKey is an intentional trigger dependency
   useEffect(() => {
     form.trigger("name");
   }, [siblingsKey, form]);

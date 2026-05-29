@@ -1,7 +1,7 @@
 import type React from "react";
 import { Content, PageSection } from "@patternfly/react-core";
 
-import { LicenseSearchProvider } from "./license-context";
+import { LicenseSearchProvider } from "./license-provider";
 import { LicenseTable } from "./license-table";
 import { LicenseToolbar } from "./license-toolbar";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
