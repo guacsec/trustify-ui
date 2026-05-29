@@ -2,10 +2,8 @@
 import React from "react";
 
 import {
-  Button,
   CodeBlock,
   CodeBlockCode,
-  Content,
   Flex,
   FlexItem,
 } from "@patternfly/react-core";
@@ -31,22 +29,12 @@ export const CsafSource: React.FC<CsafSourceProps> = ({ csafDocument }) => {
     <Flex direction={{ default: "column" }} gap={{ default: "gapMd" }}>
       {selfRef && (
         <FlexItem>
-          <Content component="h3">Original Advisory</Content>
-          <Button
-            variant="link"
-            component="a"
-            href={selfRef.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            icon={<ExternalLinkAltIcon />}
-            iconPosition="end"
-          >
-            {selfRef.summary || selfRef.url}
-          </Button>
+          <a href={selfRef.url} target="_blank" rel="noopener noreferrer">
+            View original advisory <ExternalLinkAltIcon />
+          </a>
         </FlexItem>
       )}
       <FlexItem>
-        <Content component="h3">CSAF Document</Content>
         <CodeBlock>
           <CodeBlockCode>{formattedJson}</CodeBlockCode>
         </CodeBlock>

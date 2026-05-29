@@ -4,6 +4,7 @@ import React from "react";
 import ReactECharts from "echarts-for-react";
 
 import {
+  Content,
   EmptyState,
   EmptyStateBody,
   EmptyStateVariant,
@@ -127,15 +128,21 @@ export const CsafProductTree: React.FC<CsafProductTreeProps> = ({
   return (
     <Flex direction={{ default: "column" }} gap={{ default: "gapMd" }}>
       <FlexItem>
+        <Content component="h3">Product tree</Content>
+        <Content component="small">
+          Click a node to expand or collapse. Scroll to zoom, drag to pan.
+        </Content>
+      </FlexItem>
+      <FlexItem>
+        <CategoryLegend />
+      </FlexItem>
+      <FlexItem>
         <ReactECharts
           option={option}
           style={{ height: "600px", width: "100%" }}
           notMerge
           lazyUpdate
         />
-      </FlexItem>
-      <FlexItem>
-        <CategoryLegend />
       </FlexItem>
     </Flex>
   );

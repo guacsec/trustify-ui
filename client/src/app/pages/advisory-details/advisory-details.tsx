@@ -14,7 +14,6 @@ import {
   DropdownList,
   Flex,
   FlexItem,
-  Label,
   MenuToggle,
   type MenuToggleElement,
   PageSection,
@@ -44,6 +43,7 @@ import {
 } from "@app/queries/advisories";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
+import { LabelsAsList } from "@app/components/LabelsAsList";
 
 import { CsafAdvisoryDetails } from "./csaf-advisory-details";
 import { Overview } from "./overview";
@@ -123,13 +123,16 @@ export const AdvisoryDetails: React.FC = () => {
                   <Content component="h1">
                     {advisory?.document_id ?? advisoryId ?? ""}
                   </Content>
-                  <Content component="p">Advisory detail information</Content>
                 </Content>
               </FlexItem>
               <FlexItem>
-                {advisory?.labels.type && (
-                  <Label color="blue">{advisory?.labels.type}</Label>
-                )}
+                <LabelsAsList
+                  value={Object.fromEntries(
+                    Object.entries(advisory?.labels ?? {}).filter(
+                      ([k]) => k === "type" || k === "severity",
+                    ),
+                  )}
+                />
               </FlexItem>
             </Flex>
           </SplitItem>

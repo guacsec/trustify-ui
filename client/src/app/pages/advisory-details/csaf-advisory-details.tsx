@@ -37,7 +37,7 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
     tabKeys: [
       "overview",
       "vulnerabilities",
-      "product-tree",
+      "products",
       "relationship-tree",
       "source",
     ],
@@ -69,8 +69,8 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
             tabContentRef={vulnerabilitiesTabRef}
           />
           <Tab
-            {...getTabProps("product-tree")}
-            title={<TabTitleText>Product Tree</TabTitleText>}
+            {...getTabProps("products")}
+            title={<TabTitleText>Products</TabTitleText>}
             tabContentRef={productTreeTabRef}
           />
           <Tab
@@ -104,7 +104,7 @@ export const CsafAdvisoryDetails: React.FC<CsafAdvisoryDetailsProps> = ({
             )}
           </TabContent>
           <TabContent
-            {...getTabContentProps("product-tree")}
+            {...getTabContentProps("products")}
             ref={productTreeTabRef}
             aria-label="CSAF product tree"
           >

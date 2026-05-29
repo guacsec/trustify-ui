@@ -14,16 +14,18 @@ const AUTO_COLLAPSE_THRESHOLD = 40;
 
 /** Color mapping for CSAF branch categories. */
 export const BRANCH_CATEGORY_COLORS: Record<string, string> = {
-  vendor: "#0066CC",
-  product_family: "#009596",
-  product_name: "#4CB140",
-  product_version: "#EC7A08",
-  product_version_range: "#6753AC",
-  architecture: "#8A8D90",
+  vendor: "#C9190B",
+  product_name: "#0066CC",
+  product_version: "#6753AC",
+  product_version_range: "#4CB140",
+  product_family: "#EC7A08",
+  architecture: "#F4C145",
   language: "#C9190B",
-  legacy: "#F4C145",
   patch_level: "#38812F",
   service_pack: "#2B9AF3",
+  host_name: "#7D1007",
+  legacy: "#8A8D90",
+  specification: "#009596",
 };
 
 /** Counts leaf nodes in a CSAF branch subtree. */

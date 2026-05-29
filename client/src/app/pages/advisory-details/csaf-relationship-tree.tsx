@@ -4,6 +4,7 @@ import React from "react";
 import ReactECharts from "echarts-for-react";
 
 import {
+  Content,
   EmptyState,
   EmptyStateBody,
   EmptyStateVariant,
@@ -18,21 +19,38 @@ import {
   RELATIONSHIP_CATEGORY_COLORS,
   transformRelationshipsToTreeData,
 } from "./helpers/csaf-relationship-helpers";
+import { BRANCH_CATEGORY_COLORS } from "./helpers/csaf-tree-helpers";
 
 interface CsafRelationshipTreeProps {
   csafDocument: CsafDocument;
 }
 
-/** Color-coded legend for relationship types. */
+const NODE_TYPE_SUBSET: Record<string, string> = {
+  vendor: BRANCH_CATEGORY_COLORS.vendor,
+  product_name: BRANCH_CATEGORY_COLORS.product_name,
+  product_version: BRANCH_CATEGORY_COLORS.product_version,
+  product_version_range: BRANCH_CATEGORY_COLORS.product_version_range,
+  product_family: BRANCH_CATEGORY_COLORS.product_family,
+  architecture: BRANCH_CATEGORY_COLORS.architecture,
+};
+
+const EDGE_STYLES: Record<string, { color: string; dash: string }> = {
+  default_component_of: { color: "#0066CC", dash: "" },
+  external_component_of: { color: "#EC7A08", dash: "8 4" },
+  installed_on: { color: "#6753AC", dash: "2 3" },
+  installed_with: { color: "#009596", dash: "5 2 2 2" },
+  optional_component_of: { color: "#8A8D90", dash: "4 4" },
+};
+
+/** Legend with node-type colors and edge line styles. */
 const RelationshipLegend: React.FC = () => {
-  const entries = Object.entries(RELATIONSHIP_CATEGORY_COLORS);
   return (
     <Flex
       gap={{ default: "gapMd" }}
       flexWrap={{ default: "wrap" }}
       justifyContent={{ default: "justifyContentCenter" }}
     >
-      {entries.map(([category, color]) => (
+      {Object.entries(NODE_TYPE_SUBSET).map(([category, color]) => (
         <FlexItem key={category}>
           <Flex
             gap={{ default: "gapXs" }}
@@ -48,6 +66,33 @@ const RelationshipLegend: React.FC = () => {
                   backgroundColor: color,
                 }}
               />
+            </FlexItem>
+            <FlexItem>
+              <span style={{ fontSize: "var(--pf-t--global--font--size--sm)" }}>
+                {category.replace(/_/g, " ")}
+              </span>
+            </FlexItem>
+          </Flex>
+        </FlexItem>
+      ))}
+      {Object.entries(EDGE_STYLES).map(([category, { color, dash }]) => (
+        <FlexItem key={category}>
+          <Flex
+            gap={{ default: "gapXs" }}
+            alignItems={{ default: "alignItemsCenter" }}
+          >
+            <FlexItem>
+              <svg width="24" height="12">
+                <line
+                  x1="0"
+                  y1="6"
+                  x2="24"
+                  y2="6"
+                  stroke={color}
+                  strokeWidth="2"
+                  strokeDasharray={dash || undefined}
+                />
+              </svg>
             </FlexItem>
             <FlexItem>
               <span style={{ fontSize: "var(--pf-t--global--font--size--sm)" }}>
@@ -128,15 +173,22 @@ export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
   return (
     <Flex direction={{ default: "column" }} gap={{ default: "gapMd" }}>
       <FlexItem>
+        <Content component="h3">Relationship tree</Content>
+        <Content component="small">
+          Hover to highlight path. Click a node to expand or collapse. Drag to
+          pan, scroll to zoom.
+        </Content>
+      </FlexItem>
+      <FlexItem>
+        <RelationshipLegend />
+      </FlexItem>
+      <FlexItem>
         <ReactECharts
           option={option}
           style={{ height: "600px", width: "100%" }}
           notMerge
           lazyUpdate
         />
-      </FlexItem>
-      <FlexItem>
-        <RelationshipLegend />
       </FlexItem>
     </Flex>
   );

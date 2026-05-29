@@ -3,11 +3,17 @@ import React from "react";
 
 import dayjs from "dayjs";
 
-import { ChartDonut } from "@patternfly/react-charts/victory";
+import {
+  Chart,
+  ChartAxis,
+  ChartBar,
+  ChartDonut,
+} from "@patternfly/react-charts/victory";
 
 import {
   Card,
   CardBody,
+  CardHeader,
   CardTitle,
   Content,
   DescriptionList,
@@ -24,7 +30,9 @@ import {
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
+import { Link } from "react-router-dom";
+
+import { Paths } from "@app/Routes";
 import type { CsafDocument, CsafVulnerability } from "@app/types/csaf";
 
 interface CsafOverviewProps {
@@ -40,22 +48,48 @@ const SEVERITY_COLORS: Record<string, string> = {
   NONE: "#8A8D90",
 };
 
-/** Derives severity counts from CSAF vulnerabilities. */
+/** Collects all product IDs from every product_status category. */
+function getAllProductIds(status?: {
+  [key: string]: string[] | undefined;
+}): string[] {
+  if (!status) return [];
+  return [
+    ...(status.known_affected ?? []),
+    ...(status.fixed ?? []),
+    ...(status.first_affected ?? []),
+    ...(status.last_affected ?? []),
+    ...(status.under_investigation ?? []),
+    ...(status.known_not_affected ?? []),
+    ...(status.first_fixed ?? []),
+    ...(status.recommended ?? []),
+  ];
+}
+
+/** Derives affected-product counts per severity from CSAF vulnerabilities. */
 function computeSeverityCounts(
   vulnerabilities?: CsafVulnerability[],
 ): { severity: string; count: number }[] {
-  const counts: Record<string, number> = {};
+  const productsBySeverity: Record<string, Set<string>> = {};
   if (vulnerabilities) {
     for (const vuln of vulnerabilities) {
       const baseSeverity =
         vuln.scores?.[0]?.cvss_v3?.baseSeverity?.toUpperCase() || "NONE";
-      counts[baseSeverity] = (counts[baseSeverity] || 0) + 1;
+      if (!productsBySeverity[baseSeverity]) {
+        productsBySeverity[baseSeverity] = new Set();
+      }
+      const allProducts = getAllProductIds(vuln.product_status);
+      for (const pid of allProducts) {
+        productsBySeverity[baseSeverity].add(pid);
+      }
     }
   }
   const order = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "NONE"];
   return order
-    .filter((s) => (counts[s] || 0) > 0)
-    .map((severity) => ({ severity, count: counts[severity] || 0 }));
+    .filter((s) => productsBySeverity[s]?.size)
+    .map((severity) => ({
+      severity,
+      count: productsBySeverity[severity].size,
+    }));
 }
 
 /** Derives remediation category counts from CSAF vulnerabilities. */
@@ -100,31 +134,69 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
     (sum, r) => sum + r.count,
     0,
   );
+  const totalAffectedProducts = React.useMemo(() => {
+    const productIds = new Set<string>();
+    if (vulnerabilities) {
+      for (const vuln of vulnerabilities) {
+        for (const pid of getAllProductIds(vuln.product_status)) {
+          productIds.add(pid);
+        }
+      }
+    }
+    return productIds.size;
+  }, [vulnerabilities]);
 
   return (
     <Flex direction={{ default: "column" }} gap={{ default: "gapLg" }}>
       {/* Metadata */}
       <FlexItem>
-        <Card isPlain>
-          <CardTitle>Document Metadata</CardTitle>
+        <Card>
+          <CardHeader
+            actions={{
+              actions: (
+                <Flex gap={{ default: "gapSm" }}>
+                  {doc.aggregate_severity && (
+                    <FlexItem>
+                      <Label color="blue">
+                        Severity: {doc.aggregate_severity.text}
+                      </Label>
+                    </FlexItem>
+                  )}
+                  {doc.distribution?.tlp && (
+                    <FlexItem>
+                      <Label>TLP: {doc.distribution.tlp.label}</Label>
+                    </FlexItem>
+                  )}
+                </Flex>
+              ),
+              hasNoOffset: true,
+            }}
+          >
+            <Content component="h2">{doc.title}</Content>
+          </CardHeader>
           <CardBody>
             <DescriptionList isHorizontal>
               <DescriptionListGroup>
-                <DescriptionListTerm>Title</DescriptionListTerm>
-                <DescriptionListDescription>
-                  {doc.title}
-                </DescriptionListDescription>
-              </DescriptionListGroup>
-              <DescriptionListGroup>
                 <DescriptionListTerm>Tracking ID</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {doc.tracking.id}
+                  {/^CVE-\d{4}-\d+$/.test(doc.tracking.id) ? (
+                    <Link
+                      to={Paths.vulnerabilityDetails.replace(
+                        ":vulnerabilityId",
+                        doc.tracking.id,
+                      )}
+                    >
+                      {doc.tracking.id}
+                    </Link>
+                  ) : (
+                    doc.tracking.id
+                  )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Status</DescriptionListTerm>
                 <DescriptionListDescription>
-                  <Label>{doc.tracking.status}</Label>
+                  <Label color="green">{doc.tracking.status}</Label>
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
@@ -142,14 +214,24 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
               <DescriptionListGroup>
                 <DescriptionListTerm>Publisher</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {doc.publisher.name}
+                  <Flex
+                    gap={{ default: "gapSm" }}
+                    alignItems={{ default: "alignItemsCenter" }}
+                  >
+                    <FlexItem>{doc.publisher.name}</FlexItem>
+                    {doc.publisher.category && (
+                      <FlexItem>
+                        <Label isCompact>{doc.publisher.category}</Label>
+                      </FlexItem>
+                    )}
+                  </Flex>
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Initial release</DescriptionListTerm>
                 <DescriptionListDescription>
                   {dayjs(doc.tracking.initial_release_date).format(
-                    "YYYY-MM-DD",
+                    "MMM D, YYYY",
                   )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -157,7 +239,7 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                 <DescriptionListTerm>Current release</DescriptionListTerm>
                 <DescriptionListDescription>
                   {dayjs(doc.tracking.current_release_date).format(
-                    "YYYY-MM-DD",
+                    "MMM D, YYYY",
                   )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -168,32 +250,6 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                     {doc.tracking.generator.engine.name}
                     {doc.tracking.generator.engine.version &&
                       ` v${doc.tracking.generator.engine.version}`}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-              )}
-              {doc.aggregate_severity && (
-                <DescriptionListGroup>
-                  <DescriptionListTerm>Severity</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    <SeverityShieldAndText
-                      value={
-                        doc.aggregate_severity.text.toLowerCase() as
-                          | "critical"
-                          | "high"
-                          | "medium"
-                          | "low"
-                          | "none"
-                      }
-                      score={null}
-                    />
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-              )}
-              {doc.distribution?.tlp && (
-                <DescriptionListGroup>
-                  <DescriptionListTerm>TLP</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    <Label>{doc.distribution.tlp.label}</Label>
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               )}
@@ -208,62 +264,73 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
           <Grid hasGutter>
             {severityCounts.length > 0 && (
               <GridItem md={6}>
-                <Card isPlain>
-                  <CardTitle>Impact Summary</CardTitle>
+                <Card>
+                  <CardTitle>Impact summary</CardTitle>
                   <CardBody>
-                    <Flex
-                      direction={{ default: "column" }}
-                      gap={{ default: "gapSm" }}
-                    >
-                      {severityCounts.map(({ severity, count }) => (
-                        <FlexItem key={severity}>
-                          <Flex
-                            alignItems={{ default: "alignItemsCenter" }}
-                            gap={{ default: "gapSm" }}
-                          >
-                            <FlexItem style={{ minWidth: 120 }}>
-                              <SeverityShieldAndText
-                                value={
-                                  severity.toLowerCase() as
-                                    | "critical"
-                                    | "high"
-                                    | "medium"
-                                    | "low"
-                                    | "none"
-                                }
-                                score={null}
-                              />
-                            </FlexItem>
-                            <FlexItem>
-                              <div
-                                style={{
-                                  height: 16,
-                                  width: count * 40,
-                                  maxWidth: 300,
-                                  minWidth: 20,
-                                  backgroundColor:
-                                    SEVERITY_COLORS[severity] || "#8A8D90",
-                                  borderRadius: 2,
-                                }}
-                              />
-                            </FlexItem>
-                            <FlexItem>
-                              <strong>{count}</strong>{" "}
-                              {count === 1 ? "CVE" : "CVEs"}
-                            </FlexItem>
-                          </Flex>
-                        </FlexItem>
-                      ))}
-                    </Flex>
+                    <Content component="small">
+                      {vulnerabilities?.length ?? 0}{" "}
+                      {(vulnerabilities?.length ?? 0) === 1 ? "CVE" : "CVEs"}{" "}
+                      affecting {totalAffectedProducts} products
+                    </Content>
+                    <div style={{ height: 40 + severityCounts.length * 40 }}>
+                      <Chart
+                        ariaDesc="Impact summary by severity"
+                        name="impact-summary-chart"
+                        horizontal
+                        domainPadding={{ x: [10, 10] }}
+                        height={40 + severityCounts.length * 40}
+                        padding={{
+                          bottom: 30,
+                          left: 80,
+                          right: 20,
+                          top: 10,
+                        }}
+                      >
+                        <ChartAxis
+                          dependentAxis
+                          style={{
+                            tickLabels: { fontSize: 12 },
+                          }}
+                        />
+                        <ChartAxis
+                          style={{
+                            grid: { stroke: "#D2D2D2", strokeDasharray: "4,4" },
+                            tickLabels: { fontSize: 12 },
+                          }}
+                        />
+                        <ChartBar
+                          horizontal
+                          barWidth={16}
+                          data={severityCounts.map(({ severity, count }) => ({
+                            x:
+                              severity.charAt(0) +
+                              severity.slice(1).toLowerCase(),
+                            y: count,
+                          }))}
+                          style={{
+                            data: {
+                              fill: ({ datum }) =>
+                                SEVERITY_COLORS[
+                                  (datum.x as string).toUpperCase()
+                                ] || "#8A8D90",
+                            },
+                          }}
+                          labels={({ datum }) => `${datum.x}: ${datum.y}`}
+                        />
+                      </Chart>
+                    </div>
                   </CardBody>
                 </Card>
               </GridItem>
             )}
             {remediationCounts.length > 0 && (
               <GridItem md={6}>
-                <Card isPlain>
-                  <CardTitle>Remediation Status</CardTitle>
+                <Card>
+                  <CardTitle>Remediation status</CardTitle>
                   <CardBody>
+                    <Content component="small">
+                      Fix availability across affected products
+                    </Content>
                     <div style={{ height: "230px", maxWidth: "350px" }}>
                       <ChartDonut
                         constrainToVisibleArea
@@ -276,7 +343,7 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                           top: 20,
                         }}
                         title={`${totalRemediations}`}
-                        subTitle="Remediations"
+                        subTitle="entries"
                         width={350}
                         legendData={remediationCounts.map(
                           ({ category, count }) => ({
@@ -337,7 +404,7 @@ export const CsafOverview: React.FC<CsafOverviewProps> = ({ csafDocument }) => {
                 {doc.tracking.revision_history.map((rev) => (
                   <DescriptionListGroup key={rev.number}>
                     <DescriptionListTerm>
-                      v{rev.number} — {dayjs(rev.date).format("YYYY-MM-DD")}
+                      v{rev.number} — {dayjs(rev.date).format("MMM D, YYYY")}
                     </DescriptionListTerm>
                     <DescriptionListDescription>
                       {rev.summary}

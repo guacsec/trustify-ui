@@ -16,26 +16,20 @@ interface CsafCvssDetailsProps {
 }
 
 export const CsafCvssDetails: React.FC<CsafCvssDetailsProps> = ({ cvss }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-
   const metrics: { label: string; value?: string }[] = [
-    { label: "Attack Vector", value: cvss.attackVector },
-    { label: "Attack Complexity", value: cvss.attackComplexity },
-    { label: "Privileges Required", value: cvss.privilegesRequired },
-    { label: "User Interaction", value: cvss.userInteraction },
+    { label: "Attack vector", value: cvss.attackVector },
+    { label: "Attack complexity", value: cvss.attackComplexity },
+    { label: "Privileges required", value: cvss.privilegesRequired },
+    { label: "User interaction", value: cvss.userInteraction },
     { label: "Scope", value: cvss.scope },
-    { label: "Confidentiality Impact", value: cvss.confidentialityImpact },
-    { label: "Integrity Impact", value: cvss.integrityImpact },
-    { label: "Availability Impact", value: cvss.availabilityImpact },
-    { label: "Vector String", value: cvss.vectorString },
+    { label: "Confidentiality", value: cvss.confidentialityImpact },
+    { label: "Integrity", value: cvss.integrityImpact },
+    { label: "Availability", value: cvss.availabilityImpact },
+    { label: "Vector string", value: cvss.vectorString },
   ];
 
   return (
-    <ExpandableSection
-      toggleText={isExpanded ? "Hide CVSS details" : "Show CVSS details"}
-      onToggle={(_event, expanded) => setIsExpanded(expanded)}
-      isExpanded={isExpanded}
-    >
+    <ExpandableSection toggleText="CVSS v3 details">
       <DescriptionList isHorizontal isCompact>
         {metrics
           .filter((m) => m.value)
