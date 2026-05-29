@@ -5,14 +5,14 @@ updates:
     schedule:
       interval: "monthly"
     commit-message:
-      prefix: ":ghost: "
+      prefix: "ci: "
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "monthly"
     commit-message:
-      prefix: ":ghost: "
+      prefix: "chore(deps): "
 
     allow:
       - dependency-type: direct
@@ -40,11 +40,19 @@ updates:
           - "rollup"
           - "rollup-*"
 
-      linting:
+      linting-formatting:
         patterns:
-          - "@biomejs/*"
+          - "eslint"
+          - "eslint-*"
+          - "@eslint-*"
+          - "@eslint/*"
+          - "*-eslint"
+          - "prettier"
 
       tools:
         patterns:
-          - "@rsbuild/*"
+          - "vite"
+          - "vite-*"
+          - "vitest"
+          - "@vitest/*"
           - "@hey-api/*"
