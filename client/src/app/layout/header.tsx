@@ -48,8 +48,8 @@ export const HeaderApp: React.FC = () => {
     masthead: { leftBrand, leftTitle, rightBrand, supportUrl },
   } = useBranding();
 
-  const authFromHook = useAuth();
-  const auth = isAuthRequired ? authFromHook : undefined;
+  // eslint-disable-next-line @eslint-react/rules-of-hooks -- Required for conditional auth enablement
+  const auth = (isAuthRequired && useAuth()) || undefined;
 
   const navigate = useNavigate();
 
