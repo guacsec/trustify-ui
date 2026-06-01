@@ -41,7 +41,7 @@ export async function deleteSboms(axios: AxiosInstance, sbomIds: string[]) {
 }
 
 export function getFullSbomPaths(sbomDir: string, sbomPaths: string[]) {
-  var fullSbomPaths: string[] = [];
+  const fullSbomPaths: string[] = [];
   sbomPaths.forEach((sbomPath) => {
     fullSbomPaths.push(`${sbomDir}/${sbomPath}`);
   });

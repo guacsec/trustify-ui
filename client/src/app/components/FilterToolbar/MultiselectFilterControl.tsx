@@ -257,9 +257,9 @@ export const MultiselectFilterControl = <TItem,>({
               {filteredOptions.map(
                 ({ groupLabel, label, value, optionProps = {} }, index) => (
                   <SelectOption
+                    key={value}
                     {...optionProps}
                     {...(!optionProps.isDisabled && { hasCheckbox: true })}
-                    key={value}
                     id={withPrefix(`option-${index}`)}
                     value={value}
                     isFocused={focusedItemIndex === index}

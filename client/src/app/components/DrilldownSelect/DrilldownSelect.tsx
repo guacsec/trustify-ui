@@ -159,7 +159,7 @@ export const DrilldownSelect = ({
   const handleOnDrillOut = () => {
     if (searchQuery.type === "drillIn") {
       drillDirection.current = "out";
-      currentParentId && parentIdMap.current.delete(currentParentId);
+      if (currentParentId) parentIdMap.current.delete(currentParentId);
 
       const newParentIds = searchQuery.parentIds.slice(0, -1);
       onSearchQueryChange({

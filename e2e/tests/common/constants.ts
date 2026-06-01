@@ -28,16 +28,17 @@ const CURRENT_LOG_LEVEL =
 
 export const logger = {
   debug: (...args: unknown[]) => {
-    CURRENT_LOG_LEVEL >= LOG_LEVELS.debug && console.log("[DEBUG]", ...args);
+    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.debug) console.log("[DEBUG]", ...args);
   },
   info: (...args: unknown[]) => {
-    CURRENT_LOG_LEVEL >= LOG_LEVELS.info && console.log("[INFO]", ...args);
+    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.info) console.log("[INFO]", ...args);
   },
   warn: (...args: unknown[]) => {
-    CURRENT_LOG_LEVEL >= LOG_LEVELS.warn && console.warn("[WARN]", ...args);
+    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.warn) console.warn("[WARN]", ...args);
   },
   error: (...args: unknown[]) => {
-    CURRENT_LOG_LEVEL >= LOG_LEVELS.error && console.error("[ERROR]", ...args);
+    if (CURRENT_LOG_LEVEL >= LOG_LEVELS.error)
+      console.error("[ERROR]", ...args);
   },
 };
 

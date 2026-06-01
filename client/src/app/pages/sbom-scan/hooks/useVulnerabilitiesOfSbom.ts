@@ -109,8 +109,8 @@ export const useVulnerabilitiesOfSbomByPurls = (purls: string[]) => {
           purls.add(current.purl);
 
           // new opinionated advisory
-          let opinionatedAdvisory: AdvisoryHead | null = null;
-          let opinionatedScore: Score | null = null;
+          let opinionatedAdvisory: AdvisoryHead | null;
+          let opinionatedScore: Score | null;
           if (existingElement.opinionatedAdvisory.score?.type !== score?.type) {
             const preferedAdvisoryScore = [
               {
