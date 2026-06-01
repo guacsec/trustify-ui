@@ -539,30 +539,6 @@ interface TableReportData {
   };
 }
 
-const LogButton: React.FC<{
-  messages?: TableReportData["messages"];
-  setLogData: (data: string[]) => void;
-  toggleLogModal: () => void;
-  children: React.ReactNode;
-}> = ({ messages, setLogData, toggleLogModal, children }) => {
-  if (messages) {
-    return (
-      <Button
-        isInline
-        variant="link"
-        onClick={() => {
-          const newLogData = messagesToLogData(messages);
-          setLogData(newLogData);
-          toggleLogModal();
-        }}
-      >
-        {children}
-      </Button>
-    );
-  }
-  return children;
-};
-
 interface ImporterExpandedAreaProps {
   importer: Importer;
 }
@@ -693,6 +669,12 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
+            const statusIcon = item.error ? (
+              <IconedStatus preset="Failed" label={item.error} />
+            ) : (
+              <IconedStatus preset="Completed" label="Finished successfully" />
+            );
+
             return (
               <Tbody key={item.id}>
                 <Tr {...getTrProps({ item })}>
@@ -729,21 +711,19 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
                     >
                       {item.isRunning ? (
                         <ImporterStatusIcon state="running" />
-                      ) : (
-                        <LogButton
-                          messages={item.messages}
-                          setLogData={setLogData}
-                          toggleLogModal={toggleLogModal}
+                      ) : item.messages ? (
+                        <Button
+                          isInline
+                          variant="link"
+                          onClick={() => {
+                            setLogData(messagesToLogData(item.messages ?? {}));
+                            toggleLogModal();
+                          }}
                         >
-                          {item.error ? (
-                            <IconedStatus preset="Failed" label={item.error} />
-                          ) : (
-                            <IconedStatus
-                              preset="Completed"
-                              label="Finished successfully"
-                            />
-                          )}
-                        </LogButton>
+                          {statusIcon}
+                        </Button>
+                      ) : (
+                        statusIcon
                       )}
                     </Td>
                     <Td
