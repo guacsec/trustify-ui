@@ -170,7 +170,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
           isOpen={isSelectOpen}
           onSelect={onSelectItem}
           onOpenChange={(isOpen) => {
-            !isOpen && closeMenu();
+            if (!isOpen) closeMenu();
           }}
           toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
             <MenuToggle

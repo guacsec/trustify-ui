@@ -171,8 +171,8 @@ const advisoryToModels = (advisories: SbomAdvisory[]) => {
         enrichPurlMapWithPackages(purls, current.packages);
 
         // new opinionated advisory
-        let opinionatedAdvisory: AdvisoryHead | null = null;
-        let opinionatedScore: ScoredVector | null = null;
+        let opinionatedAdvisory: AdvisoryHead | null;
+        let opinionatedScore: ScoredVector | null;
         if (existingElement.opinionatedAdvisory.score?.type !== score?.type) {
           const preferedAdvisoryScore = [
             {

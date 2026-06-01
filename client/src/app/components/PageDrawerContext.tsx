@@ -21,7 +21,7 @@ const usePageDrawerState = () => {
     Partial<DrawerPanelContentProps>
   >({});
   const [drawerPageKey, setDrawerPageKey] = React.useState<string>("");
-  const drawerFocusRef = React.useRef(document.createElement("span"));
+  const drawerFocusRef = React.useRef<HTMLSpanElement>(null);
   return {
     isDrawerExpanded,
     setIsDrawerExpanded,
