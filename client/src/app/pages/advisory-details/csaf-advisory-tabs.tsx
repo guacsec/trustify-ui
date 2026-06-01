@@ -28,18 +28,24 @@ export const CsafAdvisoryTabs: React.FC<CsafAdvisoryTabsProps> = ({
   const { csafDocument, isFetching, fetchError } =
     useFetchCsafSource(advisoryId);
 
+  const hasRelationships =
+    (csafDocument?.product_tree?.relationships?.length ?? 0) > 0;
+
+  const tabKeys = React.useMemo(() => {
+    const keys: string[] = ["overview", "vulnerabilities", "product-tree"];
+    if (hasRelationships) {
+      keys.push("relationship-tree");
+    }
+    keys.push("source");
+    return keys;
+  }, [hasRelationships]);
+
   const {
     propHelpers: { getTabsProps, getTabProps, getTabContentProps },
   } = useTabControls({
     persistenceKeyPrefix: "ad",
     persistTo: "urlParams",
-    tabKeys: [
-      "overview",
-      "vulnerabilities",
-      "product-tree",
-      "relationship-tree",
-      "source",
-    ],
+    tabKeys,
   });
 
   const overviewTabRef = React.useRef<HTMLElement>();
@@ -72,11 +78,13 @@ export const CsafAdvisoryTabs: React.FC<CsafAdvisoryTabsProps> = ({
             title={<TabTitleText>Product Tree</TabTitleText>}
             tabContentRef={productTreeTabRef}
           />
-          <Tab
-            {...getTabProps("relationship-tree")}
-            title={<TabTitleText>Relationship Tree</TabTitleText>}
-            tabContentRef={relationshipTreeTabRef}
-          />
+          {hasRelationships && (
+            <Tab
+              {...getTabProps("relationship-tree")}
+              title={<TabTitleText>Relationship Tree</TabTitleText>}
+              tabContentRef={relationshipTreeTabRef}
+            />
+          )}
           <Tab
             {...getTabProps("source")}
             title={<TabTitleText>Source</TabTitleText>}
@@ -114,15 +122,17 @@ export const CsafAdvisoryTabs: React.FC<CsafAdvisoryTabsProps> = ({
             {csafDocument && <ProductsTable csafDocument={csafDocument} />}
           </LoadingWrapper>
         </TabContent>
-        <TabContent
-          {...getTabContentProps("relationship-tree")}
-          ref={relationshipTreeTabRef}
-          aria-label="CSAF advisory relationship tree"
-        >
-          <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
-            {csafDocument && <RelationshipTree csafDocument={csafDocument} />}
-          </LoadingWrapper>
-        </TabContent>
+        {hasRelationships && (
+          <TabContent
+            {...getTabContentProps("relationship-tree")}
+            ref={relationshipTreeTabRef}
+            aria-label="CSAF advisory relationship tree"
+          >
+            <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
+              {csafDocument && <RelationshipTree csafDocument={csafDocument} />}
+            </LoadingWrapper>
+          </TabContent>
+        )}
         <TabContent
           {...getTabContentProps("source")}
           ref={sourceTabRef}
