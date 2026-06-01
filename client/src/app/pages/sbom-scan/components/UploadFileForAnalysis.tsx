@@ -77,12 +77,12 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
           browseButtonText="Browse Files"
         />
       ) : (
-        Array.from(uploads.entries()).map(([file, upload], index) => {
+        Array.from(uploads.entries()).map(([file, upload]) => {
           if (upload.error) {
             if (upload.wasCancelled) {
               return (
                 <EmptyState
-                  key={`${file.name}-${index}-cancelled`}
+                  key={`${file.name}-${file.size}-cancelled`}
                   status="danger"
                   headingLevel="h4"
                   titleText="Upload cancelled"
@@ -108,7 +108,7 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
 
             return (
               <EmptyState
-                key={`${file.name}-${index}-error`}
+                key={`${file.name}-${file.size}-error`}
                 status="danger"
                 headingLevel="h4"
                 titleText={"Report failed"}
@@ -140,7 +140,7 @@ export const UploadFileForAnalysis: React.FC<IUploadFileForAnalysisProps> = ({
 
           return (
             <EmptyState
-              key={`${file.name}-${index}-progress`}
+              key={`${file.name}-${file.size}-progress`}
               headingLevel="h4"
               titleText={"Analyzing SBOM"}
               icon={Spinner}

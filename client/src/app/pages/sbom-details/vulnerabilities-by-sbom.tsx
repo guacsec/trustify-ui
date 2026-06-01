@@ -352,8 +352,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                 </Tr>
                               </Thead>
                               <Tbody>
-                                {Array.from(item.purls.values()).map(
-                                  (purl, index) => {
+                                {Array.from(item.purls.entries()).map(
+                                  ([purlKey, purl]) => {
                                     if (!purl.isOrphan) {
                                       const decomposedPurl = decomposePurl(
                                         purl.purlSummary.purl,
@@ -390,9 +390,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                       );
                                     } else {
                                       return (
-                                        <Tr
-                                          key={`${purl.parentName}-${index}-name`}
-                                        >
+                                        <Tr key={`orphan-${purl.parentName}`}>
                                           <Td />
                                           <Td />
                                           <Td>{purl.parentName}</Td>
