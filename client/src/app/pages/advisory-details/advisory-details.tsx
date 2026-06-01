@@ -43,9 +43,11 @@ import {
   useFetchAdvisoryById,
 } from "@app/queries/advisories";
 
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
+
+import { CsafAdvisoryTabs } from "./csaf-advisory-tabs";
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
-import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -177,47 +179,53 @@ export const AdvisoryDetails: React.FC = () => {
           </SplitItem>
         </Split>
       </PageSection>
-      <PageSection>
-        <Tabs
-          mountOnEnter
-          {...getTabsProps()}
-          aria-label="Tabs that contain the Advisory information"
-          role="region"
-        >
-          <Tab
-            {...getTabProps("info")}
-            title={<TabTitleText>Info</TabTitleText>}
-            tabContentRef={infoTabRef}
-          />
-          <Tab
-            {...getTabProps("vulnerabilities")}
-            title={<TabTitleText>Vulnerabilities</TabTitleText>}
-            tabContentRef={vulnerabilitiesTabRef}
-          />
-        </Tabs>
-      </PageSection>
-      <PageSection>
-        <TabContent
-          {...getTabContentProps("info")}
-          ref={infoTabRef}
-          aria-label="Information of the Advisory"
-        >
-          <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
-            {advisory && <Overview advisory={advisory} />}
-          </LoadingWrapper>
-        </TabContent>
-        <TabContent
-          {...getTabContentProps("vulnerabilities")}
-          ref={vulnerabilitiesTabRef}
-          aria-label="Vulnerabilities within the Advisory"
-        >
-          <VulnerabilitiesByAdvisory
-            isFetching={isFetching}
-            fetchError={fetchError}
-            vulnerabilities={advisory?.vulnerabilities || []}
-          />
-        </TabContent>
-      </PageSection>
+      {advisory?.labels.type === "csaf" ? (
+        <CsafAdvisoryTabs advisoryId={advisoryId} />
+      ) : (
+        <>
+          <PageSection>
+            <Tabs
+              mountOnEnter
+              {...getTabsProps()}
+              aria-label="Tabs that contain the Advisory information"
+              role="region"
+            >
+              <Tab
+                {...getTabProps("info")}
+                title={<TabTitleText>Info</TabTitleText>}
+                tabContentRef={infoTabRef}
+              />
+              <Tab
+                {...getTabProps("vulnerabilities")}
+                title={<TabTitleText>Vulnerabilities</TabTitleText>}
+                tabContentRef={vulnerabilitiesTabRef}
+              />
+            </Tabs>
+          </PageSection>
+          <PageSection>
+            <TabContent
+              {...getTabContentProps("info")}
+              ref={infoTabRef}
+              aria-label="Information of the Advisory"
+            >
+              <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
+                {advisory && <Overview advisory={advisory} />}
+              </LoadingWrapper>
+            </TabContent>
+            <TabContent
+              {...getTabContentProps("vulnerabilities")}
+              ref={vulnerabilitiesTabRef}
+              aria-label="Vulnerabilities within the Advisory"
+            >
+              <VulnerabilitiesByAdvisory
+                isFetching={isFetching}
+                fetchError={fetchError}
+                vulnerabilities={advisory?.vulnerabilities || []}
+              />
+            </TabContent>
+          </PageSection>
+        </>
+      )}
 
       <ConfirmDialog
         {...advisoryDeleteDialogProps(advisory)}
