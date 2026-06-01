@@ -8,6 +8,7 @@ import type { AxiosError } from "axios";
 
 import type { HubRequestParams, Label } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
+import type { CsafDocument } from "@app/pages/csaf-visualizer";
 import {
   type AdvisoryDetails,
   type Labels,
@@ -136,6 +137,25 @@ export const useFetchAdvisorySourceById = (id: string) => {
 
   return {
     source: data,
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+  };
+};
+
+export const CsafSourceQueryKey = "csaf-source";
+
+export const useFetchCsafSource = (id: string) => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: [CsafSourceQueryKey, id],
+    queryFn: () =>
+      downloadAdvisory({ client, path: { key: id } }).then(
+        (response) => response.data as CsafDocument,
+      ),
+    enabled: !!id,
+  });
+
+  return {
+    csafDocument: data,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
   };
