@@ -90,13 +90,34 @@ Then(
   },
 );
 
-// Advisory Explorer / Vulenrabilities
+// Advisory Explorer / Vulnerabilities
 
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
   async ({ page }) => {
     const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(page);
     await detailsPage._layout.selectTab("Vulnerabilities");
+  },
+);
+
+Then("Vulnerability cards are displayed", async ({ page }) => {
+  const tabContent = page.getByLabel("Vulnerabilities within the Advisory");
+  const cards = tabContent.locator(".pf-v6-c-card");
+  await expect(cards.first()).toBeVisible();
+  expect(await cards.count()).toBeGreaterThan(0);
+});
+
+Then(
+  "The vulnerability card for {string} shows CVE link and details",
+  async ({ page }, vulnerabilityID) => {
+    const tabContent = page.getByLabel("Vulnerabilities within the Advisory");
+    const card = tabContent.locator(".pf-v6-c-card").filter({
+      has: page.getByRole("link", { name: vulnerabilityID }),
+    });
+    await expect(card).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: vulnerabilityID }),
+    ).toBeVisible();
   },
 );
 
