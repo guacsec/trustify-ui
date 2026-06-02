@@ -110,10 +110,11 @@ export const useUrlParams = <
     params = allParamsEmpty ? defaultValue : deserialize(serializedParams);
   }
 
+  /* eslint-disable @eslint-react/exhaustive-deps -- setParams and defaultValue are stable per-mount; including them causes render loops */
   React.useEffect(() => {
     if (allParamsEmpty) setParams(defaultValue);
-    // Leaving this rule enabled results in a cascade of unnecessary useCallbacks:
   }, [allParamsEmpty]);
+  /* eslint-enable @eslint-react/exhaustive-deps */
 
   return [params, setParams];
 };
