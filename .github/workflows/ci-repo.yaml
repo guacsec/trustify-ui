@@ -44,6 +44,9 @@ jobs:
       - name: Crate Clippy
         working-directory: ./crate
         run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Crate Test
+        working-directory: ./crate
+        run: cargo test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
         with:
