@@ -23,6 +23,7 @@ type ListType = {
   [key in ExtendedSeverity]: {
     name: string;
     color: { name: string; value: string; var: string };
+    labelColor: LabelProps["color"];
     progressProps: Pick<ProgressProps, "variant">;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
@@ -34,36 +35,42 @@ export const severityList: ListType = {
   unknown: {
     name: "Unknown",
     color: undefinedColor,
+    labelColor: "grey",
     progressProps: { variant: undefined },
     icon: SeverityUndefinedIcon,
   },
   none: {
     name: "None",
     color: noneColor,
+    labelColor: "grey",
     progressProps: { variant: undefined },
     icon: SeverityNoneIcon,
   },
   low: {
     name: "Low",
     color: minorColor,
+    labelColor: "blue",
     progressProps: { variant: undefined },
     icon: SeverityMinorIcon,
   },
   medium: {
     name: "Medium",
     color: moderateColor,
+    labelColor: "gold",
     progressProps: { variant: "warning" },
     icon: SeverityModerateIcon,
   },
   high: {
     name: "High",
     color: importantColor,
+    labelColor: "orange",
     progressProps: { variant: "danger" },
     icon: SeverityImportantIcon,
   },
   critical: {
     name: "Critical",
     color: criticalColor,
+    labelColor: "red",
     progressProps: { variant: "danger" },
     icon: SeverityCriticalIcon,
   },
@@ -97,6 +104,26 @@ export const vulnerabilityStatusList: VulnerabilityStatusListType = {
     name: "Affected",
     color: "red",
   },
+};
+
+/** Maps free-form severity text (e.g. CSAF aggregate_severity) to an ExtendedSeverity key. */
+export const normalizeSeverityText = (text?: string): ExtendedSeverity => {
+  switch (text?.toLowerCase()) {
+    case "critical":
+      return "critical";
+    case "important":
+    case "high":
+      return "high";
+    case "moderate":
+    case "medium":
+      return "medium";
+    case "low":
+      return "low";
+    case "none":
+      return "none";
+    default:
+      return "unknown";
+  }
 };
 
 export const getSeverityPriority = (val: ExtendedSeverity) => {

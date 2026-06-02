@@ -20,13 +20,16 @@ import {
   GridItem,
   Content,
   Label,
-  type LabelProps,
   List,
   ListItem,
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import { getSeverityPriority, severityList } from "@app/api/model-utils";
+import {
+  getSeverityPriority,
+  normalizeSeverityText,
+  severityList,
+} from "@app/api/model-utils";
 import type { ExtendedSeverity } from "@app/api/models";
 import { formatDate } from "@app/utils/utils";
 
@@ -55,23 +58,6 @@ const REMEDIATION_CONFIG: {
   { category: "no_fix_planned", label: "No Fix Planned", color: "#F0AB00" },
   { category: "none_available", label: "None Available", color: "#C9190B" },
 ];
-
-const getSeverityLabelColor = (text?: string): LabelProps["color"] => {
-  switch (text?.toLowerCase()) {
-    case "critical":
-      return "red";
-    case "important":
-    case "high":
-      return "orange";
-    case "moderate":
-    case "medium":
-      return "gold";
-    case "low":
-      return "blue";
-    default:
-      return "grey";
-  }
-};
 
 export const DocumentOverview: React.FC<DocumentOverviewProps> = ({
   csafDocument,
@@ -157,7 +143,11 @@ export const DocumentOverview: React.FC<DocumentOverviewProps> = ({
                   <DescriptionListTerm>Severity</DescriptionListTerm>
                   <DescriptionListDescription>
                     <Label
-                      color={getSeverityLabelColor(doc.aggregate_severity.text)}
+                      color={
+                        severityList[
+                          normalizeSeverityText(doc.aggregate_severity.text)
+                        ].labelColor
+                      }
                     >
                       {doc.aggregate_severity.text}
                     </Label>
