@@ -16,6 +16,8 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v6
       - name: Use Node.js
@@ -50,7 +52,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
           flags: unit
           slug: ${{ github.repository_owner }}/trustify-ui
           directory: client/coverage
