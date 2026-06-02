@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import type { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -43,10 +43,10 @@ import { ProductsTable } from "@app/pages/csaf-visualizer/components/ProductsTab
 import { RelationshipTree } from "@app/pages/csaf-visualizer/components/RelationshipTree";
 import { SourceView } from "@app/pages/csaf-visualizer/components/SourceView";
 import { VulnerabilitySection } from "@app/pages/csaf-visualizer/components/VulnerabilitySection";
+import type { CsafDocument } from "@app/pages/csaf-visualizer";
 import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
-  useFetchCsafSource,
 } from "@app/queries/advisories";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
@@ -94,13 +94,40 @@ export const AdvisoryDetails: React.FC = () => {
   const { mutate: deleteAdvisory, isPending: isDeleting } =
     useDeleteAdvisoryMutation(onDeleteAdvisorySuccess, onDeleteAdvisoryError);
 
-  // CSAF data
+  // CSAF data — fetched directly without TanStack Query to avoid caching large payloads
   const isCsaf = advisory?.labels.type === "csaf";
-  const {
-    csafDocument,
-    isFetching: isCsafFetching,
-    fetchError: csafFetchError,
-  } = useFetchCsafSource(advisoryId);
+  const [csafDocument, setCsafDocument] = React.useState<CsafDocument>();
+  const [isCsafFetching, setIsCsafFetching] = React.useState(false);
+  const [csafFetchError, setCsafFetchError] = React.useState<AxiosError | null>(
+    null,
+  );
+
+  React.useEffect(() => {
+    if (!isCsaf || !advisoryId) return;
+
+    let cancelled = false;
+    setIsCsafFetching(true);
+    setCsafFetchError(null);
+
+    axios
+      .get<CsafDocument>(
+        `/api/v3/advisory/${encodeURIComponent(advisoryId)}/download`,
+      )
+      .then((response) => {
+        if (!cancelled) setCsafDocument(response.data);
+      })
+      .catch((error: AxiosError) => {
+        if (!cancelled) setCsafFetchError(error);
+      })
+      .finally(() => {
+        if (!cancelled) setIsCsafFetching(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isCsaf, advisoryId]);
+
   const hasRelationships =
     (csafDocument?.product_tree?.relationships?.length ?? 0) > 0;
 
