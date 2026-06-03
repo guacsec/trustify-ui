@@ -54,8 +54,11 @@ function transformBranch(branch: Branch): EChartsTreeNode {
 export function transformBranchesToTreeData(
   branches: Branch[],
 ): EChartsTreeNode {
+  const roots = branches.map(transformBranch);
+  if (roots.length === 1) return roots[0];
   return {
-    name: "Product Tree",
-    children: branches.map(transformBranch),
+    name: "Products",
+    children: roots,
+    itemStyle: { color: "#8A8D90", borderColor: "#8A8D90" },
   };
 }
