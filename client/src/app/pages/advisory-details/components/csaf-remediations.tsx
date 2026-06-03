@@ -15,12 +15,16 @@ import AngleRightIcon from "@patternfly/react-icons/dist/esm/icons/angle-right-i
 
 import type { Remediation } from "@app/specs/csaf/csaf-v2.0-schema";
 
+const expandableSectionStyle = {
+  "--pf-v6-c-expandable-section--m-expanded__toggle-icon--Rotate": "90deg",
+} as React.CSSProperties;
+
 interface CsafRemediationsProps {
   remediations: Remediation[];
   productNameMap: Map<string, string>;
 }
 
-type LabelColor = "red" | "orange" | "gold" | "blue" | "grey";
+type LabelColor = "red" | "orange" | "yellow" | "blue" | "grey";
 
 const remediationColor = (category: string): LabelColor => {
   switch (category) {
@@ -31,7 +35,7 @@ const remediationColor = (category: string): LabelColor => {
     case "vendor_fix":
       return "blue";
     case "workaround":
-      return "gold";
+      return "yellow";
     default:
       return "grey";
   }
@@ -78,7 +82,7 @@ const AffectedProducts: React.FC<{
   const remaining = productIds.length - INITIAL_SHOW;
 
   return (
-    <Flex gap={{ default: "gapXs" }} wrap={{ default: "wrap" }}>
+    <Flex gap={{ default: "gapXs" }} flexWrap={{ default: "wrap" }}>
       {visible.map((id) => (
         <FlexItem key={id}>
           <Label variant="outline" color={color} isCompact>
@@ -88,14 +92,14 @@ const AffectedProducts: React.FC<{
       ))}
       {!expanded && remaining > 0 && (
         <FlexItem>
-          <Button variant="link" isSmall onClick={() => setExpanded(true)}>
+          <Button variant="link" size="sm" onClick={() => setExpanded(true)}>
             +{remaining} more
           </Button>
         </FlexItem>
       )}
       {expanded && productIds.length > INITIAL_SHOW && (
         <FlexItem>
-          <Button variant="link" isSmall onClick={() => setExpanded(false)}>
+          <Button variant="link" size="sm" onClick={() => setExpanded(false)}>
             Show less
           </Button>
         </FlexItem>
@@ -185,6 +189,8 @@ export const CsafRemediations: React.FC<CsafRemediationsProps> = ({
   return (
     <ExpandableSection
       toggleText={`Remediations (${sorted.length})`}
+      toggleIcon={<AngleRightIcon />}
+      style={expandableSectionStyle}
       isIndented
     >
       <Grid hasGutter style={{ marginTop: "var(--pf-v6-global--spacer--sm)" }}>
