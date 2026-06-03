@@ -1,33 +1,12 @@
-import { ExtendedSeverity } from "@app/api/models";
-import {
+import type { LabelProps } from "@patternfly/react-core";
+
+import type {
   Branch,
   FullProductName,
   ProductTree,
 } from "@app/specs/csaf/csaf-v2.0-schema";
-import { LabelProps } from "@patternfly/react-core";
 
-export const csafSeverityToExtendedSeverity = (
-  text: string,
-): ExtendedSeverity => {
-  switch (text.toLowerCase()) {
-    case "critical":
-      return "critical";
-    case "important":
-    case "high":
-      return "high";
-    case "moderate":
-    case "medium":
-      return "medium";
-    case "low":
-      return "low";
-    case "none":
-      return "none";
-    default:
-      return "unknown";
-  }
-};
-
-export const csafSstatusColor = (status: string): LabelProps["color"] => {
+export const csafStatusColor = (status: string): LabelProps["color"] => {
   switch (status.toLowerCase()) {
     case "final":
       return "green";
