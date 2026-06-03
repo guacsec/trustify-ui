@@ -5,6 +5,7 @@ export interface EChartsTreeNode {
   value?: string;
   collapsed?: boolean;
   itemStyle?: { color: string; borderColor?: string };
+  lineStyle?: { color: string; type?: string };
   children?: EChartsTreeNode[];
 }
 
