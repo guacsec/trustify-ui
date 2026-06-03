@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import type { Branch } from "@app/specs/csaf/csaf-v2.0-schema";
 
 import { transformBranchesToTreeData } from "./csaf-tree-helpers";
