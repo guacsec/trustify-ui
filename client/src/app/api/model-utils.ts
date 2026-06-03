@@ -56,7 +56,7 @@ export const severityList: ListType = {
   medium: {
     name: "Medium",
     color: moderateColor,
-    labelColor: "gold",
+    labelColor: "orangered",
     progressProps: { variant: "warning" },
     icon: SeverityModerateIcon,
   },

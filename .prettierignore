@@ -8,4 +8,5 @@
 
 # App excluded files
 client/src/app/client/**
+client/src/app/specs/**
 e2e/tests/common/assets/**
