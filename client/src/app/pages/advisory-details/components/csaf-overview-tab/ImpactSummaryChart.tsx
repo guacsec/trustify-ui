@@ -19,17 +19,10 @@ import {
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { severityOrderOf } from "../../helpers/csaf-utils";
+import { getSeverityPriority, severityList } from "@app/api/model-utils";
+import type { ExtendedSeverity } from "@app/api/models";
 
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: "#C9190B",
-  important: "#EC7A08",
-  high: "#EC7A08",
-  moderate: "#F0AB00",
-  medium: "#F0AB00",
-  low: "#0066CC",
-  unknown: "#8A8D90",
-};
+import { normalizeCsafSeverityText } from "../../helpers/csaf-utils";
 
 interface IImpactSummaryChartProps {
   vulnerabilities: Vulnerability[];
@@ -40,7 +33,7 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
 }) => {
   const chartData = React.useMemo(() => {
     const rows: {
-      severity: string;
+      severity: ExtendedSeverity;
       cveCount: number;
       productCount: number;
     }[] = [];
@@ -49,9 +42,9 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
       {};
 
     for (const vulnerability of vulnerabilities) {
-      const severity = (
-        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
-      ).toLowerCase();
+      const severity: ExtendedSeverity = normalizeCsafSeverityText(
+        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity,
+      );
 
       if (!severityMap[severity]) {
         severityMap[severity] = { cves: 0, products: new Set() };
@@ -73,7 +66,8 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
     }
 
     return rows.sort(
-      (a, b) => severityOrderOf(a.severity) - severityOrderOf(b.severity),
+      (a, b) =>
+        getSeverityPriority(a.severity) - getSeverityPriority(b.severity),
     );
   }, [vulnerabilities]);
 
@@ -115,25 +109,17 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
             />
             <ChartStack horizontal>
               <ChartBar
-                data={chartData.map(({ severity, cveCount }) => {
-                  return {
-                    x: capitalize(severity),
-                    y: cveCount,
-                    label: pluralize(cveCount, "CVE"),
-                  };
-                })}
+                data={chartData.map(({ severity, cveCount }) => ({
+                  x: capitalize(severity),
+                  y: cveCount,
+                  label: pluralize(cveCount, "CVE"),
+                  _severity: severity,
+                }))}
                 style={{
                   data: {
-                    fill: ({ datum }) => {
-                      let color: string | null = null;
-                      if (typeof datum.x === "string") {
-                        const severity = datum.x.toLowerCase();
-                        color = SEVERITY_COLORS[severity]
-                          ? SEVERITY_COLORS[severity]
-                          : null;
-                      }
-                      return color ?? SEVERITY_COLORS.unknown;
-                    },
+                    fill: ({ datum }) =>
+                      severityList[datum._severity as ExtendedSeverity].color
+                        .value,
                   },
                 }}
                 barWidth={20}
@@ -144,20 +130,12 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
                   x: capitalize(severity),
                   y: productCount,
                   label: `${pluralize(productCount, "Product")} affected`,
+                  _severity: severity,
                 }))}
                 style={{
                   data: {
-                    fill: ({ datum }) => {
-                      let color: string | null = null;
-                      if (typeof datum.x === "string") {
-                        const severity = String(datum.x).toLowerCase();
-                        const baseColor = SEVERITY_COLORS[severity]
-                          ? SEVERITY_COLORS[severity]
-                          : null;
-                        color = `${baseColor}80`;
-                      }
-                      return color ?? SEVERITY_COLORS.unknown;
-                    },
+                    fill: ({ datum }) =>
+                      `${severityList[datum._severity as ExtendedSeverity].color.value}80`,
                   },
                 }}
                 barWidth={20}
