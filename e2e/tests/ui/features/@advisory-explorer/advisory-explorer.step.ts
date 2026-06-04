@@ -116,7 +116,7 @@ Then(
     });
     await expect(card).toBeVisible();
     await expect(
-      card.getByRole("link", { name: vulnerabilityID }),
+      card.getByRole("link", { name: vulnerabilityID, exact: true }),
     ).toBeVisible();
   },
 );
