@@ -15,30 +15,35 @@ import {
   Grid,
   GridItem,
   Label,
+  pluralize,
   Stack,
   StackItem,
   Title,
 } from "@patternfly/react-core";
-import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
 import { severityList } from "@app/api/model-utils";
 import { Paths } from "@app/Routes";
-import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
+import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 import { formatDate } from "@app/utils/utils";
 
-import { normalizeCsafSeverityText } from "../../helpers/csaf-utils";
-import { collectProducts, csafStatusColor } from "../csaf-utils";
-import { CSAFImpactChart } from "./ImpactChart";
-import { CSAFRemediationStatus } from "./RemediationStatus";
+import { DocumentNotesCard } from "./components/csaf-overview-tab/DocumentNotesCard";
+import { DocumentReferencesCard } from "./components/csaf-overview-tab/DocumentReferencesCard";
+import { ImpactChart } from "./components/csaf-overview-tab/ImpactChart";
+import { RemediationStatus } from "./components/csaf-overview-tab/RemediationStatus";
+import { RevisionHistoryCard } from "./components/csaf-overview-tab/RevisionHistoryCard";
+import {
+  collectProducts,
+  csafStatusColor,
+  normalizeCsafSeverityText,
+} from "./helpers/csaf-utils";
 
-interface ITabContentCsafOverviewProps {
+interface ICsafOverviewProps {
   csafDocument: CommonSecurityAdvisoryFramework;
 }
 
-export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
+export const CsafOverview: React.FC<ICsafOverviewProps> = ({
   csafDocument,
 }) => {
-  //
   const csafSeverity = csafDocument.document.aggregate_severity?.text;
   const extendedSeverity = csafSeverity
     ? normalizeCsafSeverityText(csafSeverity)
@@ -47,19 +52,19 @@ export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
     ? severityList[extendedSeverity]
     : undefined;
 
-  //
   const { products, relationships } = React.useMemo(() => {
     const products = collectProducts(csafDocument.product_tree?.branches || []);
     const relationships =
       csafDocument.product_tree?.relationships?.map(
         (r) => r.full_product_name,
       ) || [];
-    return {
-      products,
-      relationships,
-    };
-  }, []);
+    return { products, relationships };
+  }, [csafDocument]);
   const totalProducts = products.length + relationships.length;
+
+  const references = csafDocument.document.references?.filter(Boolean);
+  const revisionHistory = csafDocument.document.tracking.revision_history;
+  const notes = csafDocument.document.notes;
 
   return (
     <Stack hasGutter>
@@ -67,9 +72,7 @@ export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
         <Card isFullHeight>
           <CardTitle>
             <Flex
-              justifyContent={{
-                default: "justifyContentSpaceBetween",
-              }}
+              justifyContent={{ default: "justifyContentSpaceBetween" }}
               alignItems={{ default: "alignItemsFlexStart" }}
             >
               <FlexItem>
@@ -188,16 +191,17 @@ export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
                 <Stack hasGutter>
                   <StackItem>
                     <Content component="small">
-                      {csafDocument.vulnerabilities?.length} CVE
-                      {csafDocument.vulnerabilities?.length !== 1
-                        ? "s"
-                        : ""}{" "}
-                      affecting {products.length} product
-                      {totalProducts !== 1 ? "s" : ""}
+                      {csafDocument.vulnerabilities?.length}{" "}
+                      {pluralize(
+                        csafDocument.vulnerabilities?.length ?? 1,
+                        "CVE",
+                      )}{" "}
+                      affecting {products.length}{" "}
+                      {pluralize(totalProducts, "product")}
                     </Content>
                   </StackItem>
                   <StackItem>
-                    <CSAFImpactChart
+                    <ImpactChart
                       vulnerabilities={csafDocument.vulnerabilities || []}
                     />
                   </StackItem>
@@ -216,7 +220,7 @@ export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
                     </Content>
                   </StackItem>
                   <StackItem>
-                    <CSAFRemediationStatus
+                    <RemediationStatus
                       totalProducts={totalProducts}
                       vulnerabilities={csafDocument.vulnerabilities ?? []}
                     />
@@ -228,114 +232,23 @@ export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
         </Grid>
       </StackItem>
 
-      {csafDocument.document.references &&
-        csafDocument.document.references.length > 0 && (
-          <StackItem>
-            <Card>
-              <CardTitle>Document references</CardTitle>
-              <CardBody>
-                <Stack hasGutter>
-                  <StackItem>
-                    <Flex
-                      direction={{ default: "column" }}
-                      gap={{ default: "gapSm" }}
-                    >
-                      {csafDocument.document.references.map((ref) => (
-                        <FlexItem key={ref.url}>
-                          <a
-                            href={ref.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {ref.summary} <ExternalLinkAltIcon />
-                          </a>
-                          {ref.category && ref.category !== "self" && (
-                            <Label
-                              variant="outline"
-                              isCompact
-                              style={{ marginLeft: 8 }}
-                            >
-                              {ref.category}
-                            </Label>
-                          )}
-                        </FlexItem>
-                      ))}
-                    </Flex>
-                  </StackItem>
-                </Stack>
-              </CardBody>
-            </Card>
-          </StackItem>
-        )}
+      {references && references.length > 0 && (
+        <StackItem>
+          <DocumentReferencesCard references={references} />
+        </StackItem>
+      )}
 
-      {csafDocument.document.tracking.revision_history &&
-        csafDocument.document.tracking.revision_history.length > 0 && (
-          <StackItem>
-            <Card>
-              <CardTitle>Revision history</CardTitle>
-              <CardBody>
-                <Stack hasGutter>
-                  <StackItem>
-                    <DescriptionList
-                      isHorizontal
-                      isCompact
-                      horizontalTermWidthModifier={{
-                        md: "15ch",
-                      }}
-                    >
-                      {[...csafDocument.document.tracking.revision_history]
-                        .sort(
-                          (a, b) =>
-                            new Date(b.date).getTime() -
-                            new Date(a.date).getTime(),
-                        )
-                        .map((rev) => (
-                          <DescriptionListGroup key={rev.number}>
-                            <DescriptionListTerm>
-                              <Flex>
-                                <FlexItem>
-                                  <Label variant="outline" isCompact>
-                                    v{rev.number}
-                                  </Label>
-                                </FlexItem>
-                                <FlexItem>
-                                  <Content component="small">
-                                    {formatDate(rev.date)}
-                                  </Content>
-                                </FlexItem>
-                              </Flex>
-                            </DescriptionListTerm>
-                            <DescriptionListDescription>
-                              {rev.summary}
-                            </DescriptionListDescription>
-                          </DescriptionListGroup>
-                        ))}
-                    </DescriptionList>
-                  </StackItem>
-                </Stack>
-              </CardBody>
-            </Card>
-          </StackItem>
-        )}
+      {revisionHistory && revisionHistory.length > 0 && (
+        <StackItem>
+          <RevisionHistoryCard revisions={revisionHistory} />
+        </StackItem>
+      )}
 
-      {csafDocument.document.notes &&
-        csafDocument.document.notes.length > 0 && (
-          <StackItem>
-            <Card>
-              <CardTitle>Notes</CardTitle>
-              <CardBody>
-                <Stack hasGutter>
-                  {csafDocument.document.notes.map((note) => (
-                    <StackItem key={note.title}>
-                      <Content component="h4">{note.title}</Content>
-                      <Content component="p">{note.text}</Content>
-                    </StackItem>
-                  ))}
-                </Stack>
-              </CardBody>
-            </Card>
-          </StackItem>
-        )}
+      {notes && notes.length > 0 && (
+        <StackItem>
+          <DocumentNotesCard notes={notes} />
+        </StackItem>
+      )}
     </Stack>
   );
 };

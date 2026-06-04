@@ -5,12 +5,12 @@ import { ChartDonut } from "@patternfly/react-charts/victory";
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
-interface ICSAFOverviewProps {
+interface IRemediationStatusProps {
   totalProducts: number;
   vulnerabilities: Vulnerability[];
 }
 
-export const CSAFRemediationStatus: React.FC<ICSAFOverviewProps> = ({
+export const RemediationStatus: React.FC<IRemediationStatusProps> = ({
   totalProducts,
   vulnerabilities,
 }) => {

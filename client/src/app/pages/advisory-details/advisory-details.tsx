@@ -48,11 +48,11 @@ import {
 } from "@app/queries/advisories";
 import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { TabContentCsafOverview } from "./components/csaf-overview-tab/TabContentOverview";
-import { CsafProductTree } from "./components/casf-products-tab/csaf-product-tree";
-import { CsafRelationshipTree } from "./components/csaf-relationship-tree-tab/csaf-relationship-tree";
-import { CsafSource } from "./components/csaf-source-tab/csaf-source";
-import { TabContentCsafVulnerabilities } from "./components/csaf-vulnerabilities-tab/TabContentVulnerabilities";
+import { CsafOverview } from "./csaf-overview";
+import { CsafProductTree } from "./csaf-product-tree";
+import { CsafRelationshipTree } from "./csaf-relationship-tree";
+import { CsafSource } from "./csaf-source";
+import { TabContentCsafVulnerabilities } from "./csaf-vulnerabilities";
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
 
@@ -328,7 +328,7 @@ export const AdvisoryDetails: React.FC = () => {
                           fetchError || fetchSourceError || parseError
                         }
                       >
-                        {csaf && <TabContentCsafOverview csafDocument={csaf} />}
+                        {csaf && <CsafOverview csafDocument={csaf} />}
                       </LoadingWrapper>
                     </TabContent>
                   )}

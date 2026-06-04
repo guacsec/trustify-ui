@@ -1,7 +1,5 @@
 import React from "react";
 
-import ReactECharts from "echarts-for-react";
-
 import {
   Card,
   CardBody,
@@ -24,10 +22,11 @@ import {
   RELATIONSHIP_CATEGORY_COLORS,
   RELATIONSHIP_LINE_STYLES,
   transformRelationshipsToTreeData,
-} from "../../helpers/csaf-relationship-helpers";
-import { BRANCH_CATEGORY_COLORS } from "../../helpers/csaf-tree-helpers";
+} from "./helpers/csaf-relationship-helpers";
+import { BRANCH_CATEGORY_COLORS } from "./helpers/csaf-tree-helpers";
+import { CsafTreeChart } from "./components/CsafTreeChart";
 
-interface CsafRelationshipTreeProps {
+interface ICsafRelationshipTreeProps {
   csaf: CommonSecurityAdvisoryFramework;
 }
 
@@ -111,7 +110,7 @@ const RelationshipLegend: React.FC = () => {
   );
 };
 
-export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
+export const CsafRelationshipTree: React.FC<ICsafRelationshipTreeProps> = ({
   csaf,
 }) => {
   const relationships = csaf.product_tree?.relationships;
@@ -121,18 +120,6 @@ export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
     if (!relationships || relationships.length === 0) return null;
     return transformRelationshipsToTreeData(relationships, branches ?? []);
   }, [relationships, branches]);
-
-  const leafCount = React.useMemo(() => {
-    if (!treeData) return 0;
-    function count(node: { children?: unknown[] }): number {
-      if (!node.children || node.children.length === 0) return 1;
-      return (node.children as { children?: unknown[] }[]).reduce(
-        (s, c) => s + count(c),
-        0,
-      );
-    }
-    return count(treeData);
-  }, [treeData]);
 
   if (!treeData) {
     return (
@@ -149,66 +136,6 @@ export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
     );
   }
 
-  const chartHeight = Math.max(600, leafCount * 26);
-
-  const option = {
-    tooltip: {
-      trigger: "item" as const,
-      triggerOn: "mousemove" as const,
-      formatter: (params: { name: string; value?: string }) => {
-        let html = `<strong>${params.name}</strong>`;
-        if (params.value) {
-          html += `<br/><span style="color:#999">ID:</span> ${params.value}`;
-        }
-        return html;
-      },
-    },
-    series: [
-      {
-        type: "tree" as const,
-        data: [treeData],
-        left: "6%",
-        right: "20%",
-        top: "2%",
-        bottom: "2%",
-        orient: "LR" as const,
-        roam: true,
-        symbol: "circle" as const,
-        symbolSize: 10,
-        edgeShape: "curve" as const,
-        lineStyle: {
-          width: 1.5,
-          curveness: 0.5,
-        },
-        initialTreeDepth: 2,
-        expandAndCollapse: true,
-        animationDuration: 550,
-        animationDurationUpdate: 750,
-        label: {
-          position: "right" as const,
-          verticalAlign: "middle" as const,
-          align: "left" as const,
-          fontSize: 11,
-          fontFamily:
-            "RedHatText, Overpass, overpass, helvetica, arial, sans-serif",
-          color: "#151515",
-          distance: 8,
-        },
-        leaves: {
-          label: {
-            position: "right" as const,
-            verticalAlign: "middle" as const,
-            align: "left" as const,
-          },
-        },
-        emphasis: {
-          focus: "descendant" as const,
-          lineStyle: { width: 3 },
-        },
-      },
-    ],
-  };
-
   return (
     <Card>
       <CardBody>
@@ -217,13 +144,7 @@ export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
             <Title headingLevel="h3" size="md">
               Relationship tree
             </Title>
-            <Content
-              component="small"
-              style={{
-                color: "var(--pf-v6-global--Color--200)",
-                marginTop: "var(--pf-v6-global--spacer--xs)",
-              }}
-            >
+            <Content component="small">
               Hover to highlight path. Click a node to expand or collapse. Drag
               to pan, scroll to zoom.
             </Content>
@@ -232,11 +153,13 @@ export const CsafRelationshipTree: React.FC<CsafRelationshipTreeProps> = ({
             <RelationshipLegend />
           </StackItem>
           <StackItem>
-            <ReactECharts
-              option={option}
-              style={{ height: `${chartHeight}px`, width: "100%" }}
-              notMerge
-              lazyUpdate
+            <CsafTreeChart
+              treeData={treeData}
+              initialTreeDepth={2}
+              chartMinHeight={600}
+              leafMultiplier={26}
+              chartPadding={{ left: "6%", right: "20%" }}
+              fontSize={11}
             />
           </StackItem>
         </Stack>

@@ -10,11 +10,11 @@ import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external
 
 import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 
-interface CsafSourceProps {
+interface ICsafSourceProps {
   csaf: CommonSecurityAdvisoryFramework;
 }
 
-export const CsafSource: React.FC<CsafSourceProps> = ({ csaf }) => {
+export const CsafSource: React.FC<ICsafSourceProps> = ({ csaf }) => {
   const selfRef = csaf.document.references?.find(
     (ref) => ref.category === "self",
   );

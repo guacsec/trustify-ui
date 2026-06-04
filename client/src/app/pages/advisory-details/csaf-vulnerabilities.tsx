@@ -10,67 +10,27 @@ import {
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
 import type {
-  Branch,
   CommonSecurityAdvisoryFramework,
-  JSONSchemaForCommonVulnerabilityScoringSystemVersion30,
-  JSONSchemaForCommonVulnerabilityScoringSystemVersion31,
   Vulnerability,
 } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { CsafVulnerabilityCard } from "./VulnerabilityCard";
-
-type CvssV3 =
-  | JSONSchemaForCommonVulnerabilityScoringSystemVersion30
-  | JSONSchemaForCommonVulnerabilityScoringSystemVersion31;
+import type { CvssV3 } from "./helpers/csaf-utils";
+import { buildProductNameMap, severityOrderOf } from "./helpers/csaf-utils";
+import { CsafVulnerabilityCard } from "./components/csaf-vulnerabilities-tab/VulnerabilityCard";
 
 interface ITabContentCsafVulnerabilitiesProps {
   csaf: CommonSecurityAdvisoryFramework;
 }
 
-const SEVERITY_ORDER: Record<string, number> = {
-  CRITICAL: 0,
-  HIGH: 1,
-  MEDIUM: 2,
-  LOW: 3,
-  NONE: 4,
-};
-
 const sortBySeverity = (vulnerabilities: Vulnerability[]): Vulnerability[] => {
   return [...vulnerabilities].sort((a, b) => {
     const aCvss = a.scores?.[0]?.cvss_v3 as CvssV3 | undefined;
     const bCvss = b.scores?.[0]?.cvss_v3 as CvssV3 | undefined;
-    const aSev = aCvss?.baseSeverity?.toUpperCase() || "NONE";
-    const bSev = bCvss?.baseSeverity?.toUpperCase() || "NONE";
-    return (SEVERITY_ORDER[aSev] ?? 5) - (SEVERITY_ORDER[bSev] ?? 5);
+    const aSev = aCvss?.baseSeverity ?? "NONE";
+    const bSev = bCvss?.baseSeverity ?? "NONE";
+    return severityOrderOf(aSev) - severityOrderOf(bSev);
   });
 };
-
-function collectBranchProducts(branches: Branch[], map: Map<string, string>) {
-  for (const branch of branches) {
-    if (branch.product) {
-      map.set(branch.product.product_id, branch.product.name);
-    }
-    if (branch.branches) {
-      collectBranchProducts(branch.branches, map);
-    }
-  }
-}
-
-function buildProductNameMap(
-  csaf: CommonSecurityAdvisoryFramework,
-): Map<string, string> {
-  const map = new Map<string, string>();
-  const products = csaf.product_tree?.full_product_names;
-  if (products) {
-    for (const p of products) {
-      map.set(p.product_id, p.name);
-    }
-  }
-  if (csaf.product_tree?.branches) {
-    collectBranchProducts(csaf.product_tree.branches, map);
-  }
-  return map;
-}
 
 export const TabContentCsafVulnerabilities: React.FC<
   ITabContentCsafVulnerabilitiesProps

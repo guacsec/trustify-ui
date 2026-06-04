@@ -19,6 +19,8 @@ import {
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
+import { severityOrderOf } from "../../helpers/csaf-utils";
+
 const SEVERITY_COLORS: Record<string, string> = {
   critical: "#C9190B",
   important: "#EC7A08",
@@ -29,21 +31,11 @@ const SEVERITY_COLORS: Record<string, string> = {
   unknown: "#8A8D90",
 };
 
-const SEVERITY_ORDER: Record<string, number> = {
-  critical: 0,
-  important: 1,
-  high: 1,
-  moderate: 2,
-  medium: 2,
-  low: 3,
-  unknown: 4,
-};
-
-interface ICSAFImpactChartProps {
+interface IImpactChartProps {
   vulnerabilities: Vulnerability[];
 }
 
-export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
+export const ImpactChart: React.FC<IImpactChartProps> = ({
   vulnerabilities,
 }) => {
   const impactData = React.useMemo(() => {
@@ -74,11 +66,9 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
       });
     }
 
-    return rows.sort((a, b) => {
-      return (
-        (SEVERITY_ORDER[a.severity] ?? 99) - (SEVERITY_ORDER[b.severity] ?? 99)
-      );
-    });
+    return rows.sort(
+      (a, b) => severityOrderOf(a.severity) - severityOrderOf(b.severity),
+    );
   }, [vulnerabilities]);
 
   return (

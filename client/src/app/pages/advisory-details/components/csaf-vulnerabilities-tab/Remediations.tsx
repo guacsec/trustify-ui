@@ -5,18 +5,19 @@ import {
   CardBody,
   Content,
   ExpandableSection,
-  GalleryItem,
   Grid,
+  GridItem,
   Label,
-  LabelGroup,
-  LabelProps,
+  type LabelProps,
   Stack,
   StackItem,
 } from "@patternfly/react-core";
 
 import type { Remediation } from "@app/specs/csaf/csaf-v2.0-schema";
 
-interface CsafRemediationsProps {
+import { AffectedProducts } from "./AffectedProducts";
+
+interface ICsafRemediationsProps {
   remediations: Remediation[];
   productNameMap: Map<string, string>;
 }
@@ -56,29 +57,13 @@ const URL_REGEX = /(https?:\/\/[^\s,)]+)/g;
 const linkifyDetails = (text: string): React.ReactNode => {
   const parts = text.split(URL_REGEX);
   return parts.map((part, i) =>
-    URL_REGEX.test(part) ? (
+    i % 2 === 1 ? (
       <a key={i} href={part} target="_blank" rel="noopener noreferrer">
         {part}
       </a>
     ) : (
       part
     ),
-  );
-};
-
-const AffectedProducts: React.FC<{
-  productIds: string[];
-  productNameMap: Map<string, string>;
-  color?: LabelProps["color"];
-}> = ({ productIds, productNameMap, color = "orange" }) => {
-  return (
-    <LabelGroup numLabels={5}>
-      {productIds.map((id) => (
-        <Label key={id} variant="outline" color={color} isCompact>
-          {productNameMap.get(id) ?? id}
-        </Label>
-      ))}
-    </LabelGroup>
   );
 };
 
@@ -128,7 +113,7 @@ const REMEDIATION_ORDER: Record<string, number> = {
   no_fix_planned: 3,
 };
 
-export const CsafRemediations: React.FC<CsafRemediationsProps> = ({
+export const CsafRemediations: React.FC<ICsafRemediationsProps> = ({
   remediations,
   productNameMap,
 }) => {
@@ -147,12 +132,12 @@ export const CsafRemediations: React.FC<CsafRemediationsProps> = ({
     >
       <Grid hasGutter md={6}>
         {sorted.map((rem, i) => (
-          <GalleryItem key={`${rem.category}-${i}`}>
+          <GridItem key={`${rem.category}-${i}`}>
             <RemediationCard
               remediation={rem}
               productNameMap={productNameMap}
             />
-          </GalleryItem>
+          </GridItem>
         ))}
       </Grid>
     </ExpandableSection>

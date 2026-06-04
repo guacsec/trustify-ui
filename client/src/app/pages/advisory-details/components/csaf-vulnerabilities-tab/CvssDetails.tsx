@@ -7,20 +7,13 @@ import {
   DescriptionListTerm,
 } from "@patternfly/react-core";
 
-import type {
-  JSONSchemaForCommonVulnerabilityScoringSystemVersion30,
-  JSONSchemaForCommonVulnerabilityScoringSystemVersion31,
-} from "@app/specs/csaf/csaf-v2.0-schema";
+import type { CvssV3 } from "../../helpers/csaf-utils";
 
-type CvssV3 =
-  | JSONSchemaForCommonVulnerabilityScoringSystemVersion30
-  | JSONSchemaForCommonVulnerabilityScoringSystemVersion31;
-
-interface CsafCvssDetailsProps {
+interface ICsafCvssDetailsProps {
   cvss: CvssV3;
 }
 
-export const CsafCvssDetails: React.FC<CsafCvssDetailsProps> = ({ cvss }) => {
+export const CsafCvssDetails: React.FC<ICsafCvssDetailsProps> = ({ cvss }) => {
   const metrics: { label: string; value?: string; isCode?: boolean }[] = [
     { label: "Attack vector", value: cvss.attackVector },
     { label: "Attack complexity", value: cvss.attackComplexity },
