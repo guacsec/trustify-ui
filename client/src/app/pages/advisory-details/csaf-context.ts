@@ -9,7 +9,6 @@ export interface ICsafContextValue {
   csaf: CommonSecurityAdvisoryFramework | null;
   productNameMap: Map<string, string>;
   products: FullProductName[];
-  totalProducts: number;
 }
 
 export const CsafContext = React.createContext<ICsafContextValue>(

@@ -18,14 +18,12 @@ export const CsafProvider: React.FC<ICsafProviderProps> = ({
 }) => {
   const value = React.useMemo<ICsafContextValue>(() => {
     const products = collectProducts(csaf?.product_tree?.branches || []);
-    const relationshipCount = csaf?.product_tree?.relationships?.length ?? 0;
     const productNameMap = csaf ? buildProductNameMap(csaf) : EMPTY_MAP;
 
     return {
       csaf,
       productNameMap,
       products,
-      totalProducts: products.length + relationshipCount,
     };
   }, [csaf]);
 

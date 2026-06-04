@@ -18,9 +18,11 @@ export const RemediationStatus: React.FC<IRemediationStatusProps> = ({
     const counts: Record<string, Set<string>> = {};
     for (const vuln of vulnerabilities) {
       for (const rem of vuln.remediations ?? []) {
-        if (!counts[rem.category]) counts[rem.category] = new Set();
-        for (const pid of rem.product_ids ?? []) {
-          counts[rem.category].add(pid);
+        if (!counts[rem.category]) {
+          counts[rem.category] = new Set();
+        }
+        for (const productId of rem.product_ids ?? []) {
+          counts[rem.category].add(productId);
         }
       }
     }

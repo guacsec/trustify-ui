@@ -45,20 +45,26 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
       productCount: number;
     }[] = [];
 
-    const seen: Record<string, { cves: number; products: Set<string> }> = {};
+    const severityMap: Record<string, { cves: number; products: Set<string> }> =
+      {};
 
-    for (const vuln of vulnerabilities) {
-      const sev = (
-        vuln.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
+    for (const vulnerability of vulnerabilities) {
+      const severity = (
+        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
       ).toLowerCase();
-      if (!seen[sev]) seen[sev] = { cves: 0, products: new Set() };
-      seen[sev].cves += 1;
-      for (const pid of vuln.scores?.[0]?.products ?? []) {
-        seen[sev].products.add(pid);
+
+      if (!severityMap[severity]) {
+        severityMap[severity] = { cves: 0, products: new Set() };
+      }
+      severityMap[severity].cves += 1;
+
+      const products = vulnerability.product_status?.known_affected ?? [];
+      for (const productId of products) {
+        severityMap[severity].products.add(productId);
       }
     }
 
-    for (const [severity, data] of Object.entries(seen)) {
+    for (const [severity, data] of Object.entries(severityMap)) {
       rows.push({
         severity,
         cveCount: data.cves,
@@ -119,10 +125,13 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = String(datum.x).toLowerCase();
-                      const color = SEVERITY_COLORS[severity]
-                        ? SEVERITY_COLORS[severity]
-                        : null;
+                      let color: string | null = null;
+                      if (typeof datum.x === "string") {
+                        const severity = datum.x.toLowerCase();
+                        color = SEVERITY_COLORS[severity]
+                          ? SEVERITY_COLORS[severity]
+                          : null;
+                      }
                       return color ?? SEVERITY_COLORS.unknown;
                     },
                   },
@@ -139,11 +148,15 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = String(datum.x).toLowerCase();
-                      const color = SEVERITY_COLORS[severity]
-                        ? SEVERITY_COLORS[severity]
-                        : null;
-                      return `${color}80`;
+                      let color: string | null = null;
+                      if (typeof datum.x === "string") {
+                        const severity = String(datum.x).toLowerCase();
+                        const baseColor = SEVERITY_COLORS[severity]
+                          ? SEVERITY_COLORS[severity]
+                          : null;
+                        color = `${baseColor}80`;
+                      }
+                      return color ?? SEVERITY_COLORS.unknown;
                     },
                   },
                 }}

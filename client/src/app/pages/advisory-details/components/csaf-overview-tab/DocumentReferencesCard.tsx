@@ -29,7 +29,7 @@ export const DocumentReferencesCard: React.FC<IDocumentReferencesCardProps> = ({
               {ref.summary} <ExternalLinkAltIcon />
             </a>
             {ref.category && ref.category !== "self" && (
-              <Label variant="outline" isCompact style={{ marginLeft: 8 }}>
+              <Label variant="outline" isCompact>
                 {ref.category}
               </Label>
             )}

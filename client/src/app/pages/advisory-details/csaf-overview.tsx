@@ -37,13 +37,9 @@ import {
 } from "./helpers/csaf-utils";
 
 export const CsafOverview: React.FC = () => {
-  const {
-    csaf: csafDocument,
-    products,
-    totalProducts,
-  } = React.useContext(CsafContext);
+  const { csaf: csafDocument, products } = React.useContext(CsafContext);
 
-  const { severityProps, references, revisionHistory, notes } =
+  const { severityProps, references, revisionHistory, notes, totalAffected } =
     React.useMemo(() => {
       const csafSeverity = csafDocument?.document.aggregate_severity?.text;
       const extendedSeverity = csafSeverity
@@ -57,11 +53,18 @@ export const CsafOverview: React.FC = () => {
       const revisionHistory = csafDocument?.document.tracking.revision_history;
       const notes = csafDocument?.document.notes;
 
+      const totalAffected = new Set(
+        (csafDocument?.vulnerabilities ?? []).flatMap(
+          (v) => v.product_status?.known_affected ?? [],
+        ),
+      ).size;
+
       return {
         severityProps,
         references,
         revisionHistory,
         notes,
+        totalAffected,
       };
     }, [csafDocument]);
 
@@ -194,7 +197,7 @@ export const CsafOverview: React.FC = () => {
                         csafDocument?.vulnerabilities?.length ?? 1,
                         "CVE",
                       )}{" "}
-                      affecting {pluralize(totalProducts, "product")}
+                      affecting {pluralize(totalAffected, "product")}
                     </Content>
                   </StackItem>
                   <StackItem>
@@ -218,7 +221,7 @@ export const CsafOverview: React.FC = () => {
                   </StackItem>
                   <StackItem>
                     <RemediationStatus
-                      totalProducts={totalProducts}
+                      totalProducts={products.length}
                       vulnerabilities={csafDocument?.vulnerabilities ?? []}
                     />
                   </StackItem>
