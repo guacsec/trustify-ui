@@ -21,11 +21,12 @@ import {
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import { normalizeSeverityText, severityList } from "@app/api/model-utils";
+import { severityList } from "@app/api/model-utils";
 import { Paths } from "@app/Routes";
 import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 import { formatDate } from "@app/utils/utils";
 
+import { normalizeCsafSeverityText } from "../helpers/csaf-utils";
 import { collectProducts, csafStatusColor } from "./csaf-utils";
 import { CSAFImpactChart } from "./CSAFImpactChart";
 import { CSAFRemediationStatus } from "./CSAFRemediationStatus";
@@ -40,7 +41,7 @@ export const CSAFOverview: React.FC<ICSAFOverviewProps> = ({
   //
   const csafSeverity = csafDocument.document.aggregate_severity?.text;
   const extendedSeverity = csafSeverity
-    ? normalizeSeverityText(csafSeverity)
+    ? normalizeCsafSeverityText(csafSeverity)
     : undefined;
   const severityProps = extendedSeverity
     ? severityList[extendedSeverity]

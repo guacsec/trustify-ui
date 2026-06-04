@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import axios, { type AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -16,7 +16,6 @@ import {
   FlexItem,
   Label,
   MenuToggle,
-  type MenuToggleElement,
   PageSection,
   Split,
   SplitItem,
@@ -24,6 +23,7 @@ import {
   TabContent,
   Tabs,
   TabTitleText,
+  type MenuToggleElement,
 } from "@patternfly/react-core";
 
 import {
@@ -32,27 +32,29 @@ import {
   advisoryDeletedSuccessMessage,
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
+import { ExtendedSeverity } from "@app/api/models";
+import { client } from "@app/axios-config/apiInit";
 import { downloadAdvisory, type AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import { WithSeverityProps } from "@app/components/WithSeverityProps";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
 import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
 } from "@app/queries/advisories";
-import { client } from "@app/axios-config/apiInit";
-
-import { Overview } from "./overview";
-import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
-import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
+
 import { CSAFOverview } from "./components/CSAFOverview";
-import { CsafVulnerabilities } from "./csaf-vulnerabilities";
 import { CsafProductTree } from "./csaf-product-tree";
 import { CsafRelationshipTree } from "./csaf-relationship-tree";
 import { CsafSource } from "./csaf-source";
+import { CsafVulnerabilities } from "./csaf-vulnerabilities";
+import { Overview } from "./overview";
+import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
 
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -105,24 +107,24 @@ export const AdvisoryDetails: React.FC = () => {
     tabKeys: [
       "info",
       "vulnerabilities",
-      "overview",
+      "csaf-overview",
       "csaf-vulnerabilities",
-      "products",
-      "relationship-tree",
-      "source",
+      "csaf-products",
+      "csaf-relationship-tree",
+      "csaf-source",
     ],
     defaultActiveTab: {
-      tabKey: !isCsaf ? "info" : "overview",
+      tabKey: !isCsaf ? "info" : "csaf-overview",
     },
   });
 
   const infoTabRef = React.useRef<HTMLElement>(null);
   const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
-  const overviewTabRef = React.useRef<HTMLElement>(null);
+  const csafOverviewTabRef = React.useRef<HTMLElement>(null);
   const csafVulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
-  const productsTabRef = React.useRef<HTMLElement>(null);
-  const relationshipTreeTabRef = React.useRef<HTMLElement>(null);
-  const sourceTabRef = React.useRef<HTMLElement>(null);
+  const csafProductsTabRef = React.useRef<HTMLElement>(null);
+  const csafRelationshipTreeTabRef = React.useRef<HTMLElement>(null);
+  const csafSourceTabRef = React.useRef<HTMLElement>(null);
 
   return (
     <>
@@ -155,7 +157,15 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {advisory?.labels.severity && (
                     <FlexItem>
-                      <Label color="blue">{`severity=${advisory.labels.severity}`}</Label>
+                      <WithSeverityProps
+                        severity={advisory.labels.severity as ExtendedSeverity}
+                      >
+                        {(props) => (
+                          <Label
+                            color={props?.labelColor}
+                          >{`severity=${advisory.labels.severity}`}</Label>
+                        )}
+                      </WithSeverityProps>
                     </FlexItem>
                   )}
                 </Flex>
@@ -243,9 +253,9 @@ export const AdvisoryDetails: React.FC = () => {
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("overview")}
+                        {...getTabProps("csaf-overview")}
                         title={<TabTitleText>Overview</TabTitleText>}
-                        tabContentRef={overviewTabRef}
+                        tabContentRef={csafOverviewTabRef}
                       />
                     )}
                     {isCsaf && (
@@ -257,23 +267,23 @@ export const AdvisoryDetails: React.FC = () => {
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("products")}
+                        {...getTabProps("csaf-products")}
                         title={<TabTitleText>Products</TabTitleText>}
-                        tabContentRef={productsTabRef}
+                        tabContentRef={csafProductsTabRef}
                       />
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("relationship-tree")}
+                        {...getTabProps("csaf-relationship-tree")}
                         title={<TabTitleText>Relationship Tree</TabTitleText>}
-                        tabContentRef={relationshipTreeTabRef}
+                        tabContentRef={csafRelationshipTreeTabRef}
                       />
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("source")}
+                        {...getTabProps("csaf-source")}
                         title={<TabTitleText>Source</TabTitleText>}
-                        tabContentRef={sourceTabRef}
+                        tabContentRef={csafSourceTabRef}
                       />
                     )}
                   </Tabs>
@@ -308,8 +318,8 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {isCsaf && (
                     <TabContent
-                      {...getTabContentProps("overview")}
-                      ref={overviewTabRef}
+                      {...getTabContentProps("csaf-overview")}
+                      ref={csafOverviewTabRef}
                       aria-label="CSAF advisory overview"
                     >
                       <LoadingWrapper
@@ -340,8 +350,8 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {isCsaf && (
                     <TabContent
-                      {...getTabContentProps("products")}
-                      ref={productsTabRef}
+                      {...getTabContentProps("csaf-products")}
+                      ref={csafProductsTabRef}
                       aria-label="CSAF product tree"
                     >
                       <LoadingWrapper
@@ -356,8 +366,8 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {isCsaf && (
                     <TabContent
-                      {...getTabContentProps("relationship-tree")}
-                      ref={relationshipTreeTabRef}
+                      {...getTabContentProps("csaf-relationship-tree")}
+                      ref={csafRelationshipTreeTabRef}
                       aria-label="CSAF relationship tree"
                     >
                       <LoadingWrapper
@@ -372,8 +382,8 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {isCsaf && (
                     <TabContent
-                      {...getTabContentProps("source")}
-                      ref={sourceTabRef}
+                      {...getTabContentProps("csaf-source")}
+                      ref={csafSourceTabRef}
                       aria-label="CSAF source JSON"
                     >
                       <LoadingWrapper
