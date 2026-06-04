@@ -169,7 +169,7 @@ Then(
 Then(
   "User visits Vulnerability details Page of {string} by clicking it",
   async ({ page }, vulnerabilityID) => {
-    const link = page.getByRole("link", { name: vulnerabilityID });
+    const link = page.getByRole("link", { name: vulnerabilityID, exact: true });
 
     await Promise.all([
       page.waitForURL(new RegExp(`/vulnerabilities/${vulnerabilityID}$`)),
