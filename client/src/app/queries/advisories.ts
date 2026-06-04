@@ -127,15 +127,23 @@ export const useDeleteAdvisoryMutation = (
   });
 };
 
-export const useFetchAdvisorySourceById = (id: string) => {
+export const useFetchAdvisorySourceById = (id: string, enabled = true) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [AdvisoriesQueryKey, id, "source"],
-    queryFn: () => downloadAdvisory({ client, path: { key: id } }),
-    enabled: !!id,
+    queryFn: async () => {
+      const response = await downloadAdvisory({
+        client,
+        path: { key: id },
+        responseType: "text",
+        headers: { Accept: "text/plain" },
+      });
+      return String(response.data);
+    },
+    enabled: !!id && enabled,
   });
 
   return {
-    source: data,
+    source: data ?? null,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
   };
