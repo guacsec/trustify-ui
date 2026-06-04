@@ -13,7 +13,7 @@
 
 ## Testing
 - [ ] All tests pass (`npm test`)
-- [ ] No lint errors (`npm run check`)
+- [ ] No lint errors (`npm run lint`)
 - [ ] No type errors (TypeScript compiles cleanly)
 - [ ] New/changed UI behavior visually verified in browser
 - [ ] Mock data updated if API types changed

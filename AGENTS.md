@@ -14,7 +14,7 @@ Four npm workspaces:
   - Exports `TrustificationEnvType`, `encodeEnv`, `decodeEnv`, branding assets
   - Built with Rollup to both ESM (.mjs) and CommonJS (.cjs)
 - **`client/`** — React SPA
-  - Tech: React 19, TypeScript, Rsbuild (Rspack), PatternFly 6
+  - Tech: ReactJS, TypeScript, Vite, PatternFly
   - Dev server: port 3000 with proxy to backend
   - Key paths (with `@app` alias mapping to `client/src/app/`):
     - `@app/Routes.tsx` — route definitions with lazy() imports
