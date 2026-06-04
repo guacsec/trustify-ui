@@ -52,7 +52,8 @@ import { CsafOverview } from "./csaf-overview";
 import { CsafProductTree } from "./csaf-product-tree";
 import { CsafRelationshipTree } from "./csaf-relationship-tree";
 import { CsafSource } from "./csaf-source";
-import { TabContentCsafVulnerabilities } from "./csaf-vulnerabilities";
+import { CsafVulnerabilities } from "./csaf-vulnerabilities";
+import { CsafProvider } from "./csaf-provider";
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
 
@@ -317,84 +318,78 @@ export const AdvisoryDetails: React.FC = () => {
                     </TabContent>
                   )}
                   {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-overview")}
-                      ref={csafOverviewTabRef}
-                      aria-label="CSAF advisory overview"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                    <CsafProvider csaf={csaf}>
+                      <TabContent
+                        {...getTabContentProps("csaf-overview")}
+                        ref={csafOverviewTabRef}
+                        aria-label="CSAF advisory overview"
                       >
-                        {csaf && <CsafOverview csafDocument={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-vulnerabilities")}
-                      ref={csafVulnerabilitiesTabRef}
-                      aria-label="CSAF vulnerabilities"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafOverview />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-vulnerabilities")}
+                        ref={csafVulnerabilitiesTabRef}
+                        aria-label="CSAF vulnerabilities"
                       >
-                        {csaf && <TabContentCsafVulnerabilities csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-products")}
-                      ref={csafProductsTabRef}
-                      aria-label="CSAF product tree"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafVulnerabilities />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-products")}
+                        ref={csafProductsTabRef}
+                        aria-label="CSAF product tree"
                       >
-                        {csaf && <CsafProductTree csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-relationship-tree")}
-                      ref={csafRelationshipTreeTabRef}
-                      aria-label="CSAF relationship tree"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafProductTree />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-relationship-tree")}
+                        ref={csafRelationshipTreeTabRef}
+                        aria-label="CSAF relationship tree"
                       >
-                        {csaf && <CsafRelationshipTree csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-source")}
-                      ref={csafSourceTabRef}
-                      aria-label="CSAF source JSON"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafRelationshipTree />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-source")}
+                        ref={csafSourceTabRef}
+                        aria-label="CSAF source JSON"
                       >
-                        {csaf && <CsafSource csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafSource />
+                        </LoadingWrapper>
+                      </TabContent>
+                    </CsafProvider>
                   )}
                 </PageSection>
               </>

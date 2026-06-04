@@ -47,6 +47,28 @@ export const normalizeCsafSeverityText = (text?: string): ExtendedSeverity => {
   }
 };
 
+export type RemediationProps = {
+  label: string;
+  color: LabelProps["color"];
+  order: number;
+};
+
+export const remediationList: Record<string, RemediationProps> = {
+  vendor_fix: { label: "Vendor fix", color: "blue", order: 0 },
+  workaround: { label: "Workaround", color: "yellow", order: 1 },
+  none_available: { label: "None available", color: "orange", order: 2 },
+  no_fix_planned: { label: "No fix planned", color: "red", order: 3 },
+};
+
+const defaultRemediationProps = (category: string): RemediationProps => ({
+  label: category.replace(/_/g, " "),
+  color: "grey",
+  order: 99,
+});
+
+export const getRemediationProps = (category: string): RemediationProps =>
+  remediationList[category] ?? defaultRemediationProps(category);
+
 export const csafStatusColor = (status: string): LabelProps["color"] => {
   switch (status.toLowerCase()) {
     case "final":

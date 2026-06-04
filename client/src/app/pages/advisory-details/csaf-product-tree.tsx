@@ -16,17 +16,12 @@ import {
 } from "@patternfly/react-core";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
-import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
-
 import {
   BRANCH_CATEGORY_COLORS,
   transformBranchesToTreeData,
 } from "./helpers/csaf-tree-helpers";
 import { CsafTreeChart } from "./components/CsafTreeChart";
-
-interface ICsafProductTreeProps {
-  csaf: CommonSecurityAdvisoryFramework;
-}
+import { CsafContext } from "./csaf-context";
 
 const CATEGORY_LABELS = [
   "vendor",
@@ -71,12 +66,13 @@ const CategoryLegend: React.FC = () => {
   );
 };
 
-export const CsafProductTree: React.FC<ICsafProductTreeProps> = ({ csaf }) => {
+export const CsafProductTree: React.FC = () => {
+  const { csaf } = React.useContext(CsafContext);
   const treeData = React.useMemo(() => {
-    const branches = csaf.product_tree?.branches;
+    const branches = csaf?.product_tree?.branches;
     if (!branches || branches.length === 0) return null;
     return transformBranchesToTreeData(branches);
-  }, [csaf.product_tree?.branches]);
+  }, [csaf?.product_tree?.branches]);
 
   if (!treeData) {
     return (

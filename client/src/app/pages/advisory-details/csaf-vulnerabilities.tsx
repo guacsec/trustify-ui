@@ -9,18 +9,12 @@ import {
 } from "@patternfly/react-core";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
-import type {
-  CommonSecurityAdvisoryFramework,
-  Vulnerability,
-} from "@app/specs/csaf/csaf-v2.0-schema";
+import type { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import type { CvssV3 } from "./helpers/csaf-utils";
-import { buildProductNameMap, severityOrderOf } from "./helpers/csaf-utils";
 import { CsafVulnerabilityCard } from "./components/csaf-vulnerabilities-tab/VulnerabilityCard";
-
-interface ITabContentCsafVulnerabilitiesProps {
-  csaf: CommonSecurityAdvisoryFramework;
-}
+import { CsafContext } from "./csaf-context";
+import type { CvssV3 } from "./helpers/csaf-utils";
+import { severityOrderOf } from "./helpers/csaf-utils";
 
 const sortBySeverity = (vulnerabilities: Vulnerability[]): Vulnerability[] => {
   return [...vulnerabilities].sort((a, b) => {
@@ -32,17 +26,14 @@ const sortBySeverity = (vulnerabilities: Vulnerability[]): Vulnerability[] => {
   });
 };
 
-export const TabContentCsafVulnerabilities: React.FC<
-  ITabContentCsafVulnerabilitiesProps
-> = ({ csaf }) => {
-  const vulnerabilities = csaf.vulnerabilities;
+export const CsafVulnerabilities: React.FC = () => {
+  const { csaf, productNameMap } = React.useContext(CsafContext);
+  const vulnerabilities = csaf?.vulnerabilities;
 
   const sortedVulnerabilities = React.useMemo(
     () => (vulnerabilities ? sortBySeverity(vulnerabilities) : []),
     [vulnerabilities],
   );
-
-  const productNameMap = React.useMemo(() => buildProductNameMap(csaf), [csaf]);
 
   if (sortedVulnerabilities.length === 0) {
     return (

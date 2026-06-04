@@ -23,48 +23,47 @@ import {
 
 import { severityList } from "@app/api/model-utils";
 import { Paths } from "@app/Routes";
-import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 import { formatDate } from "@app/utils/utils";
 
 import { DocumentNotesCard } from "./components/csaf-overview-tab/DocumentNotesCard";
 import { DocumentReferencesCard } from "./components/csaf-overview-tab/DocumentReferencesCard";
-import { ImpactChart } from "./components/csaf-overview-tab/ImpactChart";
+import { ImpactSummaryChart } from "./components/csaf-overview-tab/ImpactSummaryChart";
 import { RemediationStatus } from "./components/csaf-overview-tab/RemediationStatus";
 import { RevisionHistoryCard } from "./components/csaf-overview-tab/RevisionHistoryCard";
+import { CsafContext } from "./csaf-context";
 import {
-  collectProducts,
   csafStatusColor,
   normalizeCsafSeverityText,
 } from "./helpers/csaf-utils";
 
-interface ICsafOverviewProps {
-  csafDocument: CommonSecurityAdvisoryFramework;
-}
+export const CsafOverview: React.FC = () => {
+  const {
+    csaf: csafDocument,
+    products,
+    totalProducts,
+  } = React.useContext(CsafContext);
 
-export const CsafOverview: React.FC<ICsafOverviewProps> = ({
-  csafDocument,
-}) => {
-  const csafSeverity = csafDocument.document.aggregate_severity?.text;
-  const extendedSeverity = csafSeverity
-    ? normalizeCsafSeverityText(csafSeverity)
-    : undefined;
-  const severityProps = extendedSeverity
-    ? severityList[extendedSeverity]
-    : undefined;
+  const { severityProps, references, revisionHistory, notes } =
+    React.useMemo(() => {
+      const csafSeverity = csafDocument?.document.aggregate_severity?.text;
+      const extendedSeverity = csafSeverity
+        ? normalizeCsafSeverityText(csafSeverity)
+        : undefined;
+      const severityProps = extendedSeverity
+        ? severityList[extendedSeverity]
+        : undefined;
 
-  const { products, relationships } = React.useMemo(() => {
-    const products = collectProducts(csafDocument.product_tree?.branches || []);
-    const relationships =
-      csafDocument.product_tree?.relationships?.map(
-        (r) => r.full_product_name,
-      ) || [];
-    return { products, relationships };
-  }, [csafDocument]);
-  const totalProducts = products.length + relationships.length;
+      const references = csafDocument?.document.references?.filter(Boolean);
+      const revisionHistory = csafDocument?.document.tracking.revision_history;
+      const notes = csafDocument?.document.notes;
 
-  const references = csafDocument.document.references?.filter(Boolean);
-  const revisionHistory = csafDocument.document.tracking.revision_history;
-  const notes = csafDocument.document.notes;
+      return {
+        severityProps,
+        references,
+        revisionHistory,
+        notes,
+      };
+    }, [csafDocument]);
 
   return (
     <Stack hasGutter>
@@ -77,20 +76,20 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
             >
               <FlexItem>
                 <Title headingLevel="h2" size="xl">
-                  {csafDocument.document.title}
+                  {csafDocument?.document.title}
                 </Title>
               </FlexItem>
               <FlexItem>
                 <Flex gap={{ default: "gapSm" }}>
-                  {csafDocument.document.aggregate_severity && (
+                  {csafDocument?.document.aggregate_severity && (
                     <FlexItem>
                       <Label color={severityProps?.labelColor}>
                         Severity:{" "}
-                        {csafDocument.document.aggregate_severity.text}
+                        {csafDocument?.document.aggregate_severity.text}
                       </Label>
                     </FlexItem>
                   )}
-                  {csafDocument.document.distribution?.tlp && (
+                  {csafDocument?.document.distribution?.tlp && (
                     <FlexItem>
                       <Label>
                         TLP: {csafDocument.document.distribution.tlp.label}
@@ -106,16 +105,16 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
               <DescriptionListGroup>
                 <DescriptionListTerm>Tracking ID</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {csafDocument.document.tracking.id.startsWith("CVE-") ? (
+                  {csafDocument?.document.tracking.id.startsWith("CVE-") ? (
                     <Link
                       to={generatePath(Paths.vulnerabilityDetails, {
-                        vulnerabilityId: csafDocument.document.tracking.id,
+                        vulnerabilityId: csafDocument?.document.tracking.id,
                       })}
                     >
-                      {csafDocument.document.tracking.id}
+                      {csafDocument?.document.tracking.id}
                     </Link>
                   ) : (
-                    csafDocument.document.tracking.id
+                    csafDocument?.document.tracking.id
                   )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -124,31 +123,31 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
                 <DescriptionListDescription>
                   <Label
                     color={csafStatusColor(
-                      csafDocument.document.tracking.status,
+                      csafDocument?.document.tracking.status ?? "",
                     )}
                   >
-                    {csafDocument.document.tracking.status}
+                    {csafDocument?.document.tracking.status}
                   </Label>
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Version</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {csafDocument.document.tracking.version}
+                  {csafDocument?.document.tracking.version}
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Category</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {csafDocument.document.category}
+                  {csafDocument?.document.category}
                 </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Publisher</DescriptionListTerm>
                 <DescriptionListDescription>
-                  {csafDocument.document.publisher.name}{" "}
+                  {csafDocument?.document.publisher.name}{" "}
                   <Label variant="outline" isCompact>
-                    {csafDocument.document.publisher.category}
+                    {csafDocument?.document.publisher.category}
                   </Label>
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -156,7 +155,7 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
                 <DescriptionListTerm>Initial release</DescriptionListTerm>
                 <DescriptionListDescription>
                   {formatDate(
-                    csafDocument.document.tracking.initial_release_date,
+                    csafDocument?.document.tracking.initial_release_date,
                   )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -164,11 +163,11 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
                 <DescriptionListTerm>Current release</DescriptionListTerm>
                 <DescriptionListDescription>
                   {formatDate(
-                    csafDocument.document.tracking.current_release_date,
+                    csafDocument?.document.tracking.current_release_date,
                   )}
                 </DescriptionListDescription>
               </DescriptionListGroup>
-              {csafDocument.document.tracking.generator && (
+              {csafDocument?.document.tracking.generator && (
                 <DescriptionListGroup>
                   <DescriptionListTerm>Generator</DescriptionListTerm>
                   <DescriptionListDescription>
@@ -191,18 +190,16 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
                 <Stack hasGutter>
                   <StackItem>
                     <Content component="small">
-                      {csafDocument.vulnerabilities?.length}{" "}
                       {pluralize(
-                        csafDocument.vulnerabilities?.length ?? 1,
+                        csafDocument?.vulnerabilities?.length ?? 1,
                         "CVE",
                       )}{" "}
-                      affecting {products.length}{" "}
-                      {pluralize(totalProducts, "product")}
+                      affecting {pluralize(totalProducts, "product")}
                     </Content>
                   </StackItem>
                   <StackItem>
-                    <ImpactChart
-                      vulnerabilities={csafDocument.vulnerabilities || []}
+                    <ImpactSummaryChart
+                      vulnerabilities={csafDocument?.vulnerabilities || []}
                     />
                   </StackItem>
                 </Stack>
@@ -222,7 +219,7 @@ export const CsafOverview: React.FC<ICsafOverviewProps> = ({
                   <StackItem>
                     <RemediationStatus
                       totalProducts={totalProducts}
-                      vulnerabilities={csafDocument.vulnerabilities ?? []}
+                      vulnerabilities={csafDocument?.vulnerabilities ?? []}
                     />
                   </StackItem>
                 </Stack>

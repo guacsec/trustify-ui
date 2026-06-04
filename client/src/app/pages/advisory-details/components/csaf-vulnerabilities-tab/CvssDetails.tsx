@@ -9,11 +9,11 @@ import {
 
 import type { CvssV3 } from "../../helpers/csaf-utils";
 
-interface ICsafCvssDetailsProps {
+interface ICvssDetailsProps {
   cvss: CvssV3;
 }
 
-export const CsafCvssDetails: React.FC<ICsafCvssDetailsProps> = ({ cvss }) => {
+export const CvssDetails: React.FC<ICvssDetailsProps> = ({ cvss }) => {
   const metrics: { label: string; value?: string; isCode?: boolean }[] = [
     { label: "Attack vector", value: cvss.attackVector },
     { label: "Attack complexity", value: cvss.attackComplexity },

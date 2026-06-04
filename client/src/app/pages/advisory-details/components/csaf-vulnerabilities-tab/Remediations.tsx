@@ -8,49 +8,14 @@ import {
   Grid,
   GridItem,
   Label,
-  type LabelProps,
   Stack,
   StackItem,
 } from "@patternfly/react-core";
 
 import type { Remediation } from "@app/specs/csaf/csaf-v2.0-schema";
 
+import { getRemediationProps } from "../../helpers/csaf-utils";
 import { AffectedProducts } from "./AffectedProducts";
-
-interface ICsafRemediationsProps {
-  remediations: Remediation[];
-  productNameMap: Map<string, string>;
-}
-
-const remediationColor = (category: string): LabelProps["color"] => {
-  switch (category) {
-    case "no_fix_planned":
-      return "red";
-    case "none_available":
-      return "orange";
-    case "vendor_fix":
-      return "blue";
-    case "workaround":
-      return "yellow";
-    default:
-      return "grey";
-  }
-};
-
-const remediationLabel = (category: string): string => {
-  switch (category) {
-    case "no_fix_planned":
-      return "No fix planned";
-    case "none_available":
-      return "None available";
-    case "vendor_fix":
-      return "Vendor fix";
-    case "workaround":
-      return "Workaround";
-    default:
-      return category.replace(/_/g, " ");
-  }
-};
 
 const URL_REGEX = /(https?:\/\/[^\s,)]+)/g;
 
@@ -67,20 +32,24 @@ const linkifyDetails = (text: string): React.ReactNode => {
   );
 };
 
+interface IRemediationCardProps {
+  remediations: Remediation[];
+  productNameMap: Map<string, string>;
+}
+
 const RemediationCard: React.FC<{
   remediation: Remediation;
   productNameMap: Map<string, string>;
 }> = ({ remediation, productNameMap }) => {
   const productIds = remediation.product_ids || [];
+  const props = getRemediationProps(remediation.category);
 
   return (
     <Card variant="secondary" isFullHeight>
       <CardBody>
         <Stack hasGutter>
           <StackItem>
-            <Label color={remediationColor(remediation.category)}>
-              {remediationLabel(remediation.category)}
-            </Label>
+            <Label color={props.color}>{props.label}</Label>
           </StackItem>
           <StackItem>
             <Content component="p">
@@ -95,7 +64,7 @@ const RemediationCard: React.FC<{
                 <AffectedProducts
                   productIds={productIds}
                   productNameMap={productNameMap}
-                  color={remediationColor(remediation.category)}
+                  color={props.color}
                 />
               </ExpandableSection>
             )}
@@ -106,22 +75,15 @@ const RemediationCard: React.FC<{
   );
 };
 
-const REMEDIATION_ORDER: Record<string, number> = {
-  vendor_fix: 0,
-  workaround: 1,
-  none_available: 2,
-  no_fix_planned: 3,
-};
-
-export const CsafRemediations: React.FC<ICsafRemediationsProps> = ({
+export const CsafRemediations: React.FC<IRemediationCardProps> = ({
   remediations,
   productNameMap,
 }) => {
   const sorted = React.useMemo(() => {
     return [...remediations].sort(
       (a, b) =>
-        (REMEDIATION_ORDER[a.category] ?? 99) -
-        (REMEDIATION_ORDER[b.category] ?? 99),
+        getRemediationProps(a.category).order -
+        getRemediationProps(b.category).order,
     );
   }, [remediations]);
 

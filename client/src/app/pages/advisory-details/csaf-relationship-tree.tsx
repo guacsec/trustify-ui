@@ -16,8 +16,6 @@ import {
 } from "@patternfly/react-core";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
-import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
-
 import {
   RELATIONSHIP_CATEGORY_COLORS,
   RELATIONSHIP_LINE_STYLES,
@@ -25,10 +23,7 @@ import {
 } from "./helpers/csaf-relationship-helpers";
 import { BRANCH_CATEGORY_COLORS } from "./helpers/csaf-tree-helpers";
 import { CsafTreeChart } from "./components/CsafTreeChart";
-
-interface ICsafRelationshipTreeProps {
-  csaf: CommonSecurityAdvisoryFramework;
-}
+import { CsafContext } from "./csaf-context";
 
 const NODE_CATEGORY_LABELS = [
   "vendor",
@@ -110,11 +105,10 @@ const RelationshipLegend: React.FC = () => {
   );
 };
 
-export const CsafRelationshipTree: React.FC<ICsafRelationshipTreeProps> = ({
-  csaf,
-}) => {
-  const relationships = csaf.product_tree?.relationships;
-  const branches = csaf.product_tree?.branches;
+export const CsafRelationshipTree: React.FC = () => {
+  const { csaf } = React.useContext(CsafContext);
+  const relationships = csaf?.product_tree?.relationships;
+  const branches = csaf?.product_tree?.branches;
 
   const treeData = React.useMemo(() => {
     if (!relationships || relationships.length === 0) return null;

@@ -1,6 +1,13 @@
 import React from "react";
 
 import {
+  Chart,
+  ChartAxis,
+  ChartBar,
+  ChartStack,
+  ChartTooltip,
+} from "@patternfly/react-charts/victory";
+import {
   capitalize,
   Content,
   Flex,
@@ -9,13 +16,6 @@ import {
   Stack,
   StackItem,
 } from "@patternfly/react-core";
-import {
-  Chart,
-  ChartAxis,
-  ChartBar,
-  ChartStack,
-  ChartTooltip,
-} from "@patternfly/react-charts/victory";
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
@@ -31,14 +31,14 @@ const SEVERITY_COLORS: Record<string, string> = {
   unknown: "#8A8D90",
 };
 
-interface IImpactChartProps {
+interface IImpactSummaryChartProps {
   vulnerabilities: Vulnerability[];
 }
 
-export const ImpactChart: React.FC<IImpactChartProps> = ({
+export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
   vulnerabilities,
 }) => {
-  const impactData = React.useMemo(() => {
+  const chartData = React.useMemo(() => {
     const rows: {
       severity: string;
       cveCount: number;
@@ -76,12 +76,12 @@ export const ImpactChart: React.FC<IImpactChartProps> = ({
       <StackItem>
         <div
           style={{
-            height: Math.max(120, impactData.length * 50 + 40),
+            height: Math.max(120, chartData.length * 50 + 40),
             width: "100%",
           }}
         >
           <Chart
-            height={Math.max(120, impactData.length * 50 + 40)}
+            height={Math.max(120, chartData.length * 50 + 40)}
             padding={{
               top: 10,
               bottom: 35,
@@ -109,7 +109,7 @@ export const ImpactChart: React.FC<IImpactChartProps> = ({
             />
             <ChartStack horizontal>
               <ChartBar
-                data={impactData.map(({ severity, cveCount }) => {
+                data={chartData.map(({ severity, cveCount }) => {
                   return {
                     x: capitalize(severity),
                     y: cveCount,
@@ -119,7 +119,7 @@ export const ImpactChart: React.FC<IImpactChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = (datum.x as string).toLowerCase();
+                      const severity = String(datum.x).toLowerCase();
                       const color = SEVERITY_COLORS[severity]
                         ? SEVERITY_COLORS[severity]
                         : null;
@@ -131,7 +131,7 @@ export const ImpactChart: React.FC<IImpactChartProps> = ({
                 labelComponent={<ChartTooltip constrainToVisibleArea />}
               />
               <ChartBar
-                data={impactData.map(({ severity, productCount }) => ({
+                data={chartData.map(({ severity, productCount }) => ({
                   x: capitalize(severity),
                   y: productCount,
                   label: `${pluralize(productCount, "Product")} affected`,
@@ -139,7 +139,7 @@ export const ImpactChart: React.FC<IImpactChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = (datum.x as string).toLowerCase();
+                      const severity = String(datum.x).toLowerCase();
                       const color = SEVERITY_COLORS[severity]
                         ? SEVERITY_COLORS[severity]
                         : null;
