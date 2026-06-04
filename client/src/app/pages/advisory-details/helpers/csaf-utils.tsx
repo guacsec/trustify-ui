@@ -84,19 +84,22 @@ export const csafStatusColor = (status: string): LabelProps["color"] => {
   }
 };
 
-export const collectProducts = (
-  branches: Branch[],
-  result: FullProductName[] = [],
-): FullProductName[] => {
-  for (const branch of branches) {
-    if (branch.product) {
-      result.push(branch.product);
+export const collectProducts = (branches: Branch[]): FullProductName[] => {
+  const seen = new Map<string, FullProductName>();
+
+  const walk = (nodes: Branch[]): void => {
+    for (const branch of nodes) {
+      if (branch.product && !seen.has(branch.product.product_id)) {
+        seen.set(branch.product.product_id, branch.product);
+      }
+      if (branch.branches) {
+        walk(branch.branches);
+      }
     }
-    if (branch.branches) {
-      collectProducts(branch.branches, result);
-    }
-  }
-  return result;
+  };
+
+  walk(branches);
+  return Array.from(seen.values());
 };
 
 export const collectRelationshipProducts = (
