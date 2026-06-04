@@ -21,31 +21,31 @@ export const RELATIONSHIP_LINE_STYLES: Record<string, string> = {
   optional_component_of: "dotted",
 };
 
-function buildProductIdMap(
+const buildProductIdMap = (
   branches: Branch[],
-): Map<string, { name: string; category: string }> {
+): Map<string, { name: string; category: string }> => {
   const map = new Map<string, { name: string; category: string }>();
 
-  function walk(b: Branch) {
+  const walk = (b: Branch) => {
     if (b.product) {
       map.set(b.product.product_id, { name: b.name, category: b.category });
     }
     b.branches?.forEach(walk);
-  }
+  };
 
   branches.forEach(walk);
   return map;
-}
+};
 
-function findVendorName(branches: Branch[]): string {
+const findVendorName = (branches: Branch[]): string => {
   const vendor = branches.find((b) => b.category === "vendor");
   return vendor?.name ?? "Root";
-}
+};
 
-export function transformRelationshipsToTreeData(
+export const transformRelationshipsToTreeData = (
   relationships: Relationship[],
   branches: Branch[],
-): EChartsTreeNode {
+): EChartsTreeNode => {
   const productMap = buildProductIdMap(branches);
   const vendorName = findVendorName(branches);
 
@@ -128,4 +128,4 @@ export function transformRelationshipsToTreeData(
     },
     children: productNodes,
   };
-}
+};
