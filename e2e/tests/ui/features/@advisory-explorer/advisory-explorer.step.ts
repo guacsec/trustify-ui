@@ -101,7 +101,7 @@ Then(
 );
 
 Then("Vulnerability cards are displayed", async ({ page }) => {
-  const tabContent = page.getByLabel("Vulnerabilities within the Advisory");
+  const tabContent = page.getByLabel("CSAF vulnerabilities");
   const cards = tabContent.getByTestId("vulnerability-card");
   await expect(cards.first()).toBeVisible();
   expect(await cards.count()).toBeGreaterThan(0);
@@ -110,7 +110,7 @@ Then("Vulnerability cards are displayed", async ({ page }) => {
 Then(
   "The vulnerability card for {string} shows CVE link and details",
   async ({ page }, vulnerabilityID) => {
-    const tabContent = page.getByLabel("Vulnerabilities within the Advisory");
+    const tabContent = page.getByLabel("CSAF vulnerabilities");
     const card = tabContent.getByTestId("vulnerability-card").filter({
       has: page.getByRole("link", { name: vulnerabilityID }),
     });
