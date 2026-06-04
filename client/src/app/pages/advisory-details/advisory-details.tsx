@@ -445,6 +445,7 @@ const AdvisorySourceFetcher: React.FC<IAdvisorySourceFetcherProps> = ({
   React.useEffect(() => {
     if (isEnabled) {
       let cancelled = false;
+      setIsFetching(true);
       downloadAdvisory({
         client,
         path: { key: advisoryId },
