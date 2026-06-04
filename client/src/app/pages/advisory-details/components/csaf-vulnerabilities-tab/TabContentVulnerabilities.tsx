@@ -17,13 +17,13 @@ import type {
   Vulnerability,
 } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { CsafVulnerabilityCard } from "./components/csaf-vulnerability-card";
+import { CsafVulnerabilityCard } from "./VulnerabilityCard";
 
 type CvssV3 =
   | JSONSchemaForCommonVulnerabilityScoringSystemVersion30
   | JSONSchemaForCommonVulnerabilityScoringSystemVersion31;
 
-interface CsafVulnerabilitiesProps {
+interface ITabContentCsafVulnerabilitiesProps {
   csaf: CommonSecurityAdvisoryFramework;
 }
 
@@ -35,7 +35,7 @@ const SEVERITY_ORDER: Record<string, number> = {
   NONE: 4,
 };
 
-function sortBySeverity(vulnerabilities: Vulnerability[]): Vulnerability[] {
+const sortBySeverity = (vulnerabilities: Vulnerability[]): Vulnerability[] => {
   return [...vulnerabilities].sort((a, b) => {
     const aCvss = a.scores?.[0]?.cvss_v3 as CvssV3 | undefined;
     const bCvss = b.scores?.[0]?.cvss_v3 as CvssV3 | undefined;
@@ -43,7 +43,7 @@ function sortBySeverity(vulnerabilities: Vulnerability[]): Vulnerability[] {
     const bSev = bCvss?.baseSeverity?.toUpperCase() || "NONE";
     return (SEVERITY_ORDER[aSev] ?? 5) - (SEVERITY_ORDER[bSev] ?? 5);
   });
-}
+};
 
 function collectBranchProducts(branches: Branch[], map: Map<string, string>) {
   for (const branch of branches) {
@@ -72,19 +72,19 @@ function buildProductNameMap(
   return map;
 }
 
-export const CsafVulnerabilities: React.FC<CsafVulnerabilitiesProps> = ({
-  csaf,
-}) => {
+export const TabContentCsafVulnerabilities: React.FC<
+  ITabContentCsafVulnerabilitiesProps
+> = ({ csaf }) => {
   const vulnerabilities = csaf.vulnerabilities;
 
-  const sorted = React.useMemo(
+  const sortedVulnerabilities = React.useMemo(
     () => (vulnerabilities ? sortBySeverity(vulnerabilities) : []),
     [vulnerabilities],
   );
 
   const productNameMap = React.useMemo(() => buildProductNameMap(csaf), [csaf]);
 
-  if (sorted.length === 0) {
+  if (sortedVulnerabilities.length === 0) {
     return (
       <EmptyState
         titleText="No vulnerabilities"
@@ -101,7 +101,7 @@ export const CsafVulnerabilities: React.FC<CsafVulnerabilitiesProps> = ({
 
   return (
     <Stack hasGutter>
-      {sorted.map((vuln, i) => (
+      {sortedVulnerabilities.map((vuln, i) => (
         <StackItem key={vuln.cve || `vuln-${i}`}>
           <CsafVulnerabilityCard
             vulnerability={vuln}

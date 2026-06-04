@@ -41,17 +41,7 @@ export const CsafCvssDetails: React.FC<CsafCvssDetailsProps> = ({ cvss }) => {
           <DescriptionListGroup key={m.label}>
             <DescriptionListTerm>{m.label}</DescriptionListTerm>
             <DescriptionListDescription>
-              {m.isCode ? (
-                <code
-                  style={{
-                    fontSize: "var(--pf-v6-global--FontSize--xs)",
-                  }}
-                >
-                  {m.value}
-                </code>
-              ) : (
-                m.value
-              )}
+              {m.isCode ? <code>{m.value}</code> : m.value}
             </DescriptionListDescription>
           </DescriptionListGroup>
         ))}

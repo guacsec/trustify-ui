@@ -23,7 +23,7 @@ import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-
 import {
   BRANCH_CATEGORY_COLORS,
   transformBranchesToTreeData,
-} from "./helpers/csaf-tree-helpers";
+} from "../../helpers/csaf-tree-helpers";
 
 interface CsafProductTreeProps {
   csaf: CommonSecurityAdvisoryFramework;
@@ -176,13 +176,7 @@ export const CsafProductTree: React.FC<CsafProductTreeProps> = ({ csaf }) => {
             <Title headingLevel="h3" size="md">
               Product tree
             </Title>
-            <Content
-              component="small"
-              style={{
-                color: "var(--pf-v6-global--Color--200)",
-                marginTop: "var(--pf-v6-global--spacer--xs)",
-              }}
-            >
+            <Content component="small">
               Click a node to expand or collapse. Scroll to zoom, drag to pan.
             </Content>
           </StackItem>

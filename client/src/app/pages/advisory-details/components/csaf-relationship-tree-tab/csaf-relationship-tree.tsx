@@ -24,8 +24,8 @@ import {
   RELATIONSHIP_CATEGORY_COLORS,
   RELATIONSHIP_LINE_STYLES,
   transformRelationshipsToTreeData,
-} from "./helpers/csaf-relationship-helpers";
-import { BRANCH_CATEGORY_COLORS } from "./helpers/csaf-tree-helpers";
+} from "../../helpers/csaf-relationship-helpers";
+import { BRANCH_CATEGORY_COLORS } from "../../helpers/csaf-tree-helpers";
 
 interface CsafRelationshipTreeProps {
   csaf: CommonSecurityAdvisoryFramework;

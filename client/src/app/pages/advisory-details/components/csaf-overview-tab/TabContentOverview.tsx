@@ -26,16 +26,16 @@ import { Paths } from "@app/Routes";
 import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
 import { formatDate } from "@app/utils/utils";
 
-import { normalizeCsafSeverityText } from "../helpers/csaf-utils";
-import { collectProducts, csafStatusColor } from "./csaf-utils";
-import { CSAFImpactChart } from "./CSAFImpactChart";
-import { CSAFRemediationStatus } from "./CSAFRemediationStatus";
+import { normalizeCsafSeverityText } from "../../helpers/csaf-utils";
+import { collectProducts, csafStatusColor } from "../csaf-utils";
+import { CSAFImpactChart } from "./ImpactChart";
+import { CSAFRemediationStatus } from "./RemediationStatus";
 
-interface ICSAFOverviewProps {
+interface ITabContentCsafOverviewProps {
   csafDocument: CommonSecurityAdvisoryFramework;
 }
 
-export const CSAFOverview: React.FC<ICSAFOverviewProps> = ({
+export const TabContentCsafOverview: React.FC<ITabContentCsafOverviewProps> = ({
   csafDocument,
 }) => {
   //
