@@ -8,14 +8,11 @@ import {
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
+import { CsafContext } from "./csaf-context";
 
-interface CsafSourceProps {
-  csaf: CommonSecurityAdvisoryFramework;
-}
-
-export const CsafSource: React.FC<CsafSourceProps> = ({ csaf }) => {
-  const selfRef = csaf.document.references?.find(
+export const CsafSource: React.FC = () => {
+  const { csaf } = React.useContext(CsafContext);
+  const selfRef = csaf?.document.references?.find(
     (ref) => ref.category === "self",
   );
 

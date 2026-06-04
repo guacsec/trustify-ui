@@ -1,6 +1,13 @@
 import React from "react";
 
 import {
+  Chart,
+  ChartAxis,
+  ChartBar,
+  ChartStack,
+  ChartTooltip,
+} from "@patternfly/react-charts/victory";
+import {
   capitalize,
   Content,
   Flex,
@@ -9,15 +16,10 @@ import {
   Stack,
   StackItem,
 } from "@patternfly/react-core";
-import {
-  Chart,
-  ChartAxis,
-  ChartBar,
-  ChartStack,
-  ChartTooltip,
-} from "@patternfly/react-charts/victory";
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
+
+import { severityOrderOf } from "../../helpers/csaf-utils";
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: "#C9190B",
@@ -29,44 +31,40 @@ const SEVERITY_COLORS: Record<string, string> = {
   unknown: "#8A8D90",
 };
 
-const SEVERITY_ORDER: Record<string, number> = {
-  critical: 0,
-  important: 1,
-  high: 1,
-  moderate: 2,
-  medium: 2,
-  low: 3,
-  unknown: 4,
-};
-
-interface ICSAFImpactChartProps {
+interface IImpactSummaryChartProps {
   vulnerabilities: Vulnerability[];
 }
 
-export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
+export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
   vulnerabilities,
 }) => {
-  const impactData = React.useMemo(() => {
+  const chartData = React.useMemo(() => {
     const rows: {
       severity: string;
       cveCount: number;
       productCount: number;
     }[] = [];
 
-    const seen: Record<string, { cves: number; products: Set<string> }> = {};
+    const severityMap: Record<string, { cves: number; products: Set<string> }> =
+      {};
 
-    for (const vuln of vulnerabilities) {
-      const sev = (
-        vuln.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
+    for (const vulnerability of vulnerabilities) {
+      const severity = (
+        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
       ).toLowerCase();
-      if (!seen[sev]) seen[sev] = { cves: 0, products: new Set() };
-      seen[sev].cves += 1;
-      for (const pid of vuln.scores?.[0]?.products ?? []) {
-        seen[sev].products.add(pid);
+
+      if (!severityMap[severity]) {
+        severityMap[severity] = { cves: 0, products: new Set() };
+      }
+      severityMap[severity].cves += 1;
+
+      const products = vulnerability.product_status?.known_affected ?? [];
+      for (const productId of products) {
+        severityMap[severity].products.add(productId);
       }
     }
 
-    for (const [severity, data] of Object.entries(seen)) {
+    for (const [severity, data] of Object.entries(severityMap)) {
       rows.push({
         severity,
         cveCount: data.cves,
@@ -74,11 +72,9 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
       });
     }
 
-    return rows.sort((a, b) => {
-      return (
-        (SEVERITY_ORDER[a.severity] ?? 99) - (SEVERITY_ORDER[b.severity] ?? 99)
-      );
-    });
+    return rows.sort(
+      (a, b) => severityOrderOf(a.severity) - severityOrderOf(b.severity),
+    );
   }, [vulnerabilities]);
 
   return (
@@ -86,12 +82,12 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
       <StackItem>
         <div
           style={{
-            height: Math.max(120, impactData.length * 50 + 40),
+            height: Math.max(120, chartData.length * 50 + 40),
             width: "100%",
           }}
         >
           <Chart
-            height={Math.max(120, impactData.length * 50 + 40)}
+            height={Math.max(120, chartData.length * 50 + 40)}
             padding={{
               top: 10,
               bottom: 35,
@@ -119,7 +115,7 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
             />
             <ChartStack horizontal>
               <ChartBar
-                data={impactData.map(({ severity, cveCount }) => {
+                data={chartData.map(({ severity, cveCount }) => {
                   return {
                     x: capitalize(severity),
                     y: cveCount,
@@ -129,10 +125,13 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = (datum.x as string).toLowerCase();
-                      const color = SEVERITY_COLORS[severity]
-                        ? SEVERITY_COLORS[severity]
-                        : null;
+                      let color: string | null = null;
+                      if (typeof datum.x === "string") {
+                        const severity = datum.x.toLowerCase();
+                        color = SEVERITY_COLORS[severity]
+                          ? SEVERITY_COLORS[severity]
+                          : null;
+                      }
                       return color ?? SEVERITY_COLORS.unknown;
                     },
                   },
@@ -141,7 +140,7 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
                 labelComponent={<ChartTooltip constrainToVisibleArea />}
               />
               <ChartBar
-                data={impactData.map(({ severity, productCount }) => ({
+                data={chartData.map(({ severity, productCount }) => ({
                   x: capitalize(severity),
                   y: productCount,
                   label: `${pluralize(productCount, "Product")} affected`,
@@ -149,11 +148,15 @@ export const CSAFImpactChart: React.FC<ICSAFImpactChartProps> = ({
                 style={{
                   data: {
                     fill: ({ datum }) => {
-                      const severity = (datum.x as string).toLowerCase();
-                      const color = SEVERITY_COLORS[severity]
-                        ? SEVERITY_COLORS[severity]
-                        : null;
-                      return `${color}80`;
+                      let color: string | null = null;
+                      if (typeof datum.x === "string") {
+                        const severity = String(datum.x).toLowerCase();
+                        const baseColor = SEVERITY_COLORS[severity]
+                          ? SEVERITY_COLORS[severity]
+                          : null;
+                        color = `${baseColor}80`;
+                      }
+                      return color ?? SEVERITY_COLORS.unknown;
                     },
                   },
                 }}

@@ -1,7 +1,5 @@
 import React from "react";
 
-import ReactECharts from "echarts-for-react";
-
 import {
   Card,
   CardBody,
@@ -18,16 +16,12 @@ import {
 } from "@patternfly/react-core";
 import CubesIcon from "@patternfly/react-icons/dist/esm/icons/cubes-icon";
 
-import type { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
-
 import {
   BRANCH_CATEGORY_COLORS,
   transformBranchesToTreeData,
 } from "./helpers/csaf-tree-helpers";
-
-interface CsafProductTreeProps {
-  csaf: CommonSecurityAdvisoryFramework;
-}
+import { CsafTreeChart } from "./components/CsafTreeChart";
+import { CsafContext } from "./csaf-context";
 
 const CATEGORY_LABELS = [
   "vendor",
@@ -72,25 +66,13 @@ const CategoryLegend: React.FC = () => {
   );
 };
 
-export const CsafProductTree: React.FC<CsafProductTreeProps> = ({ csaf }) => {
-  const branches = csaf.product_tree?.branches;
-
+export const CsafProductTree: React.FC = () => {
+  const { csaf } = React.useContext(CsafContext);
   const treeData = React.useMemo(() => {
+    const branches = csaf?.product_tree?.branches;
     if (!branches || branches.length === 0) return null;
     return transformBranchesToTreeData(branches);
-  }, [branches]);
-
-  const leafCount = React.useMemo(() => {
-    if (!treeData) return 0;
-    function count(node: { children?: unknown[] }): number {
-      if (!node.children || node.children.length === 0) return 1;
-      return (node.children as { children?: unknown[] }[]).reduce(
-        (s, c) => s + count(c),
-        0,
-      );
-    }
-    return count(treeData);
-  }, [treeData]);
+  }, [csaf?.product_tree?.branches]);
 
   if (!treeData) {
     return (
@@ -107,67 +89,6 @@ export const CsafProductTree: React.FC<CsafProductTreeProps> = ({ csaf }) => {
     );
   }
 
-  const chartHeight = Math.max(500, leafCount * 28);
-
-  const option = {
-    tooltip: {
-      trigger: "item" as const,
-      triggerOn: "mousemove" as const,
-      formatter: (params: { name: string; value?: string }) => {
-        let html = `<strong>${params.name}</strong>`;
-        if (params.value) {
-          html += `<br/><span style="color:#999">ID:</span> ${params.value}`;
-        }
-        return html;
-      },
-    },
-    series: [
-      {
-        type: "tree" as const,
-        data: [treeData],
-        left: "8%",
-        right: "24%",
-        top: "2%",
-        bottom: "2%",
-        orient: "LR" as const,
-        roam: true,
-        symbol: "circle" as const,
-        symbolSize: 10,
-        edgeShape: "curve" as const,
-        lineStyle: {
-          width: 1.5,
-          color: "#C9C9C9",
-          curveness: 0.5,
-        },
-        initialTreeDepth: 3,
-        expandAndCollapse: true,
-        animationDuration: 550,
-        animationDurationUpdate: 750,
-        label: {
-          position: "right" as const,
-          verticalAlign: "middle" as const,
-          align: "left" as const,
-          fontSize: 12,
-          fontFamily:
-            "RedHatText, Overpass, overpass, helvetica, arial, sans-serif",
-          color: "#151515",
-          distance: 8,
-        },
-        leaves: {
-          label: {
-            position: "right" as const,
-            verticalAlign: "middle" as const,
-            align: "left" as const,
-          },
-        },
-        emphasis: {
-          focus: "descendant" as const,
-          lineStyle: { width: 3 },
-        },
-      },
-    ],
-  };
-
   return (
     <Card>
       <CardBody>
@@ -176,13 +97,7 @@ export const CsafProductTree: React.FC<CsafProductTreeProps> = ({ csaf }) => {
             <Title headingLevel="h3" size="md">
               Product tree
             </Title>
-            <Content
-              component="small"
-              style={{
-                color: "var(--pf-v6-global--Color--200)",
-                marginTop: "var(--pf-v6-global--spacer--xs)",
-              }}
-            >
+            <Content component="small">
               Click a node to expand or collapse. Scroll to zoom, drag to pan.
             </Content>
           </StackItem>
@@ -190,11 +105,13 @@ export const CsafProductTree: React.FC<CsafProductTreeProps> = ({ csaf }) => {
             <CategoryLegend />
           </StackItem>
           <StackItem>
-            <ReactECharts
-              option={option}
-              style={{ height: `${chartHeight}px`, width: "100%" }}
-              notMerge
-              lazyUpdate
+            <CsafTreeChart
+              treeData={treeData}
+              initialTreeDepth={3}
+              chartMinHeight={500}
+              leafMultiplier={28}
+              chartPadding={{ left: "8%", right: "24%" }}
+              lineColor="#C9C9C9"
             />
           </StackItem>
         </Stack>

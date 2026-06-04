@@ -26,14 +26,14 @@ export const BRANCH_CATEGORY_COLORS: Record<string, string> = {
   specification: "#2B9AF3",
 };
 
-function countLeaves(branch: Branch): number {
+const countLeaves = (branch: Branch): number => {
   if (!branch.branches || branch.branches.length === 0) {
     return 1;
   }
   return branch.branches.reduce((sum, child) => sum + countLeaves(child), 0);
-}
+};
 
-function transformBranch(branch: Branch): EChartsTreeNode {
+const transformBranch = (branch: Branch): EChartsTreeNode => {
   const leafCount = countLeaves(branch);
   const node: EChartsTreeNode = {
     name: branch.name,
@@ -50,11 +50,16 @@ function transformBranch(branch: Branch): EChartsTreeNode {
   }
 
   return node;
-}
+};
 
-export function transformBranchesToTreeData(
+export const countTreeLeaves = (node: EChartsTreeNode): number => {
+  if (!node.children || node.children.length === 0) return 1;
+  return node.children.reduce((sum, child) => sum + countTreeLeaves(child), 0);
+};
+
+export const transformBranchesToTreeData = (
   branches: Branch[],
-): EChartsTreeNode {
+): EChartsTreeNode => {
   const roots = branches.map(transformBranch);
   if (roots.length === 1) return roots[0];
   return {
@@ -62,4 +67,4 @@ export function transformBranchesToTreeData(
     children: roots,
     itemStyle: { color: "#8A8D90", borderColor: "#8A8D90" },
   };
-}
+};

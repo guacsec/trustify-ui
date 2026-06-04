@@ -19,16 +19,18 @@ import {
 import type { Score, ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 
-type ListType = {
-  [key in ExtendedSeverity]: {
-    name: string;
-    color: { name: string; value: string; var: string };
-    labelColor: LabelProps["color"];
-    progressProps: Pick<ProgressProps, "variant">;
+export type SeverityProps = {
+  name: string;
+  color: { name: string; value: string; var: string };
+  labelColor: LabelProps["color"];
+  progressProps: Pick<ProgressProps, "variant">;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
-    icon: React.ComponentType<any>;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
+  icon: React.ComponentType<any>;
+};
+
+type ListType = {
+  [key in ExtendedSeverity]: SeverityProps;
 };
 
 export const severityList: ListType = {
@@ -104,26 +106,6 @@ export const vulnerabilityStatusList: VulnerabilityStatusListType = {
     name: "Affected",
     color: "red",
   },
-};
-
-/** Maps free-form severity text (e.g. CSAF aggregate_severity) to an ExtendedSeverity key. */
-export const normalizeSeverityText = (text?: string): ExtendedSeverity => {
-  switch (text?.toLowerCase()) {
-    case "critical":
-      return "critical";
-    case "important":
-    case "high":
-      return "high";
-    case "moderate":
-    case "medium":
-      return "medium";
-    case "low":
-      return "low";
-    case "none":
-      return "none";
-    default:
-      return "unknown";
-  }
 };
 
 export const getSeverityPriority = (val: ExtendedSeverity) => {

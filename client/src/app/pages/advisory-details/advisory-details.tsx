@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import axios, { type AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 import {
   Breadcrumb,
@@ -16,7 +16,6 @@ import {
   FlexItem,
   Label,
   MenuToggle,
-  type MenuToggleElement,
   PageSection,
   Split,
   SplitItem,
@@ -24,6 +23,7 @@ import {
   TabContent,
   Tabs,
   TabTitleText,
+  type MenuToggleElement,
 } from "@patternfly/react-core";
 
 import {
@@ -32,27 +32,30 @@ import {
   advisoryDeletedSuccessMessage,
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
+import { ExtendedSeverity } from "@app/api/models";
+import { client } from "@app/axios-config/apiInit";
 import { downloadAdvisory, type AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import { WithSeverityProps } from "@app/components/WithSeverityProps";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
 import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
 } from "@app/queries/advisories";
-import { client } from "@app/axios-config/apiInit";
-
-import { Overview } from "./overview";
-import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
-import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { CommonSecurityAdvisoryFramework } from "@app/specs/csaf/csaf-v2.0-schema";
-import { CSAFOverview } from "./components/CSAFOverview";
-import { CsafVulnerabilities } from "./csaf-vulnerabilities";
+
+import { CsafOverview } from "./csaf-overview";
 import { CsafProductTree } from "./csaf-product-tree";
 import { CsafRelationshipTree } from "./csaf-relationship-tree";
 import { CsafSource } from "./csaf-source";
+import { CsafVulnerabilities } from "./csaf-vulnerabilities";
+import { CsafProvider } from "./csaf-provider";
+import { Overview } from "./overview";
+import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
 
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -105,24 +108,24 @@ export const AdvisoryDetails: React.FC = () => {
     tabKeys: [
       "info",
       "vulnerabilities",
-      "overview",
+      "csaf-overview",
       "csaf-vulnerabilities",
-      "products",
-      "relationship-tree",
-      "source",
+      "csaf-products",
+      "csaf-relationship-tree",
+      "csaf-source",
     ],
     defaultActiveTab: {
-      tabKey: !isCsaf ? "info" : "overview",
+      tabKey: !isCsaf ? "info" : "csaf-overview",
     },
   });
 
   const infoTabRef = React.useRef<HTMLElement>(null);
   const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
-  const overviewTabRef = React.useRef<HTMLElement>(null);
+  const csafOverviewTabRef = React.useRef<HTMLElement>(null);
   const csafVulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
-  const productsTabRef = React.useRef<HTMLElement>(null);
-  const relationshipTreeTabRef = React.useRef<HTMLElement>(null);
-  const sourceTabRef = React.useRef<HTMLElement>(null);
+  const csafProductsTabRef = React.useRef<HTMLElement>(null);
+  const csafRelationshipTreeTabRef = React.useRef<HTMLElement>(null);
+  const csafSourceTabRef = React.useRef<HTMLElement>(null);
 
   return (
     <>
@@ -155,7 +158,15 @@ export const AdvisoryDetails: React.FC = () => {
                   )}
                   {advisory?.labels.severity && (
                     <FlexItem>
-                      <Label color="blue">{`severity=${advisory.labels.severity}`}</Label>
+                      <WithSeverityProps
+                        severity={advisory.labels.severity as ExtendedSeverity}
+                      >
+                        {(props) => (
+                          <Label
+                            color={props?.labelColor}
+                          >{`severity=${advisory.labels.severity}`}</Label>
+                        )}
+                      </WithSeverityProps>
                     </FlexItem>
                   )}
                 </Flex>
@@ -243,9 +254,9 @@ export const AdvisoryDetails: React.FC = () => {
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("overview")}
+                        {...getTabProps("csaf-overview")}
                         title={<TabTitleText>Overview</TabTitleText>}
-                        tabContentRef={overviewTabRef}
+                        tabContentRef={csafOverviewTabRef}
                       />
                     )}
                     {isCsaf && (
@@ -257,23 +268,23 @@ export const AdvisoryDetails: React.FC = () => {
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("products")}
+                        {...getTabProps("csaf-products")}
                         title={<TabTitleText>Products</TabTitleText>}
-                        tabContentRef={productsTabRef}
+                        tabContentRef={csafProductsTabRef}
                       />
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("relationship-tree")}
+                        {...getTabProps("csaf-relationship-tree")}
                         title={<TabTitleText>Relationship Tree</TabTitleText>}
-                        tabContentRef={relationshipTreeTabRef}
+                        tabContentRef={csafRelationshipTreeTabRef}
                       />
                     )}
                     {isCsaf && (
                       <Tab
-                        {...getTabProps("source")}
+                        {...getTabProps("csaf-source")}
                         title={<TabTitleText>Source</TabTitleText>}
-                        tabContentRef={sourceTabRef}
+                        tabContentRef={csafSourceTabRef}
                       />
                     )}
                   </Tabs>
@@ -307,84 +318,78 @@ export const AdvisoryDetails: React.FC = () => {
                     </TabContent>
                   )}
                   {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("overview")}
-                      ref={overviewTabRef}
-                      aria-label="CSAF advisory overview"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                    <CsafProvider csaf={csaf}>
+                      <TabContent
+                        {...getTabContentProps("csaf-overview")}
+                        ref={csafOverviewTabRef}
+                        aria-label="CSAF advisory overview"
                       >
-                        {csaf && <CSAFOverview csafDocument={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("csaf-vulnerabilities")}
-                      ref={csafVulnerabilitiesTabRef}
-                      aria-label="CSAF vulnerabilities"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafOverview />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-vulnerabilities")}
+                        ref={csafVulnerabilitiesTabRef}
+                        aria-label="CSAF vulnerabilities"
                       >
-                        {csaf && <CsafVulnerabilities csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("products")}
-                      ref={productsTabRef}
-                      aria-label="CSAF product tree"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafVulnerabilities />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-products")}
+                        ref={csafProductsTabRef}
+                        aria-label="CSAF product tree"
                       >
-                        {csaf && <CsafProductTree csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("relationship-tree")}
-                      ref={relationshipTreeTabRef}
-                      aria-label="CSAF relationship tree"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafProductTree />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-relationship-tree")}
+                        ref={csafRelationshipTreeTabRef}
+                        aria-label="CSAF relationship tree"
                       >
-                        {csaf && <CsafRelationshipTree csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
-                  )}
-                  {isCsaf && (
-                    <TabContent
-                      {...getTabContentProps("source")}
-                      ref={sourceTabRef}
-                      aria-label="CSAF source JSON"
-                    >
-                      <LoadingWrapper
-                        isFetching={isFetching || isFetchingSource}
-                        fetchError={
-                          fetchError || fetchSourceError || parseError
-                        }
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafRelationshipTree />
+                        </LoadingWrapper>
+                      </TabContent>
+                      <TabContent
+                        {...getTabContentProps("csaf-source")}
+                        ref={csafSourceTabRef}
+                        aria-label="CSAF source JSON"
                       >
-                        {csaf && <CsafSource csaf={csaf} />}
-                      </LoadingWrapper>
-                    </TabContent>
+                        <LoadingWrapper
+                          isFetching={isFetching || isFetchingSource}
+                          fetchError={
+                            fetchError || fetchSourceError || parseError
+                          }
+                        >
+                          <CsafSource />
+                        </LoadingWrapper>
+                      </TabContent>
+                    </CsafProvider>
                   )}
                 </PageSection>
               </>
@@ -435,6 +440,7 @@ const AdvisorySourceFetcher: React.FC<IAdvisorySourceFetcherProps> = ({
   React.useEffect(() => {
     if (isEnabled) {
       let cancelled = false;
+      setIsFetching(true);
       downloadAdvisory({
         client,
         path: { key: advisoryId },
