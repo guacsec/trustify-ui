@@ -1,3 +1,5 @@
+import type React from "react";
+
 import type { LabelProps } from "@patternfly/react-core";
 
 import { ExtendedSeverity } from "@app/api/models";
@@ -133,3 +135,18 @@ export const buildProductNameMap = (
   }
   return map;
 };
+
+const URL_REGEX = /(https?:\/\/[^\s,)]+)/g;
+
+export function linkifyDetails(text: string): React.ReactNode[] {
+  const parts = text.split(URL_REGEX);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
+}

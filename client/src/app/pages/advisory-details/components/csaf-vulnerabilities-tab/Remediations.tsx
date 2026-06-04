@@ -14,23 +14,8 @@ import {
 
 import type { Remediation } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { getRemediationProps } from "../../helpers/csaf-utils";
+import { getRemediationProps, linkifyDetails } from "../../helpers/csaf-utils";
 import { AffectedProducts } from "./AffectedProducts";
-
-const URL_REGEX = /(https?:\/\/[^\s,)]+)/g;
-
-const linkifyDetails = (text: string): React.ReactNode => {
-  const parts = text.split(URL_REGEX);
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <a key={i} href={part} target="_blank" rel="noopener noreferrer">
-        {part}
-      </a>
-    ) : (
-      part
-    ),
-  );
-};
 
 interface IRemediationCardProps {
   remediations: Remediation[];

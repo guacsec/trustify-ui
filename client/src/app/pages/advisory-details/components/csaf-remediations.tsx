@@ -14,6 +14,7 @@ import {
 import AngleRightIcon from "@patternfly/react-icons/dist/esm/icons/angle-right-icon";
 
 import type { Remediation } from "@app/specs/csaf/csaf-v2.0-schema";
+import { linkifyDetails } from "../helpers/csaf-utils";
 
 const expandableSectionStyle = {
   "--pf-v6-c-expandable-section--m-expanded__toggle-icon--Rotate": "90deg",
@@ -55,21 +56,6 @@ const remediationLabel = (category: string): string => {
       return category.replace(/_/g, " ");
   }
 };
-
-const URL_REGEX = /(https?:\/\/[^\s,)]+)/g;
-
-function linkifyDetails(text: string): React.ReactNode {
-  const parts = text.split(URL_REGEX);
-  return parts.map((part, i) =>
-    URL_REGEX.test(part) ? (
-      <a key={i} href={part} target="_blank" rel="noopener noreferrer">
-        {part}
-      </a>
-    ) : (
-      part
-    ),
-  );
-}
 
 const AffectedProducts: React.FC<{
   productIds: string[];
