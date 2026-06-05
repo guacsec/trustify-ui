@@ -105,6 +105,22 @@ Then("Vulnerability cards are displayed", async ({ page }) => {
   const cards = tabContent.getByTestId("vulnerability-card");
   await expect(cards.first()).toBeVisible();
   expect(await cards.count()).toBeGreaterThan(0);
+
+  const firstCard = cards.first();
+
+  await expect(firstCard.getByTestId("vulnerability-severity")).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-cvss-details"),
+  ).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-affected-products"),
+  ).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-remediations"),
+  ).toBeVisible();
 });
 
 Then(
