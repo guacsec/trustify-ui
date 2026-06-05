@@ -134,6 +134,14 @@ Then(
     await expect(
       card.getByRole("link", { name: vulnerabilityID, exact: true }),
     ).toBeVisible();
+
+    const title = card.getByTestId("vulnerability-title");
+    await expect(title).toBeVisible();
+    await expect(title).not.toHaveText("");
+
+    const cwe = card.getByTestId("vulnerability-cwe");
+    await expect(cwe).toBeVisible();
+    await expect(cwe).toContainText("CWE-");
   },
 );
 
