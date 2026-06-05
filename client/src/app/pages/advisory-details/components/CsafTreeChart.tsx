@@ -1,6 +1,7 @@
 import React from "react";
 
 import ReactECharts from "echarts-for-react";
+import { ThemeContext } from "tsd-ui";
 
 import type { EChartsTreeNode } from "../helpers/csaf-tree-helpers";
 import { countTreeLeaves } from "../helpers/csaf-tree-helpers";
@@ -24,6 +25,8 @@ export const CsafTreeChart: React.FC<ICsafTreeChartProps> = ({
   lineColor,
   fontSize = 12,
 }) => {
+  const { isDark } = React.useContext(ThemeContext);
+
   const leafCount = React.useMemo(() => countTreeLeaves(treeData), [treeData]);
 
   const chartHeight = Math.max(chartMinHeight, leafCount * leafMultiplier);
@@ -33,11 +36,17 @@ export const CsafTreeChart: React.FC<ICsafTreeChartProps> = ({
       trigger: "item" as const,
       triggerOn: "mousemove" as const,
       formatter: (params: { name: string; value?: string }) => {
+        const secondaryColor = isDark ? "#ccc" : "#999";
         let html = `<strong>${params.name}</strong>`;
         if (params.value) {
-          html += `<br/><span style="color:#999">ID:</span> ${params.value}`;
+          html += `<br/><span style="color:${secondaryColor}">ID:</span> ${params.value}`;
         }
         return html;
+      },
+      backgroundColor: isDark ? "#1b1d21" : undefined,
+      borderColor: isDark ? "#444" : undefined,
+      textStyle: {
+        color: isDark ? "#e0e0e0" : "#333",
       },
     },
     series: [
@@ -69,7 +78,7 @@ export const CsafTreeChart: React.FC<ICsafTreeChartProps> = ({
           fontSize,
           fontFamily:
             "RedHatText, Overpass, overpass, helvetica, arial, sans-serif",
-          color: "#151515",
+          color: isDark ? "#e0e0e0" : "#151515",
           distance: 8,
         },
         leaves: {

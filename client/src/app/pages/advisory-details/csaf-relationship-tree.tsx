@@ -24,6 +24,7 @@ import {
 import { BRANCH_CATEGORY_COLORS } from "./helpers/csaf-tree-helpers";
 import { CsafTreeChart } from "./components/CsafTreeChart";
 import { CsafContext } from "./csaf-context";
+import { ThemeContext } from "tsd-ui";
 
 const NODE_CATEGORY_LABELS = [
   "vendor",
@@ -107,6 +108,7 @@ const RelationshipLegend: React.FC = () => {
 
 export const CsafRelationshipTree: React.FC = () => {
   const { csaf } = React.useContext(CsafContext);
+  const { isDark } = React.useContext(ThemeContext);
   const relationships = csaf?.product_tree?.relationships;
   const branches = csaf?.product_tree?.branches;
 
@@ -154,6 +156,7 @@ export const CsafRelationshipTree: React.FC = () => {
               leafMultiplier={26}
               chartPadding={{ left: "6%", right: "20%" }}
               fontSize={11}
+              lineColor={isDark ? "#5c5c5c" : "#C9C9C9"}
             />
           </StackItem>
         </Stack>

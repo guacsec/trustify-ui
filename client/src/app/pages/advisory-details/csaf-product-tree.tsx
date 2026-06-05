@@ -22,6 +22,7 @@ import {
 } from "./helpers/csaf-tree-helpers";
 import { CsafTreeChart } from "./components/CsafTreeChart";
 import { CsafContext } from "./csaf-context";
+import { ThemeContext } from "tsd-ui";
 
 const CATEGORY_LABELS = [
   "vendor",
@@ -68,6 +69,7 @@ const CategoryLegend: React.FC = () => {
 
 export const CsafProductTree: React.FC = () => {
   const { csaf } = React.useContext(CsafContext);
+  const { isDark } = React.useContext(ThemeContext);
   const treeData = React.useMemo(() => {
     const branches = csaf?.product_tree?.branches;
     if (!branches || branches.length === 0) return null;
@@ -111,7 +113,7 @@ export const CsafProductTree: React.FC = () => {
               chartMinHeight={500}
               leafMultiplier={28}
               chartPadding={{ left: "8%", right: "24%" }}
-              lineColor="#C9C9C9"
+              lineColor={isDark ? "#5c5c5c" : "#C9C9C9"}
             />
           </StackItem>
         </Stack>
