@@ -52,9 +52,27 @@ const transformBranch = (branch: Branch): EChartsTreeNode => {
   return node;
 };
 
-export const countTreeLeaves = (node: EChartsTreeNode): number => {
+export const countVisibleLeaves = (node: EChartsTreeNode): number => {
   if (!node.children || node.children.length === 0) return 1;
-  return node.children.reduce((sum, child) => sum + countTreeLeaves(child), 0);
+  if (node.collapsed) return 1;
+  return node.children.reduce(
+    (sum, child) => sum + countVisibleLeaves(child),
+    0,
+  );
+};
+
+export interface EChartsInternalNode {
+  isExpand?: boolean;
+  children?: EChartsInternalNode[];
+}
+
+export const countExpandedNodes = (node: EChartsInternalNode): number => {
+  if (!node.children || node.children.length === 0) return 1;
+  if (node.isExpand === false) return 1;
+  return node.children.reduce(
+    (sum, child) => sum + countExpandedNodes(child),
+    0,
+  );
 };
 
 export const transformBranchesToTreeData = (

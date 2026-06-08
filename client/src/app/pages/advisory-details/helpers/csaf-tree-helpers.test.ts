@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { Branch } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { transformBranchesToTreeData } from "./csaf-tree-helpers";
+import {
+  transformBranchesToTreeData,
+  countVisibleLeaves,
+  countExpandedNodes,
+} from "./csaf-tree-helpers";
 
 describe("transformBranchesToTreeData", () => {
   const makeBranch = (
@@ -74,5 +78,128 @@ describe("transformBranchesToTreeData", () => {
     const result = transformBranchesToTreeData(branches);
 
     expect(result.collapsed).toBe(true);
+  });
+});
+
+describe("countVisibleLeaves", () => {
+  it("returns 1 for a single node with no children", () => {
+    expect(countVisibleLeaves({ name: "leaf" })).toBe(1);
+  });
+
+  it("counts all leaves in a fully expanded tree", () => {
+    const tree = {
+      name: "root",
+      children: [{ name: "a" }, { name: "b" }, { name: "c" }],
+    };
+    expect(countVisibleLeaves(tree)).toBe(3);
+  });
+
+  it("counts a collapsed node as 1 regardless of its children", () => {
+    const tree = {
+      name: "root",
+      collapsed: true,
+      children: [
+        { name: "a" },
+        { name: "b" },
+        { name: "c", children: [{ name: "d" }, { name: "e" }] },
+      ],
+    };
+    expect(countVisibleLeaves(tree)).toBe(1);
+  });
+
+  it("counts visible leaves in a mixed expanded/collapsed tree", () => {
+    const tree = {
+      name: "root",
+      children: [
+        {
+          name: "expanded-parent",
+          children: [{ name: "visible-leaf-1" }, { name: "visible-leaf-2" }],
+        },
+        {
+          name: "collapsed-parent",
+          collapsed: true,
+          children: [
+            { name: "hidden-1" },
+            { name: "hidden-2" },
+            { name: "hidden-3" },
+          ],
+        },
+      ],
+    };
+    expect(countVisibleLeaves(tree)).toBe(3);
+  });
+
+  it("handles deeply nested collapsed nodes", () => {
+    const tree = {
+      name: "root",
+      children: [
+        {
+          name: "level-1",
+          children: [
+            {
+              name: "level-2-collapsed",
+              collapsed: true,
+              children: Array.from({ length: 100 }, (_, i) => ({
+                name: `deep-${i}`,
+              })),
+            },
+            { name: "level-2-leaf" },
+          ],
+        },
+      ],
+    };
+    expect(countVisibleLeaves(tree)).toBe(2);
+  });
+
+  it("matches real-world pattern: vendor with 880 collapsed children", () => {
+    const manyLeaves = Array.from({ length: 880 }, (_, i) => ({
+      name: `product-${i}`,
+    }));
+    const tree = {
+      name: "Red Hat",
+      collapsed: true,
+      children: manyLeaves,
+    };
+    expect(countVisibleLeaves(tree)).toBe(1);
+  });
+});
+
+describe("countExpandedNodes", () => {
+  it("returns 1 for a leaf node", () => {
+    const node = { children: [] };
+    expect(countExpandedNodes(node)).toBe(1);
+  });
+
+  it("counts all children when node is expanded", () => {
+    const node = {
+      isExpand: true,
+      children: [{ children: [] }, { children: [] }, { children: [] }],
+    };
+    expect(countExpandedNodes(node)).toBe(3);
+  });
+
+  it("counts a collapsed node as 1", () => {
+    const node = {
+      isExpand: false,
+      children: [{ children: [] }, { children: [] }],
+    };
+    expect(countExpandedNodes(node)).toBe(1);
+  });
+
+  it("handles mixed expanded and collapsed subtrees", () => {
+    const node = {
+      isExpand: true,
+      children: [
+        {
+          isExpand: true,
+          children: [{ children: [] }, { children: [] }],
+        },
+        {
+          isExpand: false,
+          children: Array.from({ length: 500 }, () => ({ children: [] })),
+        },
+      ],
+    };
+    expect(countExpandedNodes(node)).toBe(3);
   });
 });
