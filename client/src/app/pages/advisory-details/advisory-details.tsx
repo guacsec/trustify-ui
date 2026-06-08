@@ -57,16 +57,6 @@ import { CsafProvider } from "./csaf-provider";
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
 
-const CSAF_TABS = [
-  "csaf-overview",
-  "csaf-vulnerabilities",
-  "csaf-products",
-  "csaf-relationship-tree",
-  "csaf-source",
-] as const;
-
-const NON_CSAF_TABS = ["info", "vulnerabilities"] as const;
-
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
   const { pushNotification } = React.useContext(NotificationsContext);
@@ -131,7 +121,6 @@ export const AdvisoryDetails: React.FC = () => {
 
   // Tabs
   const {
-    state: { activeTab, setActiveTab },
     propHelpers: { getTabsProps, getTabProps, getTabContentProps },
   } = useTabControls({
     persistenceKeyPrefix: "ad", // ad="advisory details"
@@ -149,22 +138,6 @@ export const AdvisoryDetails: React.FC = () => {
       tabKey: !isCsaf ? "info" : "csaf-overview",
     },
   });
-
-  React.useEffect(() => {
-    const currentTab = activeTab?.tabKey;
-    if (!currentTab) return;
-
-    if (isCsaf && (NON_CSAF_TABS as readonly string[]).includes(currentTab)) {
-      setActiveTab({ tabKey: "csaf-overview" });
-    } else if (
-      !isCsaf &&
-      !isFetching &&
-      (CSAF_TABS as readonly string[]).includes(currentTab)
-    ) {
-      setActiveTab({ tabKey: "info" });
-    }
-  }, [isCsaf, isFetching, activeTab?.tabKey, setActiveTab]);
-
   const infoTabRef = React.useRef<HTMLElement>(null);
   const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
   const csafOverviewTabRef = React.useRef<HTMLElement>(null);
@@ -270,7 +243,6 @@ export const AdvisoryDetails: React.FC = () => {
 
       <PageSection>
         <Tabs
-          mountOnEnter
           {...getTabsProps()}
           aria-label="Tabs that contain the Advisory information"
           role="region"

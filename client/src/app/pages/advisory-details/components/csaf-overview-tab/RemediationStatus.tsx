@@ -16,13 +16,17 @@ export const RemediationStatus: React.FC<IRemediationStatusProps> = ({
 }) => {
   const remediationCounts = React.useMemo(() => {
     const counts: Record<string, Set<string>> = {};
-    for (const vuln of vulnerabilities) {
-      for (const rem of vuln.remediations ?? []) {
-        if (!counts[rem.category]) {
-          counts[rem.category] = new Set();
-        }
-        for (const productId of rem.product_ids ?? []) {
-          counts[rem.category].add(productId);
+    for (const vulnerability of vulnerabilities) {
+      if (vulnerability.remediations) {
+        for (const remediation of vulnerability.remediations) {
+          if (!counts[remediation.category]) {
+            counts[remediation.category] = new Set();
+          }
+          if (remediation.product_ids) {
+            for (const productId of remediation.product_ids) {
+              counts[remediation.category].add(productId);
+            }
+          }
         }
       }
     }

@@ -72,7 +72,7 @@ export const CsafOverview: React.FC = () => {
     <Stack hasGutter>
       <StackItem>
         <Card isFullHeight>
-          <CardTitle>
+          <CardBody>
             <Flex
               justifyContent={{ default: "justifyContentSpaceBetween" }}
               alignItems={{ default: "alignItemsFlexStart" }}
@@ -102,7 +102,7 @@ export const CsafOverview: React.FC = () => {
                 </Flex>
               </FlexItem>
             </Flex>
-          </CardTitle>
+          </CardBody>
           <CardBody>
             <DescriptionList isHorizontal isCompact>
               <DescriptionListGroup>

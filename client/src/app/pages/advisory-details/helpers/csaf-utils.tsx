@@ -16,6 +16,49 @@ export type CvssV3 =
   | JSONSchemaForCommonVulnerabilityScoringSystemVersion30
   | JSONSchemaForCommonVulnerabilityScoringSystemVersion31;
 
+export type CsafBaseSeverityType =
+  | "critical"
+  | "important"
+  | "high"
+  | "moderate"
+  | "medium"
+  | "low"
+  | "none"
+  | "unknown";
+
+type CsafBaseSeverityListType = {
+  [key in CsafBaseSeverityType]: {
+    color: string;
+  };
+};
+
+export const csafBaseSeverityList: CsafBaseSeverityListType = {
+  critical: {
+    color: "#C9190B",
+  },
+  important: {
+    color: "#EC7A08",
+  },
+  high: {
+    color: "#EC7A08",
+  },
+  moderate: {
+    color: "#F0AB00",
+  },
+  medium: {
+    color: "#F0AB00",
+  },
+  low: {
+    color: "#0066CC",
+  },
+  none: {
+    color: "#8A8D90",
+  },
+  unknown: {
+    color: "#8A8D90",
+  },
+};
+
 export const SEVERITY_ORDER: Record<string, number> = {
   critical: 0,
   important: 1,
