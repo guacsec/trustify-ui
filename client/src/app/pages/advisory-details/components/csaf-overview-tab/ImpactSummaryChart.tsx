@@ -19,10 +19,19 @@ import {
 
 import { Vulnerability } from "@app/specs/csaf/csaf-v2.0-schema";
 
-import { getSeverityPriority, severityList } from "@app/api/model-utils";
-import type { ExtendedSeverity } from "@app/api/models";
+import {
+  csafBaseSeverityList,
+  CsafBaseSeverityType,
+  severityOrderOf,
+} from "../../helpers/csaf-utils";
 
-import { normalizeCsafSeverityText } from "../../helpers/csaf-utils";
+type SeverityMap = Record<string, { cves: number; products: Set<string> }>;
+type ChartData = {
+  baseSeverity: string;
+  cveCount: number;
+  productCount: number;
+  baseColor: string;
+};
 
 interface IImpactSummaryChartProps {
   vulnerabilities: Vulnerability[];
@@ -31,57 +40,69 @@ interface IImpactSummaryChartProps {
 export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
   vulnerabilities,
 }) => {
-  const chartData = React.useMemo(() => {
-    const rows: {
-      severity: ExtendedSeverity;
-      cveCount: number;
-      productCount: number;
-    }[] = [];
-
-    const severityMap: Record<string, { cves: number; products: Set<string> }> =
-      {};
+  const severityMap = React.useMemo(() => {
+    const result: SeverityMap = {};
 
     for (const vulnerability of vulnerabilities) {
-      const severity: ExtendedSeverity = normalizeCsafSeverityText(
-        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity,
-      );
+      const baseSeverity = (
+        vulnerability.scores?.[0]?.cvss_v3?.baseSeverity ?? "unknown"
+      ).toLowerCase();
 
-      if (!severityMap[severity]) {
-        severityMap[severity] = { cves: 0, products: new Set() };
+      if (!result[baseSeverity]) {
+        result[baseSeverity] = {
+          cves: 0,
+          products: new Set(),
+        };
       }
-      severityMap[severity].cves += 1;
+      result[baseSeverity].cves += 1;
 
-      const products = vulnerability.product_status?.known_affected ?? [];
-      for (const productId of products) {
-        severityMap[severity].products.add(productId);
+      if (vulnerability.product_status?.known_affected) {
+        for (const productId of vulnerability.product_status.known_affected) {
+          result[baseSeverity].products.add(productId);
+        }
       }
     }
+    return result;
+  }, [vulnerabilities]);
 
-    for (const [severity, data] of Object.entries(severityMap)) {
+  const chartData = React.useMemo(() => {
+    const rows: ChartData[] = [];
+
+    for (const [baseSeverity, data] of Object.entries(severityMap)) {
+      const baseColor = csafBaseSeverityList[
+        baseSeverity as CsafBaseSeverityType
+      ]
+        ? csafBaseSeverityList[baseSeverity as CsafBaseSeverityType].color
+        : csafBaseSeverityList.unknown.color;
+
       rows.push({
-        severity,
+        baseSeverity,
+        baseColor,
         cveCount: data.cves,
         productCount: data.products.size,
       });
     }
 
-    return rows.sort(
-      (a, b) =>
-        getSeverityPriority(a.severity) - getSeverityPriority(b.severity),
-    );
-  }, [vulnerabilities]);
+    return rows.sort((a, b) => {
+      return severityOrderOf(a.baseSeverity) - severityOrderOf(b.baseSeverity);
+    });
+  }, [severityMap]);
+
+  const chartHeight = React.useMemo(() => {
+    return Math.max(120, chartData.length * 50 + 40);
+  }, [chartData]);
 
   return (
     <Stack hasGutter>
       <StackItem>
         <div
           style={{
-            height: Math.max(120, chartData.length * 50 + 40),
+            height: chartHeight,
             width: "100%",
           }}
         >
           <Chart
-            height={Math.max(120, chartData.length * 50 + 40)}
+            height={chartHeight}
             padding={{
               top: 10,
               bottom: 35,
@@ -109,33 +130,36 @@ export const ImpactSummaryChart: React.FC<IImpactSummaryChartProps> = ({
             />
             <ChartStack horizontal>
               <ChartBar
-                data={chartData.map(({ severity, cveCount }) => ({
-                  x: capitalize(severity),
-                  y: cveCount,
-                  label: pluralize(cveCount, "CVE"),
-                  _severity: severity,
-                }))}
+                data={chartData.map(
+                  ({ baseSeverity, cveCount, baseColor: color }) => {
+                    return {
+                      x: capitalize(baseSeverity),
+                      y: cveCount,
+                      label: pluralize(cveCount, "CVE"),
+                      color: color,
+                    };
+                  },
+                )}
                 style={{
                   data: {
-                    fill: ({ datum }) =>
-                      severityList[datum._severity as ExtendedSeverity].color
-                        .value,
+                    fill: ({ datum }) => datum.color,
                   },
                 }}
                 barWidth={20}
                 labelComponent={<ChartTooltip constrainToVisibleArea />}
               />
               <ChartBar
-                data={chartData.map(({ severity, productCount }) => ({
-                  x: capitalize(severity),
-                  y: productCount,
-                  label: `${pluralize(productCount, "Product")} affected`,
-                  _severity: severity,
-                }))}
+                data={chartData.map(
+                  ({ baseSeverity, productCount, baseColor: color }) => ({
+                    x: capitalize(baseSeverity),
+                    y: productCount,
+                    label: `${pluralize(productCount, "Product")} affected`,
+                    color: color,
+                  }),
+                )}
                 style={{
                   data: {
-                    fill: ({ datum }) =>
-                      `${severityList[datum._severity as ExtendedSeverity].color.value}80`,
+                    fill: ({ datum }) => `${datum.color}80`,
                   },
                 }}
                 barWidth={20}
