@@ -1,0 +1,1 @@
+import{t as e}from"./react-B-P7c96U.js";import{k as t,w as n}from"./Bullseye-DYUzMYzf.js";import{r}from"./Card-DcMaHSmM.js";var i=e(),a=e=>{var{children:a,className:o,component:s=`div`}=e,c=t(e,[`children`,`className`,`component`]);return(0,i.jsx)(s,Object.assign({className:n(r.cardFooter,o)},c,{children:a}))};a.displayName=`CardFooter`;export{a as t};
