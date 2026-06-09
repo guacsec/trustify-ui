@@ -51,6 +51,7 @@ export default defineConfig([
     ignores: [
       "client/config/**",
       "client/src/app/client/**",
+      "client/src/app/specs/**",
       "client/types/**",
     ],
   },

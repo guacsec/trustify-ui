@@ -19,51 +19,60 @@ import {
 import type { Score, ScoreType } from "@app/client";
 import type { ExtendedSeverity, Label, VulnerabilityStatus } from "./models";
 
-type ListType = {
-  [key in ExtendedSeverity]: {
-    name: string;
-    color: { name: string; value: string; var: string };
-    progressProps: Pick<ProgressProps, "variant">;
+export type SeverityProps = {
+  name: string;
+  color: { name: string; value: string; var: string };
+  labelColor: LabelProps["color"];
+  progressProps: Pick<ProgressProps, "variant">;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
-    icon: React.ComponentType<any>;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
+  icon: React.ComponentType<any>;
+};
+
+type ListType = {
+  [key in ExtendedSeverity]: SeverityProps;
 };
 
 export const severityList: ListType = {
   unknown: {
     name: "Unknown",
     color: undefinedColor,
+    labelColor: "grey",
     progressProps: { variant: undefined },
     icon: SeverityUndefinedIcon,
   },
   none: {
     name: "None",
     color: noneColor,
+    labelColor: "grey",
     progressProps: { variant: undefined },
     icon: SeverityNoneIcon,
   },
   low: {
     name: "Low",
     color: minorColor,
+    labelColor: "blue",
     progressProps: { variant: undefined },
     icon: SeverityMinorIcon,
   },
   medium: {
     name: "Medium",
     color: moderateColor,
+    labelColor: "orangered",
     progressProps: { variant: "warning" },
     icon: SeverityModerateIcon,
   },
   high: {
     name: "High",
     color: importantColor,
+    labelColor: "orange",
     progressProps: { variant: "danger" },
     icon: SeverityImportantIcon,
   },
   critical: {
     name: "Critical",
     color: criticalColor,
+    labelColor: "red",
     progressProps: { variant: "danger" },
     icon: SeverityCriticalIcon,
   },

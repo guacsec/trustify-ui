@@ -90,13 +90,58 @@ Then(
   },
 );
 
-// Advisory Explorer / Vulenrabilities
+// Advisory Explorer / Vulnerabilities
 
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
   async ({ page }) => {
     const detailsPage = await AdvisoryDetailsPage.fromCurrentPage(page);
     await detailsPage._layout.selectTab("Vulnerabilities");
+  },
+);
+
+Then("Vulnerability cards are displayed", async ({ page }) => {
+  const tabContent = page.getByLabel("CSAF vulnerabilities");
+  const cards = tabContent.getByTestId("vulnerability-card");
+  await expect(cards.first()).toBeVisible();
+  expect(await cards.count()).toBeGreaterThan(0);
+
+  const firstCard = cards.first();
+
+  await expect(firstCard.getByTestId("vulnerability-severity")).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-cvss-details"),
+  ).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-affected-products"),
+  ).toBeVisible();
+
+  await expect(
+    firstCard.getByTestId("vulnerability-remediations"),
+  ).toBeVisible();
+});
+
+Then(
+  "The vulnerability card for {string} shows CVE link and details",
+  async ({ page }, vulnerabilityID) => {
+    const tabContent = page.getByLabel("CSAF vulnerabilities");
+    const card = tabContent.getByTestId("vulnerability-card").filter({
+      has: page.getByRole("link", { name: vulnerabilityID }),
+    });
+    await expect(card).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: vulnerabilityID, exact: true }),
+    ).toBeVisible();
+
+    const title = card.getByTestId("vulnerability-title");
+    await expect(title).toBeVisible();
+    await expect(title).not.toHaveText("");
+
+    const cwe = card.getByTestId("vulnerability-cwe");
+    await expect(cwe).toBeVisible();
+    await expect(cwe).toContainText("CWE-");
   },
 );
 
@@ -148,7 +193,7 @@ Then(
 Then(
   "User visits Vulnerability details Page of {string} by clicking it",
   async ({ page }, vulnerabilityID) => {
-    const link = page.getByRole("link", { name: vulnerabilityID });
+    const link = page.getByRole("link", { name: vulnerabilityID, exact: true });
 
     await Promise.all([
       page.waitForURL(new RegExp(`/vulnerabilities/${vulnerabilityID}$`)),

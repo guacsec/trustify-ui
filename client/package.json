@@ -15,7 +15,7 @@
     "start:dev": "npm run generate && vite --port 3000 --host",
     "start": "vite preview",
     "test": "vitest --run",
-    "generate": "openapi-ts -f ./config/openapi-ts.config.ts",
+    "generate": "openapi-ts -f ./config/openapi-ts.config.ts && json2ts specs/csaf_v2.0_json_schema.json -o src/app/specs/csaf/csaf-v2.0-schema.d.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -30,6 +30,8 @@
     "@tanstack/react-query-devtools": "^5.61.0",
     "axios": "^1.16.0",
     "dayjs": "^1.11.18",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
     "file-saver": "^2.0.5",
     "oidc-client-ts": "^3.3.0",
     "packageurl-js": "^2.0.1",
@@ -55,6 +57,7 @@
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.1.4",
     "jsdom": "^28.0.0",
+    "json-schema-to-typescript": "^15.0.4",
     "vite": "^8.0.15",
     "vite-plugin-ejs": "^1.7.0",
     "vite-plugin-istanbul": "^9.0.1",
