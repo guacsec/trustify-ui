@@ -47,7 +47,21 @@ Feature: Advisory Explorer
             | advisoryID      |
             | CVE-2024-26308  |
 
-    # Advisory Vulnerabilities — CSAF card view
+    # Advisory Vulnerabilities — non-CSAF (table view)
+    Scenario: Display vulnerabilities for a non-CSAF advisory as table
+        Given User visits Advisory details Page of "<advisoryName>" with type "<advisoryType>"
+        Then User navigates to the Vulnerabilities tab on the Advisory Overview page
+        Then Pagination of "vulnerability" table works
+        Then A list of all active vulnerabilites tied to the advisory should display
+        And The "ID, Title, Discovery, Release, Score, CWE" information should be visible for each vulnerability
+        And The vulnerabilities should be sorted by ID by default
+        And User visits Vulnerability details Page of "<vulnerabilityID>" by clicking it
+
+        Examples:
+          | advisoryName   | vulnerabilityID | advisoryType |
+          | CVE-2024-26308 | CVE-2024-26308  | cve          |
+
+    # Advisory Vulnerabilities — CSAF (card view)
     Scenario: Display vulnerabilities for a CSAF advisory as cards
         Given User visits Advisory details Page of "<advisoryName>" with type "<advisoryType>"
         Then User navigates to the Vulnerabilities tab on the Advisory Overview page
@@ -58,18 +72,6 @@ Feature: Advisory Explorer
         Examples:
             | advisoryName    | vulnerabilityID | advisoryType |
             | CVE-2023-3223   | CVE-2023-3223   |     csaf     |
-
-    # Advisory Vulnerabilities — non-CSAF table view
-    Scenario: Display vulnerabilities for a non-CSAF advisory as table
-        Given User visits Advisory details Page of "<advisoryName>"
-        Then User navigates to the Vulnerabilities tab on the Advisory Overview page
-        Then Pagination of "vulnerability" table works
-        And The "ID, Title, Discovery, Release, Score, CWE" information should be visible for each vulnerability
-        And User visits Vulnerability details Page of "<vulnerabilityID>" by clicking it
-
-        Examples:
-            | advisoryName    | vulnerabilityID |
-            | CVE-2024-26308  | CVE-2024-26308  |
 
     Scenario: Delete an advisory from the Advisory Explorer page
         Given User visits Advisory details Page of "<advisoryID>"
