@@ -56,10 +56,10 @@ Feature: Advisory Explorer
         And User visits Vulnerability details Page of "<vulnerabilityID>" by clicking it
 
         Examples:
-          | advisoryName    | vulnerabilityID | advisoryType |
-          | CVE-2023-3223   | CVE-2023-3223   |     csaf     |
+            | advisoryName    | vulnerabilityID | advisoryType |
+            | CVE-2023-3223   | CVE-2023-3223   |     csaf     |
 
-      # Advisory Vulnerabilities — non-CSAF (table view)
+    # Advisory Vulnerabilities — non-CSAF (table view)
     Scenario: Display vulnerabilities for a non-CSAF advisory as table
         Given User visits Advisory details Page of "<advisoryName>" with type "<advisoryType>"
         Then User navigates to the Vulnerabilities tab on the Advisory Overview page
@@ -70,8 +70,8 @@ Feature: Advisory Explorer
         And User visits Vulnerability details Page of "<vulnerabilityID>" by clicking it
 
         Examples:
-          | advisoryName   | vulnerabilityID | advisoryType |
-          | CVE-2024-26308 | CVE-2024-26308  | cve          |
+            | advisoryName   | vulnerabilityID | advisoryType |
+            | CVE-2024-26308 | CVE-2024-26308  | cve          |
 
     Scenario: Delete an advisory from the Advisory Explorer page
         Given User visits Advisory details Page of "<advisoryID>"
