@@ -129,8 +129,12 @@ export const SbomDetails: React.FC = () => {
                 </Content>
               </FlexItem>
               <FlexItem>
-                {sbom?.labels.type && (
-                  <Label color="blue">{sbom?.labels.type}</Label>
+                {sbom?.labels.kind === "aibom" ? (
+                  <Label color="blue">AIBOM</Label>
+                ) : (
+                  sbom?.labels.type && (
+                    <Label color="blue">{sbom?.labels.type}</Label>
+                  )
                 )}
               </FlexItem>
             </Flex>

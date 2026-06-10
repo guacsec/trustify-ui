@@ -62,6 +62,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
       version: "Version",
       supplier: "Supplier",
       labels: "Labels",
+      type: "Type",
       published: "Created on",
       packages: "Dependencies",
       vulnerabilities: "Vulnerabilities",

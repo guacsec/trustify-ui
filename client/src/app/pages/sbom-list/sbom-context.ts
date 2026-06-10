@@ -23,6 +23,7 @@ interface ISbomSearchContext {
     | "published"
     | "supplier"
     | "labels"
+    | "type"
     | "vulnerabilities",
     "name" | "published",
     "" | "published" | "labels" | "license",

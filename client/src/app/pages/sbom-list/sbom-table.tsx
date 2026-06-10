@@ -4,7 +4,7 @@ import { generatePath, NavLink } from "react-router-dom";
 import { Modal, ModalBody, ModalHeader } from "@patternfly/react-core";
 import type { AxiosError } from "axios";
 
-import { ButtonVariant } from "@patternfly/react-core";
+import { ButtonVariant, Label } from "@patternfly/react-core";
 import {
   ActionsColumn,
   Table,
@@ -119,6 +119,7 @@ export const SbomTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "supplier" })} />
               <Th {...getThProps({ columnKey: "labels" })} />
+              <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "published" })} />
               <Th {...getThProps({ columnKey: "packages" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -204,6 +205,14 @@ export const SbomTable: React.FC = () => {
                           }
                         }}
                       />
+                    </Td>
+                    <Td
+                      width={10}
+                      {...getTdProps({ columnKey: "type" })}
+                    >
+                      {item.labels.kind === "aibom" && (
+                        <Label color="blue">AIBOM</Label>
+                      )}
                     </Td>
                     <Td
                       width={10}
