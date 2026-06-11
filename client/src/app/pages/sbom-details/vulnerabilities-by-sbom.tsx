@@ -51,6 +51,7 @@ import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
+import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
 interface VulnerabilitiesBySbomProps {
@@ -91,6 +92,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       id: "Id",
       description: "Description",
       cvss: "CVSS",
+      exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
       published: "Published",
       updated: "Updated",
@@ -203,6 +205,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
+                <Th
+                  {...getThProps({ columnKey: "exploitAnalysis" })}
+                  info={{
+                    tooltip:
+                      "Run exploit intelligence analysis for Critical and High severity vulnerabilities. Uses mock data.",
+                  }}
+                />
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -243,7 +252,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={40}
+                            width={25}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -263,7 +272,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={20} {...getTdProps({ columnKey: "cvss" })}>
+                      <Td width={15} {...getTdProps({ columnKey: "cvss" })}>
                         <Flex>
                           <FlexItem>
                             <SeverityShieldAndText
@@ -302,6 +311,17 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                             </Popover>
                           </FlexItem>
                         </Flex>
+                      </Td>
+                      <Td
+                        width={15}
+                        {...getTdProps({
+                          columnKey: "exploitAnalysis",
+                        })}
+                      >
+                        <ExploitIntelligenceAnalysisCell
+                          vulnerabilityId={item.vulnerability.identifier}
+                          severity={item.opinionatedAdvisory.extendedSeverity}
+                        />
                       </Td>
                       <Td
                         width={10}
