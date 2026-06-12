@@ -51,8 +51,45 @@ import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
-import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
+import type { ExtendedSeverity } from "@app/api/models";
+
+import {
+  ExploitIntelligenceAnalysisCell,
+  type ExploitIntelligenceCellState,
+} from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
+
+/** Severity levels eligible for exploit intelligence analysis. */
+const ELIGIBLE_SEVERITIES: ReadonlySet<ExtendedSeverity> = new Set([
+  "critical",
+  "high",
+]);
+
+/** Returns a deterministic mock finding variant based on the vulnerability id. */
+const getMockFindingVariant = (
+  vulnerabilityId: string,
+): "vulnerable" | "not_vulnerable" | "uncertain" | "failed" => {
+  const lastChar = vulnerabilityId.slice(-1);
+  const numericValue = Number.parseInt(lastChar, 10);
+
+  if (Number.isNaN(numericValue)) {
+    return "uncertain";
+  }
+
+  const bucket = numericValue % 4;
+  switch (bucket) {
+    case 0:
+      return "vulnerable";
+    case 1:
+      return "not_vulnerable";
+    case 2:
+      return "uncertain";
+    case 3:
+      return "failed";
+    default:
+      return "uncertain";
+  }
+};
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -71,6 +108,51 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
+
+  // Mock exploit intelligence analysis state — keyed by vulnerability identifier.
+  // TC-4678 will replace this with real API integration.
+  const [eiStates, setEiStates] = React.useState<
+    Record<string, ExploitIntelligenceCellState>
+  >({});
+
+  const timerRefs = React.useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
+
+  // Clear timers on unmount.
+  React.useEffect(() => {
+    return () => {
+      for (const timer of Object.values(timerRefs.current)) {
+        clearTimeout(timer);
+      }
+    };
+  }, []);
+
+  const handleRequestAnalysis = React.useCallback((vulnerabilityId: string) => {
+    setEiStates((prev) => ({
+      ...prev,
+      [vulnerabilityId]: {
+        kind: "finding",
+        finding: { variant: "in_progress" },
+      },
+    }));
+
+    timerRefs.current[vulnerabilityId] = setTimeout(() => {
+      const variant = getMockFindingVariant(vulnerabilityId);
+      setEiStates((prev) => ({
+        ...prev,
+        [vulnerabilityId]: {
+          kind: "finding",
+          finding: { variant },
+          reportUrl:
+            variant !== "failed" && variant !== "in_progress"
+              ? `https://example.com/reports/${vulnerabilityId}`
+              : undefined,
+        },
+      }));
+      delete timerRefs.current[vulnerabilityId];
+    }, 1200);
+  }, []);
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
@@ -320,8 +402,17 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         })}
                       >
                         <ExploitIntelligenceAnalysisCell
-                          vulnerabilityId={item.vulnerability.identifier}
-                          severity={item.opinionatedAdvisory.extendedSeverity}
+                          state={
+                            eiStates[item.vulnerability.identifier] ?? {
+                              kind: "not_run",
+                            }
+                          }
+                          onRequestAnalysis={() =>
+                            handleRequestAnalysis(item.vulnerability.identifier)
+                          }
+                          requestAnalysisEligible={ELIGIBLE_SEVERITIES.has(
+                            item.opinionatedAdvisory.extendedSeverity,
+                          )}
                         />
                       </Td>
                       <Td
