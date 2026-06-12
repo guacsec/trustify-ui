@@ -100,6 +100,8 @@ export const SbomDetails: React.FC = () => {
     tabKeys: ["info", "packages", "vulnerabilities", "models"],
   });
 
+  const isAibom = sbom?.labels["kind"] === "aibom";
+
   const infoTabRef = React.useRef<HTMLElement>();
   const packagesTabRef = React.useRef<HTMLElement>();
   const vulnerabilitiesTabRef = React.useRef<HTMLElement>();
@@ -229,11 +231,13 @@ export const SbomDetails: React.FC = () => {
               </>
             }
           />
-          <Tab
-            {...getTabProps("models")}
-            title={<TabTitleText>Models</TabTitleText>}
-            tabContentRef={modelsTabRef}
-          />
+          {isAibom && (
+            <Tab
+              {...getTabProps("models")}
+              title={<TabTitleText>Models</TabTitleText>}
+              tabContentRef={modelsTabRef}
+            />
+          )}
         </Tabs>
       </PageSection>
       <PageSection>
@@ -260,13 +264,15 @@ export const SbomDetails: React.FC = () => {
         >
           {sbomId && <VulnerabilitiesBySbom sbomId={sbomId} />}
         </TabContent>
-        <TabContent
-          {...getTabContentProps("models")}
-          ref={modelsTabRef}
-          aria-label="AI models within the SBOM"
-        >
-          {sbomId && <ModelsBySbom sbomId={sbomId} />}
-        </TabContent>
+        {isAibom && (
+          <TabContent
+            {...getTabContentProps("models")}
+            ref={modelsTabRef}
+            aria-label="AI models within the SBOM"
+          >
+            {sbomId && <ModelsBySbom sbomId={sbomId} />}
+          </TabContent>
+        )}
       </PageSection>
 
       <ConfirmDialog
