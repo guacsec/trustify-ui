@@ -1,10 +1,9 @@
-import type React from "react";
+import React from "react";
 
 import {
+  Alert,
   Button,
-  Card,
-  CardBody,
-  CardTitle,
+  Content,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -12,12 +11,15 @@ import {
   Label,
   Stack,
   StackItem,
+  Tab,
+  Tabs,
+  TabTitleText,
 } from "@patternfly/react-core";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
 import type { SbomModel } from "@app/client";
 
-import { getModelProperties } from "./utils";
+import { getModelProperties, parseSafetyRisks } from "./utils";
 
 export interface ExternalReference {
   type: string;
@@ -40,21 +42,23 @@ interface IAIModelDetailsProps {
 }
 
 export const AIModelDetails: React.FC<IAIModelDetailsProps> = ({ model }) => {
+  const [activeTabKey, setActiveTabKey] = React.useState("overview");
   const props = getModelProperties(model.properties);
   const externalRefs = parseExternalReferences(props.external_references);
+  const safetyRisks = parseSafetyRisks(props.safetyRiskAssessment);
 
   return (
-    <Stack hasGutter>
-      <StackItem>
-        <Card isCompact>
-          <CardTitle>Identity & Purpose</CardTitle>
-          <CardBody>
-            <DescriptionList
-              isCompact
-              columnModifier={{
-                default: "2Col",
-              }}
-            >
+    <Tabs
+      isFilled
+      activeKey={activeTabKey}
+      onSelect={(_e, key) => setActiveTabKey(key as string)}
+      aria-label="AI model details tabs"
+      role="region"
+    >
+      <Tab eventKey="overview" title={<TabTitleText>Overview</TabTitleText>}>
+        <Stack hasGutter style={{ paddingTop: 16 }}>
+          <StackItem>
+            <DescriptionList isCompact columnModifier={{ default: "2Col" }}>
               {props.typeOfModel && (
                 <DescriptionListGroup>
                   <DescriptionListTerm>Model type</DescriptionListTerm>
@@ -88,20 +92,41 @@ export const AIModelDetails: React.FC<IAIModelDetailsProps> = ({ model }) => {
                 </DescriptionListGroup>
               )}
             </DescriptionList>
-          </CardBody>
-        </Card>
-      </StackItem>
+          </StackItem>
+          {safetyRisks.length > 0 && (
+            <StackItem>
+              <Alert variant="warning" isInline title="Safety Risk Assessment">
+                <Stack hasGutter>
+                  {safetyRisks.map((risk, index) => (
+                    <StackItem key={index}>
+                      <strong>{risk.name}</strong>
+                      {risk.mitigationStrategy && (
+                        <Content component="p">
+                          Mitigation: {risk.mitigationStrategy}
+                        </Content>
+                      )}
+                    </StackItem>
+                  ))}
+                </Stack>
+              </Alert>
+            </StackItem>
+          )}
+          {props.limitation && (
+            <StackItem>
+              <Content component="h4">Limitations</Content>
+              <Content component="p">{props.limitation}</Content>
+            </StackItem>
+          )}
+        </Stack>
+      </Tab>
 
-      <StackItem>
-        <Card isCompact>
-          <CardTitle>SBOM Metadata</CardTitle>
-          <CardBody>
-            <DescriptionList
-              isCompact
-              columnModifier={{
-                default: "2Col",
-              }}
-            >
+      <Tab
+        eventKey="metadata"
+        title={<TabTitleText>SBOM Metadata</TabTitleText>}
+      >
+        <Stack hasGutter style={{ paddingTop: 16 }}>
+          <StackItem>
+            <DescriptionList isCompact columnModifier={{ default: "2Col" }}>
               {props.bomFormat && (
                 <DescriptionListGroup>
                   <DescriptionListTerm>Format</DescriptionListTerm>
@@ -135,15 +160,17 @@ export const AIModelDetails: React.FC<IAIModelDetailsProps> = ({ model }) => {
                 </DescriptionListGroup>
               )}
             </DescriptionList>
-          </CardBody>
-        </Card>
-      </StackItem>
+          </StackItem>
+        </Stack>
+      </Tab>
 
-      {externalRefs.length > 0 && (
-        <StackItem>
-          <Card isCompact>
-            <CardTitle>External References</CardTitle>
-            <CardBody>
+      <Tab
+        eventKey="references"
+        title={<TabTitleText>References</TabTitleText>}
+      >
+        <Stack hasGutter style={{ paddingTop: 16 }}>
+          {externalRefs.length > 0 && (
+            <StackItem>
               <DescriptionList isCompact>
                 {externalRefs.map((ref) => (
                   <DescriptionListGroup key={`${ref.type}-${ref.url}`}>
@@ -160,26 +187,25 @@ export const AIModelDetails: React.FC<IAIModelDetailsProps> = ({ model }) => {
                   </DescriptionListGroup>
                 ))}
               </DescriptionList>
-            </CardBody>
-          </Card>
-        </StackItem>
-      )}
-
-      {props.downloadLocation && (
-        <StackItem>
-          <Button
-            variant="secondary"
-            component="a"
-            href={props.downloadLocation}
-            target="_blank"
-            rel="noopener noreferrer"
-            icon={<ExternalLinkAltIcon />}
-            iconPosition="end"
-          >
-            Download
-          </Button>
-        </StackItem>
-      )}
-    </Stack>
+            </StackItem>
+          )}
+          {props.downloadLocation && (
+            <StackItem>
+              <Button
+                variant="secondary"
+                component="a"
+                href={props.downloadLocation}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={<ExternalLinkAltIcon />}
+                iconPosition="end"
+              >
+                Download
+              </Button>
+            </StackItem>
+          )}
+        </Stack>
+      </Tab>
+    </Tabs>
   );
 };
