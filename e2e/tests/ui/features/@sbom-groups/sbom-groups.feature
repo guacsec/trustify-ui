@@ -28,6 +28,20 @@ Feature: SBOM Groups - Manage SBOM groups
     And User submits the group form
     Then The group creation is successful
 
+  Scenario: Create empty group, assert it exists, delete it and verify it is gone
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with unique timestamp
+    And User submits the group form
+    Then The group creation is successful
+    When User filters SBOM Groups by created group name
+    Then The SBOM Groups table contains the created group
+    When User clicks kebab menu for the created group
+    And User selects "Delete" action
+    Then The delete confirmation dialog is displayed
+    When User confirms deletion
+    Then The created group is not in the SBOM Groups table
+
   # CRUD Operations - Edit
   Scenario: Edit SBOM group with unique name
     Given User navigates to SBOM Groups page

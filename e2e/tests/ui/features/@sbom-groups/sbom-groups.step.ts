@@ -419,6 +419,43 @@ When("User clears all filters on SBOM List page", async ({ page }) => {
 });
 
 // Filtering
+When("User filters SBOM Groups by created group name", async ({ page }) => {
+  if (!generatedGroupName) {
+    throw new Error("No generated group name found - step order issue");
+  }
+  const listPage = await SbomGroupListPage.fromCurrentPage(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.applyFilter({ Filter: generatedGroupName });
+});
+
+Then("The SBOM Groups table contains the created group", async ({ page }) => {
+  if (!generatedGroupName) {
+    throw new Error("No generated group name found - step order issue");
+  }
+  await expect(
+    page.getByRole("treegrid").getByRole("link", { name: generatedGroupName }),
+  ).toBeVisible();
+});
+
+When("User clicks kebab menu for the created group", async ({ page }) => {
+  if (!generatedGroupName) {
+    throw new Error("No generated group name found - step order issue");
+  }
+  const row = page
+    .getByRole("treegrid")
+    .getByRole("row", { name: new RegExp(generatedGroupName) });
+  await row.locator('button[aria-label="Kebab toggle"]').click();
+});
+
+Then("The created group is not in the SBOM Groups table", async ({ page }) => {
+  if (!generatedGroupName) {
+    throw new Error("No generated group name found - step order issue");
+  }
+  await expect(
+    page.getByRole("treegrid").getByRole("link", { name: generatedGroupName }),
+  ).not.toBeVisible();
+});
+
 When("User clears all filters on SBOM Groups page", async ({ page }) => {
   const listPage = await SbomGroupListPage.fromCurrentPage(page);
   const toolbar = await listPage.getToolbar();
