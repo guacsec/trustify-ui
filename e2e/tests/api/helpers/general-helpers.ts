@@ -47,3 +47,13 @@ export function getFullSbomPaths(sbomDir: string, sbomPaths: string[]) {
   });
   return fullSbomPaths;
 }
+
+export function formatTimeElapsed(endTime: number, startTime: number) {
+  const elapsedTimeMs = endTime - startTime;
+  const totalSeconds = Math.floor(elapsedTimeMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return formattedTime;
+}
