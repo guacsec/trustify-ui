@@ -37,7 +37,6 @@ export default defineConfig([
       "@eslint-react/no-use-context": "off",
       "@eslint-react/no-context-provider": "off",
       "@eslint-react/naming-convention-ref-name": "off",
-      "@eslint-react/no-array-index-key": "off",
       "@eslint-react/use-state": "off",
       "@eslint-react/no-unnecessary-use-prefix": "off",
       "@typescript-eslint/no-unused-vars": "off",

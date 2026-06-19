@@ -12,6 +12,7 @@ export const TableHeaderContentWithControls: React.FC<
   ITableHeaderContentWithControlsProps
 > = ({ numColumnsBeforeData, numColumnsAfterData, children }) => (
   <>
+    {/* eslint-disable @eslint-react/no-array-index-key -- filler cells with no identity beyond position */}
     {Array(numColumnsBeforeData)
       .fill(null)
       .map((_, i) => (
@@ -23,5 +24,6 @@ export const TableHeaderContentWithControls: React.FC<
       .map((_, i) => (
         <Th screenReaderText={`after-data-${i}`} key={i} />
       ))}
+    {/* eslint-enable @eslint-react/no-array-index-key */}
   </>
 );
