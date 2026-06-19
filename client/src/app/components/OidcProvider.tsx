@@ -58,7 +58,7 @@ const AuthEnabledOidcProvider: React.FC<IOidcProviderProps> = ({
         url_state: window.location.pathname + window.location.search,
       });
     }
-  }, [auth.isAuthenticated, auth.isLoading, auth.error, auth.signinRedirect]);
+  }, [auth]);
 
   if (auth.isAuthenticated) {
     return <Suspense fallback={<AppPlaceholder />}>{children}</Suspense>;
