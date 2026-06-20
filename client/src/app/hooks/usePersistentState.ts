@@ -102,7 +102,7 @@ export const usePersistentState = <
         ? { ...options, key: prefixKey(options.key) }
         : { ...options, isEnabled: false, key: "" },
     ),
-    provider: usePersistenceProvider<TValue>(
+    provider: getPersistenceProvider<TValue>(
       isPersistenceProviderOptions(options)
         ? options
         : {
@@ -118,7 +118,7 @@ export const usePersistentState = <
   return isEnabled ? [value, setValue] : [defaultValue, () => {}];
 };
 
-const usePersistenceProvider = <TValue>({
+const getPersistenceProvider = <TValue>({
   serialize,
   deserialize,
   defaultValue,

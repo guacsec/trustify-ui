@@ -4,7 +4,7 @@ import { getExpansionDerivedState } from "./getExpansionDerivedState";
 import type { IExpansionState } from "./useExpansionState";
 
 /**
- * Args for useExpansionPropHelpers that come from outside useTableControlProps
+ * Args for getExpansionPropHelpers that come from outside useTableControlProps
  * - Partially satisfied by the object returned by useTableControlState (ITableControlState)
  * - Makes up part of the arguments object taken by useTableControlProps (IUseTableControlPropsArgs)
  * @see ITableControlState
@@ -31,7 +31,7 @@ export interface IExpansionPropHelpersExternalArgs<
 }
 
 /**
- * Additional args for useExpansionPropHelpers that come from logic inside useTableControlProps
+ * Additional args for getExpansionPropHelpers that come from logic inside useTableControlProps
  * @see useTableControlProps
  */
 export interface IExpansionPropHelpersInternalArgs<TColumnKey extends string> {
@@ -53,7 +53,7 @@ export interface IExpansionPropHelpersInternalArgs<TColumnKey extends string> {
  * - "Derived state" here refers to values and convenience functions derived at render time.
  * - "source of truth" (persisted) state and "derived state" are kept separate to prevent out-of-sync duplicated state.
  */
-export const useExpansionPropHelpers = <TItem, TColumnKey extends string>(
+export const getExpansionPropHelpers = <TItem, TColumnKey extends string>(
   args: IExpansionPropHelpersExternalArgs<TItem, TColumnKey> &
     IExpansionPropHelpersInternalArgs<TColumnKey>,
 ) => {

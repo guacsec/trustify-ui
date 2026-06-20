@@ -5,8 +5,8 @@ import { type BrandingStrings, brandingStrings } from "@trustify-ui/common";
  * React way instead of a direct import.  This allows the branding implementation
  * to change in future with a minimal amount of refactoring in existing components.
  */
-export const useBranding = (): BrandingStrings => {
+export const getBranding = (): BrandingStrings => {
   return brandingStrings;
 };
 
-export default useBranding;
+export default getBranding;
