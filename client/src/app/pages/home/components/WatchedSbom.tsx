@@ -20,16 +20,12 @@ import {
   TextInputGroup,
   TextInputGroupMain,
   TextInputGroupUtilities,
-  Tooltip,
 } from "@patternfly/react-core";
 import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 import text from "@patternfly/react-styles/css/utilities/Text/text";
 
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
-import {
-  READ_ONLY_TOOLTIP,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { useFetchSBOMById, useFetchSBOMs } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 
@@ -179,44 +175,37 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
             if (!isOpen) closeMenu();
           }}
           toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-            <Tooltip
-              content={READ_ONLY_TOOLTIP}
-              trigger={isReadOnly ? "mouseenter" : "manual"}
+            <MenuToggle
+              ref={toggleRef}
+              variant="typeahead"
+              onClick={onToggleClick}
+              isExpanded={isSelectOpen}
+              isFullWidth
+              isDisabled={isReadOnly}
             >
-              <span style={{ cursor: isReadOnly ? "not-allowed" : undefined }}>
-                <MenuToggle
-                  ref={toggleRef}
-                  variant="typeahead"
-                  onClick={onToggleClick}
+              <TextInputGroup isPlain>
+                <TextInputGroupMain
+                  autoComplete="off"
+                  value={inputValue}
+                  onClick={onInputClick}
+                  onChange={onTextInputChange}
+                  innerRef={textInputRef}
                   isExpanded={isSelectOpen}
-                  isFullWidth
-                  isDisabled={isReadOnly}
-                >
-                  <TextInputGroup isPlain>
-                    <TextInputGroupMain
-                      autoComplete="off"
-                      value={inputValue}
-                      onClick={onInputClick}
-                      onChange={onTextInputChange}
-                      innerRef={textInputRef}
-                      isExpanded={isSelectOpen}
-                      placeholder="Select a new SBOM to watch"
-                    />
+                  placeholder="Select a new SBOM to watch"
+                />
 
-                    <TextInputGroupUtilities
-                      {...(!inputValue ? { style: { display: "none" } } : {})}
-                    >
-                      <Button
-                        icon={<TimesIcon aria-hidden />}
-                        variant="plain"
-                        onClick={onClearButtonClick}
-                        aria-label="Clear input value"
-                      />
-                    </TextInputGroupUtilities>
-                  </TextInputGroup>
-                </MenuToggle>
-              </span>
-            </Tooltip>
+                <TextInputGroupUtilities
+                  {...(!inputValue ? { style: { display: "none" } } : {})}
+                >
+                  <Button
+                    icon={<TimesIcon aria-hidden />}
+                    variant="plain"
+                    onClick={onClearButtonClick}
+                    aria-label="Clear input value"
+                  />
+                </TextInputGroupUtilities>
+              </TextInputGroup>
+            </MenuToggle>
           )}
         >
           <SelectList>
