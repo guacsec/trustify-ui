@@ -25,6 +25,7 @@ import TimesIcon from "@patternfly/react-icons/dist/esm/icons/times-icon";
 import text from "@patternfly/react-styles/css/utilities/Text/text";
 
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { useFetchSBOMById, useFetchSBOMs } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 
@@ -43,6 +44,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
   sbomId,
 }) => {
   const { patch, mutatingKeys } = React.useContext(WatchedSbomsContext);
+  const { isReadOnly } = React.useContext(ReadOnlyContext);
 
   const textInputRef = React.useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = React.useState<string>("");
@@ -179,6 +181,7 @@ export const WatchedSbom: React.FC<WatchedSbomProps> = ({
               onClick={onToggleClick}
               isExpanded={isSelectOpen}
               isFullWidth
+              isDisabled={isReadOnly}
             >
               <TextInputGroup isPlain>
                 <TextInputGroupMain
