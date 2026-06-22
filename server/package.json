@@ -21,7 +21,7 @@
     "cookie-parser": "^1.4.6",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
-    "http-proxy-middleware": "^4.0.0",
+    "http-proxy-middleware": "^4.1.1",
     "http-terminator": "^3.2.0"
   },
   "devDependencies": {
