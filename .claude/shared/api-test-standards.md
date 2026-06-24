@@ -84,19 +84,10 @@ test("List advisories", async () => {
 
 ## 3. Query Parameter Handling (CRITICAL)
 
-Choose the right approach based on query complexity:
-
-### When to Use `URLSearchParams`
-
-Use `URLSearchParams` when the query contains:
-- Special characters (`&`, `=`, `|`, spaces, etc.)
-- Complex query DSL via the `q` parameter
-- User input or dynamic variable values
+**Always use `URLSearchParams`** for query parameters. Trustify queries frequently involve PURLs and CPEs, which contain special characters (`:`, `/`, `@`, `+`, `&`) that must be correctly encoded. Enforcing a single approach eliminates the judgment call about "is this simple enough to skip it?" — that judgment is where encoding bugs occur.
 
 ```typescript
 test("Filter vulnerabilities by severity", async ({ axios }) => {
-  // URLSearchParams ensures special characters are properly encoded
-  // Without it, '&' in the value would be interpreted as a separator
   const queryParams = new URLSearchParams();
   queryParams.append("offset", "0");
   queryParams.append("limit", "10");
@@ -111,34 +102,30 @@ test("Filter vulnerabilities by severity", async ({ axios }) => {
 });
 ```
 
-### When to Use a Plain Object
-
-Use a plain `params` object when query values are simple fixed strings or numbers without special characters:
-
 ```typescript
 test("Sort advisories by ID ascending", async ({ axios }) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append("offset", "0");
+  queryParams.append("limit", "100");
+  queryParams.append("sort", "identifier:asc");
+
   const response = await axios.get("/api/v3/advisory", {
-    params: { offset: 0, limit: 100, sort: "identifier:asc" },
+    params: queryParams,
   });
 
   expect(response.status).toBe(200);
 });
 ```
 
-### When Inline URL Is Acceptable
-
-Simple static queries without any dynamic values MAY use an inline URL:
-
-```typescript
-// ✓ Acceptable for simple static-only queries
-const response = await axios.get("/api/v3/sbom?limit=10&offset=0");
-```
-
-Prefer the plain object style over inline URLs — it is cleaner and easier to extend.
-
 ### ❌ NEVER DO
 
 ```typescript
+// ❌ Plain object — skips encoding, unsafe for PURLs/CPEs
+await axios.get("/api/v3/advisory", { params: { offset: 0, limit: 10 } });
+
+// ❌ Inline URL — no encoding, hard to extend
+await axios.get("/api/v3/sbom?limit=10&offset=0");
+
 // ❌ Template string concatenation — unsafe for special chars
 await axios.get(`/api/v3/advisory?q=${query}&sort=${sort}`);
 
@@ -184,9 +171,14 @@ expect(response.data.items).toEqual(
 
 ### Deep Object Matching
 
-Use `toMatchObject` for deeply nested structures where the exact shape is important:
+Use `toMatchObject` only when asserting against a value you captured earlier in the same test — for example, an ID returned from an upload. **Do not hardcode literal values** (PURLs, IDs, names) pulled from the OpenAPI spec or guessed from context; those assertions will fail in environments with different data. This type of assertion is typically done manually. If unsure whether `toMatchObject` is appropriate, ask before using it.
 
 ```typescript
+// ✅ Value was derived in this test — safe to assert literally
+const uploadedId = sbomIds[0];
+expect(response.data).toMatchObject({ id: uploadedId });
+
+// ❌ Hardcoded PURL from spec — brittle, environment-dependent
 expect(response.data).toMatchObject({
   recommendations: {
     "pkg:maven/io.quarkus.arc/arc-processor@3.20.2": [],
@@ -232,7 +224,7 @@ test("Rejects invalid PURL format", async ({ axios }) => {
 });
 ```
 
-### ✅ ALSO ACCEPTABLE — `try/catch`
+### ❌ TECHNICALLY NOT WRONG, BUT UGLY —  `try/catch`
 
 ```typescript
 test("Rejects invalid input", async ({ axios }) => {
@@ -318,10 +310,11 @@ test.describe("Advisory API", () => {
 
 ### Use Existing Helpers
 
-Before writing logic inline, check the existing helper files:
+Before writing logic inline, check the existing helper files in the `e2e/tests/api/helpers` folder. For example:
 
 - **`e2e/tests/api/helpers/sorting-helpers.ts`**: `testBasicSort`, `validateDateSorting`, `validateStringSorting`, `validateNumericSorting`, `validateSortDirectionDiffers`
 - **`e2e/tests/api/helpers/general-helpers.ts`**: `uploadFiles`, `deleteSboms`, `getFullSbomPaths`
+
 
 ```typescript
 import { testBasicSort, validateStringSorting } from "../helpers/sorting-helpers";
@@ -337,7 +330,6 @@ test("Sort advisories by ID ascending", async ({ axios }) => {
 If new tests contain helper functions or repeated logic that already exists (or could be extracted), flag it:
 
 - Minor duplication (2–3 lines): **MEDIUM**
-- Helper function duplicated across files: **HIGH**
 - Duplication across many files: **CRITICAL** (extract to `e2e/tests/api/helpers/`)
 
 ### File Upload Tests
@@ -361,6 +353,8 @@ test.describe("SBOM upload", () => {
   });
 });
 ```
+
+Tests using file uploads and deletes should be run sequentially.
 
 ---
 
@@ -433,12 +427,16 @@ Each test must be self-contained and runnable in any order.
 ### ✅ GOOD — Self-contained tests
 
 ```typescript
+const sharedId: string;  
+
 test("Test A", async ({ axios }) => {
   // All setup done inline
+  await axios.get(`/api/v3/sbom/${sharedId}`);
 });
 
 test("Test B", async ({ axios }) => {
   // All setup done inline, no dependency on Test A
+  await axios.get(`/api/v3/sbom/${sharedId}`);
 });
 ```
 
@@ -490,16 +488,15 @@ test.describe("Upload flow", () => {
 ### HIGH (Should fix)
 
 - Wrong import order (helpers before fixtures)
-- Using template string concatenation or manual `encodeURIComponent` for query params with special characters
+- Query params not using `URLSearchParams` (plain object, inline URL, template strings, or manual `encodeURIComponent`)
 - Missing assertions on `response.data` structure (only checking status code)
 - Weak assertions (`toBeDefined`, `not.toBeNull`) when schema validation is possible
 - Helper functions duplicated across feature files
 - Modifying existing tests when asked to add new ones
+- `any` type without a suppression comment explaining why
 
 ### MEDIUM (Nice to fix)
 
-- `URLSearchParams` used where a plain object or inline URL would be clearer
-- `any` type without a suppression comment explaining why
 - Unclear variable names (`r`, `d`)
 - Missing `test.skip` comment explaining why the test is skipped
 - Bugfix test missing Jira comment structure
@@ -519,7 +516,7 @@ Use this checklist when generating or reviewing API tests:
 
 - [ ] **Import order**: Fixtures first (`"../fixtures"`), then helpers — blank line between groups
 - [ ] **Fixture usage**: `{ axios }` from fixture, never manual axios instantiation
-- [ ] **Query params**: `URLSearchParams` for special chars / DSL; plain object for simple fixed params
+- [ ] **Query params**: Always `URLSearchParams` — no plain objects, inline URLs, or template strings
 - [ ] **Status assertion**: `expect(response.status).toBe(...)` present
 - [ ] **Body assertion**: `objectContaining` or `toMatchObject` — not just `toBeDefined`
 - [ ] **Negative tests**: `.catch((err) => err.response)` pattern used
@@ -544,5 +541,5 @@ Use this checklist when generating or reviewing API tests:
 
 ---
 
-**Last Updated**: 2026-06-17
-**Version**: 1.0.0
+**Last Updated**: 2026-06-24
+**Version**: 1.1.0
