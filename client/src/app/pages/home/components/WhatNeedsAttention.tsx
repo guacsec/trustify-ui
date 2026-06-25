@@ -11,6 +11,8 @@ import {
   EmptyStateVariant,
   Flex,
   FlexItem,
+  Stack,
+  StackItem,
   Title,
 } from "@patternfly/react-core";
 import ArrowRightIcon from "@patternfly/react-icons/dist/esm/icons/arrow-right-icon";
@@ -35,7 +37,7 @@ const getLastSevenDaysRequestParams = (): HubRequestParams => {
   publishedAfter.setHours(0, 0, 0, 0);
 
   return {
-    page: { pageNumber: 1, itemsPerPage: 10 },
+    page: { pageNumber: 1, itemsPerPage: MAX_ATTENTION_ITEMS },
     sort: { field: "base_score", direction: "desc" },
     filters: [
       {
@@ -70,102 +72,126 @@ export const VulnerabilityAttentionSection: React.FC = () => {
   );
 
   return (
-    <HomeSectionCard className="vulnerability-attention-section">
-      <div className="home-section-card__header">
-        <Title headingLevel="h2" size="lg">
-          Highest vulnerabilities (last 7 days)
-        </Title>
-        <Content className="home-section-card__subtitle" component="p">
-          Highest severity CVEs published in the last seven days, ranked by CVSS
-          score.
-        </Content>
-      </div>
-
-      <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
-        {attentionVulnerabilities.length > 0 ? (
-          <div className="home-section-card__columns">
-            {attentionVulnerabilities.map((vulnerability, index) => (
-              <React.Fragment key={vulnerability.identifier}>
-                {index > 0 && (
-                  <Divider
-                    className="home-section-card__divider"
-                    orientation={{ default: "vertical" }}
-                  />
-                )}
-                <div className="home-section-card__column">
-                  <div className="home-section-card__column-content">
-                    <Flex
-                      alignItems={{ default: "alignItemsCenter" }}
-                      justifyContent={{
-                        default: "justifyContentSpaceBetween",
-                      }}
-                      spaceItems={{ default: "spaceItemsSm" }}
-                      wrap={{ default: "wrap" }}
-                    >
-                      <FlexItem>
-                        <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(
-                            vulnerability.base_score?.severity,
-                          )}
-                          score={vulnerability.base_score?.score ?? null}
-                          showLabel
-                          showScore
-                        />
-                      </FlexItem>
-                      <FlexItem>
-                        <Link
-                          to={generatePath(Paths.vulnerabilityDetails, {
-                            vulnerabilityId: vulnerability.identifier,
-                          })}
-                        >
-                          {vulnerability.identifier}
-                        </Link>
-                      </FlexItem>
-                    </Flex>
-                    <Content
-                      className="home-section-card__column-description"
-                      component="p"
-                    >
-                      <VulnerabilityDescription vulnerability={vulnerability} />
-                    </Content>
-                  </div>
-                  <Link
-                    to={generatePath(Paths.vulnerabilityDetails, {
-                      vulnerabilityId: vulnerability.identifier,
-                    })}
-                  >
-                    <Button
-                      variant="link"
-                      isInline
-                      icon={<ArrowRightIcon />}
-                      iconPosition="end"
-                    >
-                      View vulnerability
+    <HomeSectionCard>
+      <Stack hasGutter>
+        <StackItem>
+          <Title headingLevel="h2" size="lg">
+            Highest vulnerabilities (last 7 days)
+          </Title>
+          <Content component="p">
+            Highest severity vulnerabilities published in the last seven days,
+            ranked by CVSS score.
+          </Content>
+        </StackItem>
+        <StackItem>
+          <LoadingWrapper isFetching={isFetching} fetchError={fetchError}>
+            {attentionVulnerabilities.length > 0 ? (
+              <Flex
+                direction={{ default: "column", md: "row" }}
+                alignItems={{ default: "alignItemsStretch" }}
+              >
+                {attentionVulnerabilities.map((vulnerability, index) => (
+                  <React.Fragment key={vulnerability.identifier}>
+                    {index > 0 && (
+                      <Divider
+                        orientation={{
+                          default: "horizontal",
+                          md: "vertical",
+                        }}
+                      />
+                    )}
+                    <FlexItem flex={{ default: "flex_1" }}>
+                      <Stack hasGutter>
+                        <StackItem isFilled>
+                          <Stack>
+                            <StackItem>
+                              <Flex
+                                alignItems={{
+                                  default: "alignItemsCenter",
+                                }}
+                                justifyContent={{
+                                  default: "justifyContentSpaceBetween",
+                                }}
+                                spaceItems={{ default: "spaceItemsSm" }}
+                                wrap={{ default: "wrap" }}
+                              >
+                                <FlexItem>
+                                  <SeverityShieldAndText
+                                    value={extendedSeverityFromSeverity(
+                                      vulnerability.base_score?.severity,
+                                    )}
+                                    score={
+                                      vulnerability.base_score?.score ?? null
+                                    }
+                                    showLabel
+                                    showScore
+                                  />
+                                </FlexItem>
+                                <FlexItem>
+                                  <Link
+                                    to={generatePath(
+                                      Paths.vulnerabilityDetails,
+                                      {
+                                        vulnerabilityId:
+                                          vulnerability.identifier,
+                                      },
+                                    )}
+                                  >
+                                    {vulnerability.identifier}
+                                  </Link>
+                                </FlexItem>
+                              </Flex>
+                            </StackItem>
+                            <StackItem>
+                              <VulnerabilityDescription
+                                vulnerability={vulnerability}
+                              />
+                            </StackItem>
+                          </Stack>
+                        </StackItem>
+                        <StackItem>
+                          <Link
+                            to={generatePath(Paths.vulnerabilityDetails, {
+                              vulnerabilityId: vulnerability.identifier,
+                            })}
+                          >
+                            <Button
+                              variant="link"
+                              isInline
+                              icon={<ArrowRightIcon />}
+                              iconPosition="end"
+                            >
+                              View vulnerability
+                            </Button>
+                          </Link>
+                        </StackItem>
+                      </Stack>
+                    </FlexItem>
+                  </React.Fragment>
+                ))}
+              </Flex>
+            ) : (
+              <EmptyState
+                headingLevel="h4"
+                titleText="No vulnerabilities in the last 7 days"
+                variant={EmptyStateVariant.sm}
+              >
+                <EmptyStateBody>
+                  Newly published vulnerabilities will appear here as they
+                  arrive.
+                </EmptyStateBody>
+                <EmptyStateFooter>
+                  <Link to={Paths.vulnerabilities}>
+                    <Button variant="link" isInline>
+                      View all vulnerabilities
                     </Button>
                   </Link>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            headingLevel="h4"
-            titleText="No vulnerabilities in the last 7 days"
-            variant={EmptyStateVariant.sm}
-          >
-            <EmptyStateBody>
-              Newly published vulnerabilities will appear here as they arrive.
-            </EmptyStateBody>
-            <EmptyStateFooter>
-              <Link to={Paths.vulnerabilities}>
-                <Button variant="link" isInline>
-                  View all vulnerabilities
-                </Button>
-              </Link>
-            </EmptyStateFooter>
-          </EmptyState>
-        )}
-      </LoadingWrapper>
+                </EmptyStateFooter>
+              </EmptyState>
+            )}
+          </LoadingWrapper>
+        </StackItem>
+      </Stack>
     </HomeSectionCard>
   );
 };
