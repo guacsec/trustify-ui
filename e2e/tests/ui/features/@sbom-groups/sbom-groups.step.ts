@@ -422,15 +422,13 @@ When("User clears all filters on SBOM List page", async ({ page }) => {
 When("User clears all filters on SBOM Groups page", async ({ page }) => {
   const listPage = await SbomGroupListPage.fromCurrentPage(page);
   const toolbar = await listPage.getToolbar();
-  await toolbar.clearAllFilters(); // This waits for filter chips to be removed
+  await toolbar.clearAllFilters();
 });
 
 Then("The SBOM Groups table shows all groups", async ({ page }) => {
-  // Verify table has content after clearing filters
   const table = page.getByRole("treegrid", { name: "sbom-groups-table" });
   await expect(table).toBeVisible();
 
-  // Wait for at least one row to be visible (indicating data has loaded)
   const rows = table.getByRole("row");
   await expect(rows.first()).toBeVisible();
 });
@@ -447,7 +445,6 @@ When(
 Then(
   "The SBOM Groups table shows filtered results containing {string}",
   async ({ page }, searchTerm: string) => {
-    // Verify at least one row contains the search term
     const rows = page.getByRole("row", { name: new RegExp(searchTerm, "i") });
     const count = await rows.count();
     expect(count).toBeGreaterThan(0);
@@ -462,3 +459,251 @@ When(
     await toolbar.applyFilter({ Filter: searchTerm });
   },
 );
+
+// Product label filtering
+When("User filters the created group by name", async ({ page }) => {
+  if (!generatedGroupName) {
+    throw new Error("No generated group name found - step order issue");
+  }
+  const listPage = await SbomGroupListPage.fromCurrentPage(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.applyFilter({ Filter: generatedGroupName });
+});
+
+Then(
+  "The {string} label badge is visible for the created group",
+  async ({ page }, labelText: string) => {
+    const treegrid = page.getByRole("treegrid", { name: "sbom-groups-table" });
+    await expect(
+      treegrid.locator(".pf-v6-c-label", { hasText: labelText }),
+    ).toBeVisible();
+  },
+);
+
+// Hierarchical tree display
+Given(
+  "A parent group {string} with child group {string} exists",
+  async ({ page }, parentName: string, childName: string) => {
+    const listPage = await SbomGroupListPage.fromCurrentPage(page);
+    const toolbar = await listPage.getToolbar();
+
+    // Ensure parent exists
+    await toolbar.applyFilter({ Filter: parentName });
+    let row = page.getByRole("row", { name: new RegExp(parentName) });
+    if ((await row.count()) === 0) {
+      await page.getByRole("button", { name: "Create group" }).click();
+      const modal = await GroupFormModal.build(page, "Create group");
+      await modal.clearAndFillName(parentName);
+      await modal.fillDescription(`Parent group for ${childName}`);
+      await modal.selectIsProduct(false);
+      await modal.submit();
+    }
+
+    // Ensure child exists under parent
+    await toolbar.applyFilter({ Filter: childName });
+    row = page.getByRole("row", { name: new RegExp(childName) });
+    if ((await row.count()) === 0) {
+      await page.getByRole("button", { name: "Create group" }).click();
+      const modal = await GroupFormModal.build(page, "Create group");
+      await modal.clearAndFillName(childName);
+      await modal.selectParentGroup(parentName);
+      await modal.submit();
+    }
+
+    await toolbar.applyFilter({ Filter: "" });
+  },
+);
+
+When("User filters groups by name {string}", async ({ page }, name: string) => {
+  const listPage = await SbomGroupListPage.fromCurrentPage(page);
+  const toolbar = await listPage.getToolbar();
+  await toolbar.applyFilter({ Filter: name });
+});
+
+Then(
+  "The group {string} is visible in the table",
+  async ({ page }, groupName: string) => {
+    const row = page.getByRole("row", { name: new RegExp(groupName) });
+    await expect(row).toBeVisible();
+  },
+);
+
+When(
+  "User expands the tree node for {string}",
+  async ({ page }, groupName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    const row = treegrid.getByRole("row", { name: new RegExp(groupName) });
+    const expandButton = row.getByRole("button", { name: /expand row/i });
+    await expandButton.click();
+  },
+);
+
+Then(
+  "The child group {string} is visible under {string}",
+  async ({ page }, childName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    await expect(treegrid.getByRole("link", { name: childName })).toBeVisible();
+  },
+);
+
+When(
+  "User collapses the tree node for {string}",
+  async ({ page }, groupName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    const row = treegrid.getByRole("row", { name: new RegExp(groupName) });
+    const collapseButton = row.getByRole("button", { name: /collapse row/i });
+    await collapseButton.click();
+  },
+);
+
+Then(
+  "The child group {string} is not visible",
+  async ({ page }, childName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    await expect(
+      treegrid.getByRole("link", { name: childName }),
+    ).not.toBeVisible();
+  },
+);
+
+// Parent group selection in create
+When("User fills group name with {string}", async ({ page }, name: string) => {
+  const modal = page.getByRole("dialog");
+  await modal.getByRole("textbox", { name: "Group name" }).clear();
+  await modal.getByRole("textbox", { name: "Group name" }).fill(name);
+});
+
+When(
+  "User selects parent group {string} in the form",
+  async ({ page }, parentName: string) => {
+    const modal = page.getByRole("dialog");
+    await modal.getByRole("button", { name: /select parent group/i }).click();
+    await modal.getByRole("menuitem", { name: parentName }).click();
+  },
+);
+
+Then(
+  "The group {string} creation notification is displayed",
+  async ({ page }, groupName: string) => {
+    const successMessage = page.getByText(`Group ${groupName} created`);
+    await expect(successMessage).toBeVisible();
+  },
+);
+
+// Invalid group ID handling
+When("User navigates to group details with invalid ID", async ({ page }) => {
+  await page.goto("/sbom-groups/invalid-group-id-12345");
+});
+
+Then("An error state is displayed for the invalid group", async ({ page }) => {
+  const errorHeading = page.getByRole("heading", {
+    name: /error|not found|something went wrong/i,
+  });
+  await expect(errorHeading).toBeVisible({ timeout: 10000 });
+});
+
+// SBOM count in group list
+Then(
+  "The SBOM count is displayed for group {string}",
+  async ({ page }, groupName: string) => {
+    const row = page.getByRole("row", { name: new RegExp(groupName) });
+    await expect(row).toBeVisible();
+    await expect(row.locator("text=/\\d+ SBOMs?/")).toBeVisible();
+  },
+);
+
+// Product badge on group detail page
+Given(
+  "A product group {string} exists",
+  async ({ page }, groupName: string) => {
+    const listPage = await SbomGroupListPage.fromCurrentPage(page);
+    const toolbar = await listPage.getToolbar();
+    await toolbar.applyFilter({ Filter: groupName });
+
+    const row = page.getByRole("row", { name: new RegExp(groupName) });
+    if ((await row.count()) === 0) {
+      await page.getByRole("button", { name: "Create group" }).click();
+      const modal = await GroupFormModal.build(page, "Create group");
+      await modal.clearAndFillName(groupName);
+      await modal.fillDescription(`Product group: ${groupName}`);
+      await modal.selectIsProduct(true);
+      await modal.submit();
+    }
+
+    await toolbar.applyFilter({ Filter: "" });
+  },
+);
+
+Then(
+  "The {string} badge is visible on the detail page",
+  async ({ page }, badgeText: string) => {
+    const label = page.locator(".pf-v6-c-label", { hasText: badgeText });
+    await expect(label).toBeVisible();
+  },
+);
+
+// Edit group to change/remove parent
+When(
+  "User clicks kebab menu for child group {string}",
+  async ({ page }, childName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    const childRow = treegrid.getByRole("row", {
+      name: new RegExp(childName),
+    });
+    const kebabButton = childRow.locator('button[aria-label="Kebab toggle"]');
+    await kebabButton.click();
+  },
+);
+
+When("User clears parent group selection in the form", async ({ page }) => {
+  const modal = page.getByRole("dialog");
+  await modal.getByLabel("Clear selection").click();
+});
+
+Then(
+  "The group {string} is visible as a root group",
+  async ({ page }, groupName: string) => {
+    const treegrid = page.getByRole("treegrid");
+    const row = treegrid.getByRole("row", { name: new RegExp(groupName) });
+    await expect(row).toBeVisible();
+    // Root-level rows have aria-level=1
+    await expect(row).toHaveAttribute("aria-level", "1");
+  },
+);
+
+// Breadcrumb navigation
+Then(
+  "The breadcrumb shows {string} and {string}",
+  async ({ page }, firstCrumb: string, secondCrumb: string) => {
+    const breadcrumb = page.getByRole("navigation", { name: /breadcrumb/i });
+    await expect(breadcrumb.getByText(firstCrumb)).toBeVisible();
+    await expect(breadcrumb.getByText(secondCrumb)).toBeVisible();
+  },
+);
+
+When(
+  "User clicks the {string} breadcrumb link",
+  async ({ page }, linkText: string) => {
+    const breadcrumb = page.getByRole("navigation", { name: /breadcrumb/i });
+    await breadcrumb.getByRole("link", { name: linkText }).click();
+  },
+);
+
+// Sorting on group list
+When("User clicks the name column header to sort", async ({ page }) => {
+  const treegrid = page.getByRole("treegrid", { name: "sbom-groups-table" });
+  const nameHeader = treegrid.getByRole("columnheader", { name: /name/i });
+  await nameHeader.getByRole("button").click();
+});
+
+Then("The groups table is sorted by name ascending", async ({ page }) => {
+  const treegrid = page.getByRole("treegrid", { name: "sbom-groups-table" });
+  const nameHeader = treegrid.getByRole("columnheader", { name: /name/i });
+  await expect(nameHeader).toHaveAttribute("aria-sort", "ascending");
+});
+
+Then("The groups table is sorted by name descending", async ({ page }) => {
+  const treegrid = page.getByRole("treegrid", { name: "sbom-groups-table" });
+  const nameHeader = treegrid.getByRole("columnheader", { name: /name/i });
+  await expect(nameHeader).toHaveAttribute("aria-sort", "descending");
+});
