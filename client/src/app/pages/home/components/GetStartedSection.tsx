@@ -20,7 +20,7 @@ import UploadIcon from "@patternfly/react-icons/dist/esm/icons/upload-icon";
 import { Paths } from "@app/Routes";
 import useBranding from "@app/hooks/useBranding";
 
-import { HomeSectionCard } from "./HomeSectionCard";
+import { HomeSectionCard } from "./PortfolioMetricsSection";
 
 const ACTION_ICON_COLOR = "var(--pf-t--global--text--color--brand--default)";
 
@@ -54,18 +54,21 @@ const STATIC_ACTIONS: GetStartedAction[] = [
 
 export const GetStartedSection: React.FC = () => {
   const { about } = useBranding();
-  const documentationUrl =
-    about.documentationUrl?.trim() || "https://www.redhat.com/";
+  const documentationUrl = about.documentationUrl?.trim();
 
   const actions: GetStartedAction[] = [
     ...STATIC_ACTIONS,
-    {
-      title: "Learn more",
-      description: `Discover how ${about.displayName} helps you manage supply chain security, interpret SBOM analysis, and act on vulnerability findings.`,
-      href: documentationUrl,
-      buttonLabel: "View documentation",
-      icon: <BookOpenIcon aria-hidden color={ACTION_ICON_COLOR} />,
-    },
+    ...(documentationUrl
+      ? [
+          {
+            title: "Learn more",
+            description: `Discover how ${about.displayName} helps you manage supply chain security, interpret SBOM analysis, and act on vulnerability findings.`,
+            href: documentationUrl,
+            buttonLabel: "View documentation",
+            icon: <BookOpenIcon aria-hidden color={ACTION_ICON_COLOR} />,
+          },
+        ]
+      : []),
   ];
 
   return (

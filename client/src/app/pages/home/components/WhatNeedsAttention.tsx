@@ -27,7 +27,7 @@ import { VulnerabilityDescription } from "@app/components/VulnerabilityDescripti
 import { useFetchVulnerabilities } from "@app/queries/vulnerabilities";
 import { Paths } from "@app/Routes";
 
-import { HomeSectionCard } from "./HomeSectionCard";
+import { HomeSectionCard } from "./PortfolioMetricsSection";
 
 const MAX_ATTENTION_ITEMS = 3;
 
