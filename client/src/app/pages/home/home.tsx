@@ -12,7 +12,7 @@ export const Home: React.FC = () => {
   return (
     <>
       <DocumentMetadata title={"Home"} />
-      <PageSection variant="light">
+      <PageSection>
         <Stack hasGutter>
           <StackItem>
             <GetStartedSection />
