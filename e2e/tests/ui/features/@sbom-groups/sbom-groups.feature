@@ -11,12 +11,6 @@ Feature: SBOM Groups - Manage SBOM groups
   Scenario: Navigate to SBOM Groups page
     When User navigates to SBOM Groups page
     Then The page title is "Groups"
-    And The SBOM Groups table is visible
-
-  Scenario: Display SBOM Groups table structure
-    Given User navigates to SBOM Groups page
-    Then The SBOM Groups table is visible
-    And The SBOM Groups table shows group data
 
   # CRUD Operations - Create
   Scenario: Create new SBOM group with unique name
@@ -27,6 +21,8 @@ Feature: SBOM Groups - Manage SBOM groups
     And User fills group product status with "No"
     And User submits the group form
     Then The group creation is successful
+    And The SBOM Groups table is visible
+    And The SBOM Groups table shows group data
 
   # CRUD Operations - Edit
   Scenario: Edit SBOM group with unique name
@@ -95,9 +91,11 @@ Feature: SBOM Groups - Manage SBOM groups
     And User submits add to group form
     Then Success notification "1" is displayed
     When User navigates to SBOM Groups page
+    And User filters groups by name "<groupName>"
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is visible in the group member list
     When User navigates back to SBOM Groups page
+    And User filters groups by name "<groupName>"
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is still visible in the group member list
 
@@ -137,6 +135,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User submits add to group form
     Then Success notification "1" is displayed
     When User navigates to SBOM Groups page
+    And User filters groups by name "<groupName>"
     And User clicks on group "<groupName>"
     Then The SBOM "<sbomName>" is visible in the group member list
 
@@ -144,15 +143,244 @@ Feature: SBOM Groups - Manage SBOM groups
       | groupName        | sbomName     |
       | Critical Group   | openssl-3  |
 
-  Scenario: Add multiple SBOMs to group from SBOM list page
+  Scenario Outline: Add multiple SBOMs to group from SBOM list page
     Given User navigates to SBOM Groups page
-    And A group "Multi SBOM Group" exists
+    And A group "<groupName>" exists
+    Given An ingested SBOM "<sbom1>" is available
+    Given An ingested SBOM "<sbom2>" is available
     When User navigates to SBOM list page
-    And User picks 2 SBOMs from the list for bulk action
+    And User selects SBOM "<sbom1>" for bulk action
+    And User clears all filters on SBOM List page
+    And User selects SBOM "<sbom2>" for bulk action
+    And User clears all filters on SBOM List page
     And User clicks "Add to group" button
-    And User selects group "Multi SBOM Group" in the modal
+    And User selects group "<groupName>" in the modal
     And User submits add to group form
     Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
-    And User clicks on group "Multi SBOM Group"
-    Then The picked SBOMs are visible in the group member list
+    And User filters groups by name "<groupName>"
+    And User clicks on group "<groupName>"
+    Then The SBOM "<sbom1>" is visible in the group member list
+    And The SBOM "<sbom2>" is visible in the group member list
+
+    Examples:
+      | groupName        | sbom1  | sbom2       |
+      | Multi SBOM Group | curl   | quarkus-bom |
+
+  # Product label filtering
+  Scenario: Product label badge appears for product groups
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with unique timestamp
+    And User fills group description with "Product group test"
+    And User fills group product status with "Yes"
+    And User submits the group form
+    Then The group creation is successful
+    When User filters the created group by name
+    Then The "Product" label badge is visible for the created group
+
+  # Hierarchical tree display
+  Scenario: Expand and collapse hierarchical tree nodes
+    Given User navigates to SBOM Groups page
+    And A parent group "Tree Parent" with child group "Tree Child" exists
+    When User clears all filters on SBOM Groups page
+    And User sets items per page to 50 on SBOM Groups page
+    Then The group "Tree Parent" is visible in the table
+    When User expands the tree node for "Tree Parent"
+    Then The child group "Tree Child" is visible under "Tree Parent"
+    When User collapses the tree node for "Tree Parent"
+    Then The child group "Tree Child" is not visible
+
+  # Parent group selection in create
+  Scenario: Create child group with parent selection
+    Given User navigates to SBOM Groups page
+    And A group "Parent For Child" exists
+    When User clicks "Create group" button
+    And User fills group name with unique timestamp for child
+    And User fills group product status with "No"
+    And User selects parent group "Parent For Child" in the form
+    And User submits the group form
+    Then The child group creation is successful
+
+  # Invalid group ID handling
+  Scenario: Navigate to invalid group ID shows error
+    When User navigates to group details with invalid ID
+    Then An error state is displayed for the invalid group
+
+  # SBOM count in group list
+  Scenario: SBOM count is displayed for groups with SBOMs
+    Given User navigates to SBOM Groups page
+    And A group "Count Test Group" exists
+    Given An ingested SBOM "curl" is available
+    When User navigates to SBOM list page
+    And User selects SBOM "curl" for bulk action
+    And User clicks "Add to group" button
+    And User selects group "Count Test Group" in the modal
+    And User submits add to group form
+    Then Success notification "1" is displayed
+    When User navigates to SBOM Groups page
+    And User filters groups by name "Count Test Group"
+    Then The SBOM count is displayed for group "Count Test Group"
+
+  # Product badge on group detail page
+  Scenario: Product badge is displayed on group detail page
+    Given User navigates to SBOM Groups page
+    And A product group "Product Detail Badge" exists
+    When User clicks on group "Product Detail Badge"
+    Then The group details page is displayed
+    And The "Product" badge is visible on the detail page
+
+  # Edit group to change parent
+  Scenario: Edit group to assign a parent
+    Given User navigates to SBOM Groups page
+    And A standalone group "Orphan Child" exists
+    And A group "New Parent Group" exists
+    When User clears all filters on SBOM Groups page
+    And User filters groups by name "Orphan Child"
+    And User clicks kebab menu for group "Orphan Child"
+    And User selects "Edit" action
+    And User selects parent group "New Parent Group" in the edit form
+    And User submits the group form
+    And User clears all filters on SBOM Groups page
+    And User filters groups by name "New Parent"
+    And User expands the tree node for "New Parent Group"
+    Then The child group "Orphan Child" is visible under "New Parent Group"
+
+  # Edit group to remove parent
+  Scenario: Edit group to remove parent makes it a root group
+    Given User navigates to SBOM Groups page
+    And A parent group "Detach Parent" with child group "Detach Child" exists
+    When User clears all filters on SBOM Groups page
+    And User sets items per page to 50 on SBOM Groups page
+    And User expands the tree node for "Detach Parent"
+    And User clicks kebab menu for child group "Detach Child"
+    And User selects "Edit" action
+    And User clears parent group selection in the form
+    And User submits the group form
+    And User clears all filters on SBOM Groups page
+    And User filters groups by name "Detach Child"
+    Then The group "Detach Child" is visible as a root group
+
+  # Breadcrumb navigation
+  Scenario: Breadcrumb navigation on group detail page
+    Given User navigates to SBOM Groups page
+    And A group "Breadcrumb Test" exists with description "Breadcrumb test group"
+    When User clicks on group "Breadcrumb Test"
+    Then The group details page is displayed
+    And The breadcrumb shows "Groups" and "Group details"
+    When User clicks the "Groups" breadcrumb link
+    Then The SBOM Groups table is visible
+
+  # Pagination on group detail page
+  Scenario Outline: Pagination is displayed on group detail page
+    Given User navigates to SBOM Groups page
+    And A group "<groupName>" exists
+    Given An ingested SBOM "<sbom1>" is available
+    Given An ingested SBOM "<sbom2>" is available
+    When User navigates to SBOM list page
+    And User selects SBOM "<sbom1>" for bulk action
+    And User clears all filters on SBOM List page
+    And User selects SBOM "<sbom2>" for bulk action
+    And User clears all filters on SBOM List page
+    And User clicks "Add to group" button
+    And User selects group "<groupName>" in the modal
+    And User submits add to group form
+    Then Success notification "2" is displayed
+    When User navigates to SBOM Groups page
+    And User filters groups by name "<groupName>"
+    And User clicks on group "<groupName>"
+    Then The group detail SBOMs pagination is visible
+
+    Examples:
+      | groupName            | sbom1  | sbom2       |
+      | Pagination Test Group | curl   | quarkus-bom |
+
+  # Sorting on group detail page
+  Scenario Outline: Sort SBOMs by name on group detail page
+    Given User navigates to SBOM Groups page
+    And A group "<groupName>" exists
+    Given An ingested SBOM "<sbom1>" is available
+    Given An ingested SBOM "<sbom2>" is available
+    When User navigates to SBOM list page
+    And User selects SBOM "<sbom1>" for bulk action
+    And User clears all filters on SBOM List page
+    And User selects SBOM "<sbom2>" for bulk action
+    And User clears all filters on SBOM List page
+    And User clicks "Add to group" button
+    And User selects group "<groupName>" in the modal
+    And User submits add to group form
+    Then Success notification "2" is displayed
+    When User navigates to SBOM Groups page
+    And User filters groups by name "<groupName>"
+    And User clicks on group "<groupName>"
+    Then The SBOMs table is sorted by Name ascending
+    When User clicks the Name column header to sort SBOMs
+    Then The SBOMs table is sorted by Name descending
+    When User clicks the Name column header to sort SBOMs
+    Then The SBOMs table is sorted by Name ascending
+
+    Examples:
+      | groupName        | sbom1  | sbom2       |
+      | Sort Test Group  | curl   | quarkus-bom |
+
+  # Delete guard for parent groups
+  Scenario: Delete action is disabled for group with children
+    Given User navigates to SBOM Groups page
+    And A parent group "Parent No Delete" with child group "Child Prevents Delete" exists
+    When User clears all filters on SBOM Groups page
+    And User sets items per page to 50 on SBOM Groups page
+    And User clicks kebab menu for group "Parent No Delete"
+    Then The "Delete" action is disabled in the kebab menu
+
+  # Labels management
+  Scenario: Create group with custom labels
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with unique timestamp
+    And User fills group product status with "No"
+    And User adds label "env=staging" to the group form
+    And User adds label "team=security" to the group form
+    And User submits the group form
+    Then The group creation is successful
+    When User filters the created group by name
+    Then The "env=staging" label badge is visible for the created group
+    And The "team=security" label badge is visible for the created group
+
+  Scenario: Verify labels on group detail page
+    Given User navigates to SBOM Groups page
+    And A group "Detail Label Check" with label "source=api" exists
+    When User filters groups by name "Detail Label Check"
+    And User clicks on group "Detail Label Check"
+    Then The group details page is displayed
+    And The "source=api" label badge is visible on the detail page
+
+  # Navigate into child group from tree
+  Scenario: Navigate into child group from tree
+    Given User navigates to SBOM Groups page
+    And A parent group "Nav Parent" with child group "Nav Child" exists
+    When User clears all filters on SBOM Groups page
+    And User sets items per page to 50 on SBOM Groups page
+    And User expands the tree node for "Nav Parent"
+    And User clicks on group "Nav Child"
+    Then The group details page is displayed
+    And The page title is "Nav Child"
+
+  # Description display in tree table
+  Scenario: Group description displays in tree table
+    Given User navigates to SBOM Groups page
+    And A group "Desc Display" exists with description "Verify description display"
+    When User filters groups by name "Desc Display"
+    Then The description "Verify description display" is visible for group "Desc Display"
+
+  # Toggle product flag
+  Scenario: Toggle product flag from Yes to No
+    Given User navigates to SBOM Groups page
+    And A product group "Toggle Product" exists
+    When User filters groups by name "Toggle Product"
+    Then The "Product" label badge is visible for group "Toggle Product"
+    When User clicks kebab menu for group "Toggle Product"
+    And User selects "Edit" action
+    And User fills group product status with "No"
+    And User submits the group form
+    And User filters groups by name "Toggle Product"
+    Then The "Product" label badge is not visible for group "Toggle Product"
