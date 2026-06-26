@@ -27,4 +27,12 @@ export class DeletionConfirmDialog {
     await expect(confirmBtn).toBeEnabled();
     await confirmBtn.click();
   }
+
+  async clickCancel() {
+    const cancelBtn = this._deleteConfirmationDialog.getByRole("button", {
+      name: "Cancel",
+    });
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+  }
 }
