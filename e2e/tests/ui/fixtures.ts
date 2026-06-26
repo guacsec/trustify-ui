@@ -4,7 +4,23 @@ import { test as base } from "playwright-bdd";
 
 const istanbulCLIOutput = join(__dirname, "../../.nyc_output");
 
-export const test = base.extend({
+export type SbomGroupState = {
+  generatedGroupName: string | null;
+  generatedEditName: string | null;
+  generatedChildName: string | null;
+};
+
+export const test = base.extend<{ sbomGroupState: SbomGroupState }>({
+  // eslint-disable-next-line no-empty-pattern
+  sbomGroupState: async ({}, use) => {
+    // eslint-disable-next-line @eslint-react/rules-of-hooks -- Playwright fixture use(), not React
+    await use({
+      generatedGroupName: null,
+      generatedEditName: null,
+      generatedChildName: null,
+    });
+  },
+
   context: async ({ context }, use, testInfo) => {
     await context.addInitScript(() =>
       window.addEventListener("beforeunload", () =>

@@ -15,6 +15,12 @@ export class GroupFormModal {
     return new GroupFormModal(page, dialog);
   }
 
+  static async fromCurrentPage(page: Page) {
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    return new GroupFormModal(page, dialog);
+  }
+
   async fillName(name: string) {
     await this._dialog.getByRole("textbox", { name: "Group name" }).fill(name);
   }
