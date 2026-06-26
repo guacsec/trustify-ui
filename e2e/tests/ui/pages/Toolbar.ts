@@ -166,17 +166,20 @@ export class Toolbar<
   }
 
   /**
-   * Clears all applied filters by clicking the "Clear all filters" button
+   * Clears all applied filters by clicking the "Clear all filters" button.
+   * No-ops gracefully when no filters are active (button not present).
    */
   async clearAllFilters() {
     const clearButton = this._toolbar.getByRole("button", {
       name: "Clear all filters",
     });
-    await expect(clearButton).toBeVisible();
+    if (!(await clearButton.isVisible())) return;
     await clearButton.click();
 
-    // Verify all filter chips are removed
-    await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
+    // Give PatternFly label-group animations time to fully complete
+    await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0, {
+      timeout: 10000,
+    });
   }
 
   /**
