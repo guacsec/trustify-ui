@@ -21,6 +21,15 @@ export interface TableMatchers<
     lessThan?: number;
   }): Promise<MatcherResult>;
   toHaveEmptyState(): Promise<MatcherResult>;
+  toHaveCvssCellContent(
+    rowFilter: Partial<Record<TColumns[number], string>>,
+    cvssAssertions: {
+      severity?: string;
+      score?: string;
+      version?: string;
+      noVersionTag?: boolean;
+    },
+  ): Promise<MatcherResult>;
 }
 
 type TableMatcherDefinitions = {
@@ -164,6 +173,54 @@ export const tableAssertions = baseExpect.extend<TableMatcherDefinitions>({
       return {
         pass: true,
         message: () => "Table has empty state",
+      };
+    } catch (error) {
+      return {
+        pass: false,
+        message: () => (error instanceof Error ? error.message : String(error)),
+      };
+    }
+  },
+  toHaveCvssCellContent: async <
+    const TColumns extends readonly string[],
+    const TActions extends readonly string[],
+  >(
+    table: Table<TColumns, TActions>,
+    rowFilter: Partial<Record<TColumns[number], string>>,
+    cvssAssertions: {
+      severity?: string;
+      score?: string;
+      version?: string;
+      noVersionTag?: boolean;
+    },
+  ) => {
+    try {
+      const row = await table.getRowsByCellValue(rowFilter);
+      const cvssCell = row.locator('td[data-label="CVSS"]').first();
+
+      if (cvssAssertions.severity) {
+        await baseExpect(
+          cvssCell.getByText(cvssAssertions.severity, { exact: true }),
+        ).toBeVisible();
+      }
+      if (cvssAssertions.score) {
+        await baseExpect(
+          cvssCell.getByText(`(${cvssAssertions.score})`),
+        ).toBeVisible();
+      }
+      if (cvssAssertions.version) {
+        await baseExpect(
+          cvssCell.getByText(cvssAssertions.version, { exact: true }),
+        ).toBeVisible();
+      }
+      if (cvssAssertions.noVersionTag) {
+        await baseExpect(cvssCell.getByText(/^v\d/)).toHaveCount(0);
+      }
+
+      return {
+        pass: true,
+        message: () =>
+          `CVSS cell matches expected content: ${JSON.stringify(cvssAssertions)}`,
       };
     } catch (error) {
       return {

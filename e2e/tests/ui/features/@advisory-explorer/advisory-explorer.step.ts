@@ -90,7 +90,7 @@ Then(
   },
 );
 
-// Advisory Explorer / Vulenrabilities
+// Advisory Explorer / Vulnerabilities
 
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
