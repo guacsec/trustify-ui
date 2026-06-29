@@ -10,23 +10,25 @@ import type { ToolbarLabel } from "@patternfly/react-core";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
 export const getAxiosErrorMessage = (axiosError: AxiosError<any>) => {
-  if (axiosError.response?.data?.errorMessage) {
-    return axiosError.response.data.errorMessage;
+  const data = axiosError.response?.data;
+
+  const error = typeof data?.error === "string" ? data.error : undefined;
+  const message = typeof data?.message === "string" ? data.message : undefined;
+  const details = typeof data?.details === "string" ? data.details : undefined;
+
+  if (error && message) {
+    const base = `${error}: ${message}`;
+    return details ? `${base}\n${details}` : base;
   }
-  if (
-    axiosError.response?.data?.message &&
-    typeof axiosError.response.data.message === "string"
-  ) {
-    return axiosError.response.data.message;
+  if (message) {
+    return message;
   }
-  if (
-    axiosError.response?.data?.error &&
-    typeof axiosError.response.data.error === "string"
-  ) {
-    return axiosError.response.data.error;
+  if (error) {
+    return error;
   }
-  if (typeof axiosError.response?.data === "string") {
-    return axiosError.response.data;
+
+  if (typeof data === "string") {
+    return data;
   }
   return axiosError.message;
 };

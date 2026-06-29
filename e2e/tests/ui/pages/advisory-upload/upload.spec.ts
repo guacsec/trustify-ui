@@ -152,7 +152,12 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadApiErrorMessage("displays API error message for advisory", {
     filePath: TEST_FILES.INVALID_JSON,
     apiRoutePattern: "**/api/v3/advisory",
-    errorMessage: "Invalid advisory: not a valid CSAF, CVE, or OSV document",
+    errorResponseBody: {
+      error: "InvalidFormat",
+      message: "not a valid CSAF, CVE, or OSV document",
+    },
+    expectedErrorMessage:
+      "InvalidFormat: not a valid CSAF, CVE, or OSV document",
     getConfig: async ({ page }) => {
       const uploadPage = await AdvisoryUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();

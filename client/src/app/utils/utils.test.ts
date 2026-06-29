@@ -28,10 +28,10 @@ describe("utils", () => {
 
   // getAxiosErrorMessage
 
-  it("getAxiosErrorMessage: returns errorMessage when present", () => {
+  it("getAxiosErrorMessage: concatenates error and message (ErrorInformation)", () => {
     const error = createAxiosError({
       response: {
-        data: { errorMessage: "Detailed error from errorMessage" },
+        data: { error: "InvalidFormat", message: "expected CycloneDX or SPDX" },
         status: 400,
         statusText: "Bad Request",
         headers: {},
@@ -39,11 +39,30 @@ describe("utils", () => {
       },
     });
     expect(getAxiosErrorMessage(error)).toBe(
-      "Detailed error from errorMessage",
+      "InvalidFormat: expected CycloneDX or SPDX",
     );
   });
 
-  it("getAxiosErrorMessage: returns message when present", () => {
+  it("getAxiosErrorMessage: includes details when error and message present", () => {
+    const error = createAxiosError({
+      response: {
+        data: {
+          error: "InvalidFormat",
+          message: "could not parse document",
+          details: "line 42: unexpected token",
+        },
+        status: 400,
+        statusText: "Bad Request",
+        headers: {},
+        config: {} as never,
+      },
+    });
+    expect(getAxiosErrorMessage(error)).toBe(
+      "InvalidFormat: could not parse document\nline 42: unexpected token",
+    );
+  });
+
+  it("getAxiosErrorMessage: returns message when only message present", () => {
     const error = createAxiosError({
       response: {
         data: { message: "Invalid SBOM format" },
@@ -56,7 +75,7 @@ describe("utils", () => {
     expect(getAxiosErrorMessage(error)).toBe("Invalid SBOM format");
   });
 
-  it("getAxiosErrorMessage: returns error string when present", () => {
+  it("getAxiosErrorMessage: returns error when only error present", () => {
     const error = createAxiosError({
       response: {
         data: { error: "Something went wrong" },
@@ -89,12 +108,13 @@ describe("utils", () => {
     expect(getAxiosErrorMessage(error)).toBe("Network Error");
   });
 
-  it("getAxiosErrorMessage: errorMessage takes priority over message", () => {
+  it("getAxiosErrorMessage: ignores unknown fields and uses error+message", () => {
     const error = createAxiosError({
       response: {
         data: {
-          errorMessage: "Higher priority",
-          message: "Lower priority",
+          error: "SomeError",
+          message: "Something happened",
+          unknownField: "ignored",
         },
         status: 400,
         statusText: "Bad Request",
@@ -102,6 +122,6 @@ describe("utils", () => {
         config: {} as never,
       },
     });
-    expect(getAxiosErrorMessage(error)).toBe("Higher priority");
+    expect(getAxiosErrorMessage(error)).toBe("SomeError: Something happened");
   });
 });

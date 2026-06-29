@@ -152,7 +152,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
   testUploadApiErrorMessage("displays API error message for SBOM", {
     filePath: TEST_FILES.INVALID_JSON,
     apiRoutePattern: "**/api/v3/sbom",
-    errorMessage: "Invalid SBOM format: expected CycloneDX or SPDX document",
+    errorResponseBody: {
+      error: "InvalidFormat",
+      message: "expected CycloneDX or SPDX document",
+    },
+    expectedErrorMessage: "InvalidFormat: expected CycloneDX or SPDX document",
     getConfig: async ({ page }) => {
       const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();

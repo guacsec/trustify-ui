@@ -146,12 +146,14 @@ export const testUploadApiErrorMessage = (
   {
     filePath,
     apiRoutePattern,
-    errorMessage,
+    errorResponseBody,
+    expectedErrorMessage,
     getConfig,
   }: {
     filePath: string;
     apiRoutePattern: string;
-    errorMessage: string;
+    errorResponseBody: { error: string; message?: string; details?: string };
+    expectedErrorMessage: string;
     getConfig: ({ page }: { page: Page }) => Promise<UploadTestConfig>;
   },
 ) =>
@@ -163,7 +165,7 @@ export const testUploadApiErrorMessage = (
       await route.fulfill({
         status: 400,
         contentType: "application/json",
-        body: JSON.stringify({ message: errorMessage }),
+        body: JSON.stringify(errorResponseBody),
       });
     });
 
@@ -177,7 +179,7 @@ export const testUploadApiErrorMessage = (
       });
       await expect(fileUploader).toHaveItemUploadErrorMessage({
         fileName,
-        errorMessage,
+        errorMessage: expectedErrorMessage,
       });
     } finally {
       await page.unroute(apiRoutePattern);
