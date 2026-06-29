@@ -1,3 +1,8 @@
+export interface SafetyRisk {
+  name: string;
+  mitigationStrategy?: string;
+}
+
 export interface ModelProperties {
   version?: string;
   licenses?: string;
@@ -10,7 +15,7 @@ export interface ModelProperties {
   downloadLocation?: string;
   external_references?: string;
   limitation?: string;
-  safetyRiskAssessment?: string;
+  safetyRiskAssessment?: string | SafetyRisk[];
 }
 
 export const getModelProperties = (properties: unknown): ModelProperties => {
@@ -18,4 +23,12 @@ export const getModelProperties = (properties: unknown): ModelProperties => {
     return properties as ModelProperties;
   }
   return {};
+};
+
+export const parseSafetyRisks = (
+  value?: string | SafetyRisk[],
+): SafetyRisk[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return [{ name: value }];
 };
