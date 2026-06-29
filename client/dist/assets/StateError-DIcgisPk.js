@@ -1,1 +1,0 @@
-import{t as e}from"./react-B-P7c96U.js";import{tt as t}from"./useBranding-C36_5_Nu.js";import{i as n,n as r,r as i}from"./Bullseye-DYUzMYzf.js";var a=e(),o=()=>(0,a.jsx)(i,{status:`danger`,headingLevel:`h4`,titleText:`Unable to connect`,icon:t,variant:n.sm,children:(0,a.jsx)(r,{children:`There was an error retrieving data. Check your connection and try again.`})});export{o as t};

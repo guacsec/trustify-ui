@@ -1,1 +1,0 @@
-import{t as e}from"./react-B-P7c96U.js";import{gt as t}from"./useBranding-C36_5_Nu.js";var n=e(),r=({value:e})=>(0,n.jsx)(n.Fragment,{children:Object.entries(e).map(([e,r])=>(0,n.jsx)(t,{isCompact:!0,children:`${e}=${r}`},`${e}=${r}`))});export{r as t};
