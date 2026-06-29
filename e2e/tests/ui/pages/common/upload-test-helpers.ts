@@ -176,10 +176,7 @@ export const testUploadApiErrorMessage = (
       await expect(fileUploader).toHaveItemUploadStatus({
         fileName,
         status: "danger",
-      });
-      await expect(fileUploader).toHaveItemUploadErrorMessage({
-        fileName,
-        errorMessage: expectedErrorMessage,
+        message: expectedErrorMessage,
       });
     } finally {
       await page.unroute(apiRoutePattern);
