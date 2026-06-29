@@ -15,13 +15,15 @@ import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 
 import { HeaderApp } from "./header";
 import { SidebarApp } from "./sidebar";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { getAxiosErrorMessage } from "@app/utils/utils";
 
 interface DefaultLayoutProps {
   children?: React.ReactNode;
 }
 
 export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { isLoading, areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const pageId = "main-content-page-layout-horizontal-nav";
   const PageSkipToContent = (
     <SkipToContent href={`#${pageId}`}>Skip to content</SkipToContent>
@@ -35,27 +37,37 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
       skipToContent={PageSkipToContent}
       mainContainerId={pageId}
     >
-      {isReadOnly && (
-        <Banner
-          isSticky
-          status="info"
-          screenReaderText="Info banner: application is in read-only mode"
-        >
-          <Flex
-            justifyContent={{ default: "justifyContentCenter" }}
-            alignItems={{ default: "alignItemsCenter" }}
-            gap={{ default: "gapSm" }}
+      <LoadingWrapper
+        isFetching={isLoading}
+        isFetchingState={<></>}
+        fetchErrorState={(error) => (
+          <Banner isSticky status="danger">
+            {getAxiosErrorMessage(error)}
+          </Banner>
+        )}
+      >
+        {areMutationsDisabled && (
+          <Banner
+            isSticky
+            status="info"
+            screenReaderText="Info banner: application is in read-only mode"
           >
-            <FlexItem>
-              <InfoCircleIcon />
-            </FlexItem>
-            <FlexItem>
-              This instance is running in read-only mode. Uploads, imports, and
-              other modifications are disabled.
-            </FlexItem>
-          </Flex>
-        </Banner>
-      )}
+            <Flex
+              justifyContent={{ default: "justifyContentCenter" }}
+              alignItems={{ default: "alignItemsCenter" }}
+              gap={{ default: "gapSm" }}
+            >
+              <FlexItem>
+                <InfoCircleIcon />
+              </FlexItem>
+              <FlexItem>
+                This instance is running in read-only mode. Uploads, imports,
+                and other modifications are disabled.
+              </FlexItem>
+            </Flex>
+          </Banner>
+        )}
+      </LoadingWrapper>
       <PageContentWithDrawerProvider>
         {children}
         <Notifications />

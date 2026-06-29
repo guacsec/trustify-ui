@@ -33,9 +33,15 @@ vi.mock("@patternfly/react-core", async () => {
   };
 });
 
-const renderLayout = (isReadOnly: boolean) => {
+const renderLayout = ({
+  isLoading = false,
+  areMutationsDisabled = false,
+}: {
+  isLoading?: boolean;
+  areMutationsDisabled?: boolean;
+}) => {
   return render(
-    <ReadOnlyContext.Provider value={{ isReadOnly, isLoading: false }}>
+    <ReadOnlyContext.Provider value={{ isLoading, areMutationsDisabled }}>
       <DefaultLayout>
         <div data-testid="page-content">Page content</div>
       </DefaultLayout>
@@ -44,19 +50,27 @@ const renderLayout = (isReadOnly: boolean) => {
 };
 
 describe("DefaultLayout", () => {
-  it("shows a read-only banner when isReadOnly is true", () => {
-    renderLayout(true);
+  it("shows a read-only banner when mutations are disabled", () => {
+    renderLayout({ areMutationsDisabled: true });
 
     expect(screen.getByText(/running in read-only mode/i)).toBeInTheDocument();
     expect(screen.getByTestId("page-content")).toBeInTheDocument();
   });
 
-  it("does not show a banner when isReadOnly is false", () => {
-    renderLayout(false);
+  it("does not show a banner when mutations are allowed", () => {
+    renderLayout({ areMutationsDisabled: false });
 
     expect(
       screen.queryByText(/running in read-only mode/i),
     ).not.toBeInTheDocument();
     expect(screen.getByTestId("page-content")).toBeInTheDocument();
+  });
+
+  it("does not show a banner while trustify info is loading", () => {
+    renderLayout({ isLoading: true, areMutationsDisabled: true });
+
+    expect(
+      screen.queryByText(/running in read-only mode/i),
+    ).not.toBeInTheDocument();
   });
 });

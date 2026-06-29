@@ -12,11 +12,12 @@ interface IReadOnlyProvider {
 export const ReadOnlyProvider: React.FunctionComponent<IReadOnlyProvider> = ({
   children,
 }) => {
-  const { trustifyInfo, isLoading } = useFetchTrustifyInfo();
-  const isReadOnly = isLoading || (trustifyInfo?.readOnly ?? false);
+  const { data: trustifyInfo, isLoading } = useFetchTrustifyInfo();
+  const isReadOnly = trustifyInfo?.readOnly ?? false;
+  const areMutationsDisabled = isLoading || isReadOnly;
 
   return (
-    <ReadOnlyContext.Provider value={{ isReadOnly, isLoading }}>
+    <ReadOnlyContext.Provider value={{ isLoading, areMutationsDisabled }}>
       {children}
     </ReadOnlyContext.Provider>
   );
