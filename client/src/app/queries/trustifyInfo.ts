@@ -10,15 +10,10 @@ export const useFetchTrustifyInfo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: [TrustifyInfoQueryKey],
     queryFn: () => info({ client }),
-    staleTime: Number.POSITIVE_INFINITY,
-    gcTime: Number.POSITIVE_INFINITY,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    retry: 3,
   });
 
   return {
-    trustifyInfo: data?.data,
+    data: data?.data,
     isLoading,
     error,
   };
