@@ -87,7 +87,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -397,7 +397,7 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]
                                 : [
@@ -406,17 +406,16 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("run", item);
                                       },
-                                      isAriaDisabled:
-                                        isReadOnly ||
-                                        importerStatus === "running",
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled:
+                                        importerStatus === "running" ||
+                                        areMutationsDisabled,
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]),
                             ]}
