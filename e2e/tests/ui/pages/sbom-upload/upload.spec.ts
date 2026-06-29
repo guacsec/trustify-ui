@@ -5,6 +5,7 @@ import { login } from "../../helpers/Auth";
 import {
   testInvalidFileExtensions,
   testRemoveFiles,
+  testUploadApiErrorMessage,
   testUploadFilesParallel,
   testUploadFilesSequentially,
 } from "../common/upload-test-helpers";
@@ -141,6 +142,17 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
 
   testInvalidFileExtensions({
     filesPaths: [TEST_FILES.INVALID_TXT],
+    getConfig: async ({ page }) => {
+      const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
+      const fileUploader = await uploadPage.getFileUploader();
+      return { fileUploader };
+    },
+  });
+
+  testUploadApiErrorMessage("displays API error message for SBOM", {
+    filePath: TEST_FILES.INVALID_JSON,
+    apiRoutePattern: "**/api/v3/sbom",
+    errorMessage: "Invalid SBOM format: expected CycloneDX or SPDX document",
     getConfig: async ({ page }) => {
       const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();

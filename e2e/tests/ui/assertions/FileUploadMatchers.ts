@@ -11,6 +11,10 @@ export interface FileUploadMatchers {
     fileName: string;
     status: "success" | "danger";
   }): Promise<MatcherResult>;
+  toHaveItemUploadErrorMessage(expectedStatus: {
+    fileName: string;
+    errorMessage: string;
+  }): Promise<MatcherResult>;
 }
 
 type FileUploadMatcherDefinitions = {
@@ -71,6 +75,33 @@ export const fileUploadAssertions =
         return {
           pass: true,
           message: () => "Uploader has item with expected status",
+        };
+      } catch (error) {
+        return {
+          pass: false,
+          message: () =>
+            error instanceof Error ? error.message : String(error),
+        };
+      }
+    },
+    toHaveItemUploadErrorMessage: async (
+      fileUpload: FileUpload,
+      expectedStatus: {
+        fileName: string;
+        errorMessage: string;
+      },
+    ): Promise<MatcherResult> => {
+      try {
+        const statusItem = await fileUpload.getUploadStatusItem(
+          expectedStatus.fileName,
+        );
+        await baseExpect(
+          statusItem.locator(".pf-v6-c-helper-text__item.pf-m-error"),
+        ).toContainText(expectedStatus.errorMessage);
+
+        return {
+          pass: true,
+          message: () => "Uploader item has expected error message",
         };
       } catch (error) {
         return {

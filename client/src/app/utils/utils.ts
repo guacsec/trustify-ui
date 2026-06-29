@@ -14,10 +14,19 @@ export const getAxiosErrorMessage = (axiosError: AxiosError<any>) => {
     return axiosError.response.data.errorMessage;
   }
   if (
-    axiosError.response?.data?.error &&
-    typeof axiosError?.response?.data?.error === "string"
+    axiosError.response?.data?.message &&
+    typeof axiosError.response.data.message === "string"
   ) {
-    return axiosError?.response?.data?.error;
+    return axiosError.response.data.message;
+  }
+  if (
+    axiosError.response?.data?.error &&
+    typeof axiosError.response.data.error === "string"
+  ) {
+    return axiosError.response.data.error;
+  }
+  if (typeof axiosError.response?.data === "string") {
+    return axiosError.response.data;
   }
   return axiosError.message;
 };

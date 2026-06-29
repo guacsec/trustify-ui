@@ -141,6 +141,49 @@ export const testRemoveFiles = ({
     }
   });
 
+export const testUploadApiErrorMessage = (
+  testName: string,
+  {
+    filePath,
+    apiRoutePattern,
+    errorMessage,
+    getConfig,
+  }: {
+    filePath: string;
+    apiRoutePattern: string;
+    errorMessage: string;
+    getConfig: ({ page }: { page: Page }) => Promise<UploadTestConfig>;
+  },
+) =>
+  test(`Upload API error message - ${testName}`, async ({ page }) => {
+    const config = await getConfig({ page });
+    const fileUploader = config.fileUploader;
+
+    await page.route(apiRoutePattern, async (route) => {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ message: errorMessage }),
+      });
+    });
+
+    try {
+      await fileUploader.uploadFiles([filePath]);
+
+      const fileName = path.basename(filePath);
+      await expect(fileUploader).toHaveItemUploadStatus({
+        fileName,
+        status: "danger",
+      });
+      await expect(fileUploader).toHaveItemUploadErrorMessage({
+        fileName,
+        errorMessage,
+      });
+    } finally {
+      await page.unroute(apiRoutePattern);
+    }
+  });
+
 export const testInvalidFileExtensions = ({
   filesPaths,
   getConfig,
