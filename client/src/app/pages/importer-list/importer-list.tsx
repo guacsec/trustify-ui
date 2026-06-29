@@ -669,24 +669,11 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const LogButton = ({ children }: { children: React.ReactNode }) => {
-              if (item.messages) {
-                return (
-                  <Button
-                    isInline
-                    variant="link"
-                    onClick={() => {
-                      const newLogData = messagesToLogData(item.messages ?? {});
-                      setLogData(newLogData);
-                      toggleLogModal();
-                    }}
-                  >
-                    {children}
-                  </Button>
-                );
-              }
-              return children;
-            };
+            const statusIcon = item.error ? (
+              <IconedStatus preset="Failed" label={item.error} />
+            ) : (
+              <IconedStatus preset="Completed" label="Finished successfully" />
+            );
 
             return (
               <Tbody key={item.id}>
@@ -724,17 +711,19 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
                     >
                       {item.isRunning ? (
                         <ImporterStatusIcon state="running" />
+                      ) : item.messages ? (
+                        <Button
+                          isInline
+                          variant="link"
+                          onClick={() => {
+                            setLogData(messagesToLogData(item.messages ?? {}));
+                            toggleLogModal();
+                          }}
+                        >
+                          {statusIcon}
+                        </Button>
                       ) : (
-                        <LogButton>
-                          {item.error ? (
-                            <IconedStatus preset="Failed" label={item.error} />
-                          ) : (
-                            <IconedStatus
-                              preset="Completed"
-                              label="Finished successfully"
-                            />
-                          )}
-                        </LogButton>
+                        statusIcon
                       )}
                     </Td>
                     <Td

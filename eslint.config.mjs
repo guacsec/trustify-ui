@@ -41,7 +41,6 @@ export default defineConfig([
       "@eslint-react/use-state": "off",
       "@eslint-react/no-unnecessary-use-prefix": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@eslint-react/static-components": "off",
       "@eslint-react/exhaustive-deps": "off",
       "@eslint-react/no-nested-component-definitions": "off",
       "@tanstack/query/prefer-query-options": "off",
