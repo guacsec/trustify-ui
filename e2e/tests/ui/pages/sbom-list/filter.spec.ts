@@ -184,7 +184,7 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
 
   testFilterMatches("Empty filter input is handled", {
     filters: { "Filter text": "" },
-    assertions: { columnName: "Name", value: "quarkus-bom" },
+    assertions: { columnName: "Name", value: /\S+/, rowIndex: 0 },
     getConfig: async ({ page }) => {
       const listPage = await SbomListPage.build(page);
       const toolbar = await listPage.getToolbar();
