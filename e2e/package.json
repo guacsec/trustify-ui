@@ -25,6 +25,6 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "axios": "^1.16.0",
-    "playwright-bdd": "^8.5.1"
+    "playwright-bdd": "^9.2.0"
   }
 }
