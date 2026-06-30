@@ -65,6 +65,11 @@ import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-br
 const ELIGIBLE_SEVERITIES: ReadonlySet<ExtendedSeverity> = new Set([
   "critical",
   "high",
+  "medium",
+  "moderate",
+  "low",
+  "none",
+  "unknown",
 ]);
 
 interface VulnerabilitiesBySbomProps {
@@ -356,14 +361,15 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         })}
                       >
                         <ExploitIntelligenceAnalysisCell
+                          vulnerabilityIdentifier={
+                            item.vulnerability.identifier
+                          }
                           state={
                             eiStates[item.vulnerability.identifier] ?? {
                               kind: "not_run",
                             }
                           }
-                          onRequestAnalysis={() =>
-                            handleRequestAnalysis(item.vulnerability.identifier)
-                          }
+                          onRequestAnalysis={handleRequestAnalysis}
                           requestAnalysisEligible={ELIGIBLE_SEVERITIES.has(
                             item.opinionatedAdvisory.extendedSeverity,
                           )}
