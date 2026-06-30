@@ -53,6 +53,15 @@ export class VulnerabilitiesTab {
     );
   }
 
+  async clickSourcesButton(vulnerabilityID: string) {
+    const pagination = await this.getPagination();
+    await pagination.selectItemsPerPage(20);
+    const table = await this.getTable();
+    const rows = await table.getRowsByCellValue({ Id: vulnerabilityID });
+    const sourcesButton = rows.getByRole("button", { name: /Sources/i });
+    await sourcesButton.click();
+  }
+
   async getPagination(top: boolean = true) {
     return await Pagination.build(
       this._page,

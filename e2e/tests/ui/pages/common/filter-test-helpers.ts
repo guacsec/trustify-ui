@@ -57,7 +57,7 @@ export const testFilterMatches = <
     filters: Partial<FilterValueType<TFilter>>;
     assertions: {
       columnName: TColumns[number];
-      value: string;
+      value: string | RegExp;
       rowIndex?: number;
     };
     getConfig: ({

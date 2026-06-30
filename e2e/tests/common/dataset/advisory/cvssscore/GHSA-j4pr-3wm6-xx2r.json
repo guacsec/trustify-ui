@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.4.0",
+  "id": "GHSA-j4pr-3wm6-xx2r",
+  "modified": "2026-04-24T13:42:05Z",
+  "published": "2025-12-30T21:07:14Z",
+  "aliases": ["CVE-2025-61594"],
+  "summary": "URI Credential Leakage Bypass over CVE-2025-27221",
+  "details": "### Impact\n\nIn affected URI version, a bypass exists for the fix to CVE-2025-27221 that can expose user credentials.\n\nWhen using the `+` operator to combine URIs, sensitive information like passwords from the original URI can be leaked, violating RFC3986 and making applications vulnerable to credential exposure.\n\nThe vulnerability affects the `uri` gem bundled with the following Ruby series:\n\n* 0.12.4 and earlier (bundled in Ruby 3.2 series)\n* 0.13.2 and earlier (bundled in Ruby 3.3 series)\n* 1.0.3 and earlier (bundled in Ruby 3.4 series)\n\n### Patches\n\nUpgrade to 0.12.5, 0.13.3 or 1.0.4\n\n### References\n\n* https://www.ruby-lang.org/en/news/2025/02/26/security-advisories/\n* https://hackerone.com/reports/2957667",
+  "severity": [
+    {
+      "type": "CVSS_V3",
+      "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+    },
+    {
+      "type": "CVSS_V4",
+      "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "RubyGems",
+        "name": "uri"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "0.12.5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "RubyGems",
+        "name": "uri"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "0.13.0"
+            },
+            {
+              "fixed": "0.13.3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "RubyGems",
+        "name": "uri"
+      },
+      "ranges": [
+        {
+          "type": "ECOSYSTEM",
+          "events": [
+            {
+              "introduced": "1.0.0"
+            },
+            {
+              "fixed": "1.0.4"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "references": [
+    {
+      "type": "WEB",
+      "url": "https://github.com/ruby/uri/security/advisories/GHSA-j4pr-3wm6-xx2r"
+    },
+    {
+      "type": "ADVISORY",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61594"
+    },
+    {
+      "type": "WEB",
+      "url": "https://github.com/ruby/uri/commit/20157e3e29b125ff41f1d9662e2e3b1d066f5902"
+    },
+    {
+      "type": "WEB",
+      "url": "https://github.com/ruby/uri/commit/7e521b2da0833d964aab43019e735aea674e1c2c"
+    },
+    {
+      "type": "WEB",
+      "url": "https://github.com/ruby/uri/commit/d3116ca66a3b1c97dc7577f9d2d6e353f391cd6a"
+    },
+    {
+      "type": "WEB",
+      "url": "https://hackerone.com/reports/2957667"
+    },
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-22h5-pq3x-2gf2"
+    },
+    {
+      "type": "PACKAGE",
+      "url": "https://github.com/ruby/uri"
+    },
+    {
+      "type": "WEB",
+      "url": "https://github.com/rubysec/ruby-advisory-db/blob/master/gems/uri/CVE-2025-61594.yml"
+    },
+    {
+      "type": "WEB",
+      "url": "https://www.ruby-lang.org/en/news/2025/02/26/security-advisories"
+    },
+    {
+      "type": "WEB",
+      "url": "https://www.ruby-lang.org/en/news/2025/10/07/uri-cve-2025-61594"
+    }
+  ],
+  "database_specific": {
+    "cwe_ids": ["CWE-200", "CWE-212"],
+    "severity": "LOW",
+    "github_reviewed": true,
+    "github_reviewed_at": "2025-12-30T21:07:14Z",
+    "nvd_published_at": "2025-12-30T21:15:43Z"
+  }
+}
