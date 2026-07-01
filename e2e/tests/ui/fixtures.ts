@@ -30,6 +30,7 @@ export const test = base.extend({
       },
     );
 
+    // eslint-disable-next-line @eslint-react/rules-of-hooks
     await use(context);
 
     for (const page of context.pages()) {

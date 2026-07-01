@@ -12,6 +12,8 @@ use std::collections::HashMap;
 use std::str::from_utf8;
 use std::sync::OnceLock;
 
+mod test;
+
 #[derive(Serialize, Clone, Default)]
 pub struct UI {
     #[serde(rename(serialize = "VERSION"))]

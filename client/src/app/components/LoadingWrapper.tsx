@@ -6,11 +6,11 @@ import { Bullseye, Spinner } from "@patternfly/react-core";
 
 import { StateError } from "./StateError";
 
-export const LoadingWrapper = (props: {
+export const LoadingWrapper = <T extends Error = AxiosError>(props: {
   isFetching: boolean;
-  fetchError?: AxiosError | null;
+  fetchError?: T | null;
   isFetchingState?: React.ReactNode;
-  fetchErrorState?: (error: AxiosError) => React.ReactNode;
+  fetchErrorState?: (error: T) => React.ReactNode;
   children: React.ReactNode;
 }) => {
   if (props.isFetching) {

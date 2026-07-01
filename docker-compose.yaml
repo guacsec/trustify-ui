@@ -41,6 +41,7 @@ services:
     image: ${TRUSTIFY_IMAGE}
     environment:
       TRUSTD_DB_HOST: trustify-db
+      TRUSTD_DB_MAX_CONN: "30"
       RUST_LOG: "error"
     entrypoint: /usr/local/bin/trustd
     command: importer --working-dir /data/workdir
@@ -56,6 +57,7 @@ services:
     image: ${TRUSTIFY_IMAGE}
     environment:
       TRUSTD_DB_HOST: trustify-db
+      TRUSTD_DB_MAX_CONN: "50"
       HTTP_SERVER_BIND_ADDR: "::"
       AUTH_DISABLED: true
       RUST_LOG: "error"

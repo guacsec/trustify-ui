@@ -50,9 +50,9 @@ export default defineConfig({
     },
     viteStaticCopy({
       targets: [
-        { src: manifestPath, dest: "." },
-        { src: faviconPath, dest: "." },
-        { src: brandingPath, dest: "." },
+        { src: manifestPath, dest: ".", rename: { stripBase: true } },
+        { src: faviconPath, dest: ".", rename: { stripBase: true } },
+        { src: brandingPath, dest: ".", rename: { stripBase: 2 } },
       ],
     }),
     ...(process.env.NODE_ENV === "production"

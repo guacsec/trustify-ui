@@ -46,7 +46,7 @@ import { SbomSearchContext } from "./sbom-context";
 
 export const SbomTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const {
     isFetching,
@@ -229,7 +229,7 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setEditLabelsModalState(item);
                             },
-                            ...readOnlyActionProps(isReadOnly),
+                            isDisabled: areMutationsDisabled,
                           },
                           {
                             isSeparator: true,
@@ -254,7 +254,7 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setSbomToDelete(item);
                             },
-                            ...readOnlyActionProps(isReadOnly),
+                            isDisabled: areMutationsDisabled,
                           },
                         ]}
                       />
