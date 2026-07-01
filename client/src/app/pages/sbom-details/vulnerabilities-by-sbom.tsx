@@ -352,58 +352,52 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                 </Tr>
                               </Thead>
                               <Tbody>
-                                {Array.from(item.purls.values()).map(
-                                  (purl, index) => {
-                                    if (!purl.isOrphan) {
-                                      const decomposedPurl = decomposePurl(
-                                        purl.purlSummary.purl,
-                                      );
-                                      return (
-                                        <Tr key={purl.purlSummary.uuid}>
-                                          <Td>{decomposedPurl?.type}</Td>
-                                          <Td>{decomposedPurl?.namespace}</Td>
-                                          <Td>
-                                            <Link
-                                              to={generatePath(
-                                                Paths.packageDetails,
-                                                {
-                                                  packageId:
-                                                    purl.purlSummary.uuid,
-                                                },
-                                              )}
-                                            >
-                                              {decomposedPurl?.name}
-                                            </Link>
-                                          </Td>
-                                          <Td>{decomposedPurl?.version}</Td>
-                                          <Td>{decomposedPurl?.path}</Td>
-                                          <Td>
-                                            {decomposedPurl?.qualifiers && (
-                                              <PackageQualifiers
-                                                value={
-                                                  decomposedPurl?.qualifiers
-                                                }
-                                              />
+                                {Array.from(item.purls.values()).map((purl) => {
+                                  if (!purl.isOrphan) {
+                                    const decomposedPurl = decomposePurl(
+                                      purl.purlSummary.purl,
+                                    );
+                                    return (
+                                      <Tr key={purl.purlSummary.uuid}>
+                                        <Td>{decomposedPurl?.type}</Td>
+                                        <Td>{decomposedPurl?.namespace}</Td>
+                                        <Td>
+                                          <Link
+                                            to={generatePath(
+                                              Paths.packageDetails,
+                                              {
+                                                packageId:
+                                                  purl.purlSummary.uuid,
+                                              },
                                             )}
-                                          </Td>
-                                        </Tr>
-                                      );
-                                    } else {
-                                      return (
-                                        <Tr
-                                          key={`${purl.parentName}-${index}-name`}
-                                        >
-                                          <Td />
-                                          <Td />
-                                          <Td>{purl.parentName}</Td>
-                                          <Td />
-                                          <Td />
-                                          <Td />
-                                        </Tr>
-                                      );
-                                    }
-                                  },
-                                )}
+                                          >
+                                            {decomposedPurl?.name}
+                                          </Link>
+                                        </Td>
+                                        <Td>{decomposedPurl?.version}</Td>
+                                        <Td>{decomposedPurl?.path}</Td>
+                                        <Td>
+                                          {decomposedPurl?.qualifiers && (
+                                            <PackageQualifiers
+                                              value={decomposedPurl?.qualifiers}
+                                            />
+                                          )}
+                                        </Td>
+                                      </Tr>
+                                    );
+                                  } else {
+                                    return (
+                                      <Tr key={`orphan-${purl.parentName}`}>
+                                        <Td />
+                                        <Td />
+                                        <Td>{purl.parentName}</Td>
+                                        <Td />
+                                        <Td />
+                                        <Td />
+                                      </Tr>
+                                    );
+                                  }
+                                })}
                               </Tbody>
                             </Table>
                           ) : null}

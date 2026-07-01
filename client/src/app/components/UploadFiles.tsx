@@ -118,13 +118,13 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
           statusToggleText={`${successFileCount} of ${uploads.size} files uploaded`}
           statusToggleIcon={statusIcon}
         >
-          {Array.from(uploads.entries()).map(([file, upload], index) => (
+          {Array.from(uploads.entries()).map(([file, upload]) => (
             <MultipleFileUploadStatusItem
               // customFileHandler is Required until https://github.com/patternfly/patternfly-react/issues/11276 is fixed
               customFileHandler={() => {}}
               fileIcon={<FileIcon />}
               file={file}
-              key={`${file.name}-${index}`}
+              key={`${file.name}-${file.size}-${file.lastModified}`}
               onClearClick={() => removeFiles([file])}
               progressValue={upload.progress}
               progressVariant={
