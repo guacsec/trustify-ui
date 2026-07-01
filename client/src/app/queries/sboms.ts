@@ -62,20 +62,21 @@ export const useFetchSBOMs = (
   labels: Label[] = [],
   disableQuery = false,
 ) => {
-  const { q, ...rest } = requestParamsQuery(params);
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
-    queryFn: () =>
-      listSboms({
+    queryFn: () => {
+      const { q, ...rest } = requestParamsQuery(params);
+      return listSboms({
         client,
         query: {
           ...rest,
           group: groupId ? [groupId] : [],
           q: [q, labelQuery].filter((e) => e).join("&"),
         },
-      }),
+      });
+    },
     enabled: !disableQuery,
   });
   return {

@@ -41,32 +41,27 @@ export const useFetchVulnerabilities = (
 };
 
 export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
-  const chunks = {
-    ids: ids.reduce<string[][]>((chunks, item, index) => {
-      if (index % 100 === 0) {
-        chunks.push([item]);
-      } else {
-        chunks[chunks.length - 1].push(item);
-      }
-      return chunks;
-    }, []),
-    dataResolver: async (ids: string[]) => {
-      const response = await analyzeV3({
-        client,
-        body: { purls: ids },
-      });
-      return response.data;
-    },
-  };
+  const chunkedIds = ids.reduce<string[][]>((chunks, item, index) => {
+    if (index % 100 === 0) {
+      chunks.push([item]);
+    } else {
+      chunks[chunks.length - 1].push(item);
+    }
+    return chunks;
+  }, []);
 
   const userQueries = useQueries({
-    queries: chunks.ids.map((ids) => {
-      return {
-        queryKey: [VulnerabilitiesQueryKey, ids],
-        queryFn: () => chunks.dataResolver(ids),
-        retry: false,
-      };
-    }),
+    queries: chunkedIds.map((chunkIds) => ({
+      queryKey: [VulnerabilitiesQueryKey, chunkIds],
+      queryFn: async () => {
+        const response = await analyzeV3({
+          client,
+          body: { purls: chunkIds },
+        });
+        return response.data;
+      },
+      retry: false,
+    })),
   });
 
   const isFetching = userQueries.some(({ isFetching }) => isFetching);

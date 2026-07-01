@@ -60,12 +60,12 @@ export const useFetchAdvisories = (
   labels: Label[] = [],
   disableQuery = false,
 ) => {
-  const { q, ...rest } = requestParamsQuery(params);
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [AdvisoriesQueryKey, params, labelQuery],
     queryFn: () => {
+      const { q, ...rest } = requestParamsQuery(params);
       return listAdvisories({
         client,
         query: {
