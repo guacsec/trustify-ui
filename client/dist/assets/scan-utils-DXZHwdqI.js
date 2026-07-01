@@ -1,0 +1,3 @@
+import{Kn as e}from"./StateError-Bpz7WHfk.js";var t=`importer`,n=`Unknown`,r=e=>e.labels[t]??n,i=e=>{let t=e.replace(/"/g,`""`);return/[",\r\n]/.test(t)&&(t=`"${t}"`),t},a=t=>`VulnerabilityID, Description, Severity, Severity score, Advisory, Status, Affected package, Published, Updated
+`+t.flatMap(({advisories:t,purls:n,vulnerability:a,status:o})=>Array.from(t.values()).flatMap(({opinionatedExtendedSeverity:t,opinionatedScore:s,advisory:c})=>Array.from(n).map(n=>({vulnerabilityId:i(a.identifier),description:i(a.description??``),severity:i(t),severityScore:s?.value??``,advisory:r(c),status:i(o),affectedPackage:i(n),published:i(e(a.published)??``),updated:i(e(a.modified)??``)})))).map(e=>Object.values(e).join(`,`)).join(`
+`);export{r as n,a as t};
