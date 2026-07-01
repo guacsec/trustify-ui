@@ -1,1 +1,0 @@
-import{t as e}from"./react-B-P7c96U.js";import{s as t,t as n}from"./Bullseye-0TTW7Sms.js";import{W as r}from"./_createAssigner-DAGGTl5B.js";var i=e(),a=e=>e.isFetching?e.isFetchingState||(0,i.jsx)(n,{children:(0,i.jsx)(t,{})}):e.fetchError?e.fetchErrorState?e.fetchErrorState(e.fetchError):(0,i.jsx)(r,{}):e.children;export{a as t};
