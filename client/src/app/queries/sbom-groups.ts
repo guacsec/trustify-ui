@@ -67,20 +67,20 @@ export const useFetchSBOMGroups = (
   > = {},
   enabled = true,
 ) => {
-  const { q, ...rest } = requestParamsQuery(params);
-  const parentQuery = parentId ? `parent=${parentId}` : "";
-
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [SBOMGroupsQueryKey, parentId, { params, extraQueryParams }],
-    queryFn: () =>
-      listSbomGroups({
+    queryFn: () => {
+      const { q, ...rest } = requestParamsQuery(params);
+      const parentQuery = parentId ? `parent=${parentId}` : "";
+      return listSbomGroups({
         client,
         query: {
           ...rest,
           ...extraQueryParams,
           q: [q, parentQuery].filter((e) => e).join("&"),
         },
-      }),
+      });
+    },
     enabled,
   });
 

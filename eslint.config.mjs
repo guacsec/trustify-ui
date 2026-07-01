@@ -44,7 +44,6 @@ export default defineConfig([
       "@eslint-react/exhaustive-deps": "off",
       "@eslint-react/no-nested-component-definitions": "off",
       "@tanstack/query/prefer-query-options": "off",
-      "@tanstack/query/exhaustive-deps": "off",
       "@tanstack/query/no-void-query-fn": "off",
     },
     ignores: [
