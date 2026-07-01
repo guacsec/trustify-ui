@@ -74,6 +74,7 @@ export const useFetchSBOMs = (
           ...rest,
           group: groupId ? [groupId] : [],
           q: [q, labelQuery].filter((e) => e).join("&"),
+          advisories: true,
         },
       }),
     enabled: !disableQuery,
