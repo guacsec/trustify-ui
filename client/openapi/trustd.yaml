@@ -5,7 +5,7 @@ info:
   license:
     name: Apache License, Version 2.0
     identifier: Apache-2.0
-  version: 0.5.0-beta.3
+  version: 0.5.0-rc.1
 paths:
   /.well-known/trustify:
     get:
@@ -449,14 +449,8 @@ paths:
         schema:
           $ref: '#/components/schemas/Id'
       responses:
-        '200':
-          description: Matching advisory
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AdvisoryDetails'
-        '404':
-          description: The advisory could not be found
+        '204':
+          description: The advisory was deleted or did not exist
   /api/v3/advisory/{key}/download:
     get:
       tags:
@@ -2255,14 +2249,8 @@ paths:
           type: string
           format: uuid
       responses:
-        '200':
-          description: Matching product
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductDetails'
-        '404':
-          description: The product could not be found
+        '204':
+          description: The product was deleted or did not exist
   /api/v3/purl:
     get:
       tags:
@@ -2761,6 +2749,23 @@ paths:
                 $ref: '#/components/schemas/IngestResult'
         '400':
           description: One or more group IDs are invalid or do not exist
+    delete:
+      tags:
+      - sbom
+      summary: Delete multiple SBOMs
+      operationId: deleteSboms
+      requestBody:
+        description: List of ids of SBOMs to be deleted
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        '204':
+          description: Requested SBOMs were deleted or did not exist
   /api/v3/sbom-labels:
     get:
       tags:
@@ -3123,9 +3128,7 @@ paths:
           $ref: '#/components/schemas/Id'
       responses:
         '204':
-          description: Matching SBOM as deleted
-        '404':
-          description: The SBOM could not be found
+          description: The SBOM was deleted or did not exist
   /api/v3/sbom/{id}/advisory:
     get:
       tags:

@@ -35,7 +35,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
   showActions,
 }) => {
   const navigate = useNavigate();
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Create Form Modal
   const [saveGroupModalState, setSaveGroupModalState] = React.useState<
@@ -104,20 +104,14 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                 <KebabDropdown
                   ariaLabel="SBOM actions"
                   dropdownItems={[
-                    <Tooltip
-                      key="upload-sbom-tooltip"
-                      content={READ_ONLY_TOOLTIP}
-                      trigger={isReadOnly ? "mouseenter focus" : "manual"}
+                    <DropdownItem
+                      key="upload-sbom"
+                      component="button"
+                      isDisabled={areMutationsDisabled}
+                      onClick={() => navigate(Paths.sbomUpload)}
                     >
-                      <DropdownItem
-                        key="upload-sbom"
-                        component="button"
-                        isAriaDisabled={isReadOnly}
-                        onClick={() => navigate(Paths.sbomUpload)}
-                      >
-                        Upload SBOM
-                      </DropdownItem>
-                    </Tooltip>,
+                      Upload SBOM
+                    </DropdownItem>,
                     <DropdownItem
                       key="scan-sbom"
                       component="button"

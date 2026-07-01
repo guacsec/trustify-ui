@@ -11,6 +11,7 @@ coverage/
 
 # generated files
 client/src/app/client/
+client/src/app/specs/
 
 # production
 dist/
