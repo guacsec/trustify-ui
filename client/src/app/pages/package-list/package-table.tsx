@@ -171,7 +171,9 @@ export const PackageTable: React.FC = () => {
                               {isCellExpanded(item, "licenses") ? (
                                 <List isPlain>
                                   {pkg?.licenses?.map((license) => (
-                                    <ListItem key={license.license_name}>
+                                    <ListItem
+                                      key={`${license.license_name}-${license.license_type}`}
+                                    >
                                       {license.license_name}
                                     </ListItem>
                                   ))}

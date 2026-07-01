@@ -188,6 +188,7 @@ export function linkifyDetails(text: string): React.ReactNode[] {
   const parts = text.split(URL_REGEX);
   return parts.map((part, i) =>
     i % 2 === 1 ? (
+      // eslint-disable-next-line @eslint-react/no-array-index-key -- index is the only identity for regex-split fragments
       <a key={i} href={part} target="_blank" rel="noopener noreferrer">
         {part}
       </a>

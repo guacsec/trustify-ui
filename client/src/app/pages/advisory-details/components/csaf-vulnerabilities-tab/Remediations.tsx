@@ -78,8 +78,8 @@ export const CsafRemediations: React.FC<IRemediationCardProps> = ({
       isIndented
     >
       <Grid hasGutter md={6}>
-        {sorted.map((rem, i) => (
-          <GridItem key={`${rem.category}-${i}`}>
+        {sorted.map((rem) => (
+          <GridItem key={`${rem.category}-${rem.details}`}>
             <RemediationCard
               remediation={rem}
               productNameMap={productNameMap}
