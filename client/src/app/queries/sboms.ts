@@ -92,11 +92,8 @@ export const useFetchSBOMs = (
 
 export const sbomByIdQueryOptions = (id: string | undefined) => ({
   queryKey: [SBOMsQueryKey, id] as const,
-  queryFn: () => {
-    return id === undefined
-      ? Promise.resolve(undefined)
-      : getSbom({ client, path: { id: id } });
-  },
+  queryFn: () => getSbom({ client, path: { id: id! } }),
+  enabled: !!id,
 });
 
 export const useFetchSBOMById = (
