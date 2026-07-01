@@ -29,7 +29,7 @@ import type {
   IExpansionState,
   IExpansionStateArgs,
 } from "./expansion";
-import type { IExpansionPropHelpersExternalArgs } from "./expansion/getExpansionPropHelpers";
+import type { IExpansionPropHelpersExternalArgs } from "./expansion/useExpansionPropHelpers";
 import type {
   IFilterPropHelpersExternalArgs,
   IFilterState,
