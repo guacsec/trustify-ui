@@ -17,10 +17,7 @@ import type { Group } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { TableCellError } from "@app/components/TableCellError";
 import { ConditionalTableBody } from "@app/components/TableControls";
@@ -155,19 +152,18 @@ const SbomGroupRow: React.FC<{
     isExpanded || hasBeenExpanded.current,
   );
 
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const actions: IAction[] = [
     {
       title: "Edit",
       onClick: () => onEdit(node),
-      ...readOnlyActionProps(isReadOnly),
+      isDisabled: areMutationsDisabled,
     },
     {
       title: "Delete",
       onClick: () => onDelete(node),
-      isDisabled: !isReadOnly && !!node.number_of_groups,
-      ...readOnlyActionProps(isReadOnly),
+      isDisabled: areMutationsDisabled || !!node.number_of_groups,
     },
   ];
 

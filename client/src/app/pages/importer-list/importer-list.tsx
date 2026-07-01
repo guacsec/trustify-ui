@@ -87,7 +87,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -397,7 +397,7 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]
                                 : [
@@ -406,17 +406,16 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("run", item);
                                       },
-                                      isAriaDisabled:
-                                        isReadOnly ||
-                                        importerStatus === "running",
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled:
+                                        importerStatus === "running" ||
+                                        areMutationsDisabled,
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]),
                             ]}
@@ -669,24 +668,11 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const LogButton = ({ children }: { children: React.ReactNode }) => {
-              if (item.messages) {
-                return (
-                  <Button
-                    isInline
-                    variant="link"
-                    onClick={() => {
-                      const newLogData = messagesToLogData(item.messages ?? {});
-                      setLogData(newLogData);
-                      toggleLogModal();
-                    }}
-                  >
-                    {children}
-                  </Button>
-                );
-              }
-              return children;
-            };
+            const statusIcon = item.error ? (
+              <IconedStatus preset="Failed" label={item.error} />
+            ) : (
+              <IconedStatus preset="Completed" label="Finished successfully" />
+            );
 
             return (
               <Tbody key={item.id}>
@@ -724,17 +710,19 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
                     >
                       {item.isRunning ? (
                         <ImporterStatusIcon state="running" />
+                      ) : item.messages ? (
+                        <Button
+                          isInline
+                          variant="link"
+                          onClick={() => {
+                            setLogData(messagesToLogData(item.messages ?? {}));
+                            toggleLogModal();
+                          }}
+                        >
+                          {statusIcon}
+                        </Button>
                       ) : (
-                        <LogButton>
-                          {item.error ? (
-                            <IconedStatus preset="Failed" label={item.error} />
-                          ) : (
-                            <IconedStatus
-                              preset="Completed"
-                              label="Finished successfully"
-                            />
-                          )}
-                        </LogButton>
+                        statusIcon
                       )}
                     </Td>
                     <Td
