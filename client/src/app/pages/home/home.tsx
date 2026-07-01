@@ -2,24 +2,26 @@ import type React from "react";
 
 import { PageSection, Stack, StackItem } from "@patternfly/react-core";
 
-import { MonitoringSection } from "./components/MonitoringSection";
-import { WatchedSbomsSection } from "./components/WatchedSbomsSection";
-import { WatchedSbomsProvider } from "./watched-sboms-provider";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
+
+import { GetStartedSection } from "./components/GetStartedSection";
+import { PortfolioMetricsSection } from "./components/PortfolioMetricsSection";
+import { VulnerabilityAttentionSection } from "./components/WhatNeedsAttention";
 
 export const Home: React.FC = () => {
   return (
     <>
-      <DocumentMetadata title={"Dashboard"} />
-      <PageSection hasBodyWrapper={false}>
+      <DocumentMetadata title={"Home"} />
+      <PageSection>
         <Stack hasGutter>
           <StackItem>
-            <MonitoringSection />
+            <GetStartedSection />
           </StackItem>
           <StackItem>
-            <WatchedSbomsProvider>
-              <WatchedSbomsSection />
-            </WatchedSbomsProvider>
+            <VulnerabilityAttentionSection />
+          </StackItem>
+          <StackItem>
+            <PortfolioMetricsSection />
           </StackItem>
         </Stack>
       </PageSection>
