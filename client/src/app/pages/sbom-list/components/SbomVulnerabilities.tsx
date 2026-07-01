@@ -1,31 +1,26 @@
 import type React from "react";
 
-import { Skeleton } from "@patternfly/react-core";
-
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
-import { TableCellError } from "@app/components/TableCellError";
+import type { SbomAdvisorySummary } from "@app/client";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
-import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
+import type { ExtendedSeverity } from "@app/api/models";
 
 interface SBOMVulnerabilitiesProps {
-  sbomId: string;
+  advisories?: SbomAdvisorySummary | null;
 }
 
-export const SBOMVulnerabilities: React.FC<SBOMVulnerabilitiesProps> = ({
-  sbomId,
-}) => {
-  const { data, isFetching, fetchError } = useVulnerabilitiesOfSbom(sbomId);
+const DEFAULT_SEVERITIES: { [key in ExtendedSeverity]: number } = {
+  unknown: 0,
+  none: 0,
+  low: 0,
+  medium: 0,
+  high: 0,
+  critical: 0,
+};
 
-  return (
-    <LoadingWrapper
-      isFetching={isFetching}
-      fetchError={fetchError}
-      isFetchingState={<Skeleton screenreaderText="Loading contents" />}
-      fetchErrorState={(error) => <TableCellError error={error} />}
-    >
-      <VulnerabilityGallery
-        severities={data.summary.vulnerabilityStatus.affected.severities}
-      />
-    </LoadingWrapper>
-  );
+export const SBOMVulnerabilities: React.FC<SBOMVulnerabilitiesProps> = ({
+  advisories,
+}) => {
+  const severities = { ...DEFAULT_SEVERITIES, ...advisories };
+
+  return <VulnerabilityGallery severities={severities} />;
 };
