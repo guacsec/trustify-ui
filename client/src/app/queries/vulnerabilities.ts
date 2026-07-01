@@ -55,7 +55,7 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
         client,
         body: { purls: ids },
       });
-      return response.data ?? {};
+      return response.data ?? null;
     },
   };
 
