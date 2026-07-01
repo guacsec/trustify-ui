@@ -133,6 +133,8 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     (tableControlState.filterState.filterValues.labels ?? []).map((label) =>
       splitStringAsKeyValue(label),
     ),
+    false,
+    true,
   );
 
   const tableControls = useTableControlProps({
