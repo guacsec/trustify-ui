@@ -34,6 +34,7 @@ import {
 } from "@patternfly/react-table";
 
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { NotificationsContext } from "@app/components/NotificationsContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
@@ -47,11 +48,29 @@ import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
 import { useLocalTableControls } from "@app/hooks/table-controls";
+import {
+  useFetchExploitIntelligenceJobs,
+  useSubmitExploitAnalysisMutation,
+} from "@app/queries/exploit-intelligence";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
+import type { ExtendedSeverity } from "@app/api/models";
+
+import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
+
+/** Severity levels eligible for exploit intelligence analysis. */
+const ELIGIBLE_SEVERITIES: ReadonlySet<ExtendedSeverity> = new Set([
+  "critical",
+  "high",
+  "medium",
+  "moderate",
+  "low",
+  "none",
+  "unknown",
+]);
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -70,6 +89,29 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
+
+  const { pushNotification } = React.useContext(NotificationsContext);
+
+  const { stateMap: eiStates } = useFetchExploitIntelligenceJobs(sbomId);
+
+  const submitAnalysis = useSubmitExploitAnalysisMutation();
+
+  const handleRequestAnalysis = React.useCallback(
+    (vulnerabilityId: string) => {
+      submitAnalysis.mutate(
+        { sbom_id: sbomId, vulnerability_id: vulnerabilityId },
+        {
+          onError: () => {
+            pushNotification({
+              title: `Failed to submit exploit analysis for ${vulnerabilityId}`,
+              variant: "danger",
+            });
+          },
+        },
+      );
+    },
+    [sbomId, submitAnalysis, pushNotification],
+  );
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
@@ -91,6 +133,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       id: "Id",
       description: "Description",
       cvss: "CVSS",
+      exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
       published: "Published",
       updated: "Updated",
@@ -104,6 +147,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       "published",
       "updated",
     ],
+    initialSort: { columnKey: "cvss", direction: "desc" },
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
       cvss: item.opinionatedAdvisory.score?.value ?? 0,
@@ -203,6 +247,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
+                <Th
+                  {...getThProps({ columnKey: "exploitAnalysis" })}
+                  info={{
+                    tooltip:
+                      "Run exploit intelligence analysis for Critical and High severity vulnerabilities.",
+                  }}
+                />
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -243,7 +294,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={40}
+                            width={25}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -263,7 +314,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={20} {...getTdProps({ columnKey: "cvss" })}>
+                      <Td width={15} {...getTdProps({ columnKey: "cvss" })}>
                         <Flex>
                           <FlexItem>
                             <SeverityShieldAndText
@@ -302,6 +353,27 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                             </Popover>
                           </FlexItem>
                         </Flex>
+                      </Td>
+                      <Td
+                        width={15}
+                        {...getTdProps({
+                          columnKey: "exploitAnalysis",
+                        })}
+                      >
+                        <ExploitIntelligenceAnalysisCell
+                          vulnerabilityIdentifier={
+                            item.vulnerability.identifier
+                          }
+                          state={
+                            eiStates[item.vulnerability.identifier] ?? {
+                              kind: "not_run",
+                            }
+                          }
+                          onRequestAnalysis={handleRequestAnalysis}
+                          requestAnalysisEligible={ELIGIBLE_SEVERITIES.has(
+                            item.opinionatedAdvisory.extendedSeverity,
+                          )}
+                        />
                       </Td>
                       <Td
                         width={10}
