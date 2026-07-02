@@ -147,7 +147,6 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       "published",
       "updated",
     ],
-    initialSort: { columnKey: "cvss", direction: "desc" },
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
       cvss: item.opinionatedAdvisory.score?.value ?? 0,
