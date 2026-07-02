@@ -42,9 +42,7 @@ export default defineConfig([
       "@eslint-react/no-unnecessary-use-prefix": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@eslint-react/exhaustive-deps": "off",
-      "@eslint-react/no-nested-component-definitions": "off",
       "@tanstack/query/prefer-query-options": "off",
-      "@tanstack/query/no-void-query-fn": "off",
     },
     ignores: [
       "client/config/**",
