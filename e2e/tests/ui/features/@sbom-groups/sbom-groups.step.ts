@@ -1,14 +1,12 @@
 import { createBdd } from "playwright-bdd";
-
-import { test } from "../../fixtures";
-
 import { expect } from "../../assertions";
+import { test } from "../../fixtures";
 
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
-import { Pagination } from "../../pages/Pagination";
 import { Navigation } from "../../pages/Navigation";
+import { Pagination } from "../../pages/Pagination";
 import { SbomGroupDetailPage } from "../../pages/sbom-group-detail/SbomGroupDetailPage";
 import { AddToGroupModal } from "../../pages/sbom-group-list/AddToGroupModal";
 import { GroupFormModal } from "../../pages/sbom-group-list/GroupFormModal";
@@ -241,7 +239,9 @@ Then(
       .locator("div")
       .filter({ hasText: "Success alert " })
       .nth(1);
-    console.log(await successMessage.textContent());
+    console.log(
+      `Success message content: ${await successMessage.textContent()}`,
+    );
     await expect(
       page.getByRole("heading", {
         name: `Success alert: ${sbomCount} SBOM(s)`,
@@ -655,6 +655,7 @@ Then(
   async ({ page }, groupName: string, expectedText: string) => {
     const listPage = await SbomGroupListPage.fromCurrentPage(page);
     const row = listPage.getGroupRow(groupName);
+    console.log(await row.textContent());
     await expect(row.getByText(expectedText, { exact: true })).toBeVisible();
   },
 );
@@ -716,6 +717,51 @@ Then(
     const listPage = await SbomGroupListPage.fromCurrentPage(page);
     const actualLevel = await listPage.getGroupTreeLevel(groupName);
     expect(actualLevel).toBe(expectedLevel);
+  },
+);
+
+// Form validation — danger notification
+Then(
+  "A danger notification {string} is displayed",
+  async ({ page }, message: string) => {
+    await expect(
+      page.getByRole("heading", {
+        name: new RegExp(`Danger alert:.*${message}`),
+      }),
+    ).toBeVisible();
+  },
+);
+
+// Form validation — inline error (PatternFly FormHelperText)
+Then(
+  "The form validation error {string} is displayed",
+  async ({ page }, errorText: string) => {
+    const errorItem = page.locator(".pf-v6-c-helper-text__item.pf-m-error");
+    await expect(errorItem.filter({ hasText: errorText })).toBeVisible();
+  },
+);
+
+// Label validation error
+Then(
+  "The label validation error {string} is displayed",
+  async ({ page }, errorText: string) => {
+    await expect(page.getByText(errorText)).toBeVisible();
+  },
+);
+
+// Cancel group form (create or edit)
+When("User cancels the group form", async ({ page }) => {
+  const modal = await GroupFormModal.fromCurrentPage(page);
+  await modal.clickCancel();
+});
+
+// Filter SBOMs on group detail page
+When(
+  "User applies SBOM filter {string} with value {string} on the detail page",
+  async ({ page }, filterName: string, filterValue: string) => {
+    const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
+    const toolbar = await detailPage.getToolbar();
+    await toolbar.applyFilter({ [filterName]: filterValue });
   },
 );
 

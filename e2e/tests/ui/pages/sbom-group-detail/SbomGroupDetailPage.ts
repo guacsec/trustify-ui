@@ -2,6 +2,7 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 import { DetailsPageLayout } from "../DetailsPageLayout";
 import { Pagination } from "../Pagination";
+import { Toolbar } from "../Toolbar";
 import { Table } from "../Table";
 
 const SBOM_TABLE_COLUMNS = [
@@ -53,6 +54,10 @@ export class SbomGroupDetailPage {
       SBOM_TABLE_COLUMNS,
       SBOM_TABLE_ACTIONS,
     );
+  }
+
+  async getToolbar() {
+    return await Toolbar.build(this._page, "sbom-toolbar");
   }
 
   async getPagination(top: boolean = true) {

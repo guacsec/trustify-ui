@@ -116,7 +116,6 @@ Feature: SBOM Groups - Manage SBOM groups
       | Critical Group   | openssl-3 |
       | Correlation Test | curl      |
 
-  @slow
   Scenario Outline: Add multiple SBOMs to group from SBOM list page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
@@ -132,8 +131,8 @@ Feature: SBOM Groups - Manage SBOM groups
     And The SBOM "<sbom2>" is visible in the group member list
 
     Examples:
-      | groupName        | sbom1  | sbom2       |
-      | Multi SBOM Group | curl   | quarkus-bom |
+      | groupName        | sbom1  | sbom2     |
+      | Multi SBOM Group | liboqs | claude    |
 
   # Product label filtering
   Scenario: Product label badge appears for product groups
@@ -216,7 +215,6 @@ Feature: SBOM Groups - Manage SBOM groups
     Then The SBOM Groups table is visible
 
   # Pagination on group detail page
-  @slow
   Scenario Outline: Pagination and Sorting on group detail page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
@@ -298,7 +296,6 @@ Feature: SBOM Groups - Manage SBOM groups
   # ─────────────────────────────────────────────────────────────────
   # SBOM count decreases after reassignment to another group
   # ─────────────────────────────────────────────────────────────────
-  @slow
   Scenario: SBOM count decreases when SBOM is reassigned to another group
     Given User navigates to SBOM Groups page
     And A group "Reassign Source" exists
@@ -403,3 +400,92 @@ Feature: SBOM Groups - Manage SBOM groups
     And User expands the tree node for "Guard3 GP"
     And User clicks kebab menu for child group "Guard3 Mid"
     Then The "Delete" action is disabled in the kebab menu
+
+  # ─────────────────────────────────────────────────────────────────
+  # Form validation — duplicate name
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Create group with duplicate name shows error
+    Given User navigates to SBOM Groups page
+    And A group "Dup Name Check" exists
+    When User clicks "Create group" button
+    And User fills group name with "Dup Name Check"
+    And User fills group product status with "No"
+    And User submits the group form
+    Then A danger notification "Error while saving the group" is displayed
+
+  # ─────────────────────────────────────────────────────────────────
+  # Form validation — self-referencing parent
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Self-referencing parent shows validation error
+    Given User navigates to SBOM Groups page
+    And A group "Self Ref Test" exists
+    When User applies filter "Filter" with value "Self Ref Test"
+    And User clicks kebab menu for group "Self Ref Test"
+    And User selects "Edit" action
+    And User selects parent group "Self Ref Test" in the edit form
+    Then The form validation error "Parent cannot reference itself" is displayed
+
+  # ─────────────────────────────────────────────────────────────────
+  # Form validation — reserved and restricted labels
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Reserved Product label is rejected in group form
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with "Reserved Label Test"
+    And User fills group product status with "No"
+    And User adds label "Product" to the group form
+    Then The label validation error "The label 'Product' is reserved" is displayed
+
+  Scenario: Product group rejects type labels
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with "Type Label Reject Test"
+    And User fills group product status with "Yes"
+    And User adds label "type=widget" to the group form
+    Then The label validation error "Groups designated as products cannot have additional 'type' labels" is displayed
+
+  # ─────────────────────────────────────────────────────────────────
+  # Cancel create — form discards input
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Cancel create group discards input
+    Given User navigates to SBOM Groups page
+    When User clicks "Create group" button
+    And User fills group name with "Should Not Exist"
+    And User fills group description with "This should be discarded"
+    And User cancels the group form
+    And User applies filter "Filter" with value "Should Not Exist"
+    Then The SBOM Groups table does not contain "Should Not Exist"
+
+  # ─────────────────────────────────────────────────────────────────
+  # Cancel edit — original values preserved
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Cancel edit group preserves original values
+    Given User navigates to SBOM Groups page
+    And A group "Cancel Edit Test" exists
+    When User applies filter "Filter" with value "Cancel Edit Test"
+    And User clicks kebab menu for group "Cancel Edit Test"
+    And User selects "Edit" action
+    And User fills group name with "Changed Name"
+    And User cancels the group form
+    And User applies filter "Filter" with value "Cancel Edit Test"
+    Then The group "Cancel Edit Test" is visible in the table
+
+  # ─────────────────────────────────────────────────────────────────
+  # Filter SBOMs on group detail page
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Filter SBOMs on group detail page
+    Given User navigates to SBOM Groups page
+    And A group "Detail Filter Test" exists
+    When User adds SBOMs "curl" and "quarkus-bom" to group "Detail Filter Test"
+    When User navigates to SBOM Groups page
+    And User applies filter "Filter" with value "Detail Filter Test"
+    And User clicks on group "Detail Filter Test"
+    Then The group details page is displayed
+    When User applies SBOM filter "Filter text" with value "curl" on the detail page
+    Then The SBOM "curl" is visible in the group member list
