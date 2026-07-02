@@ -25,7 +25,7 @@ interface ISbomSearchContext {
     | "labels"
     | "vulnerabilities",
     "name" | "published",
-    "" | "published" | "labels" | "license",
+    "name" | "published" | "labels" | "license",
     string
   >;
 
