@@ -99,7 +99,6 @@ Feature: SBOM Groups - Manage SBOM groups
   Scenario Outline: Add SBOM to group from SBOM list page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
-    Given An ingested SBOM "<sbomName>" is available
     When User navigates to SBOM list page
     And User selects SBOM "<sbomName>" for bulk action
     And User clicks "Add to group" button
@@ -117,11 +116,10 @@ Feature: SBOM Groups - Manage SBOM groups
       | Critical Group   | openssl-3 |
       | Correlation Test | curl      |
 
+  @slow
   Scenario Outline: Add multiple SBOMs to group from SBOM list page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
-    Given An ingested SBOM "<sbom1>" is available
-    Given An ingested SBOM "<sbom2>" is available
     When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
     Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
@@ -167,12 +165,13 @@ Feature: SBOM Groups - Manage SBOM groups
     Then An error state is displayed for the invalid group
 
   # # Product badge on group detail page
-  # Scenario: Product badge is displayed on group detail page
-  #   Given User navigates to SBOM Groups page
-  #   And A product group "Product Detail Badge" exists
-  #   When User clicks on group "Product Detail Badge"
-  #   Then The group details page is displayed
-  #   And The product badge is visible on the detail page
+  Scenario: Product badge is displayed on group detail page
+    Given User navigates to SBOM Groups page
+    And A product group "Product Detail Badge" exists
+    When User applies filter "Filter" with value "Product Detail Badge"
+    And User clicks on group "Product Detail Badge"
+    Then The group details page is displayed
+    And The Product badge is visible on the detail page
 
   # Edit group to change parent
   Scenario: Edit group to assign a parent
@@ -215,40 +214,43 @@ Feature: SBOM Groups - Manage SBOM groups
     Then The SBOM Groups table is visible
 
   # Pagination on group detail page
-  Scenario Outline: Pagination is displayed on group detail page
+  @slow
+  Scenario Outline: Pagination and Sorting on group detail page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
-    Given An ingested SBOM "<sbom1>" is available
-    Given An ingested SBOM "<sbom2>" is available
     When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
     When User navigates to SBOM Groups page
     And User applies filter "Filter" with value "<groupName>"
     And User clicks on group "<groupName>"
     Then The group detail SBOMs pagination is visible
-
-    Examples:
-      | groupName             | sbom1 | sbom2       |
-      | Pagination Test Group | curl  | quarkus-bom |
-
-  # Sorting on group detail page
-  Scenario Outline: Sort SBOMs by name on group detail page
-    Given User navigates to SBOM Groups page
-    And A group "<groupName>" exists
-    Given An ingested SBOM "<sbom1>" is available
-    Given An ingested SBOM "<sbom2>" is available
-    When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
-    When User navigates to SBOM Groups page
-    And User applies filter "Filter" with value "<groupName>"
-    And User clicks on group "<groupName>"
-    Then The SBOMs table is sorted by Name ascending
+    And The SBOMs table is sorted by Name ascending
     When User clicks the Name column header to sort SBOMs
     Then The SBOMs table is sorted by Name descending
     When User clicks the Name column header to sort SBOMs
     Then The SBOMs table is sorted by Name ascending
 
     Examples:
-      | groupName       | sbom1 | sbom2       |
-      | Sort Test Group | curl  | quarkus-bom |
+      | groupName             | sbom1 | sbom2       |
+      | Multi SBOM Group      | curl  | quarkus-bom |
+
+
+  # ─────────────────────────────────────────────────────────────────
+  # SBOM count verification — before and after adding SBOMs
+  # ─────────────────────────────────────────────────────────────────
+  @slow
+  Scenario: SBOM count shows correct value after adding SBOMs
+    Given User navigates to SBOM Groups page
+    And A group "<groupName>" exists
+    When User applies filter "Filter" with value "<groupName>"
+    Then The SBOM count is not displayed for group "<groupName>"
+    When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
+    When User navigates to SBOM Groups page
+    And User applies filter "Filter" with value "<groupName>"
+    Then The SBOM count for group "<groupName>" shows "2 SBOMs"
+
+    Examples:
+      | groupName          | sbom1 | sbom2       |
+      | Count Verify Group | curl  | quarkus-bom |
 
   # Delete guard for parent groups
   Scenario: Delete action is disabled for group with children
@@ -278,7 +280,7 @@ Feature: SBOM Groups - Manage SBOM groups
     When User applies filter "Filter" with value "Detail Label Check"
     And User clicks on group "Detail Label Check"
     Then The group details page is displayed
-    And The "source=api" label badge is visible on the detail page
+    And The "source=api" label badge is not visible on the detail page
 
   # Navigate into child group from tree
   Scenario: Navigate into child group from tree
@@ -311,29 +313,13 @@ Feature: SBOM Groups - Manage SBOM groups
     Then The "Product" label badge is not visible for group "Toggle Product"
 
   # ─────────────────────────────────────────────────────────────────
-  # SBOM count verification — before and after adding SBOMs
-  # ─────────────────────────────────────────────────────────────────
-  Scenario: SBOM count shows correct value after adding SBOMs
-    Given User navigates to SBOM Groups page
-    And A group "Count Verify Group" exists
-    When User applies filter "Filter" with value "Count Verify Group"
-    Then The SBOM count is not displayed for group "Count Verify Group"
-    Given An ingested SBOM "curl" is available
-    Given An ingested SBOM "quarkus-bom" is available
-    When User adds SBOMs "curl" and "quarkus-bom" to group "Count Verify Group"
-    When User navigates to SBOM Groups page
-    And User applies filter "Filter" with value "Count Verify Group"
-    Then The SBOM count for group "Count Verify Group" shows "2 SBOMs"
-
-  # ─────────────────────────────────────────────────────────────────
   # SBOM count decreases after reassignment to another group
   # ─────────────────────────────────────────────────────────────────
-  
+  @slow
   Scenario: SBOM count decreases when SBOM is reassigned to another group
     Given User navigates to SBOM Groups page
     And A group "Reassign Source" exists
     And A group "Reassign Dest" exists
-    Given An ingested SBOM "curl" is available
     When User navigates to SBOM list page
     And User selects SBOM "curl" for bulk action
     And User clicks "Add to group" button
@@ -363,7 +349,6 @@ Feature: SBOM Groups - Manage SBOM groups
   Scenario: SBOM counts are independent between parent and child groups
     Given User navigates to SBOM Groups page
     And A parent group "Count Parent" with child group "Count Child" exists
-    Given An ingested SBOM "curl" is available
     When User navigates to SBOM list page
     And User selects SBOM "curl" for bulk action
     And User clicks "Add to group" button

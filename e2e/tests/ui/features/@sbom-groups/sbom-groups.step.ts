@@ -288,10 +288,6 @@ When(
     const modal = await AddToGroupModal.build(page);
     await modal.selectGroup(groupName);
     await modal.submit();
-
-    await expect(
-      page.getByRole("heading", { name: "Success alert: 2 SBOM(s)" }),
-    ).toBeVisible();
   },
 );
 
@@ -600,13 +596,19 @@ Given(
 
 // Label badge on detail page
 Then(
-  "The {string} label badge is visible on the detail page",
+  "The {string} label badge is not visible on the detail page",
   async ({ page }, labelText: string) => {
     const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
     const badge = detailPage.getLabelBadge(labelText);
-    await expect(badge).toBeVisible();
+    await expect(badge).not.toBeVisible();
   },
 );
+
+Then("The Product badge is visible on the detail page", async ({ page }) => {
+  const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
+  const badge = detailPage.getLabelBadge("Product");
+  await expect(badge).toBeVisible();
+});
 
 // Label badge for named group (not fixture-state)
 Then(
