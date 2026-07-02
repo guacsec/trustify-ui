@@ -166,9 +166,14 @@ jobs:
           EOF
           )"
 
-      - name: Enable auto-merge
+      - name: Merge PR
         env:
           GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
+          if [ "$BASE_REF" = "main" ]; then
+            gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
+          else
+            gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --squash
+          fi
