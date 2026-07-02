@@ -1,0 +1,1 @@
+import{t as e}from"./react-B-P7c96U.js";import{E as t,w as n}from"./Bullseye-0TTW7Sms.js";import{K as r}from"./index-Cc6vXwhR.js";var i=e(),a=e=>{var{children:a,className:o}=e,s=t(e,[`children`,`className`]);return(0,i.jsx)(`footer`,Object.assign({},s,{className:n(r.modalBoxFooter,o),children:a}))};a.displayName=`ModalFooter`;export{a as t};
