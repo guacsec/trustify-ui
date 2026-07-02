@@ -72,7 +72,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
     isFilterEnabled: true,
     filterCategories: [
       {
-        categoryKey: FILTER_TEXT_CATEGORY_KEY,
+        categoryKey: "name",
         title: "Filter text",
         placeholderText: "Search",
         type: FilterType.search,
