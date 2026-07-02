@@ -48,7 +48,7 @@ export interface SearchTabsProps {
     >;
     sbomFilterPanelProps: IFilterPanelProps<
       SbomSummary,
-      "" | "published" | "labels" | "license"
+      "name" | "published" | "labels" | "license"
     >;
     vulnerabilityFilterPanelProps: IFilterPanelProps<
       VulnerabilitySummary,
@@ -117,7 +117,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
           <CardBody style={{ width: 241 }}>
             {isTabActive("sboms") ? (
               <FilterPanel
-                omitFilterCategoryKeys={[""]}
+                omitFilterCategoryKeys={["name"]}
                 {...sbomFilterPanelProps}
               />
             ) : isTabActive("packages") ? (
