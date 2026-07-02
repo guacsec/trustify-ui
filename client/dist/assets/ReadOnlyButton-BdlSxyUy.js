@@ -1,1 +1,0 @@
-import{r as e}from"./rolldown-runtime-QTnfLwEv.js";import{i as t,t as n}from"./react-B-P7c96U.js";import{ln as r}from"./StateError-mN1q9Mqy.js";import{o as i}from"./index-4sa_oiFG.js";var a=e(t(),1),o=n(),s=e=>{let{areMutationsDisabled:t}=a.useContext(i);return(0,o.jsx)(r,{...e,isDisabled:t})};export{s as t};
