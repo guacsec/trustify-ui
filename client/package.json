@@ -49,7 +49,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.97.2",
+    "@hey-api/openapi-ts": "^0.99.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@types/file-saver": "^2.0.2",
@@ -58,10 +58,10 @@
     "@vitejs/plugin-react": "^5.1.4",
     "jsdom": "^28.0.0",
     "json-schema-to-typescript": "^15.0.4",
-    "vite": "^8.0.16",
-    "vite-plugin-ejs": "^1.7.0",
+    "vite": "^8.1.2",
+    "vite-plugin-ejs": "^2.0.0",
     "vite-plugin-istanbul": "^9.0.1",
-    "vite-plugin-static-copy": "^4.1.0",
+    "vite-plugin-static-copy": "^4.1.1",
     "vitest": "^4.0.0"
   },
   "browserslist": {
