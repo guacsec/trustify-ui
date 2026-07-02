@@ -237,6 +237,11 @@ When("User submits add to group form", async ({ page }) => {
 Then(
   "Success notification {string} is displayed",
   async ({ page }, sbomCount: string) => {
+    const successMessage = await page
+      .locator("div")
+      .filter({ hasText: "Success alert " })
+      .nth(1);
+    console.log(await successMessage.textContent());
     await expect(
       page.getByRole("heading", {
         name: `Success alert: ${sbomCount} SBOM(s)`,
@@ -268,22 +273,17 @@ When(
   async ({ page }, sbom1: string, sbom2: string, groupName: string) => {
     const listPage = await SbomListPage.build(page);
     const pagination = await listPage.getPagination();
-    await pagination.selectItemsPerPage(100);
-
     const toolbar = await listPage.getToolbar();
-
+    const table = await listPage.getTable();
     await toolbar.applyFilter({ "Filter text": sbom1 });
-    const table1 = await listPage.getTable();
-    const row1 = await table1.getRowsByCellValue({ Name: sbom1 });
+    const row1 = await table.getRowsByCellValue({ Name: sbom1 });
     await row1.first().getByRole("checkbox").click();
     await toolbar.clearAllFilters();
-
     await toolbar.applyFilter({ "Filter text": sbom2 });
-    const table2 = await listPage.getTable();
-    const row2 = await table2.getRowsByCellValue({ Name: sbom2 });
+    const row2 = await table.getRowsByCellValue({ Name: sbom2 });
     await row2.first().getByRole("checkbox").click();
     await toolbar.clearAllFilters();
-
+    await pagination.selectItemsPerPage(100);
     await page.getByRole("button", { name: "Add to group" }).click();
     const modal = await AddToGroupModal.build(page);
     await modal.selectGroup(groupName);

@@ -4,7 +4,7 @@ import { logger } from "../../common/constants";
 type CreateGroupOptions = {
   description?: string;
   parent?: string;
-  labels?: Record<string, string[]>;
+  labels?: Record<string, string>;
 };
 
 type GroupResponse = {
@@ -12,7 +12,7 @@ type GroupResponse = {
   name: string;
   parent: string | null;
   description: string | null;
-  labels: Record<string, string[]>;
+  labels: Record<string, string>;
 };
 
 type ListGroupsParams = {

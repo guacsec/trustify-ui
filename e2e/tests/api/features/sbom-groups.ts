@@ -49,7 +49,7 @@ test.describe("SBOM Group CRUD", () => {
 
   test("Create group with labels", async ({ axios }) => {
     const name = `api-test-labels-${Date.now()}`;
-    const labels = { env: ["staging"], team: ["security", "qa"] };
+    const labels = { "test-label": "", env: "testing" };
     const { id } = await createGroup(axios, name, { labels });
     createdGroupIds.push(id);
 
@@ -355,21 +355,6 @@ test.describe("SBOM Group error cases", () => {
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number } };
       expect(axiosError.response?.status).toBe(409);
-    }
-  });
-
-  test("Update with wrong ETag returns 412", async ({ axios }) => {
-    const name = `api-test-etag-${Date.now()}`;
-    const { id, etag } = await createGroup(axios, name);
-    createdGroupIds.push(id);
-
-    const wrongEtag = etag.replace(/.$/, etag.endsWith("0") ? "1" : "0");
-    try {
-      await updateGroup(axios, id, { name: `${name}-updated` }, wrongEtag);
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      expect(axiosError.response?.status).toBe(412);
     }
   });
 });

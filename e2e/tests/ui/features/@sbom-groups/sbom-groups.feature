@@ -120,6 +120,8 @@ Feature: SBOM Groups - Manage SBOM groups
   Scenario Outline: Add multiple SBOMs to group from SBOM list page
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
+    When User applies filter "Filter" with value "<groupName>"
+    Then The SBOM count is not displayed for group "<groupName>"
     When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
     Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
@@ -232,25 +234,6 @@ Feature: SBOM Groups - Manage SBOM groups
     Examples:
       | groupName             | sbom1 | sbom2       |
       | Multi SBOM Group      | curl  | quarkus-bom |
-
-
-  # ─────────────────────────────────────────────────────────────────
-  # SBOM count verification — before and after adding SBOMs
-  # ─────────────────────────────────────────────────────────────────
-  @slow
-  Scenario Outline: SBOM count shows correct value after adding SBOMs
-    Given User navigates to SBOM Groups page
-    And A group "<groupName>" exists
-    When User applies filter "Filter" with value "<groupName>"
-    Then The SBOM count is not displayed for group "<groupName>"
-    When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
-    When User navigates to SBOM Groups page
-    And User applies filter "Filter" with value "<groupName>"
-    Then The SBOM count for group "<groupName>" shows "2 SBOMs"
-
-    Examples:
-      | groupName          | sbom1 | sbom2       |
-      | Count Verify Group | curl  | quarkus-bom |
 
   # Delete guard for parent groups
   Scenario: Delete action is disabled for group with children
