@@ -238,7 +238,7 @@ Feature: SBOM Groups - Manage SBOM groups
   # SBOM count verification — before and after adding SBOMs
   # ─────────────────────────────────────────────────────────────────
   @slow
-  Scenario: SBOM count shows correct value after adding SBOMs
+  Scenario Outline: SBOM count shows correct value after adding SBOMs
     Given User navigates to SBOM Groups page
     And A group "<groupName>" exists
     When User applies filter "Filter" with value "<groupName>"

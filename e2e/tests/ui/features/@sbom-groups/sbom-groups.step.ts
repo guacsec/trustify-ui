@@ -217,7 +217,7 @@ When(
 
     const table = await listPage.getTable();
     const row = await table.getRowsByCellValue({ Name: sbomName });
-    await row.getByRole("checkbox").click();
+    await row.first().getByRole("checkbox").click();
   },
 );
 
@@ -275,13 +275,13 @@ When(
     await toolbar.applyFilter({ "Filter text": sbom1 });
     const table1 = await listPage.getTable();
     const row1 = await table1.getRowsByCellValue({ Name: sbom1 });
-    await row1.getByRole("checkbox").click();
+    await row1.first().getByRole("checkbox").click();
     await toolbar.clearAllFilters();
 
     await toolbar.applyFilter({ "Filter text": sbom2 });
     const table2 = await listPage.getTable();
     const row2 = await table2.getRowsByCellValue({ Name: sbom2 });
-    await row2.getByRole("checkbox").click();
+    await row2.first().getByRole("checkbox").click();
     await toolbar.clearAllFilters();
 
     await page.getByRole("button", { name: "Add to group" }).click();
@@ -431,7 +431,7 @@ Then(
   "The {string} badge is visible on the detail page",
   async ({ page }, badgeText: string) => {
     const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
-    const badge = await detailPage.getLabelBadge(badgeText);
+    const badge = detailPage.getLabelBadge(badgeText);
     await expect(badge).toBeVisible();
   },
 );

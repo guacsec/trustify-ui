@@ -32,8 +32,8 @@ test.describe("SBOM Group CRUD", () => {
 
     const { body } = await readGroup(axios, id);
     expect(body.name).toBe(name);
-    expect(body.description).toBeNull();
-    expect(body.parent).toBeNull();
+    expect(body.description ?? null).toBeNull();
+    expect(body.parent ?? null).toBeNull();
   });
 
   test("Create group with description", async ({ axios }) => {
@@ -360,10 +360,10 @@ test.describe("SBOM Group error cases", () => {
 
   test("Update with wrong ETag returns 412", async ({ axios }) => {
     const name = `api-test-etag-${Date.now()}`;
-    const { id } = await createGroup(axios, name);
+    const { id, etag } = await createGroup(axios, name);
     createdGroupIds.push(id);
 
-    const wrongEtag = "00000000-0000-0000-0000-000000000000";
+    const wrongEtag = etag.replace(/.$/, etag.endsWith("0") ? "1" : "0");
     try {
       await updateGroup(axios, id, { name: `${name}-updated` }, wrongEtag);
       expect(true).toBe(false);

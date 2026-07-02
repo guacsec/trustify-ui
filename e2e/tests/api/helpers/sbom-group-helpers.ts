@@ -30,12 +30,12 @@ export async function createGroup(
   name: string,
   options?: CreateGroupOptions,
 ): Promise<{ id: string; etag: string }> {
-  const response = await axios.post("/api/v3/group/sbom", {
-    name,
-    description: options?.description ?? null,
-    parent: options?.parent ?? null,
-    labels: options?.labels ?? {},
-  });
+  const body: Record<string, unknown> = { name };
+  if (options?.description != null) body.description = options.description;
+  if (options?.parent != null) body.parent = options.parent;
+  if (options?.labels) body.labels = options.labels;
+
+  const response = await axios.post("/api/v3/group/sbom", body);
 
   return {
     id: response.data.id,
