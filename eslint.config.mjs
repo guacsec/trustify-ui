@@ -43,7 +43,6 @@ export default defineConfig([
       "@typescript-eslint/no-unused-vars": "off",
       "@eslint-react/exhaustive-deps": "off",
       "@tanstack/query/prefer-query-options": "off",
-      "@tanstack/query/exhaustive-deps": "off",
     },
     ignores: [
       "client/config/**",
