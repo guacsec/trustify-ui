@@ -1,9 +1,5 @@
 import { expect, test } from "../fixtures";
 import {
-  testBasicSort,
-  validateStringSorting,
-} from "../helpers/sorting-helpers";
-import {
   bulkAssign,
   cleanupGroups,
   createGroup,
@@ -14,6 +10,10 @@ import {
   updateAssignments,
   updateGroup,
 } from "../helpers/sbom-group-helpers";
+import {
+  testBasicSort,
+  validateStringSorting,
+} from "../helpers/sorting-helpers";
 
 test.describe("SBOM Group CRUD", () => {
   const createdGroupIds: string[] = [];
@@ -102,6 +102,146 @@ test.describe("SBOM Group CRUD", () => {
   test("Delete nonexistent group returns 204", async ({ axios }) => {
     const fakeId = "00000000-0000-0000-0000-000000000000";
     await expect(deleteGroup(axios, fakeId)).resolves.toBeUndefined();
+  });
+
+  test("Update group name", async ({ axios }) => {
+    const name = `api-test-upd-name-${Date.now()}`;
+    const newName = `api-test-upd-name-new-${Date.now()}`;
+    const { id, etag } = await createGroup(axios, name);
+    createdGroupIds.push(id);
+
+    await updateGroup(axios, id, { name: newName }, etag);
+
+    const { body } = await readGroup(axios, id);
+    expect(body.name).toBe(newName);
+  });
+
+  test("Update group description", async ({ axios }) => {
+    const name = `api-test-upd-desc-${Date.now()}`;
+    const { id } = await createGroup(axios, name, {
+      description: "original",
+    });
+    createdGroupIds.push(id);
+
+    await updateGroup(axios, id, {
+      name,
+      description: "updated",
+    });
+
+    const { body } = await readGroup(axios, id);
+    expect(body.description).toBe("updated");
+  });
+
+  test("Clear group description", async ({ axios }) => {
+    const name = `api-test-clear-desc-${Date.now()}`;
+    const { id } = await createGroup(axios, name, {
+      description: "to be cleared",
+    });
+    createdGroupIds.push(id);
+
+    await updateGroup(axios, id, { name, description: null });
+
+    const { body } = await readGroup(axios, id);
+    expect(body.description ?? null).toBeNull();
+  });
+
+  test("Update group labels", async ({ axios }) => {
+    const name = `api-test-upd-labels-${Date.now()}`;
+    const { id } = await createGroup(axios, name, {
+      labels: { env: "dev" },
+    });
+    createdGroupIds.push(id);
+
+    await updateGroup(axios, id, {
+      name,
+      labels: { env: "prod", tier: "1" },
+    });
+
+    const { body } = await readGroup(axios, id);
+    expect(body.labels).toEqual({ env: "prod", tier: "1" });
+  });
+
+  test("Move group to a new parent", async ({ axios }) => {
+    const parentAName = `api-test-move-pA-${Date.now()}`;
+    const parentBName = `api-test-move-pB-${Date.now()}`;
+    const childName = `api-test-move-child-${Date.now()}`;
+
+    const { id: parentAId } = await createGroup(axios, parentAName);
+    const { id: parentBId } = await createGroup(axios, parentBName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentAId,
+    });
+    createdGroupIds.push(childId, parentAId, parentBId);
+
+    await updateGroup(axios, childId, {
+      name: childName,
+      parent: parentBId,
+    });
+
+    const { body } = await readGroup(axios, childId);
+    expect(body.parent).toBe(parentBId);
+  });
+
+  test("Move group to root", async ({ axios }) => {
+    const parentName = `api-test-toroot-parent-${Date.now()}`;
+    const childName = `api-test-toroot-child-${Date.now()}`;
+
+    const { id: parentId } = await createGroup(axios, parentName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentId,
+    });
+    createdGroupIds.push(childId, parentId);
+
+    await updateGroup(axios, childId, {
+      name: childName,
+      parent: null,
+    });
+
+    const { body } = await readGroup(axios, childId);
+    expect(body.parent ?? null).toBeNull();
+  });
+});
+
+test.describe("SBOM Group ETag / optimistic locking", () => {
+  const createdGroupIds: string[] = [];
+
+  test.afterEach(async ({ axios }) => {
+    await cleanupGroups(axios, createdGroupIds.splice(0));
+  });
+
+  test("ETag changes after mutation", async ({ axios }) => {
+    const name = `api-test-etag-change-${Date.now()}`;
+    const { id, etag: etag1 } = await createGroup(axios, name);
+    createdGroupIds.push(id);
+
+    const newName = `api-test-etag-change-new-${Date.now()}`;
+    await updateGroup(axios, id, { name: newName });
+
+    const { etag: etag2 } = await readGroup(axios, id);
+    expect(etag2).not.toBe(etag1);
+  });
+
+  test("Update with stale ETag returns 412", async ({ axios }) => {
+    const name = `api-test-stale-etag-${Date.now()}`;
+    const { id, etag: oldEtag } = await createGroup(axios, name);
+    createdGroupIds.push(id);
+
+    await updateGroup(axios, id, {
+      name: `api-test-stale-etag-v2-${Date.now()}`,
+    });
+
+    try {
+      await updateGroup(
+        axios,
+        id,
+        { name: `api-test-stale-etag-v3-${Date.now()}` },
+        oldEtag,
+      );
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(412);
+    }
   });
 });
 
@@ -266,6 +406,39 @@ test.describe("SBOM Group hierarchy", () => {
     expect(result.items[0].parents).toBeDefined();
     expect(result.items[0].parents).toContain(parentId);
   });
+
+  test("Parents chain resolution with parents=resolve returns referenced groups", async ({
+    axios,
+  }) => {
+    const grandparentName = `api-test-resolve-gp-${Date.now()}`;
+    const parentName = `api-test-resolve-p-${Date.now()}`;
+    const childName = `api-test-resolve-c-${Date.now()}`;
+
+    const { id: grandparentId } = await createGroup(axios, grandparentName);
+    const { id: parentId } = await createGroup(axios, parentName, {
+      parent: grandparentId,
+    });
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentId,
+    });
+    createdGroupIds.push(childId, parentId, grandparentId);
+
+    const result = await listGroups(axios, {
+      q: `name=${childName}`,
+      parents: "resolve",
+    });
+    expect(result.items.length).toBe(1);
+    expect(result.items[0].parents).toBeDefined();
+    expect(result.items[0].parents).toContain(parentId);
+    expect(result.items[0].parents).toContain(grandparentId);
+
+    expect(result.referenced).toBeDefined();
+    expect(Array.isArray(result.referenced)).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response items not strictly typed
+    const refIds = result.referenced.map((g: any) => g.id);
+    expect(refIds).toContain(parentId);
+    expect(refIds).toContain(grandparentId);
+  });
 });
 
 test.describe("SBOM Group error cases", () => {
@@ -339,6 +512,26 @@ test.describe("SBOM Group error cases", () => {
     }
   });
 
+  test("Name with invalid characters returns 400", async ({ axios }) => {
+    try {
+      await createGroup(axios, "invalid:name@test");
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(400);
+    }
+  });
+
+  test("Name with leading whitespace returns 400", async ({ axios }) => {
+    try {
+      await createGroup(axios, " leading-space");
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(400);
+    }
+  });
+
   test("Delete group with children returns 409", async ({ axios }) => {
     const parentName = `api-test-delchild-parent-${Date.now()}`;
     const childName = `api-test-delchild-child-${Date.now()}`;
@@ -356,6 +549,126 @@ test.describe("SBOM Group error cases", () => {
       const axiosError = error as { response?: { status?: number } };
       expect(axiosError.response?.status).toBe(409);
     }
+  });
+});
+
+test.describe("SBOM Group hierarchy with assignments", () => {
+  const createdGroupIds: string[] = [];
+
+  test.afterEach(async ({ axios }) => {
+    await cleanupGroups(axios, createdGroupIds.splice(0));
+  });
+
+  const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
+    const response = await axios.get("/api/v3/sbom", {
+      params: { limit: 1, offset: 0 },
+    });
+    expect(response.data.items.length).toBeGreaterThan(0);
+    return response.data.items[0].id as string;
+  };
+
+  const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
+    const response = await axios.get("/api/v3/sbom", {
+      params: { limit: 2, offset: 0 },
+    });
+    expect(response.data.items.length).toBeGreaterThanOrEqual(2);
+    return [
+      response.data.items[0].id as string,
+      response.data.items[1].id as string,
+    ];
+  };
+
+  test("Detach child from parent preserves assignments", async ({ axios }) => {
+    const parentName = `api-test-detach-parent-${Date.now()}`;
+    const childName = `api-test-detach-child-${Date.now()}`;
+
+    const { id: parentId } = await createGroup(axios, parentName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentId,
+    });
+    createdGroupIds.push(childId, parentId);
+
+    const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
+    await updateAssignments(axios, sbomId1, [parentId]);
+    await updateAssignments(axios, sbomId2, [childId]);
+
+    await updateGroup(axios, childId, {
+      name: childName,
+      parent: null,
+    });
+
+    const parentAssignments = await readAssignments(axios, sbomId1);
+    expect(parentAssignments.groupIds).toContain(parentId);
+
+    const childAssignments = await readAssignments(axios, sbomId2);
+    expect(childAssignments.groupIds).toContain(childId);
+
+    const { body } = await readGroup(axios, childId);
+    expect(body.parent ?? null).toBeNull();
+
+    await updateAssignments(axios, sbomId1, []);
+    await updateAssignments(axios, sbomId2, []);
+  });
+
+  test("Delete parent after detaching child preserves child assignments", async ({
+    axios,
+  }) => {
+    const parentName = `api-test-delpar-parent-${Date.now()}`;
+    const childName = `api-test-delpar-child-${Date.now()}`;
+
+    const { id: parentId } = await createGroup(axios, parentName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentId,
+    });
+    createdGroupIds.push(childId);
+
+    const sbomId = await findFirstSbomId(axios);
+    await updateAssignments(axios, sbomId, [childId]);
+
+    await updateGroup(axios, childId, {
+      name: childName,
+      parent: null,
+    });
+    await deleteGroup(axios, parentId);
+
+    const { body } = await readGroup(axios, childId);
+    expect(body.name).toBe(childName);
+
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).toContain(childId);
+
+    await updateAssignments(axios, sbomId, []);
+  });
+
+  test("Move child to different parent preserves assignments", async ({
+    axios,
+  }) => {
+    const parentAName = `api-test-mvpar-a-${Date.now()}`;
+    const parentBName = `api-test-mvpar-b-${Date.now()}`;
+    const childName = `api-test-mvpar-child-${Date.now()}`;
+
+    const { id: parentAId } = await createGroup(axios, parentAName);
+    const { id: parentBId } = await createGroup(axios, parentBName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentAId,
+    });
+    createdGroupIds.push(childId, parentAId, parentBId);
+
+    const sbomId = await findFirstSbomId(axios);
+    await updateAssignments(axios, sbomId, [childId]);
+
+    await updateGroup(axios, childId, {
+      name: childName,
+      parent: parentBId,
+    });
+
+    const { body } = await readGroup(axios, childId);
+    expect(body.parent).toBe(parentBId);
+
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).toContain(childId);
+
+    await updateAssignments(axios, sbomId, []);
   });
 });
 
@@ -509,5 +822,55 @@ test.describe("SBOM Group assignments", () => {
     expect(groupIds).not.toContain(idA);
 
     await updateAssignments(axios, sbomId, []);
+  });
+
+  test("Update assignments for nonexistent SBOM returns 404", async ({
+    axios,
+  }) => {
+    const fakeId = "00000000-0000-0000-0000-000000000000";
+    try {
+      await updateAssignments(axios, fakeId, []);
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(404);
+    }
+  });
+
+  test("Assign SBOM to nonexistent group returns 400", async ({ axios }) => {
+    const fakeGroupId = "00000000-0000-0000-0000-000000000000";
+    const sbomId = await findFirstSbomId(axios);
+
+    try {
+      await updateAssignments(axios, sbomId, [fakeGroupId]);
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(400);
+    }
+  });
+
+  test("Bulk assign with empty sbom_ids is no-op", async ({ axios }) => {
+    const name = `api-test-bulk-empty-sboms-${Date.now()}`;
+    const { id: groupId } = await createGroup(axios, name);
+    createdGroupIds.push(groupId);
+
+    await expect(bulkAssign(axios, [], [groupId])).resolves.toBeUndefined();
+  });
+
+  test("Bulk assign with empty group_ids clears assignments", async ({
+    axios,
+  }) => {
+    const name = `api-test-bulk-empty-groups-${Date.now()}`;
+    const { id: groupId } = await createGroup(axios, name);
+    createdGroupIds.push(groupId);
+
+    const sbomId = await findFirstSbomId(axios);
+    await updateAssignments(axios, sbomId, [groupId]);
+
+    await bulkAssign(axios, [sbomId], []);
+
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).not.toContain(groupId);
   });
 });

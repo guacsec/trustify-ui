@@ -62,16 +62,21 @@ export async function updateGroup(
     name: string;
     description?: string | null;
     parent?: string | null;
-    labels?: Record<string, string[]>;
+    labels?: Record<string, string>;
   },
   etag?: string,
-): Promise<void> {
+): Promise<{ etag: string }> {
   const headers: Record<string, string> = {};
   if (etag) {
     headers["If-Match"] = etag;
   }
 
-  await axios.put(`/api/v3/group/sbom/${id}`, body, { headers });
+  const response = await axios.put(`/api/v3/group/sbom/${id}`, body, {
+    headers,
+  });
+  return {
+    etag: response.headers["etag"] as string,
+  };
 }
 
 export async function deleteGroup(
