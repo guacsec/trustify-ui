@@ -17,11 +17,13 @@ const mockedUseFetchTrustifyInfo =
   >;
 
 const ReadOnlyConsumer: React.FC = () => {
-  const { isReadOnly, isLoading } = React.useContext(ReadOnlyContext);
+  const { isLoading, areMutationsDisabled } = React.useContext(ReadOnlyContext);
   return (
     <div>
-      <span data-testid="read-only">{String(isReadOnly)}</span>
       <span data-testid="loading">{String(isLoading)}</span>
+      <span data-testid="mutations-disabled">
+        {String(areMutationsDisabled)}
+      </span>
     </div>
   );
 };
@@ -38,53 +40,53 @@ const renderWithProvider = () => {
 };
 
 describe("ReadOnlyContext", () => {
-  it("provides isReadOnly=true when the endpoint returns readOnly: true", () => {
+  it("disables mutations when the endpoint returns readOnly: true", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
-      trustifyInfo: { version: "0.5.0", readOnly: true },
+      data: { version: "0.5.0", readOnly: true },
       isLoading: false,
       error: null,
     });
 
     renderWithProvider();
 
-    expect(screen.getByTestId("read-only")).toHaveTextContent("true");
     expect(screen.getByTestId("loading")).toHaveTextContent("false");
+    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("true");
   });
 
-  it("provides isReadOnly=false when the endpoint returns readOnly: false", () => {
+  it("allows mutations when the endpoint returns readOnly: false", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
-      trustifyInfo: { version: "0.5.0", readOnly: false },
+      data: { version: "0.5.0", readOnly: false },
       isLoading: false,
       error: null,
     });
 
     renderWithProvider();
 
-    expect(screen.getByTestId("read-only")).toHaveTextContent("false");
+    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("false");
   });
 
-  it("treats isReadOnly as true while loading", () => {
+  it("disables mutations while loading", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
-      trustifyInfo: undefined,
+      data: undefined,
       isLoading: true,
       error: null,
     });
 
     renderWithProvider();
 
-    expect(screen.getByTestId("read-only")).toHaveTextContent("true");
     expect(screen.getByTestId("loading")).toHaveTextContent("true");
+    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("true");
   });
 
-  it("defaults to isReadOnly=false when the fetch errors", () => {
+  it("allows mutations when the fetch errors", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
-      trustifyInfo: undefined,
+      data: undefined,
       isLoading: false,
       error: new Error("network error"),
     });
 
     renderWithProvider();
 
-    expect(screen.getByTestId("read-only")).toHaveTextContent("false");
+    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("false");
   });
 });
