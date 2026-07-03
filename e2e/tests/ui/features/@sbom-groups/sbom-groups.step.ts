@@ -259,6 +259,17 @@ Then(
   },
 );
 
+Then(
+  "The Selected SBOMs are visible in the group member list",
+  async ({ page, selectedSbomNames }) => {
+    const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
+    const table = await detailPage.getMemberSbomsTable();
+    for (const sbomName of selectedSbomNames) {
+      await expect(table).toHaveColumnWithValue("Name", sbomName);
+    }
+  },
+);
+
 When("User clears all filters on SBOM List page", async ({ page }) => {
   const listPage = await SbomListPage.fromCurrentPage(page);
   const toolbar = await listPage.getToolbar();
@@ -284,6 +295,28 @@ When(
     await row2.first().getByRole("checkbox").click();
     await toolbar.clearAllFilters();
     await pagination.selectItemsPerPage(100);
+    await page.getByRole("button", { name: "Add to group" }).click();
+    const modal = await AddToGroupModal.build(page);
+    await modal.selectGroup(groupName);
+    await modal.submit();
+  },
+);
+
+When(
+  "User adds multiple SBOMs to the group {string}",
+  async ({ page, selectedSbomNames }, groupName: string) => {
+    const listPage = await SbomListPage.build(page);
+    const table = await listPage.getTable();
+    const row1 = (await table.getRows()).nth(1);
+    const row2 = (await table.getRows()).nth(2);
+
+    const name1 = await row1.locator('td[data-label="Name"]').textContent();
+    const name2 = await row2.locator('td[data-label="Name"]').textContent();
+    if (name1) selectedSbomNames.push(name1.trim());
+    if (name2) selectedSbomNames.push(name2.trim());
+
+    await row1.getByRole("checkbox").click();
+    await row2.getByRole("checkbox").click();
     await page.getByRole("button", { name: "Add to group" }).click();
     const modal = await AddToGroupModal.build(page);
     await modal.selectGroup(groupName);
@@ -394,6 +427,15 @@ Then(
     await expect(
       treegrid.getByRole("link", { name: childName }),
     ).not.toBeVisible();
+  },
+);
+
+Then(
+  "The group {string} is not expandable",
+  async ({ page }, groupName: string) => {
+    const listPage = await SbomGroupListPage.fromCurrentPage(page);
+    const isExpandable = await listPage.isGroupExpandable(groupName);
+    expect(isExpandable).toBe(false);
   },
 );
 

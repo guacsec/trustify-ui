@@ -748,6 +748,34 @@ test.describe("SBOM Group assignments", () => {
     await updateAssignments(axios, sbomId, []);
   });
 
+  test("Append assignment preserves existing groups via read-merge-write", async ({
+    axios,
+  }) => {
+    const nameA = `api-test-append-a-${Date.now()}`;
+    const nameB = `api-test-append-b-${Date.now()}`;
+    const { id: idA } = await createGroup(axios, nameA);
+    const { id: idB } = await createGroup(axios, nameB);
+    createdGroupIds.push(idA, idB);
+
+    const sbomId = await findFirstSbomId(axios);
+
+    // Assign to group A
+    await updateAssignments(axios, sbomId, [idA]);
+    const before = await readAssignments(axios, sbomId);
+    expect(before.groupIds).toContain(idA);
+
+    // Read current, merge with group B, write back
+    const merged = [...before.groupIds, idB];
+    await updateAssignments(axios, sbomId, merged, before.etag);
+
+    const after = await readAssignments(axios, sbomId);
+    expect(after.groupIds).toContain(idA);
+    expect(after.groupIds).toContain(idB);
+    expect(after.groupIds).toHaveLength(2);
+
+    await updateAssignments(axios, sbomId, []);
+  });
+
   test("Clear assignments with empty array", async ({ axios }) => {
     const name = `api-test-clear-${Date.now()}`;
     const { id: groupId } = await createGroup(axios, name);

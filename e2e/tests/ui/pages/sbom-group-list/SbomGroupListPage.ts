@@ -107,6 +107,12 @@ export class SbomGroupListPage {
     await row.getByRole("button", { name: /collapse row/i }).click();
   }
 
+  async isGroupExpandable(groupName: string): Promise<boolean> {
+    const row = this.getGroupRow(groupName);
+    const expandButton = row.getByRole("button", { name: /expand row/i });
+    return (await expandButton.count()) > 0;
+  }
+
   async clickGroupLink(groupName: string) {
     const link = this.getTreegrid().getByRole("link", {
       name: groupName,

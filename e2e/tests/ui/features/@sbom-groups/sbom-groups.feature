@@ -121,18 +121,17 @@ Feature: SBOM Groups - Manage SBOM groups
     And A group "<groupName>" exists
     When User applies filter "Filter" with value "<groupName>"
     Then The SBOM count is not displayed for group "<groupName>"
-    When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
+    #When User adds SBOMs "<sbom1>" and "<sbom2>" to group "<groupName>"
+    When User adds multiple SBOMs to the group "<groupName>"
     Then Success notification "2" is displayed
     When User navigates to SBOM Groups page
     And User applies filter "Filter" with value "<groupName>"
     Then The SBOM count for group "<groupName>" shows "2 SBOMs"
     When User clicks on group "<groupName>"
-    Then The SBOM "<sbom1>" is visible in the group member list
-    And The SBOM "<sbom2>" is visible in the group member list
-
+    Then The Selected SBOMs are visible in the group member list
     Examples:
-      | groupName        | sbom1  | sbom2     |
-      | Multi SBOM Group | liboqs | claude    |
+      | groupName        |
+      | Multi SBOM Group |
 
   # Product label filtering
   Scenario: Product label badge appears for product groups
@@ -159,6 +158,30 @@ Feature: SBOM Groups - Manage SBOM groups
     Then The child group "Tree Child" is visible under "Tree Parent"
     When User collapses the tree node for "Tree Parent"
     Then The child group "Tree Child" is not visible
+
+  # ─────────────────────────────────────────────────────────────────
+  # Filter auto-expands parent when child matches
+  # ─────────────────────────────────────────────────────────────────
+
+  Scenario: Filter matching child auto-expands parent to show matching child
+    Given User navigates to SBOM Groups page
+    And A parent group "AutoExpand Parent" with child group "AutoExpand Child" exists
+    When User applies filter "Filter" with value "AutoExpand Child"
+    Then The SBOM Groups table shows filtered results containing "AutoExpand Parent"
+    And The child group "AutoExpand Child" is visible under "AutoExpand Parent"
+
+  # ─────────────────────────────────────────────────────────────────
+  # Filter matching only parent — children not visible after expand
+  # Bug: TC-5060 — filtered tree shows non-matching children when parent is expanded
+  # ─────────────────────────────────────────────────────────────────
+
+  # Scenario: Filter matching only parent shows no children when expanded
+  #   Given User navigates to SBOM Groups page
+  #   And A parent group "OnlyParent Match" with child group "Hidden Offspring" exists
+  #   When User applies filter "Filter" with value "OnlyParent Match"
+  #   Then The SBOM Groups table shows filtered results containing "OnlyParent Match"
+  #   When User expands the tree node for "OnlyParent Match"
+  #   Then The child group "Hidden Offspring" is not visible
 
   # Invalid group ID handling
   Scenario: Navigate to invalid group ID shows error
