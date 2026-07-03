@@ -39,6 +39,7 @@ const getLastSevenDaysRequestParams = (): HubRequestParams => {
   return {
     page: { pageNumber: 1, itemsPerPage: MAX_ATTENTION_ITEMS },
     sort: { field: "base_score", direction: "desc" },
+    total: false,
     filters: [
       {
         field: "published",

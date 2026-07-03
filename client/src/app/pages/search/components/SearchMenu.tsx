@@ -61,11 +61,13 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
       { field: FILTER_TEXT_CATEGORY_KEY, operator: "~", value: filterText },
     ],
     page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
   };
 
   const sbomParams: HubRequestParams = {
     filters: [{ field: "name", operator: "~", value: filterText }],
     page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
   };
 
   const {
