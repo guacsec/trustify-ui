@@ -20,7 +20,8 @@ export const WithSBOMsByLicense: React.FC<WithSBOMsByLicenseProps> = ({
     null,
     {
       filters: [{ field: "license", operator: "=", value: licenseId }],
-      page: { itemsPerPage: 1, pageNumber: 1 },
+      page: { itemsPerPage: 0, pageNumber: 1 },
+      total: true,
     },
     [],
   );
