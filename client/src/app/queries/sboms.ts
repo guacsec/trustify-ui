@@ -15,7 +15,7 @@ import {
   type IngestResult,
   type Labels,
   type SbomHead,
-  bulkUpdateSbomGroupAssignments,
+  patchSbomGroupAssignments,
   deleteSbom,
   downloadSbom,
   getSbom,
@@ -305,11 +305,11 @@ export const useAddSBOMsToGroupsMutation = (
   return useMutation({
     mutationFn: async (payload: { group: Group; sboms: SbomHead[] }) => {
       const { sboms, group } = payload;
-      const response = await bulkUpdateSbomGroupAssignments({
+      const response = await patchSbomGroupAssignments({
         client,
         body: {
-          group_ids: [group.id],
           sbom_ids: sboms.map((e) => e.id),
+          add: [group.id],
         },
       });
       return response.data;
