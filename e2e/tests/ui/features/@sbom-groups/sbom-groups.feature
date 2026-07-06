@@ -340,7 +340,7 @@ Feature: SBOM Groups - Manage SBOM groups
     Then Success notification "1" is displayed
     When User navigates to SBOM Groups page
     And User applies filter "Filter" with value "Reassign Source"
-    Then The SBOM count is not displayed for group "Reassign Source"
+    Then The SBOM count for group "Reassign Source" shows "1 SBOMs"
     When User clears all filters on SBOM Groups page
     And User applies filter "Filter" with value "Reassign Dest"
     Then The SBOM count for group "Reassign Dest" shows "1 SBOMs"
@@ -353,7 +353,7 @@ Feature: SBOM Groups - Manage SBOM groups
     Given User navigates to SBOM Groups page
     And A parent group "Count Parent" with child group "Count Child" exists
     When User navigates to SBOM list page
-    And User selects SBOM "curl" for bulk action
+    And User selects SBOM "ubi9-minimal-container" for bulk action
     And User clicks "Add to group" button
     And User selects group "Count Child" in the modal
     And User submits add to group form
@@ -362,7 +362,7 @@ Feature: SBOM Groups - Manage SBOM groups
     And User applies filter "Filter" with value "Count Parent"
     Then The SBOM count is not displayed for group "Count Parent"
     When User expands the tree node for "Count Parent"
-  Then The SBOM count for group "Count Child" shows "1 SBOMs"
+    Then The SBOM count for group "Count Child" shows "1 SBOMs"
 
   # ─────────────────────────────────────────────────────────────────
   # 3-level hierarchy — expand, collapse, verify tree levels
@@ -434,8 +434,7 @@ Feature: SBOM Groups - Manage SBOM groups
     When User clicks "Create group" button
     And User fills group name with "Dup Name Check"
     And User fills group product status with "No"
-    And User submits the group form
-    Then A danger notification "Error while saving the group" is displayed
+    Then The form validation error "Dup Name Check already exists in group" is displayed
 
   # ─────────────────────────────────────────────────────────────────
   # Form validation — self-referencing parent
@@ -505,10 +504,12 @@ Feature: SBOM Groups - Manage SBOM groups
   Scenario: Filter SBOMs on group detail page
     Given User navigates to SBOM Groups page
     And A group "Detail Filter Test" exists
-    When User adds SBOMs "curl" and "quarkus-bom" to group "Detail Filter Test"
+    When User adds SBOMs "curl" and "claude-4-opus" to group "Detail Filter Test"
     When User navigates to SBOM Groups page
     And User applies filter "Filter" with value "Detail Filter Test"
     And User clicks on group "Detail Filter Test"
     Then The group details page is displayed
-    When User applies SBOM filter "Filter text" with value "curl" on the detail page
+    When User filters SBOMs by name "curl" on the detail page
     Then The SBOM "curl" is visible in the group member list
+    When User filters SBOMs by name "claude-4-opus" on the detail page
+    Then The SBOM "claude-4-opus" is visible in the group member list

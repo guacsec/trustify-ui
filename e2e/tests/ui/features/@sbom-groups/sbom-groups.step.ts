@@ -5,7 +5,6 @@ import { test } from "../../fixtures";
 import { ToolbarTable } from "../../helpers/ToolbarTable";
 
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
-import { Navigation } from "../../pages/Navigation";
 import { Pagination } from "../../pages/Pagination";
 import { SbomGroupDetailPage } from "../../pages/sbom-group-detail/SbomGroupDetailPage";
 import { AddToGroupModal } from "../../pages/sbom-group-list/AddToGroupModal";
@@ -21,8 +20,7 @@ Given("User navigates to SBOM Groups page", async ({ page }) => {
 });
 
 When("User navigates to SBOM list page", async ({ page }) => {
-  const navigation = await Navigation.build(page);
-  await navigation.goToSidebar("All SBOMs");
+  await SbomListPage.build(page);
 });
 
 Then("The SBOM Groups table is visible", async ({ page }) => {
@@ -235,13 +233,6 @@ When("User submits add to group form", async ({ page }) => {
 Then(
   "Success notification {string} is displayed",
   async ({ page }, sbomCount: string) => {
-    const successMessage = await page
-      .locator("div")
-      .filter({ hasText: "Success alert " })
-      .nth(1);
-    console.log(
-      `Success message content: ${await successMessage.textContent()}`,
-    );
     await expect(
       page.getByRole("heading", {
         name: `Success alert: ${sbomCount} SBOM(s)`,
@@ -697,7 +688,6 @@ Then(
   async ({ page }, groupName: string, expectedText: string) => {
     const listPage = await SbomGroupListPage.fromCurrentPage(page);
     const row = listPage.getGroupRow(groupName);
-    console.log(await row.textContent());
     await expect(row.getByText(expectedText, { exact: true })).toBeVisible();
   },
 );
@@ -799,11 +789,11 @@ When("User cancels the group form", async ({ page }) => {
 
 // Filter SBOMs on group detail page
 When(
-  "User applies SBOM filter {string} with value {string} on the detail page",
-  async ({ page }, filterName: string, filterValue: string) => {
+  "User filters SBOMs by name {string} on the detail page",
+  async ({ page }, sbomName: string) => {
     const detailPage = await SbomGroupDetailPage.fromCurrentPage(page);
     const toolbar = await detailPage.getToolbar();
-    await toolbar.applyFilter({ [filterName]: filterValue });
+    await toolbar.applyFilter({ "Filter text": sbomName });
   },
 );
 

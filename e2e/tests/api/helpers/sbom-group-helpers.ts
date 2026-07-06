@@ -139,6 +139,19 @@ export async function bulkAssign(
   });
 }
 
+export async function patchAssignments(
+  axios: AxiosInstance,
+  sbomIds: string[],
+  add: string[],
+  remove: string[],
+): Promise<void> {
+  await axios.patch("/api/v3/group/sbom-assignment", {
+    sbom_ids: sbomIds,
+    add,
+    remove,
+  });
+}
+
 /**
  * Deletes groups in order. Pass children before parents to avoid 409 conflicts.
  */

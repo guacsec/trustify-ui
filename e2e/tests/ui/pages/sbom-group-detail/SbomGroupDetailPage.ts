@@ -57,7 +57,9 @@ export class SbomGroupDetailPage {
   }
 
   async getToolbar() {
-    return await Toolbar.build(this._page, "sbom-toolbar");
+    return await Toolbar.build(this._page, "sbom-toolbar", {
+      "Filter text": "string",
+    } as const);
   }
 
   async getPagination(top: boolean = true) {
