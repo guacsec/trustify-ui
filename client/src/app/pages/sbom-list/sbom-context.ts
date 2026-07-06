@@ -3,7 +3,7 @@ import React from "react";
 import type { AxiosError } from "axios";
 
 import type {
-  SbomAdvisorySummary,
+  RequestedFieldHashMapHashMap,
   SbomHead,
   SourceDocument,
 } from "@app/client";
@@ -20,7 +20,7 @@ interface ISbomSearchContext {
           name: string;
           version?: string | null;
         }>;
-        advisories?: SbomAdvisorySummary | null;
+        advisories?: RequestedFieldHashMapHashMap;
       },
     | "name"
     | "version"
