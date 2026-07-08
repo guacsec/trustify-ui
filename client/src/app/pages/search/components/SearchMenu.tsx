@@ -70,6 +70,12 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
     total: false,
   };
 
+  const packageParams: HubRequestParams = {
+    filters: [{ field: "name", operator: "~", value: filterText }],
+    page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
+  };
+
   const {
     isFetching: isFetchingAdvisories,
     result: { data: advisories },
@@ -78,7 +84,7 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
   const {
     isFetching: isFetchingPackages,
     result: { data: packages },
-  } = useFetchPackages({ ...params }, disableSearch);
+  } = useFetchPackages({ ...packageParams }, disableSearch);
 
   const {
     isFetching: isFetchingSBOMs,

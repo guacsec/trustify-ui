@@ -22,7 +22,7 @@ interface IPackageSearchContext {
     | "qualifiers"
     | "vulnerabilities",
     "name" | "namespace" | "version",
-    "" | "type" | "arch" | "license",
+    "name" | "type" | "arch" | "license",
     string
   >;
 
