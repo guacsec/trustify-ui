@@ -48,29 +48,15 @@ import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
 import { useLocalTableControls } from "@app/hooks/table-controls";
-import {
-  useFetchExploitIntelligenceJobs,
-  useSubmitExploitAnalysisMutation,
-} from "@app/queries/exploit-intelligence";
+import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
+import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
-import type { ExtendedSeverity } from "@app/api/models";
 
 import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
-
-/** Severity levels eligible for exploit intelligence analysis. */
-const ELIGIBLE_SEVERITIES: ReadonlySet<ExtendedSeverity> = new Set([
-  "critical",
-  "high",
-  "medium",
-  "moderate",
-  "low",
-  "none",
-  "unknown",
-]);
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -92,7 +78,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
 
   const { pushNotification } = React.useContext(NotificationsContext);
 
-  const { stateMap: eiStates } = useFetchExploitIntelligenceJobs(sbomId);
+  const { stateMap: eiStates } = useExploitIntelligenceOfSbom(sbomId);
 
   const submitAnalysis = useSubmitExploitAnalysisMutation();
 
@@ -246,13 +232,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
-                <Th
-                  {...getThProps({ columnKey: "exploitAnalysis" })}
-                  info={{
-                    tooltip:
-                      "Run exploit intelligence analysis for Critical and High severity vulnerabilities.",
-                  }}
-                />
+                <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -369,9 +349,6 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                             }
                           }
                           onRequestAnalysis={handleRequestAnalysis}
-                          requestAnalysisEligible={ELIGIBLE_SEVERITIES.has(
-                            item.opinionatedAdvisory.extendedSeverity,
-                          )}
                         />
                       </Td>
                       <Td
