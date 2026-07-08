@@ -96,7 +96,7 @@ export const Search: React.FC<SearchPageProps> = ({ searchBodyOverride }) => {
     });
     packageTableControls.filterState.setFilterValues({
       ...packageTableControls.filterState.filterValues,
-      [FILTER_TEXT_CATEGORY_KEY]: [searchValue],
+      ["name"]: [searchValue],
     });
     vulnerabilityTableControls.filterState.setFilterValues({
       ...vulnerabilityTableControls.filterState.filterValues,
