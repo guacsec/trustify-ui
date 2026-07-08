@@ -1,7 +1,7 @@
 ######################################################################
 # UI
 ######################################################################
-FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS ui-source
+FROM registry.access.redhat.com/ubi10/nodejs-22:latest AS ui-source
 USER 1001
 COPY --chown=1001 . .
 RUN \
@@ -14,7 +14,7 @@ RUN \
 ######################################################################
 # Prepare server
 ######################################################################
-FROM registry.access.redhat.com/ubi9/ubi:latest AS server-source
+FROM registry.access.redhat.com/ubi10/ubi:latest AS server-source
 ARG server_branch="main"
 ARG server_commit
 
@@ -26,13 +26,13 @@ RUN sed -i 's/trustify-ui = { git = "https:\/\/github.com\/guacsec\/trustify-ui.
 ######################################################################
 # Build server
 ######################################################################
-FROM registry.access.redhat.com/ubi9/ubi:latest AS server-builder
+FROM registry.access.redhat.com/ubi10/ubi:latest AS server-builder
 
 # Dependencies
-RUN dnf install -y openssl-devel gcc
+RUN dnf install -y openssl-devel gcc clang-libs
 
 RUN mkdir /stage/ && \
-    dnf install --installroot /stage/ --setop install_weak_deps=false --nodocs -y zlib openssl && \
+    dnf install --installroot /stage/ --setop install_weak_deps=false --nodocs -y zlib openssl krb5-libs libzstd lz4-libs libxml2 && \
     dnf clean all --installroot /stage/
 
 # Setup Rust
@@ -50,6 +50,6 @@ RUN cd /code/trustify/ && \
 ######################################################################
 # Builder runner
 ######################################################################
-FROM registry.access.redhat.com/ubi9/ubi-micro:latest AS server-runner
+FROM registry.access.redhat.com/ubi10/ubi-micro:latest AS server-runner
 COPY --from=server-builder /stage/ .
 ENTRYPOINT ["/usr/local/bin/trustd"]
