@@ -20,3 +20,16 @@ Scenario: Verify page title remains "Search" when switching between tabs
 	Then the page title should contain "Search"
 	When User clicks on "Packages" tab
 	Then the page title should contain "Search"
+
+# Verify page titles for main application pages
+Scenario Outline: Verify page title changes when navigating to <page> page
+	When User navigates to "<page>" page
+	Then the page title should contain "<expectedTitle>"
+
+	Examples:
+		| page            | expectedTitle   |
+		| SBOMs           | SBOMs           |
+		| Advisories      | Advisories      |
+		| Vulnerabilities | Vulnerabilities |
+		| Packages        | Packages        |
+		| Importers       | Importers       |
