@@ -61,7 +61,7 @@ export const PackageSearchProvider: React.FunctionComponent<
     isFilterEnabled: true,
     filterCategories: [
       {
-        categoryKey: FILTER_TEXT_CATEGORY_KEY,
+        categoryKey: "name",
         title: "Filter text",
         placeholderText: "Search",
         type: FilterType.search,
