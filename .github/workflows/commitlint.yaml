@@ -2,6 +2,7 @@ name: Commitlint
 on: [pull_request]
 jobs:
   commitlint:
+    if: github.actor != 'trustify-ci-bot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
