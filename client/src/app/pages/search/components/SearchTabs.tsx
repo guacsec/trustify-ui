@@ -44,7 +44,7 @@ export interface SearchTabsProps {
     >;
     packageFilterPanelProps: IFilterPanelProps<
       PackageTableData,
-      "" | "type" | "arch" | "license"
+      "name" | "type" | "arch" | "license"
     >;
     sbomFilterPanelProps: IFilterPanelProps<
       SbomSummary,
@@ -122,7 +122,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
               />
             ) : isTabActive("packages") ? (
               <FilterPanel
-                omitFilterCategoryKeys={[""]}
+                omitFilterCategoryKeys={["name"]}
                 {...packageFilterPanelProps}
               />
             ) : isTabActive("vulnerabilities") ? (
