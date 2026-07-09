@@ -219,7 +219,7 @@ export const SbomTable: React.FC = () => {
                       width={20}
                       {...getTdProps({ columnKey: "vulnerabilities" })}
                     >
-                      <SBOMVulnerabilities sbomId={item.id} />
+                      <SBOMVulnerabilities advisories={item.advisories} />
                     </Td>
                     <Td isActionCell>
                       <ActionsColumn

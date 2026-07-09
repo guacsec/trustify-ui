@@ -61,11 +61,12 @@ export const useFetchSBOMs = (
   params: HubRequestParams = {},
   labels: Label[] = [],
   disableQuery = false,
+  advisories = false,
 ) => {
   const labelQuery = labelRequestParamsQuery(labels);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [SBOMsQueryKey, groupId, params, labelQuery],
+    queryKey: [SBOMsQueryKey, groupId, params, labelQuery, advisories],
     queryFn: () => {
       const { q, ...rest } = requestParamsQuery(params);
       return listSboms({
@@ -74,6 +75,7 @@ export const useFetchSBOMs = (
           ...rest,
           group: groupId ? [groupId] : [],
           q: [q, labelQuery].filter((e) => e).join("&"),
+          advisories,
         },
       });
     },
