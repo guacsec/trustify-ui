@@ -26,6 +26,7 @@ import { List, ListItem, Label, LabelGroup } from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 import { PackageRecommendations } from "./components/PackageRecommendations";
+import { vexStatusColor } from "@app/utils/vex-utils";
 
 export const PackageTable: React.FC = () => {
   const {
@@ -218,14 +219,7 @@ export const PackageTable: React.FC = () => {
                                           {rec.vulnerabilities.map((v) => (
                                             <Label
                                               key={v.id}
-                                              color={
-                                                v.status === "Fixed" ||
-                                                v.status === "NotAffected"
-                                                  ? "green"
-                                                  : v.status === "Affected"
-                                                    ? "red"
-                                                    : "grey"
-                                              }
+                                              color={vexStatusColor(v.status)}
                                             >
                                               {v.id}: {v.status ?? "Unknown"}
                                             </Label>

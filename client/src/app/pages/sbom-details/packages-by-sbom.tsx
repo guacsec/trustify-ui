@@ -7,7 +7,6 @@ import {
   LabelGroup,
   List,
   ListItem,
-  Skeleton,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -44,8 +43,10 @@ import { Paths } from "@app/Routes";
 import { decodePurl } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
+import { PackageRecommendations } from "@app/pages/package-list/components/PackageRecommendations";
 import { WithPackage } from "@app/components/WithPackage";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
+import { vexStatusColor } from "@app/utils/vex-utils";
 
 const renderLicenseWithMappings = (
   license: string,
@@ -259,15 +260,13 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                         rowIndex,
                       })}
                     >
-                      {(() => {
-                        const recs =
-                          recommendationsMap.get(item.purl[0]?.purl) ?? [];
-                        return recIsFetching ? (
-                          <Skeleton screenreaderText="Loading" />
-                        ) : (
-                          `${recs.length} ${recs.length === 1 ? "Recommendation" : "Recommendations"}`
-                        );
-                      })()}
+                      <PackageRecommendations
+                        recommendations={
+                          recommendationsMap.get(item.purl[0]?.purl) ?? []
+                        }
+                        isFetching={recIsFetching}
+                        fetchError={recFetchError}
+                      />
                     </Td>
                     <Td
                       width={20}
@@ -341,14 +340,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                       {rec.vulnerabilities.map((v) => (
                                         <Label
                                           key={v.id}
-                                          color={
-                                            v.status === "Fixed" ||
-                                            v.status === "NotAffected"
-                                              ? "green"
-                                              : v.status === "Affected"
-                                                ? "red"
-                                                : "grey"
-                                          }
+                                          color={vexStatusColor(v.status)}
                                         >
                                           {v.id}: {v.status ?? "Unknown"}
                                         </Label>
