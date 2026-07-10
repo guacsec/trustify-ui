@@ -14,6 +14,7 @@ import {
 } from "@app/hooks/table-controls";
 import { useFetchLicenses } from "@app/queries/licenses";
 import { useFetchPackages } from "@app/queries/packages";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { decomposePurl } from "@app/utils/utils";
 
 import { type PackageTableData, PackageSearchContext } from "./package-context";
@@ -51,6 +52,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       version: "Version",
       type: "Type",
       licenses: "Licenses",
+      recommendations: "Recommendations",
       path: "Path",
       qualifiers: "Qualifiers",
       vulnerabilities: "Vulnerabilities",
@@ -135,6 +137,14 @@ export const PackageSearchProvider: React.FunctionComponent<
     });
   }, [packages]);
 
+  const purls = React.useMemo(
+    () => enrichedPackages.map((item) => item.purl),
+    [enrichedPackages],
+  );
+
+  const { recommendationsMap, isFetching: recIsFetching, fetchError: recFetchError } =
+    useFetchRecommendations(purls);
+
   const tableControls = useTableControlProps({
     ...tableControlState,
     idProperty: "uuid",
@@ -145,7 +155,15 @@ export const PackageSearchProvider: React.FunctionComponent<
 
   return (
     <PackageSearchContext.Provider
-      value={{ totalItemCount, isFetching, fetchError, tableControls }}
+      value={{
+        totalItemCount,
+        isFetching,
+        fetchError,
+        tableControls,
+        recommendationsMap,
+        recIsFetching,
+        recFetchError,
+      }}
     >
       {children}
     </PackageSearchContext.Provider>
