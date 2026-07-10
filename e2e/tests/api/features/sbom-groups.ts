@@ -905,214 +905,214 @@ test.describe("SBOM Group assignments", () => {
 });
 
 // Added Patch tests - disabled for now
-// test.describe("SBOM Group PATCH assignments", () => {
-//   const createdGroupIds: string[] = [];
+test.describe("SBOM Group PATCH assignments", () => {
+  const createdGroupIds: string[] = [];
 
-//   test.afterEach(async ({ axios }) => {
-//     await cleanupGroups(axios, createdGroupIds.splice(0));
-//   });
+  test.afterEach(async ({ axios }) => {
+    await cleanupGroups(axios, createdGroupIds.splice(0));
+  });
 
-//   const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
-//     const response = await axios.get("/api/v3/sbom", {
-//       params: { limit: 1, offset: 0 },
-//     });
-//     expect(response.data.items.length).toBeGreaterThan(0);
-//     return response.data.items[0].id as string;
-//   };
+  const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
+    const response = await axios.get("/api/v3/sbom", {
+      params: { limit: 1, offset: 0 },
+    });
+    expect(response.data.items.length).toBeGreaterThan(0);
+    return response.data.items[0].id as string;
+  };
 
-//   const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
-//     const response = await axios.get("/api/v3/sbom", {
-//       params: { limit: 2, offset: 0 },
-//     });
-//     expect(response.data.items.length).toBeGreaterThanOrEqual(2);
-//     return [
-//       response.data.items[0].id as string,
-//       response.data.items[1].id as string,
-//     ];
-//   };
+  const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
+    const response = await axios.get("/api/v3/sbom", {
+      params: { limit: 2, offset: 0 },
+    });
+    expect(response.data.items.length).toBeGreaterThanOrEqual(2);
+    return [
+      response.data.items[0].id as string,
+      response.data.items[1].id as string,
+    ];
+  };
 
-//   test("TC-5036 regression: adding Group B preserves existing Group A", async ({
-//     axios,
-//   }) => {
-//     const { id: groupAId } = await createGroup(
-//       axios,
-//       `patch-tc5036-a-${Date.now()}`,
-//     );
-//     const { id: groupBId } = await createGroup(
-//       axios,
-//       `patch-tc5036-b-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupAId, groupBId);
+  test("TC-5036 regression: adding Group B preserves existing Group A", async ({
+    axios,
+  }) => {
+    const { id: groupAId } = await createGroup(
+      axios,
+      `patch-tc5036-a-${Date.now()}`,
+    );
+    const { id: groupBId } = await createGroup(
+      axios,
+      `patch-tc5036-b-${Date.now()}`,
+    );
+    createdGroupIds.push(groupAId, groupBId);
 
-//     const sbomId = await findFirstSbomId(axios);
+    const sbomId = await findFirstSbomId(axios);
 
-//     await patchAssignments(axios, [sbomId], [groupAId], []);
-//     await patchAssignments(axios, [sbomId], [groupBId], []);
+    await patchAssignments(axios, [sbomId], [groupAId], []);
+    await patchAssignments(axios, [sbomId], [groupBId], []);
 
-//     const { groupIds } = await readAssignments(axios, sbomId);
-//     expect(groupIds).toContain(groupAId);
-//     expect(groupIds).toContain(groupBId);
-//     expect(groupIds).toHaveLength(2);
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).toContain(groupAId);
+    expect(groupIds).toContain(groupBId);
+    expect(groupIds).toHaveLength(2);
 
-//     await updateAssignments(axios, sbomId, []);
-//   });
+    await updateAssignments(axios, sbomId, []);
+  });
 
-//   test("TC-5058: remove SBOM from specific group without affecting others", async ({
-//     axios,
-//   }) => {
-//     const { id: groupAId } = await createGroup(
-//       axios,
-//       `patch-tc5058-a-${Date.now()}`,
-//     );
-//     const { id: groupBId } = await createGroup(
-//       axios,
-//       `patch-tc5058-b-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupAId, groupBId);
+  test("TC-5058: remove SBOM from specific group without affecting others", async ({
+    axios,
+  }) => {
+    const { id: groupAId } = await createGroup(
+      axios,
+      `patch-tc5058-a-${Date.now()}`,
+    );
+    const { id: groupBId } = await createGroup(
+      axios,
+      `patch-tc5058-b-${Date.now()}`,
+    );
+    createdGroupIds.push(groupAId, groupBId);
 
-//     const sbomId = await findFirstSbomId(axios);
+    const sbomId = await findFirstSbomId(axios);
 
-//     await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
-//     await patchAssignments(axios, [sbomId], [], [groupAId]);
+    await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
+    await patchAssignments(axios, [sbomId], [], [groupAId]);
 
-//     const { groupIds } = await readAssignments(axios, sbomId);
-//     expect(groupIds).not.toContain(groupAId);
-//     expect(groupIds).toContain(groupBId);
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).not.toContain(groupAId);
+    expect(groupIds).toContain(groupBId);
 
-//     await updateAssignments(axios, sbomId, []);
-//   });
+    await updateAssignments(axios, sbomId, []);
+  });
 
-//   test("PATCH add and remove in one request", async ({ axios }) => {
-//     const { id: groupAId } = await createGroup(
-//       axios,
-//       `patch-addrem-a-${Date.now()}`,
-//     );
-//     const { id: groupBId } = await createGroup(
-//       axios,
-//       `patch-addrem-b-${Date.now()}`,
-//     );
-//     const { id: groupCId } = await createGroup(
-//       axios,
-//       `patch-addrem-c-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupAId, groupBId, groupCId);
+  test("PATCH add and remove in one request", async ({ axios }) => {
+    const { id: groupAId } = await createGroup(
+      axios,
+      `patch-addrem-a-${Date.now()}`,
+    );
+    const { id: groupBId } = await createGroup(
+      axios,
+      `patch-addrem-b-${Date.now()}`,
+    );
+    const { id: groupCId } = await createGroup(
+      axios,
+      `patch-addrem-c-${Date.now()}`,
+    );
+    createdGroupIds.push(groupAId, groupBId, groupCId);
 
-//     const sbomId = await findFirstSbomId(axios);
+    const sbomId = await findFirstSbomId(axios);
 
-//     await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
-//     await patchAssignments(axios, [sbomId], [groupCId], [groupAId]);
+    await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
+    await patchAssignments(axios, [sbomId], [groupCId], [groupAId]);
 
-//     const { groupIds } = await readAssignments(axios, sbomId);
-//     expect(groupIds).not.toContain(groupAId);
-//     expect(groupIds).toContain(groupBId);
-//     expect(groupIds).toContain(groupCId);
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).not.toContain(groupAId);
+    expect(groupIds).toContain(groupBId);
+    expect(groupIds).toContain(groupCId);
 
-//     await updateAssignments(axios, sbomId, []);
-//   });
+    await updateAssignments(axios, sbomId, []);
+  });
 
-//   test("PATCH add is idempotent", async ({ axios }) => {
-//     const { id: groupId } = await createGroup(
-//       axios,
-//       `patch-idempotent-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupId);
+  test("PATCH add is idempotent", async ({ axios }) => {
+    const { id: groupId } = await createGroup(
+      axios,
+      `patch-idempotent-${Date.now()}`,
+    );
+    createdGroupIds.push(groupId);
 
-//     const sbomId = await findFirstSbomId(axios);
+    const sbomId = await findFirstSbomId(axios);
 
-//     await patchAssignments(axios, [sbomId], [groupId], []);
-//     await patchAssignments(axios, [sbomId], [groupId], []);
+    await patchAssignments(axios, [sbomId], [groupId], []);
+    await patchAssignments(axios, [sbomId], [groupId], []);
 
-//     const { groupIds } = await readAssignments(axios, sbomId);
-//     expect(groupIds).toContain(groupId);
-//     expect(groupIds.filter((id: string) => id === groupId)).toHaveLength(1);
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).toContain(groupId);
+    expect(groupIds.filter((id: string) => id === groupId)).toHaveLength(1);
 
-//     await updateAssignments(axios, sbomId, []);
-//   });
+    await updateAssignments(axios, sbomId, []);
+  });
 
-//   test("PATCH remove of non-assigned group is silent", async ({ axios }) => {
-//     const { id: groupId } = await createGroup(
-//       axios,
-//       `patch-rmsilent-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupId);
+  test("PATCH remove of non-assigned group is silent", async ({ axios }) => {
+    const { id: groupId } = await createGroup(
+      axios,
+      `patch-rmsilent-${Date.now()}`,
+    );
+    createdGroupIds.push(groupId);
 
-//     const sbomId = await findFirstSbomId(axios);
-//     await patchAssignments(axios, [sbomId], [groupId], []);
+    const sbomId = await findFirstSbomId(axios);
+    await patchAssignments(axios, [sbomId], [groupId], []);
 
-//     await patchAssignments(
-//       axios,
-//       [sbomId],
-//       [],
-//       ["00000000-0000-0000-0000-000000000099"],
-//     );
+    await patchAssignments(
+      axios,
+      [sbomId],
+      [],
+      ["00000000-0000-0000-0000-000000000099"],
+    );
 
-//     const { groupIds } = await readAssignments(axios, sbomId);
-//     expect(groupIds).toContain(groupId);
+    const { groupIds } = await readAssignments(axios, sbomId);
+    expect(groupIds).toContain(groupId);
 
-//     await updateAssignments(axios, sbomId, []);
-//   });
+    await updateAssignments(axios, sbomId, []);
+  });
 
-//   test("PATCH with multiple SBOMs — cartesian product semantics", async ({
-//     axios,
-//   }) => {
-//     const { id: groupAId } = await createGroup(
-//       axios,
-//       `patch-bulk-a-${Date.now()}`,
-//     );
-//     const { id: groupBId } = await createGroup(
-//       axios,
-//       `patch-bulk-b-${Date.now()}`,
-//     );
-//     createdGroupIds.push(groupAId, groupBId);
+  test("PATCH with multiple SBOMs — cartesian product semantics", async ({
+    axios,
+  }) => {
+    const { id: groupAId } = await createGroup(
+      axios,
+      `patch-bulk-a-${Date.now()}`,
+    );
+    const { id: groupBId } = await createGroup(
+      axios,
+      `patch-bulk-b-${Date.now()}`,
+    );
+    createdGroupIds.push(groupAId, groupBId);
 
-//     const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
+    const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
 
-//     await patchAssignments(axios, [sbomId1, sbomId2], [groupAId, groupBId], []);
+    await patchAssignments(axios, [sbomId1, sbomId2], [groupAId, groupBId], []);
 
-//     const result1 = await readAssignments(axios, sbomId1);
-//     const result2 = await readAssignments(axios, sbomId2);
-//     expect(result1.groupIds).toContain(groupAId);
-//     expect(result1.groupIds).toContain(groupBId);
-//     expect(result2.groupIds).toContain(groupAId);
-//     expect(result2.groupIds).toContain(groupBId);
+    const result1 = await readAssignments(axios, sbomId1);
+    const result2 = await readAssignments(axios, sbomId2);
+    expect(result1.groupIds).toContain(groupAId);
+    expect(result1.groupIds).toContain(groupBId);
+    expect(result2.groupIds).toContain(groupAId);
+    expect(result2.groupIds).toContain(groupBId);
 
-//     await updateAssignments(axios, sbomId1, []);
-//     await updateAssignments(axios, sbomId2, []);
-//   });
+    await updateAssignments(axios, sbomId1, []);
+    await updateAssignments(axios, sbomId2, []);
+  });
 
-//   test("PATCH with nonexistent SBOM returns 404", async ({ axios }) => {
-//     try {
-//       await patchAssignments(
-//         axios,
-//         ["00000000-0000-0000-0000-000000000000"],
-//         [],
-//         [],
-//       );
-//       expect(true).toBe(false);
-//     } catch (error: unknown) {
-//       const axiosError = error as { response?: { status?: number } };
-//       expect(axiosError.response?.status).toBe(404);
-//     }
-//   });
+  test("PATCH with nonexistent SBOM returns 404", async ({ axios }) => {
+    try {
+      await patchAssignments(
+        axios,
+        ["00000000-0000-0000-0000-000000000000"],
+        [],
+        [],
+      );
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(404);
+    }
+  });
 
-//   test("PATCH with nonexistent group in add returns 400", async ({ axios }) => {
-//     const sbomId = await findFirstSbomId(axios);
+  test("PATCH with nonexistent group in add returns 400", async ({ axios }) => {
+    const sbomId = await findFirstSbomId(axios);
 
-//     try {
-//       await patchAssignments(
-//         axios,
-//         [sbomId],
-//         ["00000000-0000-0000-0000-000000000099"],
-//         [],
-//       );
-//       expect(true).toBe(false);
-//     } catch (error: unknown) {
-//       const axiosError = error as { response?: { status?: number } };
-//       expect(axiosError.response?.status).toBe(400);
-//     }
-//   });
+    try {
+      await patchAssignments(
+        axios,
+        [sbomId],
+        ["00000000-0000-0000-0000-000000000099"],
+        [],
+      );
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      expect(axiosError.response?.status).toBe(400);
+    }
+  });
 
-//   test("PATCH with empty sbom_ids is 204 no-op", async ({ axios }) => {
-//     await expect(patchAssignments(axios, [], [], [])).resolves.toBeUndefined();
-//   });
-// });
+  test("PATCH with empty sbom_ids is 204 no-op", async ({ axios }) => {
+    await expect(patchAssignments(axios, [], [], [])).resolves.toBeUndefined();
+  });
+});
