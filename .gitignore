@@ -70,3 +70,4 @@ test_suite_analysis/
 # AgentReady
 .agentready/*.md
 .agentready/*.html
+.superpowers/
