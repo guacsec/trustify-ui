@@ -155,6 +155,7 @@ export const PackageTable: React.FC = () => {
                             }
                             isFetching={recIsFetching}
                             fetchError={recFetchError}
+                            currentPurl={item.purl}
                           />
                         </Td>
                         <Td
@@ -212,6 +213,7 @@ export const PackageTable: React.FC = () => {
                                   recommendations={
                                     recommendationsMap.get(item.purl) ?? []
                                   }
+                                  currentPurl={item.purl}
                                 />
                               ) : null}
                             </div>

@@ -99,6 +99,21 @@ export const getValidatedFromError = (error: unknown | undefined) => {
   return error ? "error" : "default";
 };
 
+export const purlBaseEquals = (a: string, b: string): boolean => {
+  try {
+    const pa = PackageURL.fromString(a);
+    const pb = PackageURL.fromString(b);
+    return (
+      pa.type === pb.type &&
+      pa.namespace === pb.namespace &&
+      pa.name === pb.name &&
+      pa.version === pb.version
+    );
+  } catch {
+    return a === b;
+  }
+};
+
 export const decomposePurl = (purl: string) => {
   try {
     const packageData = PackageURL.fromString(purl);

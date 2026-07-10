@@ -264,6 +264,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                         }
                         isFetching={recIsFetching}
                         fetchError={recFetchError}
+                        currentPurl={item.purl[0]?.purl}
                       />
                     </Td>
                     <Td
@@ -331,6 +332,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                               recommendations={
                                 recommendationsMap.get(item.purl[0]?.purl) ?? []
                               }
+                              currentPurl={item.purl[0]?.purl}
                             />
                           ) : null}
                           {isCellExpanded(item, "purls") ? (
