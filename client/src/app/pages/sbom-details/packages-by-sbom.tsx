@@ -1,9 +1,13 @@
 import type React from "react";
+import { useMemo } from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import {
+  Label,
+  LabelGroup,
   List,
   ListItem,
+  Skeleton,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -34,6 +38,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { decodePurl } from "@app/utils/utils";
@@ -65,6 +70,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
       version: "Version",
       vulnerabilities: "Vulnerabilities",
       licenses: "Licenses",
+      recommendations: "Recommendations",
       purls: "PURLs",
       cpes: "CPEs",
     },
@@ -118,6 +124,20 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     isLoading: isFetching,
   });
 
+  const purls = useMemo(
+    () =>
+      packages
+        .map((item) => item.purl[0]?.purl)
+        .filter((p): p is string => Boolean(p)),
+    [packages],
+  );
+
+  const {
+    recommendationsMap,
+    isFetching: recIsFetching,
+    fetchError: recFetchError,
+  } = useFetchRecommendations(purls);
+
   const {
     currentPageItems,
     numRenderedColumns,
@@ -158,6 +178,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "recommendations" })} />
               <Th {...getThProps({ columnKey: "purls" })} />
               <Th {...getThProps({ columnKey: "cpes" })} />
             </TableHeaderContentWithControls>
@@ -229,6 +250,26 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {item.licenses.length} Licenses
                     </Td>
                     <Td
+                      width={10}
+                      modifier="truncate"
+                      {...getTdProps({
+                        columnKey: "recommendations",
+                        isCompoundExpandToggle: true,
+                        item,
+                        rowIndex,
+                      })}
+                    >
+                      {(() => {
+                        const recs =
+                          recommendationsMap.get(item.purl[0]?.purl) ?? [];
+                        return recIsFetching ? (
+                          <Skeleton screenreaderText="Loading" />
+                        ) : (
+                          `${recs.length} ${recs.length === 1 ? "Recommendation" : "Recommendations"}`
+                        );
+                      })()}
+                    </Td>
+                    <Td
                       width={20}
                       modifier="breakWord"
                       {...getTdProps({
@@ -283,6 +324,36 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                   {renderLicenseWithMappings(
                                     e.license_name,
                                     item.licenses_ref_mapping,
+                                  )}
+                                </ListItem>
+                              ))}
+                            </List>
+                          ) : null}
+                          {isCellExpanded(item, "recommendations") ? (
+                            <List isPlain>
+                              {(
+                                recommendationsMap.get(item.purl[0]?.purl) ?? []
+                              ).map((rec, idx) => (
+                                <ListItem key={idx}>
+                                  <strong>{rec.package}</strong>
+                                  {rec.vulnerabilities.length > 0 && (
+                                    <LabelGroup className={spacing.mlSm}>
+                                      {rec.vulnerabilities.map((v) => (
+                                        <Label
+                                          key={v.id}
+                                          color={
+                                            v.status === "Fixed" ||
+                                            v.status === "NotAffected"
+                                              ? "green"
+                                              : v.status === "Affected"
+                                                ? "red"
+                                                : "grey"
+                                          }
+                                        >
+                                          {v.id}: {v.status ?? "Unknown"}
+                                        </Label>
+                                      ))}
+                                    </LabelGroup>
                                   )}
                                 </ListItem>
                               ))}
