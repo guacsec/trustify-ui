@@ -3,8 +3,6 @@ import { useMemo } from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import {
-  Label,
-  LabelGroup,
   List,
   ListItem,
   Toolbar,
@@ -43,9 +41,9 @@ import { Paths } from "@app/Routes";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { PackageRecommendations } from "@app/pages/package-list/components/PackageRecommendations";
+import { RecommendationsExpandedContent } from "@app/pages/package-list/components/RecommendationsExpandedContent";
 import { WithPackage } from "@app/components/WithPackage";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
-import { formatVexStatus, vexStatusColor } from "@app/utils/vex-utils";
 
 const renderLicenseWithMappings = (
   license: string,
@@ -328,27 +326,11 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                             </List>
                           ) : null}
                           {isCellExpanded(item, "recommendations") ? (
-                            <List isPlain>
-                              {(
+                            <RecommendationsExpandedContent
+                              recommendations={
                                 recommendationsMap.get(item.purl[0]?.purl) ?? []
-                              ).map((rec, idx) => (
-                                <ListItem key={idx}>
-                                  <strong>{rec.package}</strong>
-                                  {rec.vulnerabilities.length > 0 && (
-                                    <LabelGroup className={spacing.mlSm}>
-                                      {rec.vulnerabilities.map((v) => (
-                                        <Label
-                                          key={v.id}
-                                          color={vexStatusColor(v.status)}
-                                        >
-                                          {v.id}: {formatVexStatus(v.status)}
-                                        </Label>
-                                      ))}
-                                    </LabelGroup>
-                                  )}
-                                </ListItem>
-                              ))}
-                            </List>
+                              }
+                            />
                           ) : null}
                           {isCellExpanded(item, "purls") ? (
                             <List isPlain>
