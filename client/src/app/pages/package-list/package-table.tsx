@@ -22,13 +22,20 @@ import { Paths } from "@app/Routes";
 import { decodePurl } from "@app/utils/utils";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
-import { List, ListItem } from "@patternfly/react-core";
+import { List, ListItem, Label, LabelGroup } from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
+import { PackageRecommendations } from "./components/PackageRecommendations";
 
 export const PackageTable: React.FC = () => {
-  const { isFetching, fetchError, tableControls } =
-    React.useContext(PackageSearchContext);
+  const {
+    isFetching,
+    fetchError,
+    tableControls,
+    recommendationsMap,
+    recIsFetching,
+    recFetchError,
+  } = React.useContext(PackageSearchContext);
 
   const {
     numRenderedColumns,
@@ -55,6 +62,7 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "recommendations" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -133,6 +141,24 @@ export const PackageTable: React.FC = () => {
                         <Td
                           width={10}
                           modifier="truncate"
+                          {...getTdProps({
+                            columnKey: "recommendations",
+                            isCompoundExpandToggle: true,
+                            item,
+                            rowIndex,
+                          })}
+                        >
+                          <PackageRecommendations
+                            recommendations={
+                              recommendationsMap.get(item.purl) ?? []
+                            }
+                            isFetching={recIsFetching}
+                            fetchError={recFetchError}
+                          />
+                        </Td>
+                        <Td
+                          width={10}
+                          modifier="truncate"
                           {...getTdProps({ columnKey: "path" })}
                         >
                           {item.decomposedPurl?.path}
@@ -176,6 +202,36 @@ export const PackageTable: React.FC = () => {
                                       key={`${license.license_name}-${idx}`}
                                     >
                                       {license.license_name}
+                                    </ListItem>
+                                  ))}
+                                </List>
+                              ) : null}
+                              {isCellExpanded(item, "recommendations") ? (
+                                <List isPlain>
+                                  {(
+                                    recommendationsMap.get(item.purl) ?? []
+                                  ).map((rec, idx) => (
+                                    <ListItem key={idx}>
+                                      <strong>{rec.package}</strong>
+                                      {rec.vulnerabilities.length > 0 && (
+                                        <LabelGroup className={spacing.mlSm}>
+                                          {rec.vulnerabilities.map((v) => (
+                                            <Label
+                                              key={v.id}
+                                              color={
+                                                v.status === "Fixed" ||
+                                                v.status === "NotAffected"
+                                                  ? "green"
+                                                  : v.status === "Affected"
+                                                    ? "red"
+                                                    : "grey"
+                                              }
+                                            >
+                                              {v.id}: {v.status ?? "Unknown"}
+                                            </Label>
+                                          ))}
+                                        </LabelGroup>
+                                      )}
                                     </ListItem>
                                   ))}
                                 </List>
