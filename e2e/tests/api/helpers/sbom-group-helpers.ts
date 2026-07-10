@@ -152,6 +152,31 @@ export async function patchAssignments(
   });
 }
 
+export async function findFirstSbomId(axios: AxiosInstance): Promise<string> {
+  const response = await axios.get("/api/v3/sbom", {
+    params: { limit: 1, offset: 0 },
+  });
+  if (response.data.items.length === 0) {
+    throw new Error("No SBOMs found in database");
+  }
+  return response.data.items[0].id as string;
+}
+
+export async function findTwoSbomIds(
+  axios: AxiosInstance,
+): Promise<[string, string]> {
+  const response = await axios.get("/api/v3/sbom", {
+    params: { limit: 2, offset: 0 },
+  });
+  if (response.data.items.length < 2) {
+    throw new Error("Expected at least 2 SBOMs in database");
+  }
+  return [
+    response.data.items[0].id as string,
+    response.data.items[1].id as string,
+  ];
+}
+
 /**
  * Deletes groups in order. Pass children before parents to avoid 409 conflicts.
  */

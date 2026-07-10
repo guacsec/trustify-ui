@@ -4,6 +4,8 @@ import {
   cleanupGroups,
   createGroup,
   deleteGroup,
+  findFirstSbomId,
+  findTwoSbomIds,
   listGroups,
   patchAssignments,
   readAssignments,
@@ -328,6 +330,24 @@ test.describe("SBOM Group filtering and pagination", () => {
     expect(result.items[0].number_of_groups).toBeDefined();
     expect(result.items[0].number_of_sboms).toBeDefined();
   });
+
+  test("Filter groups by parent", async ({ axios }) => {
+    const parentName = `api-test-filter-parent-${Date.now()}`;
+    const childName = `api-test-filter-child-${Date.now()}`;
+
+    const { id: parentId } = await createGroup(axios, parentName);
+    const { id: childId } = await createGroup(axios, childName, {
+      parent: parentId,
+    });
+    createdGroupIds.push(childId, parentId);
+
+    const result = await listGroups(axios, { q: `parent=${parentId}` });
+    expect(result.items.length).toBeGreaterThanOrEqual(1);
+    expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API response items not strictly typed
+      result.items.some((item: any) => item.id === childId),
+    ).toBe(true);
+  });
 });
 
 test.describe("SBOM Group hierarchy", () => {
@@ -553,566 +573,651 @@ test.describe("SBOM Group error cases", () => {
   });
 });
 
-test.describe("SBOM Group hierarchy with assignments", () => {
-  const createdGroupIds: string[] = [];
+test.describe("SBOM Group assignment tests", () => {
+  test.describe.configure({ mode: "serial" });
 
-  test.afterEach(async ({ axios }) => {
-    await cleanupGroups(axios, createdGroupIds.splice(0));
-  });
+  test.describe("SBOM Group hierarchy with assignments", () => {
+    const createdGroupIds: string[] = [];
 
-  const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 1, offset: 0 },
-    });
-    expect(response.data.items.length).toBeGreaterThan(0);
-    return response.data.items[0].id as string;
-  };
-
-  const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 2, offset: 0 },
-    });
-    expect(response.data.items.length).toBeGreaterThanOrEqual(2);
-    return [
-      response.data.items[0].id as string,
-      response.data.items[1].id as string,
-    ];
-  };
-
-  test("Detach child from parent preserves assignments", async ({ axios }) => {
-    const parentName = `api-test-detach-parent-${Date.now()}`;
-    const childName = `api-test-detach-child-${Date.now()}`;
-
-    const { id: parentId } = await createGroup(axios, parentName);
-    const { id: childId } = await createGroup(axios, childName, {
-      parent: parentId,
-    });
-    createdGroupIds.push(childId, parentId);
-
-    const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
-    await updateAssignments(axios, sbomId1, [parentId]);
-    await updateAssignments(axios, sbomId2, [childId]);
-
-    await updateGroup(axios, childId, {
-      name: childName,
-      parent: null,
+    test.afterEach(async ({ axios }) => {
+      await cleanupGroups(axios, createdGroupIds.splice(0));
     });
 
-    const parentAssignments = await readAssignments(axios, sbomId1);
-    expect(parentAssignments.groupIds).toContain(parentId);
+    test("Detach child from parent preserves assignments", async ({
+      axios,
+    }) => {
+      const parentName = `api-test-detach-parent-${Date.now()}`;
+      const childName = `api-test-detach-child-${Date.now()}`;
 
-    const childAssignments = await readAssignments(axios, sbomId2);
-    expect(childAssignments.groupIds).toContain(childId);
+      const { id: parentId } = await createGroup(axios, parentName);
+      const { id: childId } = await createGroup(axios, childName, {
+        parent: parentId,
+      });
+      createdGroupIds.push(childId, parentId);
 
-    const { body } = await readGroup(axios, childId);
-    expect(body.parent ?? null).toBeNull();
+      const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
+      await updateAssignments(axios, sbomId1, [parentId]);
+      await updateAssignments(axios, sbomId2, [childId]);
 
-    await updateAssignments(axios, sbomId1, []);
-    await updateAssignments(axios, sbomId2, []);
-  });
+      await updateGroup(axios, childId, {
+        name: childName,
+        parent: null,
+      });
 
-  test("Delete parent after detaching child preserves child assignments", async ({
-    axios,
-  }) => {
-    const parentName = `api-test-delpar-parent-${Date.now()}`;
-    const childName = `api-test-delpar-child-${Date.now()}`;
+      const parentAssignments = await readAssignments(axios, sbomId1);
+      expect(parentAssignments.groupIds).toContain(parentId);
 
-    const { id: parentId } = await createGroup(axios, parentName);
-    const { id: childId } = await createGroup(axios, childName, {
-      parent: parentId,
-    });
-    createdGroupIds.push(childId);
+      const childAssignments = await readAssignments(axios, sbomId2);
+      expect(childAssignments.groupIds).toContain(childId);
 
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [childId]);
+      const { body } = await readGroup(axios, childId);
+      expect(body.parent ?? null).toBeNull();
 
-    await updateGroup(axios, childId, {
-      name: childName,
-      parent: null,
-    });
-    await deleteGroup(axios, parentId);
-
-    const { body } = await readGroup(axios, childId);
-    expect(body.name).toBe(childName);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(childId);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Move child to different parent preserves assignments", async ({
-    axios,
-  }) => {
-    const parentAName = `api-test-mvpar-a-${Date.now()}`;
-    const parentBName = `api-test-mvpar-b-${Date.now()}`;
-    const childName = `api-test-mvpar-child-${Date.now()}`;
-
-    const { id: parentAId } = await createGroup(axios, parentAName);
-    const { id: parentBId } = await createGroup(axios, parentBName);
-    const { id: childId } = await createGroup(axios, childName, {
-      parent: parentAId,
-    });
-    createdGroupIds.push(childId, parentAId, parentBId);
-
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [childId]);
-
-    await updateGroup(axios, childId, {
-      name: childName,
-      parent: parentBId,
+      await updateAssignments(axios, sbomId1, []);
+      await updateAssignments(axios, sbomId2, []);
     });
 
-    const { body } = await readGroup(axios, childId);
-    expect(body.parent).toBe(parentBId);
+    test("Delete parent after detaching child preserves child assignments", async ({
+      axios,
+    }) => {
+      const parentName = `api-test-delpar-parent-${Date.now()}`;
+      const childName = `api-test-delpar-child-${Date.now()}`;
 
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(childId);
+      const { id: parentId } = await createGroup(axios, parentName);
+      const { id: childId } = await createGroup(axios, childName, {
+        parent: parentId,
+      });
+      createdGroupIds.push(childId);
 
-    await updateAssignments(axios, sbomId, []);
-  });
-});
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [childId]);
 
-test.describe("SBOM Group assignments", () => {
-  const createdGroupIds: string[] = [];
+      await updateGroup(axios, childId, {
+        name: childName,
+        parent: null,
+      });
+      await deleteGroup(axios, parentId);
 
-  test.afterEach(async ({ axios }) => {
-    await cleanupGroups(axios, createdGroupIds.splice(0));
-  });
+      const { body } = await readGroup(axios, childId);
+      expect(body.name).toBe(childName);
 
-  const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 1, offset: 0 },
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(childId);
+
+      await updateAssignments(axios, sbomId, []);
     });
-    expect(response.data.items.length).toBeGreaterThan(0);
-    return response.data.items[0].id as string;
-  };
 
-  const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 2, offset: 0 },
+    test("Move child to different parent preserves assignments", async ({
+      axios,
+    }) => {
+      const parentAName = `api-test-mvpar-a-${Date.now()}`;
+      const parentBName = `api-test-mvpar-b-${Date.now()}`;
+      const childName = `api-test-mvpar-child-${Date.now()}`;
+
+      const { id: parentAId } = await createGroup(axios, parentAName);
+      const { id: parentBId } = await createGroup(axios, parentBName);
+      const { id: childId } = await createGroup(axios, childName, {
+        parent: parentAId,
+      });
+      createdGroupIds.push(childId, parentAId, parentBId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [childId]);
+
+      await updateGroup(axios, childId, {
+        name: childName,
+        parent: parentBId,
+      });
+
+      const { body } = await readGroup(axios, childId);
+      expect(body.parent).toBe(parentBId);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(childId);
+
+      await updateAssignments(axios, sbomId, []);
     });
-    expect(response.data.items.length).toBeGreaterThanOrEqual(2);
-    return [
-      response.data.items[0].id as string,
-      response.data.items[1].id as string,
-    ];
-  };
-
-  test("Assign SBOM to single group", async ({ axios }) => {
-    const groupName = `api-test-assign1-${Date.now()}`;
-    const { id: groupId } = await createGroup(axios, groupName);
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [groupId]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(groupId);
-
-    // Cleanup: clear assignments
-    await updateAssignments(axios, sbomId, []);
   });
 
-  test("Assign SBOM to multiple groups", async ({ axios }) => {
-    const nameA = `api-test-assign-a-${Date.now()}`;
-    const nameB = `api-test-assign-b-${Date.now()}`;
-    const { id: idA } = await createGroup(axios, nameA);
-    const { id: idB } = await createGroup(axios, nameB);
-    createdGroupIds.push(idA, idB);
+  test.describe("SBOM Group assignments", () => {
+    const createdGroupIds: string[] = [];
 
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [idA, idB]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(idA);
-    expect(groupIds).toContain(idB);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Replace assignments overwrites previous", async ({ axios }) => {
-    const nameA = `api-test-replace-a-${Date.now()}`;
-    const nameB = `api-test-replace-b-${Date.now()}`;
-    const { id: idA } = await createGroup(axios, nameA);
-    const { id: idB } = await createGroup(axios, nameB);
-    createdGroupIds.push(idA, idB);
-
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [idA]);
-    await updateAssignments(axios, sbomId, [idB]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(idB);
-    expect(groupIds).not.toContain(idA);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Append assignment preserves existing groups via read-merge-write", async ({
-    axios,
-  }) => {
-    const nameA = `api-test-append-a-${Date.now()}`;
-    const nameB = `api-test-append-b-${Date.now()}`;
-    const { id: idA } = await createGroup(axios, nameA);
-    const { id: idB } = await createGroup(axios, nameB);
-    createdGroupIds.push(idA, idB);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    // Assign to group A
-    await updateAssignments(axios, sbomId, [idA]);
-    const before = await readAssignments(axios, sbomId);
-    expect(before.groupIds).toContain(idA);
-
-    // Read current, merge with group B, write back
-    const merged = [...before.groupIds, idB];
-    await updateAssignments(axios, sbomId, merged, before.etag);
-
-    const after = await readAssignments(axios, sbomId);
-    expect(after.groupIds).toContain(idA);
-    expect(after.groupIds).toContain(idB);
-    expect(after.groupIds).toHaveLength(2);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Clear assignments with empty array", async ({ axios }) => {
-    const name = `api-test-clear-${Date.now()}`;
-    const { id: groupId } = await createGroup(axios, name);
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [groupId]);
-    await updateAssignments(axios, sbomId, []);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).not.toContain(groupId);
-  });
-
-  test("Read assignments after assign", async ({ axios }) => {
-    const name = `api-test-readassign-${Date.now()}`;
-    const { id: groupId } = await createGroup(axios, name);
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    // Read before assign
-    const before = await readAssignments(axios, sbomId);
-    expect(before.etag).toBeTruthy();
-
-    // Assign and read
-    await updateAssignments(axios, sbomId, [groupId]);
-    const after = await readAssignments(axios, sbomId);
-    expect(after.groupIds).toContain(groupId);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Bulk assign multiple SBOMs to multiple groups", async ({ axios }) => {
-    const nameA = `api-test-bulk-a-${Date.now()}`;
-    const nameB = `api-test-bulk-b-${Date.now()}`;
-    const { id: idA } = await createGroup(axios, nameA);
-    const { id: idB } = await createGroup(axios, nameB);
-    createdGroupIds.push(idA, idB);
-
-    const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
-    await bulkAssign(axios, [sbomId1, sbomId2], [idA, idB]);
-
-    const result1 = await readAssignments(axios, sbomId1);
-    const result2 = await readAssignments(axios, sbomId2);
-    expect(result1.groupIds).toContain(idA);
-    expect(result1.groupIds).toContain(idB);
-    expect(result2.groupIds).toContain(idA);
-    expect(result2.groupIds).toContain(idB);
-
-    // Cleanup assignments
-    await updateAssignments(axios, sbomId1, []);
-    await updateAssignments(axios, sbomId2, []);
-  });
-
-  test("Bulk assign replaces existing assignments", async ({ axios }) => {
-    const nameA = `api-test-bulkrep-a-${Date.now()}`;
-    const nameB = `api-test-bulkrep-b-${Date.now()}`;
-    const { id: idA } = await createGroup(axios, nameA);
-    const { id: idB } = await createGroup(axios, nameB);
-    createdGroupIds.push(idA, idB);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    // First assign to group A
-    await updateAssignments(axios, sbomId, [idA]);
-
-    // Bulk assign to group B only
-    await bulkAssign(axios, [sbomId], [idB]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(idB);
-    expect(groupIds).not.toContain(idA);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("Update assignments for nonexistent SBOM returns 404", async ({
-    axios,
-  }) => {
-    const fakeId = "00000000-0000-0000-0000-000000000000";
-    try {
-      await updateAssignments(axios, fakeId, []);
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      expect(axiosError.response?.status).toBe(404);
-    }
-  });
-
-  test("Assign SBOM to nonexistent group returns 400", async ({ axios }) => {
-    const fakeGroupId = "00000000-0000-0000-0000-000000000000";
-    const sbomId = await findFirstSbomId(axios);
-
-    try {
-      await updateAssignments(axios, sbomId, [fakeGroupId]);
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      expect(axiosError.response?.status).toBe(400);
-    }
-  });
-
-  test("Bulk assign with empty sbom_ids is no-op", async ({ axios }) => {
-    const name = `api-test-bulk-empty-sboms-${Date.now()}`;
-    const { id: groupId } = await createGroup(axios, name);
-    createdGroupIds.push(groupId);
-
-    await expect(bulkAssign(axios, [], [groupId])).resolves.toBeUndefined();
-  });
-
-  test("Bulk assign with empty group_ids clears assignments", async ({
-    axios,
-  }) => {
-    const name = `api-test-bulk-empty-groups-${Date.now()}`;
-    const { id: groupId } = await createGroup(axios, name);
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-    await updateAssignments(axios, sbomId, [groupId]);
-
-    await bulkAssign(axios, [sbomId], []);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).not.toContain(groupId);
-  });
-});
-
-// Added Patch tests - disabled for now
-test.describe("SBOM Group PATCH assignments", () => {
-  const createdGroupIds: string[] = [];
-
-  test.afterEach(async ({ axios }) => {
-    await cleanupGroups(axios, createdGroupIds.splice(0));
-  });
-
-  const findFirstSbomId = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 1, offset: 0 },
+    test.afterEach(async ({ axios }) => {
+      await cleanupGroups(axios, createdGroupIds.splice(0));
     });
-    expect(response.data.items.length).toBeGreaterThan(0);
-    return response.data.items[0].id as string;
-  };
 
-  const findTwoSbomIds = async (axios: import("axios").AxiosInstance) => {
-    const response = await axios.get("/api/v3/sbom", {
-      params: { limit: 2, offset: 0 },
+    test("Assign SBOM to single group", async ({ axios }) => {
+      const groupName = `api-test-assign1-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, groupName);
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [groupId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupId);
+
+      // Cleanup: clear assignments
+      await updateAssignments(axios, sbomId, []);
     });
-    expect(response.data.items.length).toBeGreaterThanOrEqual(2);
-    return [
-      response.data.items[0].id as string,
-      response.data.items[1].id as string,
-    ];
-  };
 
-  test("TC-5036 regression: adding Group B preserves existing Group A", async ({
-    axios,
-  }) => {
-    const { id: groupAId } = await createGroup(
+    test("Assign SBOM to multiple groups", async ({ axios }) => {
+      const nameA = `api-test-assign-a-${Date.now()}`;
+      const nameB = `api-test-assign-b-${Date.now()}`;
+      const { id: idA } = await createGroup(axios, nameA);
+      const { id: idB } = await createGroup(axios, nameB);
+      createdGroupIds.push(idA, idB);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [idA, idB]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(idA);
+      expect(groupIds).toContain(idB);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Replace assignments overwrites previous", async ({ axios }) => {
+      const nameA = `api-test-replace-a-${Date.now()}`;
+      const nameB = `api-test-replace-b-${Date.now()}`;
+      const { id: idA } = await createGroup(axios, nameA);
+      const { id: idB } = await createGroup(axios, nameB);
+      createdGroupIds.push(idA, idB);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [idA]);
+      await updateAssignments(axios, sbomId, [idB]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(idB);
+      expect(groupIds).not.toContain(idA);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Append assignment preserves existing groups via read-merge-write", async ({
       axios,
-      `patch-tc5036-a-${Date.now()}`,
-    );
-    const { id: groupBId } = await createGroup(
+    }) => {
+      const nameA = `api-test-append-a-${Date.now()}`;
+      const nameB = `api-test-append-b-${Date.now()}`;
+      const { id: idA } = await createGroup(axios, nameA);
+      const { id: idB } = await createGroup(axios, nameB);
+      createdGroupIds.push(idA, idB);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      // Assign to group A
+      await updateAssignments(axios, sbomId, [idA]);
+      const before = await readAssignments(axios, sbomId);
+      expect(before.groupIds).toContain(idA);
+
+      // Read current, merge with group B, write back
+      const merged = [...before.groupIds, idB];
+      await updateAssignments(axios, sbomId, merged, before.etag);
+
+      const after = await readAssignments(axios, sbomId);
+      expect(after.groupIds).toContain(idA);
+      expect(after.groupIds).toContain(idB);
+      expect(after.groupIds).toHaveLength(2);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Clear assignments with empty array", async ({ axios }) => {
+      const name = `api-test-clear-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [groupId]);
+      await updateAssignments(axios, sbomId, []);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).not.toContain(groupId);
+    });
+
+    test("Read assignments after assign", async ({ axios }) => {
+      const name = `api-test-readassign-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      // Read before assign
+      const before = await readAssignments(axios, sbomId);
+      expect(before.etag).toBeTruthy();
+
+      // Assign and read
+      await updateAssignments(axios, sbomId, [groupId]);
+      const after = await readAssignments(axios, sbomId);
+      expect(after.groupIds).toContain(groupId);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Bulk assign multiple SBOMs to multiple groups", async ({ axios }) => {
+      const nameA = `api-test-bulk-a-${Date.now()}`;
+      const nameB = `api-test-bulk-b-${Date.now()}`;
+      const { id: idA } = await createGroup(axios, nameA);
+      const { id: idB } = await createGroup(axios, nameB);
+      createdGroupIds.push(idA, idB);
+
+      const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
+      await bulkAssign(axios, [sbomId1, sbomId2], [idA, idB]);
+
+      const result1 = await readAssignments(axios, sbomId1);
+      const result2 = await readAssignments(axios, sbomId2);
+      expect(result1.groupIds).toContain(idA);
+      expect(result1.groupIds).toContain(idB);
+      expect(result2.groupIds).toContain(idA);
+      expect(result2.groupIds).toContain(idB);
+
+      // Cleanup assignments
+      await updateAssignments(axios, sbomId1, []);
+      await updateAssignments(axios, sbomId2, []);
+    });
+
+    test("Bulk assign replaces existing assignments", async ({ axios }) => {
+      const nameA = `api-test-bulkrep-a-${Date.now()}`;
+      const nameB = `api-test-bulkrep-b-${Date.now()}`;
+      const { id: idA } = await createGroup(axios, nameA);
+      const { id: idB } = await createGroup(axios, nameB);
+      createdGroupIds.push(idA, idB);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      // First assign to group A
+      await updateAssignments(axios, sbomId, [idA]);
+
+      // Bulk assign to group B only
+      await bulkAssign(axios, [sbomId], [idB]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(idB);
+      expect(groupIds).not.toContain(idA);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Update assignments for nonexistent SBOM returns 404", async ({
       axios,
-      `patch-tc5036-b-${Date.now()}`,
-    );
-    createdGroupIds.push(groupAId, groupBId);
+    }) => {
+      const fakeId = "00000000-0000-0000-0000-000000000000";
+      try {
+        await updateAssignments(axios, fakeId, []);
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(404);
+      }
+    });
 
-    const sbomId = await findFirstSbomId(axios);
+    test("Assign SBOM to nonexistent group returns 400", async ({ axios }) => {
+      const fakeGroupId = "00000000-0000-0000-0000-000000000000";
+      const sbomId = await findFirstSbomId(axios);
 
-    await patchAssignments(axios, [sbomId], [groupAId], []);
-    await patchAssignments(axios, [sbomId], [groupBId], []);
+      try {
+        await updateAssignments(axios, sbomId, [fakeGroupId]);
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(400);
+      }
+    });
 
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(groupAId);
-    expect(groupIds).toContain(groupBId);
-    expect(groupIds).toHaveLength(2);
+    test("Bulk assign with empty sbom_ids is no-op", async ({ axios }) => {
+      const name = `api-test-bulk-empty-sboms-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+      createdGroupIds.push(groupId);
 
-    await updateAssignments(axios, sbomId, []);
+      await expect(bulkAssign(axios, [], [groupId])).resolves.toBeUndefined();
+    });
+
+    test("Bulk assign with empty group_ids clears assignments", async ({
+      axios,
+    }) => {
+      const name = `api-test-bulk-empty-groups-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [groupId]);
+
+      await bulkAssign(axios, [sbomId], []);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).not.toContain(groupId);
+    });
   });
 
-  test("TC-5058: remove SBOM from specific group without affecting others", async ({
-    axios,
-  }) => {
-    const { id: groupAId } = await createGroup(
+  test.describe("SBOM Group PATCH assignments", () => {
+    const createdGroupIds: string[] = [];
+
+    test.afterEach(async ({ axios }) => {
+      await cleanupGroups(axios, createdGroupIds.splice(0));
+    });
+
+    test("TC-5036 regression: adding Group B preserves existing Group A", async ({
       axios,
-      `patch-tc5058-a-${Date.now()}`,
-    );
-    const { id: groupBId } = await createGroup(
-      axios,
-      `patch-tc5058-b-${Date.now()}`,
-    );
-    createdGroupIds.push(groupAId, groupBId);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
-    await patchAssignments(axios, [sbomId], [], [groupAId]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).not.toContain(groupAId);
-    expect(groupIds).toContain(groupBId);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("PATCH add and remove in one request", async ({ axios }) => {
-    const { id: groupAId } = await createGroup(
-      axios,
-      `patch-addrem-a-${Date.now()}`,
-    );
-    const { id: groupBId } = await createGroup(
-      axios,
-      `patch-addrem-b-${Date.now()}`,
-    );
-    const { id: groupCId } = await createGroup(
-      axios,
-      `patch-addrem-c-${Date.now()}`,
-    );
-    createdGroupIds.push(groupAId, groupBId, groupCId);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
-    await patchAssignments(axios, [sbomId], [groupCId], [groupAId]);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).not.toContain(groupAId);
-    expect(groupIds).toContain(groupBId);
-    expect(groupIds).toContain(groupCId);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("PATCH add is idempotent", async ({ axios }) => {
-    const { id: groupId } = await createGroup(
-      axios,
-      `patch-idempotent-${Date.now()}`,
-    );
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-
-    await patchAssignments(axios, [sbomId], [groupId], []);
-    await patchAssignments(axios, [sbomId], [groupId], []);
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(groupId);
-    expect(groupIds.filter((id: string) => id === groupId)).toHaveLength(1);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("PATCH remove of non-assigned group is silent", async ({ axios }) => {
-    const { id: groupId } = await createGroup(
-      axios,
-      `patch-rmsilent-${Date.now()}`,
-    );
-    createdGroupIds.push(groupId);
-
-    const sbomId = await findFirstSbomId(axios);
-    await patchAssignments(axios, [sbomId], [groupId], []);
-
-    await patchAssignments(
-      axios,
-      [sbomId],
-      [],
-      ["00000000-0000-0000-0000-000000000099"],
-    );
-
-    const { groupIds } = await readAssignments(axios, sbomId);
-    expect(groupIds).toContain(groupId);
-
-    await updateAssignments(axios, sbomId, []);
-  });
-
-  test("PATCH with multiple SBOMs — cartesian product semantics", async ({
-    axios,
-  }) => {
-    const { id: groupAId } = await createGroup(
-      axios,
-      `patch-bulk-a-${Date.now()}`,
-    );
-    const { id: groupBId } = await createGroup(
-      axios,
-      `patch-bulk-b-${Date.now()}`,
-    );
-    createdGroupIds.push(groupAId, groupBId);
-
-    const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
-
-    await patchAssignments(axios, [sbomId1, sbomId2], [groupAId, groupBId], []);
-
-    const result1 = await readAssignments(axios, sbomId1);
-    const result2 = await readAssignments(axios, sbomId2);
-    expect(result1.groupIds).toContain(groupAId);
-    expect(result1.groupIds).toContain(groupBId);
-    expect(result2.groupIds).toContain(groupAId);
-    expect(result2.groupIds).toContain(groupBId);
-
-    await updateAssignments(axios, sbomId1, []);
-    await updateAssignments(axios, sbomId2, []);
-  });
-
-  test("PATCH with nonexistent SBOM returns 404", async ({ axios }) => {
-    try {
-      await patchAssignments(
+    }) => {
+      const { id: groupAId } = await createGroup(
         axios,
-        ["00000000-0000-0000-0000-000000000000"],
-        [],
-        [],
+        `patch-tc5036-a-${Date.now()}`,
       );
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      expect(axiosError.response?.status).toBe(404);
-    }
-  });
+      const { id: groupBId } = await createGroup(
+        axios,
+        `patch-tc5036-b-${Date.now()}`,
+      );
+      createdGroupIds.push(groupAId, groupBId);
 
-  test("PATCH with nonexistent group in add returns 400", async ({ axios }) => {
-    const sbomId = await findFirstSbomId(axios);
+      const sbomId = await findFirstSbomId(axios);
 
-    try {
+      await patchAssignments(axios, [sbomId], [groupAId], []);
+      await patchAssignments(axios, [sbomId], [groupBId], []);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupAId);
+      expect(groupIds).toContain(groupBId);
+      expect(groupIds).toHaveLength(2);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("TC-5058: remove SBOM from specific group without affecting others", async ({
+      axios,
+    }) => {
+      const { id: groupAId } = await createGroup(
+        axios,
+        `patch-tc5058-a-${Date.now()}`,
+      );
+      const { id: groupBId } = await createGroup(
+        axios,
+        `patch-tc5058-b-${Date.now()}`,
+      );
+      createdGroupIds.push(groupAId, groupBId);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
+      await patchAssignments(axios, [sbomId], [], [groupAId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).not.toContain(groupAId);
+      expect(groupIds).toContain(groupBId);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("PATCH add and remove in one request", async ({ axios }) => {
+      const { id: groupAId } = await createGroup(
+        axios,
+        `patch-addrem-a-${Date.now()}`,
+      );
+      const { id: groupBId } = await createGroup(
+        axios,
+        `patch-addrem-b-${Date.now()}`,
+      );
+      const { id: groupCId } = await createGroup(
+        axios,
+        `patch-addrem-c-${Date.now()}`,
+      );
+      createdGroupIds.push(groupAId, groupBId, groupCId);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
+      await patchAssignments(axios, [sbomId], [groupCId], [groupAId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).not.toContain(groupAId);
+      expect(groupIds).toContain(groupBId);
+      expect(groupIds).toContain(groupCId);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("PATCH add is idempotent", async ({ axios }) => {
+      const { id: groupId } = await createGroup(
+        axios,
+        `patch-idempotent-${Date.now()}`,
+      );
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      await patchAssignments(axios, [sbomId], [groupId], []);
+      await patchAssignments(axios, [sbomId], [groupId], []);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupId);
+      expect(groupIds.filter((id: string) => id === groupId)).toHaveLength(1);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("PATCH remove of non-assigned group is silent", async ({ axios }) => {
+      const { id: groupId } = await createGroup(
+        axios,
+        `patch-rmsilent-${Date.now()}`,
+      );
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await patchAssignments(axios, [sbomId], [groupId], []);
+
       await patchAssignments(
         axios,
         [sbomId],
+        [],
         ["00000000-0000-0000-0000-000000000099"],
+      );
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupId);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("PATCH with multiple SBOMs — cartesian product semantics", async ({
+      axios,
+    }) => {
+      const { id: groupAId } = await createGroup(
+        axios,
+        `patch-bulk-a-${Date.now()}`,
+      );
+      const { id: groupBId } = await createGroup(
+        axios,
+        `patch-bulk-b-${Date.now()}`,
+      );
+      createdGroupIds.push(groupAId, groupBId);
+
+      const [sbomId1, sbomId2] = await findTwoSbomIds(axios);
+
+      await patchAssignments(
+        axios,
+        [sbomId1, sbomId2],
+        [groupAId, groupBId],
         [],
       );
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      const axiosError = error as { response?: { status?: number } };
-      expect(axiosError.response?.status).toBe(400);
-    }
+
+      const result1 = await readAssignments(axios, sbomId1);
+      const result2 = await readAssignments(axios, sbomId2);
+      expect(result1.groupIds).toContain(groupAId);
+      expect(result1.groupIds).toContain(groupBId);
+      expect(result2.groupIds).toContain(groupAId);
+      expect(result2.groupIds).toContain(groupBId);
+
+      await updateAssignments(axios, sbomId1, []);
+      await updateAssignments(axios, sbomId2, []);
+    });
+
+    test("PATCH with nonexistent SBOM returns 404", async ({ axios }) => {
+      try {
+        await patchAssignments(
+          axios,
+          ["00000000-0000-0000-0000-000000000000"],
+          [],
+          [],
+        );
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(404);
+      }
+    });
+
+    test("PATCH with nonexistent group in add returns 400", async ({
+      axios,
+    }) => {
+      const sbomId = await findFirstSbomId(axios);
+
+      try {
+        await patchAssignments(
+          axios,
+          [sbomId],
+          ["00000000-0000-0000-0000-000000000099"],
+          [],
+        );
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(400);
+      }
+    });
+
+    test("PATCH with empty sbom_ids is 204 no-op", async ({ axios }) => {
+      await expect(
+        patchAssignments(axios, [], [], []),
+      ).resolves.toBeUndefined();
+    });
   });
 
-  test("PATCH with empty sbom_ids is 204 no-op", async ({ axios }) => {
-    await expect(patchAssignments(axios, [], [], [])).resolves.toBeUndefined();
+  test.describe("SBOM Group assignment edge cases", () => {
+    const createdGroupIds: string[] = [];
+
+    test.afterEach(async ({ axios }) => {
+      await cleanupGroups(axios, createdGroupIds.splice(0));
+    });
+
+    test("Read assignments for nonexistent SBOM returns 404", async ({
+      axios,
+    }) => {
+      const fakeId = "00000000-0000-0000-0000-000000000000";
+      try {
+        await readAssignments(axios, fakeId);
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(404);
+      }
+    });
+
+    test("Bulk assign with nonexistent SBOM returns 400", async ({ axios }) => {
+      const name = `api-test-bulk-fakesb-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+      createdGroupIds.push(groupId);
+
+      const fakeId = "00000000-0000-0000-0000-000000000000";
+      try {
+        await bulkAssign(axios, [fakeId], [groupId]);
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(400);
+      }
+    });
+
+    test("Bulk assign with nonexistent group returns 400", async ({
+      axios,
+    }) => {
+      const sbomId = await findFirstSbomId(axios);
+      const fakeGroupId = "00000000-0000-0000-0000-000000000000";
+
+      try {
+        await bulkAssign(axios, [sbomId], [fakeGroupId]);
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        expect(axiosError.response?.status).toBe(400);
+      }
+    });
+
+    test("PATCH remove all groups clears assignments", async ({ axios }) => {
+      const { id: groupAId } = await createGroup(
+        axios,
+        `patch-clear-a-${Date.now()}`,
+      );
+      const { id: groupBId } = await createGroup(
+        axios,
+        `patch-clear-b-${Date.now()}`,
+      );
+      createdGroupIds.push(groupAId, groupBId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await patchAssignments(axios, [sbomId], [groupAId, groupBId], []);
+
+      await patchAssignments(axios, [sbomId], [], [groupAId, groupBId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).not.toContain(groupAId);
+      expect(groupIds).not.toContain(groupBId);
+      expect(groupIds).toHaveLength(0);
+    });
+
+    test("PATCH remove with nonexistent group is silent", async ({ axios }) => {
+      const { id: groupId } = await createGroup(
+        axios,
+        `patch-rm-fake-${Date.now()}`,
+      );
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+      await patchAssignments(axios, [sbomId], [groupId], []);
+
+      const fakeGroupId = "00000000-0000-0000-0000-000000000000";
+      await patchAssignments(axios, [sbomId], [], [fakeGroupId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupId);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("PATCH add and remove same group in one request", async ({
+      axios,
+    }) => {
+      const { id: groupId } = await createGroup(
+        axios,
+        `patch-addrem-same-${Date.now()}`,
+      );
+      createdGroupIds.push(groupId);
+
+      const sbomId = await findFirstSbomId(axios);
+
+      await patchAssignments(axios, [sbomId], [groupId], [groupId]);
+
+      const { groupIds } = await readAssignments(axios, sbomId);
+      expect(groupIds).toContain(groupId);
+      expect(groupIds).toHaveLength(1);
+
+      await updateAssignments(axios, sbomId, []);
+    });
+
+    test("Delete group cleans up its SBOM assignments", async ({ axios }) => {
+      const name = `api-test-delgrp-assign-${Date.now()}`;
+      const { id: groupId } = await createGroup(axios, name);
+
+      const sbomId = await findFirstSbomId(axios);
+      await updateAssignments(axios, sbomId, [groupId]);
+
+      const before = await readAssignments(axios, sbomId);
+      expect(before.groupIds).toContain(groupId);
+
+      await deleteGroup(axios, groupId);
+
+      const after = await readAssignments(axios, sbomId);
+      expect(after.groupIds).not.toContain(groupId);
+    });
   });
 });
