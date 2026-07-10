@@ -22,11 +22,11 @@ import { Paths } from "@app/Routes";
 import { decodePurl } from "@app/utils/utils";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
-import { List, ListItem, Label, LabelGroup } from "@patternfly/react-core";
+import { List, ListItem } from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 import { PackageRecommendations } from "./components/PackageRecommendations";
-import { formatVexStatus, vexStatusColor } from "@app/utils/vex-utils";
+import { RecommendationsExpandedContent } from "./components/RecommendationsExpandedContent";
 
 export const PackageTable: React.FC = () => {
   const {
@@ -208,28 +208,11 @@ export const PackageTable: React.FC = () => {
                                 </List>
                               ) : null}
                               {isCellExpanded(item, "recommendations") ? (
-                                <List isPlain>
-                                  {(
+                                <RecommendationsExpandedContent
+                                  recommendations={
                                     recommendationsMap.get(item.purl) ?? []
-                                  ).map((rec, idx) => (
-                                    <ListItem key={idx}>
-                                      <strong>{rec.package}</strong>
-                                      {rec.vulnerabilities.length > 0 && (
-                                        <LabelGroup className={spacing.mlSm}>
-                                          {rec.vulnerabilities.map((v) => (
-                                            <Label
-                                              key={v.id}
-                                              color={vexStatusColor(v.status)}
-                                            >
-                                              {v.id}:{" "}
-                                              {formatVexStatus(v.status)}
-                                            </Label>
-                                          ))}
-                                        </LabelGroup>
-                                      )}
-                                    </ListItem>
-                                  ))}
-                                </List>
+                                  }
+                                />
                               ) : null}
                             </div>
                           </ExpandableRowContent>
