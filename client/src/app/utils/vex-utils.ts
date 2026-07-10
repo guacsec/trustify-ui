@@ -7,3 +7,11 @@ export const vexStatusColor = (
   if (status === "Affected") return "red";
   return "grey";
 };
+
+export const formatVexStatus = (
+  status: VexStatus | null | undefined,
+): string => {
+  if (!status) return "Unknown";
+  if (typeof status === "string") return status;
+  return status.Other;
+};

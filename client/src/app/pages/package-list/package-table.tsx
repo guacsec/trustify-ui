@@ -26,7 +26,7 @@ import { List, ListItem, Label, LabelGroup } from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 import { PackageRecommendations } from "./components/PackageRecommendations";
-import { vexStatusColor } from "@app/utils/vex-utils";
+import { formatVexStatus, vexStatusColor } from "@app/utils/vex-utils";
 
 export const PackageTable: React.FC = () => {
   const {
@@ -221,7 +221,8 @@ export const PackageTable: React.FC = () => {
                                               key={v.id}
                                               color={vexStatusColor(v.status)}
                                             >
-                                              {v.id}: {v.status ?? "Unknown"}
+                                              {v.id}:{" "}
+                                              {formatVexStatus(v.status)}
                                             </Label>
                                           ))}
                                         </LabelGroup>
