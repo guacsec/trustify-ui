@@ -3,7 +3,7 @@ import React from "react";
 import type { AxiosError } from "axios";
 
 import type { DecomposedPurl } from "@app/api/models";
-import type { PurlSummary } from "@app/client";
+import type { PurlSummary, RecommendEntry } from "@app/client";
 import type { ITableControls } from "@app/hooks/table-controls";
 
 export interface PackageTableData extends PurlSummary {
@@ -18,6 +18,7 @@ interface IPackageSearchContext {
     | "version"
     | "type"
     | "licenses"
+    | "recommendations"
     | "path"
     | "qualifiers"
     | "vulnerabilities",
@@ -29,6 +30,9 @@ interface IPackageSearchContext {
   totalItemCount: number;
   isFetching: boolean;
   fetchError: AxiosError | null;
+  recommendationsMap: Map<string, RecommendEntry[]>;
+  recIsFetching: boolean;
+  recFetchError: AxiosError | null;
 }
 
 const contextDefaultValue = {} as IPackageSearchContext;
