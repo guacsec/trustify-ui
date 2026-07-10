@@ -45,7 +45,7 @@ import { PackageVulnerabilities } from "../package-list/components/PackageVulner
 import { PackageRecommendations } from "@app/pages/package-list/components/PackageRecommendations";
 import { WithPackage } from "@app/components/WithPackage";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
-import { vexStatusColor } from "@app/utils/vex-utils";
+import { formatVexStatus, vexStatusColor } from "@app/utils/vex-utils";
 
 const renderLicenseWithMappings = (
   license: string,
@@ -341,7 +341,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                           key={v.id}
                                           color={vexStatusColor(v.status)}
                                         >
-                                          {v.id}: {v.status ?? "Unknown"}
+                                          {v.id}: {formatVexStatus(v.status)}
                                         </Label>
                                       ))}
                                     </LabelGroup>
