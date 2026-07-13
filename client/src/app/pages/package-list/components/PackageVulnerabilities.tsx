@@ -3,7 +3,7 @@ import type React from "react";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
 import { useVulnerabilitiesOfPackage } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
 import type { PurlDetails } from "@app/client";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import type { AxiosError } from "axios";
 import { Skeleton } from "@patternfly/react-core";
 import { TableCellError } from "@app/components/TableCellError";

@@ -1,7 +1,7 @@
 import React from "react";
 
 import ReactECharts from "echarts-for-react";
-import { ThemeContext } from "tsd-ui";
+import { ThemeContext } from "@tsd-ui/core";
 
 import type {
   EChartsInternalNode,

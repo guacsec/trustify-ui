@@ -22,7 +22,7 @@ import {
 } from "./helpers/csaf-tree-helpers";
 import { CsafTreeChart } from "./components/CsafTreeChart";
 import { CsafContext } from "./csaf-context";
-import { ThemeContext } from "tsd-ui";
+import { ThemeContext } from "@tsd-ui/core";
 
 const CATEGORY_LABELS = [
   "vendor",

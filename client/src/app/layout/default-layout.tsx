@@ -15,7 +15,7 @@ import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 
 import { HeaderApp } from "./header";
 import { SidebarApp } from "./sidebar";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { getAxiosErrorMessage } from "@app/utils/utils";
 
 interface DefaultLayoutProps {
