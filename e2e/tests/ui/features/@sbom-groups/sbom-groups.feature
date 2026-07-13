@@ -202,8 +202,7 @@ Feature: SBOM Groups - Manage SBOM groups
     Given User navigates to SBOM Groups page
     And A standalone group "Orphan Child" exists
     And A group "New Parent Group" exists
-    When User clears all filters on SBOM Groups page
-    And User applies filter "Filter" with value "Orphan Child"
+    When User applies filter "Filter" with value "Orphan Child"
     And User clicks kebab menu for group "Orphan Child"
     And User selects "Edit" action
     And User selects parent group "New Parent Group" in the edit form

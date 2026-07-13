@@ -500,8 +500,10 @@ Given(
       const modal = await GroupFormModal.build(page, "Edit group");
       if (await modal.hasParentGroupSet()) {
         await modal.clearParentGroup();
+        await modal.submit();
+      } else {
+        await modal.clickCancel();
       }
-      await modal.submit();
     }
 
     await toolbar.clearAllFilters();
