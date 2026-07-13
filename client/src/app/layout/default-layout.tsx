@@ -17,6 +17,7 @@ import { HeaderApp } from "./header";
 import { SidebarApp } from "./sidebar";
 import { LoadingWrapper } from "@tsd-ui/core";
 import { getAxiosErrorMessage } from "@app/utils/utils";
+import type { AxiosError } from "axios";
 
 interface DefaultLayoutProps {
   children?: React.ReactNode;
@@ -37,7 +38,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
       skipToContent={PageSkipToContent}
       mainContainerId={pageId}
     >
-      <LoadingWrapper
+      <LoadingWrapper<AxiosError>
         isFetching={isLoading}
         isFetchingState={<></>}
         fetchErrorState={(error) => (
