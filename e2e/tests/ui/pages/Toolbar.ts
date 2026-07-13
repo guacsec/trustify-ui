@@ -167,13 +167,11 @@ export class Toolbar<
 
   /**
    * Clears all applied filters by clicking the "Clear all filters" button.
-   * No-ops gracefully when no filters are active (button not present).
    */
   async clearAllFilters() {
     const clearButton = this._toolbar.getByRole("button", {
       name: "Clear all filters",
     });
-    if (!(await clearButton.isVisible())) return;
     await clearButton.click();
 
     await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
