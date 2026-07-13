@@ -176,10 +176,7 @@ export class Toolbar<
     if (!(await clearButton.isVisible())) return;
     await clearButton.click();
 
-    // Give PatternFly label-group animations time to fully complete
-    await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0, {
-      timeout: 10000,
-    });
+    await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
   }
 
   /**
