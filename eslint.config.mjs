@@ -38,7 +38,6 @@ export default defineConfig([
       "@eslint-react/no-context-provider": "off",
       "@eslint-react/naming-convention-ref-name": "off",
       "@eslint-react/no-array-index-key": "off",
-      "@eslint-react/use-state": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@eslint-react/exhaustive-deps": "off",
       "@tanstack/query/prefer-query-options": "off",
