@@ -12,7 +12,7 @@ import {
   brandingStrings,
   encodeEnv,
 } from "@trustify-ui/common";
-import { proxyMap } from "./proxies";
+import { proxyMap } from "./proxies.js";
 
 const debugMode = process.env.DEBUG === "1";
 if (debugMode) console.log("CONSOLE_ENV", TRUSTIFICATION_ENV);
@@ -65,7 +65,7 @@ const server = app.listen(port, (error) => {
 // Handle shutdown signals Ctrl-C (SIGINT) and default podman/docker stop (SIGTERM)
 const httpTerminator = createHttpTerminator({ server });
 
-const shutdown = async (signal) => {
+const shutdown = async (signal: string) => {
   if (!server) {
     console.log(`${signal}, no server running.`);
     return;
