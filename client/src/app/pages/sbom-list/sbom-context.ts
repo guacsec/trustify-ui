@@ -2,7 +2,11 @@ import React from "react";
 
 import type { AxiosError } from "axios";
 
-import type { SbomHead, SourceDocument } from "@app/client";
+import type {
+  RequestedFieldHashMapHashMap,
+  SbomHead,
+  SourceDocument,
+} from "@app/client";
 import type { BulkSelectionValues } from "@app/hooks/selection";
 import type { ITableControls } from "@app/hooks/table-controls";
 
@@ -16,6 +20,7 @@ interface ISbomSearchContext {
           name: string;
           version?: string | null;
         }>;
+        advisories?: RequestedFieldHashMapHashMap;
       },
     | "name"
     | "version"
@@ -25,7 +30,7 @@ interface ISbomSearchContext {
     | "labels"
     | "vulnerabilities",
     "name" | "published",
-    "" | "published" | "labels" | "license",
+    "name" | "published" | "labels" | "license",
     string
   >;
 

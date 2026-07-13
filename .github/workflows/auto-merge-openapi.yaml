@@ -65,7 +65,7 @@ jobs:
     needs: discover-envs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build and save trustify-ui image
         run: |
@@ -84,7 +84,7 @@ jobs:
     needs: discover-envs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build and save trustd server image
         run: |
@@ -121,7 +121,7 @@ jobs:
         run: docker load --input /tmp/trustd.tar
 
       - name: Checkout ui repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -166,9 +166,14 @@ jobs:
           EOF
           )"
 
-      - name: Enable auto-merge
+      - name: Merge PR
         env:
           GH_TOKEN: ${{ secrets.BOT_APPROVE_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
+          if [ "$BASE_REF" = "main" ]; then
+            gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto
+          else
+            gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --squash
+          fi

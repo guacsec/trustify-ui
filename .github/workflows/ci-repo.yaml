@@ -19,7 +19,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
@@ -50,7 +50,7 @@ jobs:
         working-directory: ./crate
         run: cargo test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           use_oidc: true
           flags: unit
