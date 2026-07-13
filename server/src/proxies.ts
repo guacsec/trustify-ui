@@ -1,3 +1,6 @@
+import type http from "node:http";
+import type { Options } from "http-proxy-middleware";
+
 import * as cookie from "cookie";
 import { TRUSTIFICATION_ENV } from "@trustify-ui/common";
 
@@ -10,7 +13,7 @@ const logger =
         error: console.error,
       };
 
-export const proxyMap = {
+export const proxyMap: Record<string, Options> = {
   ...(TRUSTIFICATION_ENV.OIDC_SERVER_IS_EMBEDDED === "true" && {
     auth: {
       pathFilter: "/auth",
@@ -18,25 +21,18 @@ export const proxyMap = {
       logger,
       changeOrigin: true,
       on: {
-        proxyReq: (proxyReq, req, _res) => {
-          // Keycloak needs these header set so we can function in Kubernetes (non-OpenShift)
-          // https://www.keycloak.org/server/reverseproxy
-          //
-          // Note, on OpenShift, this works as the haproxy implementation
-          // for the OpenShift route is setting these for us automatically
-          //
-          // We saw problems with including the below broke the OpenShift route
-          //  {"X-Forwarded-Proto", req.protocol} broke the OpenShift
-          //  {"X-Forwarded-Port", req.socket.localPort}
-          //  {"Forwarded", `for=${req.socket.remoteAddress};proto=${req.protocol};host=${req.headers.host}`}
-          // so we are not including even though they are customary
-          //
-          req.socket.remoteAddress &&
+        proxyReq: (
+          proxyReq: http.ClientRequest,
+          req: http.IncomingMessage,
+          _res: http.ServerResponse,
+        ) => {
+          if (req.socket.remoteAddress) {
             proxyReq.setHeader("X-Forwarded-For", req.socket.remoteAddress);
-          req.socket.remoteAddress &&
             proxyReq.setHeader("X-Real-IP", req.socket.remoteAddress);
-          req.headers.host &&
+          }
+          if (req.headers.host) {
             proxyReq.setHeader("X-Forwarded-Host", req.headers.host);
+          }
         },
       },
     },
@@ -47,14 +43,22 @@ export const proxyMap = {
     logger,
     changeOrigin: true,
     on: {
-      proxyReq: (proxyReq, req, _res) => {
+      proxyReq: (
+        proxyReq: http.ClientRequest,
+        req: http.IncomingMessage,
+        _res: http.ServerResponse,
+      ) => {
         const cookies = cookie.parse(req.headers.cookie ?? "");
         const bearerToken = cookies.keycloak_cookie;
         if (bearerToken && !req.headers.authorization) {
           proxyReq.setHeader("Authorization", `Bearer ${bearerToken}`);
         }
       },
-      proxyRes: (proxyRes, req, res) => {
+      proxyRes: (
+        proxyRes: http.IncomingMessage,
+        req: http.IncomingMessage,
+        res: http.ServerResponse,
+      ) => {
         if (
           !req.headers.accept?.includes("application/json") &&
           (proxyRes.statusCode === 401 ||
