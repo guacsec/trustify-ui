@@ -22,7 +22,7 @@ import { Paths } from "@app/Routes";
 import { getAxiosErrorMessage } from "@app/utils/utils";
 
 export const AdvisoryUpload: React.FC = () => {
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } = useUploadAdvisory();
 
   return (
@@ -36,7 +36,7 @@ export const AdvisoryUpload: React.FC = () => {
           <BreadcrumbItem isActive>Upload Advisory</BreadcrumbItem>
         </Breadcrumb>
       </PageSection>
-      {isReadOnly ? (
+      {areMutationsDisabled ? (
         <PageSection>
           <EmptyState
             headingLevel="h1"

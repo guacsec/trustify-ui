@@ -33,7 +33,7 @@ import {
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
 import { ExtendedSeverity } from "@app/api/models";
-import { type AdvisorySummary } from "@app/client";
+import { AdvisoryHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { LoadingWrapper } from "@tsd-ui/core";
@@ -100,7 +100,7 @@ export const AdvisoryDetails: React.FC = () => {
   // Delete action
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
-  const onDeleteAdvisorySuccess = (advisory: AdvisorySummary) => {
+  const onDeleteAdvisorySuccess = (advisory: AdvisoryHead) => {
     setIsDeleteDialogOpen(false);
     pushNotification({
       title: advisoryDeletedSuccessMessage(advisory),
@@ -401,7 +401,7 @@ export const AdvisoryDetails: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => {
           if (advisory) {
-            deleteAdvisory(advisory.uuid);
+            deleteAdvisory(advisory);
           }
         }}
       />

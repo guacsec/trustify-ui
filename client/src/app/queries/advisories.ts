@@ -10,6 +10,7 @@ import type { HubRequestParams, Label } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
   type AdvisoryDetails,
+  AdvisoryHead,
   type Labels,
   deleteAdvisory,
   downloadAdvisory,
@@ -107,17 +108,16 @@ export const useFetchAdvisoryById = (id: string) => {
 };
 
 export const useDeleteAdvisoryMutation = (
-  onSuccess: (payload: AdvisoryDetails, id: string) => void,
+  onSuccess: (payload: AdvisoryHead) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await deleteAdvisory({ client, path: { key: id } });
-      return response.data as AdvisoryDetails;
+    mutationFn: async (payload: AdvisoryHead) => {
+      await deleteAdvisory({ client, path: { key: payload.uuid } });
     },
-    onSuccess: async (response, id) => {
-      onSuccess(response, id);
+    onSuccess: async (_response, payload) => {
+      onSuccess(payload);
       await queryClient.invalidateQueries({ queryKey: [AdvisoriesQueryKey] });
     },
     onError: async (err: AxiosError) => {

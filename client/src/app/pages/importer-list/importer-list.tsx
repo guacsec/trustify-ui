@@ -36,10 +36,7 @@ import {
   type ConfirmDialogProps,
 } from "@app/components/ConfirmDialog";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import {
   useFetchImporterReports,
   useFetchImporters,

@@ -6,17 +6,13 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarItem,
-  Tooltip,
 } from "@patternfly/react-core";
 
 import type { Group } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { KebabDropdown } from "@app/components/KebabDropdown";
 import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
-import {
-  READ_ONLY_TOOLTIP,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
 import { Paths } from "@app/Routes";

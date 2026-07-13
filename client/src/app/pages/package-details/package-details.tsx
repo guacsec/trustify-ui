@@ -47,10 +47,10 @@ export const PackageDetails: React.FC = () => {
     tabKeys: ["vulnerabilities", "sboms"],
   });
 
-  const vulnerabilitiesTabRef = React.useRef<HTMLElement>();
-  const sbomsTabRef = React.useRef<HTMLElement>();
+  const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
+  const sbomsTabRef = React.useRef<HTMLElement>(null);
 
-  const sbomsPopupRef = React.useRef<HTMLElement>();
+  const sbomsPopupRef = React.useRef<HTMLElement>(null);
 
   return (
     <>

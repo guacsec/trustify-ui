@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import type { AdvisorySummary, SbomHead } from "./client";
+import type { AdvisoryHead, AdvisorySummary, SbomHead } from "./client";
 import ENV from "./env";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
@@ -91,7 +91,7 @@ export const sbomDeletedSuccessMessage = (sbom: SbomHead) =>
 export const sbomDeletedErrorMessage = (_error: AxiosError) =>
   "Error occurred while deleting the SBOM";
 
-export const advisoryDeletedSuccessMessage = (sbom: AdvisorySummary) =>
+export const advisoryDeletedSuccessMessage = (sbom: AdvisoryHead) =>
   `The Advisory ${sbom.document_id} was deleted`;
 
 export const advisoryDeletedErrorMessage = (_error: AxiosError) =>
