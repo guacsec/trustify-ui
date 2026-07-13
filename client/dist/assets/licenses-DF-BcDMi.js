@@ -1,1 +1,0 @@
-import{Cr as e,D as t,W as n,a as r}from"./StateError-9lmgg7WX.js";var i=`licenses`,a=(a={},o=!1)=>{let{data:s,isLoading:c,error:l,refetch:u}=e({queryKey:[i,a],queryFn:()=>t({client:r,query:{...n(a)}}),enabled:!o});return{result:{data:s?.data?.items||[],total:s?.data?.total??0,params:a},isFetching:c,fetchError:l,refetch:u}};export{a as t};
