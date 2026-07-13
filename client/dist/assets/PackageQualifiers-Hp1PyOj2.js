@@ -1,1 +1,0 @@
-import{t as e}from"./react-D-7welKy.js";import{St as t}from"./StateError-Bya3dX6w.js";var n=e(),r=({value:e})=>(0,n.jsx)(n.Fragment,{children:Object.entries(e).map(([e,r])=>(0,n.jsx)(t,{isCompact:!0,children:`${e}=${r}`},`${e}=${r}`))});export{r as t};
