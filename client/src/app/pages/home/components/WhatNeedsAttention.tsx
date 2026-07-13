@@ -114,7 +114,7 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                                   default: "justifyContentSpaceBetween",
                                 }}
                                 spaceItems={{ default: "spaceItemsSm" }}
-                                wrap={{ default: "wrap" }}
+                                flexWrap={{ default: "wrap" }}
                               >
                                 <FlexItem>
                                   <SeverityShieldAndText

@@ -22,7 +22,7 @@ import { Paths } from "@app/Routes";
 import { getAxiosErrorMessage } from "@app/utils/utils";
 
 export const SbomUpload: React.FC = () => {
-  const { isReadOnly } = React.useContext(ReadOnlyContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } = useUploadSBOM();
 
   return (
@@ -36,7 +36,7 @@ export const SbomUpload: React.FC = () => {
           <BreadcrumbItem isActive>Upload SBOM</BreadcrumbItem>
         </Breadcrumb>
       </PageSection>
-      {isReadOnly ? (
+      {areMutationsDisabled ? (
         <PageSection>
           <EmptyState
             headingLevel="h1"

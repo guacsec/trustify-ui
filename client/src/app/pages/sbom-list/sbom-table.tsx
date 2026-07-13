@@ -20,10 +20,7 @@ import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
