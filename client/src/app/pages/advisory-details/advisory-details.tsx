@@ -36,7 +36,7 @@ import { ExtendedSeverity } from "@app/api/models";
 import { AdvisoryHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { WithSeverityProps } from "@app/components/WithSeverityProps";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";

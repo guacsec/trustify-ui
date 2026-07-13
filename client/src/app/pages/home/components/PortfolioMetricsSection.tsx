@@ -14,7 +14,7 @@ import {
   StackItem,
 } from "@patternfly/react-core";
 
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { useFetchAdvisories } from "@app/queries/advisories";
 import { useFetchSBOMs } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
