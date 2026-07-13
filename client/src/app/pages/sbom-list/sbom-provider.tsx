@@ -154,6 +154,7 @@ export const SbomSearchProvider: React.FunctionComponent<ISbomProvider> = ({
   return (
     <SbomSearchContext.Provider
       value={{
+        sbomGroupId,
         totalItemCount,
         isFetching,
         fetchError,
