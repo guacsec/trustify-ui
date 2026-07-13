@@ -21,7 +21,7 @@ import {
   extendedSeverityFromSeverity,
   type HubRequestParams,
 } from "@app/api/models";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useFetchVulnerabilities } from "@app/queries/vulnerabilities";

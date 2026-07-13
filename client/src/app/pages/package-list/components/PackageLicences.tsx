@@ -3,7 +3,7 @@ import { Skeleton } from "@patternfly/react-core";
 import { NavLink, generatePath } from "react-router-dom";
 
 import { Paths } from "@app/Routes";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { TableCellError } from "@app/components/TableCellError";
 import type { AxiosError } from "axios";
 import type { PurlDetails } from "@app/client";

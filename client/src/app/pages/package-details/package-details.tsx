@@ -20,7 +20,7 @@ import {
 import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
 
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useFetchPackageById } from "@app/queries/packages";

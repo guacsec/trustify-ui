@@ -15,7 +15,7 @@ import {
 
 import type { Group } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { LoadingWrapper } from "@tsd-ui/core";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";

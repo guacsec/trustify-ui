@@ -34,7 +34,7 @@ import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
 import BarsIcon from "@patternfly/react-icons/dist/esm/icons/bars-icon";
 import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
 
-import { ThemeSelector } from "tsd-ui";
+import { ThemeSelector } from "@tsd-ui/core";
 
 import { isAuthRequired } from "@app/Constants";
 import getBranding from "@app/hooks/useBranding";
