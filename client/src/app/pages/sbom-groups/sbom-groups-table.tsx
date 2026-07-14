@@ -21,7 +21,7 @@ import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { TableCellError } from "@app/components/TableCellError";
 import { ConditionalTableBody } from "@app/components/TableControls";
-import { groupDeleteDialogProps } from "@app/Constants";
+import { groupDeleteDialogProps } from "./utils";
 import {
   useDeleteSbomGroupMutation,
   useFetchSBOMGroups,
@@ -108,14 +108,20 @@ export const SbomGroupsTable: React.FC = () => {
         inProgress={isDeletingGroup}
         titleIconVariant="warning"
         isOpen={!!groupToDelete}
-        confirmBtnVariant={ButtonVariant.danger}
-        confirmBtnLabel="Delete"
-        cancelBtnLabel="Cancel"
+        confirmBtnVariant={
+          !groupToDelete?.number_of_groups
+            ? ButtonVariant.danger
+            : ButtonVariant.primary
+        }
+        confirmBtnLabel={!groupToDelete?.number_of_groups ? "Delete" : "Close"}
+        cancelBtnLabel={!groupToDelete?.number_of_groups ? "Cancel" : ""}
         onCancel={() => setGroupToDelete(null)}
         onClose={() => setGroupToDelete(null)}
         onConfirm={() => {
-          if (groupToDelete) {
+          if (groupToDelete && !groupToDelete?.number_of_groups) {
             deleteGroup(groupToDelete);
+          } else {
+            setGroupToDelete(null);
           }
         }}
       />
@@ -163,7 +169,7 @@ const SbomGroupRow: React.FC<{
     {
       title: "Delete",
       onClick: () => onDelete(node),
-      isDisabled: areMutationsDisabled || !!node.number_of_groups,
+      isDisabled: areMutationsDisabled,
     },
   ];
 
