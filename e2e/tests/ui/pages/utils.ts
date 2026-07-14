@@ -17,27 +17,27 @@ export type FilterValueType<TFilter extends Record<string, TFilterValue>> = {
 export function isStringFilter<
   K extends string,
   T extends Record<K, TFilterValue>,
->(type: T[K], value: unknown): value is string {
+>(type: T[K], _value: unknown): _value is string {
   return type === "string";
 }
 
 export function isDateRangeFilter<
   K extends string,
   T extends Record<K, TFilterValue>,
->(type: T[K], value: unknown): value is TDateRange {
+>(type: T[K], _value: unknown): _value is TDateRange {
   return type === "dateRange";
 }
 
 export function isMultiSelectFilter<
   K extends string,
   T extends Record<K, TFilterValue>,
->(type: T[K], value: unknown): value is TMultiValue {
+>(type: T[K], _value: unknown): _value is TMultiValue {
   return type === "multiSelect";
 }
 
 export function isTypeaheadFilter<
   K extends string,
   T extends Record<K, TFilterValue>,
->(type: T[K], value: unknown): value is TMultiValue {
+>(type: T[K], _value: unknown): _value is TMultiValue {
   return type === "typeahead";
 }
