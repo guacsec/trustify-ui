@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 
 import { Navigation } from "../Navigation";
 import { Pagination } from "../Pagination";
@@ -147,10 +147,5 @@ export class SbomGroupListPage {
   async hasSbomCount(groupName: string): Promise<Locator> {
     const row = this.getGroupRow(groupName);
     return row.locator("text=/\\d+ SBOMs?/");
-  }
-
-  async isDeleteDisabledForGroup(groupName: string): Promise<boolean> {
-    const deleteItem = this._page.getByRole("menuitem", { name: "Delete" });
-    return (await deleteItem.getAttribute("aria-disabled")) === "true";
   }
 }

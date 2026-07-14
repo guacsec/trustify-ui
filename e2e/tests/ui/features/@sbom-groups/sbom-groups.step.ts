@@ -589,12 +589,16 @@ Then("The SBOMs table is sorted by Name descending", async ({ page }) => {
   await expect(table).toBeSortedBy("Name", "descending");
 });
 
-// Delete guard — disabled action in kebab menu
+// Delete guard — dialog blocks deletion for groups with children
 Then(
-  "The {string} action is disabled in the kebab menu",
-  async ({ page }, actionName: string) => {
-    const menuItem = page.getByRole("menuitem", { name: actionName });
-    await expect(menuItem).toBeDisabled();
+  "The delete guard dialog is displayed for group {string}",
+  async ({ page }, groupName: string) => {
+    const dialog = page.getByRole("dialog", { name: "Confirm dialog" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("Cannot delete group");
+    await expect(dialog).toContainText(groupName);
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).not.toBeVisible();
   },
 );
 

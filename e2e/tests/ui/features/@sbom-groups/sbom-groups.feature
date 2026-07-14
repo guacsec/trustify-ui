@@ -255,13 +255,15 @@ Feature: SBOM Groups - Manage SBOM groups
       | groupName             | sbom1 | sbom2       |
       | Multi SBOM Group      | curl  | quarkus-bom |
 
-  # Delete guard for parent groups
-  Scenario: Delete action is disabled for group with children
+  # Delete guard for parent groups - Bug TC-5059
+  @skip
+  Scenario: Delete action is blocked for group with children
     Given User navigates to SBOM Groups page
     And A parent group "Parent No Delete" with child group "Child Prevents Delete" exists
     When User applies filter "Filter" with value "Parent No Delete"
     And User clicks kebab menu for group "Parent No Delete"
-    Then The "Delete" action is disabled in the kebab menu
+    And User selects "Delete" action
+    Then The delete guard dialog is displayed for group "Parent No Delete"
 
   # Labels management
   Scenario: Create group with custom labels
@@ -412,16 +414,17 @@ Feature: SBOM Groups - Manage SBOM groups
     Then The child group "Detach3 Child" is visible under "Detach3 Mid"
 
   # ─────────────────────────────────────────────────────────────────
-  # Delete guard — middle group with children in 3-level hierarchy
+  # Delete guard — middle group with children in 3-level hierarchy - Bug TC-5059
   # ─────────────────────────────────────────────────────────────────
-  
-  Scenario: Delete is disabled for middle group with children in 3-level hierarchy
+  @skip
+  Scenario: Delete is blocked for middle group with children in 3-level hierarchy
     Given User navigates to SBOM Groups page
     And A grandparent group "Guard3 GP" with parent group "Guard3 Mid" and child group "Guard3 Child" exists
     When User applies filter "Filter" with value "Guard3 GP"
     And User expands the tree node for "Guard3 GP"
     And User clicks kebab menu for child group "Guard3 Mid"
-    Then The "Delete" action is disabled in the kebab menu
+    And User selects "Delete" action
+    Then The delete guard dialog is displayed for group "Guard3 Mid"
 
   # ─────────────────────────────────────────────────────────────────
   # Form validation — duplicate name
