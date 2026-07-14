@@ -80,11 +80,6 @@ export const advisoryDeleteDialogProps = (
   message: `This action permanently deletes the ${advisory?.document_id} Advisory.`,
 });
 
-export const groupDeleteDialogProps = (group?: { name?: string } | null) => ({
-  title: "Permanently delete Group?",
-  message: `This action permanently deletes the ${group?.name} group.`,
-});
-
 export const sbomDeletedSuccessMessage = (sbom: SbomHead) =>
   `The SBOM ${sbom.name} was deleted`;
 
