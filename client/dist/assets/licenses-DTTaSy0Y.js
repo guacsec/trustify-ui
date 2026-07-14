@@ -1,1 +1,0 @@
-import{E as e,Sr as t,U as n,i as r}from"./useBranding-D75uDlcB.js";var i=`licenses`,a=(a={},o=!1)=>{let{data:s,isLoading:c,error:l,refetch:u}=t({queryKey:[i,a],queryFn:()=>e({client:r,query:{...n(a)}}),enabled:!o});return{result:{data:s?.data?.items||[],total:s?.data?.total??0,params:a},isFetching:c,fetchError:l,refetch:u}};export{a as t};
