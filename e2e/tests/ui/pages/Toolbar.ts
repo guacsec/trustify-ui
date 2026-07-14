@@ -172,6 +172,7 @@ export class Toolbar<
     const clearButton = this._toolbar.getByRole("button", {
       name: "Clear all filters",
     });
+    await expect(clearButton).toBeVisible();
     await clearButton.click();
 
     await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
