@@ -15,6 +15,12 @@ export class GroupFormModal {
     return new GroupFormModal(page, dialog);
   }
 
+  static async fromCurrentPage(page: Page) {
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    return new GroupFormModal(page, dialog);
+  }
+
   async fillName(name: string) {
     await this._dialog.getByRole("textbox", { name: "Group name" }).fill(name);
   }
@@ -66,7 +72,13 @@ export class GroupFormModal {
     await this._dialog
       .getByRole("button", { name: /select parent group/i })
       .click();
+    await this._dialog.getByPlaceholder("Find by name").fill(name);
     await this._dialog.getByRole("menuitem", { name }).click();
+  }
+
+  async hasParentGroupSet(): Promise<boolean> {
+    const clearButton = this._dialog.getByLabel("Clear selection");
+    return (await clearButton.count()) > 0;
   }
 
   async clearParentGroup() {
