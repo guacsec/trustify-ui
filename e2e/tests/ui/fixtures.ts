@@ -4,7 +4,12 @@ import { test as base } from "playwright-bdd";
 
 const istanbulCLIOutput = join(__dirname, "../../.nyc_output");
 
-export const test = base.extend({
+export const test = base.extend<{ selectedSbomNames: string[] }>({
+  // eslint-disable-next-line no-empty-pattern
+  selectedSbomNames: async ({}, use) => {
+    // eslint-disable-next-line @eslint-react/rules-of-hooks
+    await use([]);
+  },
   context: async ({ context }, use, testInfo) => {
     await context.addInitScript(() =>
       window.addEventListener("beforeunload", () =>
