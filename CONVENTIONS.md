@@ -307,6 +307,8 @@ When the backend OpenAPI spec changes:
 - Page Object Model pattern: each page has a class (e.g., `SbomListPage`) with a static `build()` factory, encapsulating navigation and element access
 - Shared page objects: `Table`, `Toolbar`, `Pagination`, `Navigation` in `e2e/tests/ui/pages/`
 - Tags for test tiers: `{ tag: "@tier1" }`
+- **No explicit timeouts in shared page objects:** Playwright provides automatic waiting for elements, assertions, and actions. Shared classes (`Table`, `Toolbar`, `Pagination`, `Navigation`) must not add explicit `timeout` parameters. If a component triggers async re-rendering, the wait belongs in that component's page object, not in shared infrastructure.
+- **Composition over conditional expansion:** Page object methods should do one thing. For example, `clearAllFilters()` clears filters — checking whether filters exist is the caller's responsibility. Do not add conditional guards inside action methods.
 - Run e2e: `npm run e2e:test:ui` (full), `npm run e2e:test:api` (API only)
 
 ## Commit Messages
