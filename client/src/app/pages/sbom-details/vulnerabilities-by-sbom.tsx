@@ -23,6 +23,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 import {
+  ActionsColumn,
   ExpandableRowContent,
   Table,
   TableText,
@@ -124,7 +125,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       published: "Published",
       updated: "Updated",
     },
-    hasActionsColumn: false,
+    hasActionsColumn: true,
     isSortEnabled: true,
     sortableColumns: [
       "id",
@@ -246,6 +247,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             numRenderedColumns={numRenderedColumns}
           >
             {currentPageItems?.map((item, rowIndex) => {
+              const eiState = eiStates[item.vulnerability.identifier];
+              const isReanalysisDisabled =
+                !eiState ||
+                eiState.kind === "not_run" ||
+                (eiState.kind === "finding" &&
+                  eiState.finding.variant === "in_progress");
+
               return (
                 <Tbody
                   key={item._ui_unique_id}
@@ -343,11 +351,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           vulnerabilityIdentifier={
                             item.vulnerability.identifier
                           }
-                          state={
-                            eiStates[item.vulnerability.identifier] ?? {
-                              kind: "not_run",
-                            }
-                          }
+                          state={eiState ?? { kind: "not_run" }}
                           onRequestAnalysis={handleRequestAnalysis}
                         />
                       </Td>
@@ -376,6 +380,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         {...getTdProps({ columnKey: "updated" })}
                       >
                         {formatDate(item.vulnerability?.modified)}
+                      </Td>
+                      <Td isActionCell>
+                        <ActionsColumn
+                          items={[
+                            {
+                              title: "Request new analysis",
+                              onClick: () =>
+                                handleRequestAnalysis(
+                                  item.vulnerability.identifier,
+                                ),
+                              isDisabled: isReanalysisDisabled,
+                            },
+                          ]}
+                        />
                       </Td>
                     </TableRowContentWithControls>
                   </Tr>
