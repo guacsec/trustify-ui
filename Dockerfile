@@ -13,8 +13,8 @@ RUN \
 # Runner image
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:latest
 
-# Add ps package to allow liveness probe for k8s cluster
-# Add tar package to allow copying files with kubectl scp
+# Add tar to allow copying files with kubectl cp
+# Add procps-ng to allow liveness probe for k8s cluster
 USER 0
 RUN microdnf -y install tar procps-ng && microdnf clean all
 
