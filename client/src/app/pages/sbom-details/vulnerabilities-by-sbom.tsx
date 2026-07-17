@@ -4,6 +4,8 @@ import { generatePath, Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
+  Alert,
+  AlertActionCloseButton,
   Button,
   Card,
   CardBody,
@@ -35,7 +37,6 @@ import {
 } from "@patternfly/react-table";
 
 import { LoadingWrapper } from "@tsd-ui/core";
-import { NotificationsContext } from "@app/components/NotificationsContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
@@ -77,9 +78,22 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
 
-  const { pushNotification } = React.useContext(NotificationsContext);
+  const [errorBanner, setErrorBanner] = React.useState<{
+    title: string;
+    message?: string;
+  } | null>(null);
 
-  const { stateMap: eiStates } = useExploitIntelligenceOfSbom(sbomId);
+  const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
+    sbomId,
+    {
+      onJobFailed: (vulnerabilityId, errorMessage) => {
+        setErrorBanner({
+          title: `Exploit intelligence analysis failed for ${vulnerabilityId}`,
+          message: errorMessage,
+        });
+      },
+    },
+  );
 
   const submitAnalysis = useSubmitExploitAnalysisMutation();
 
@@ -88,16 +102,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       submitAnalysis.mutate(
         { sbom_id: sbomId, vulnerability_id: vulnerabilityId },
         {
+          onSuccess: (data) => {
+            if (data.data?.job_id) {
+              trackJob(data.data.job_id);
+            }
+          },
           onError: () => {
-            pushNotification({
+            setErrorBanner({
               title: `Failed to submit exploit analysis for ${vulnerabilityId}`,
-              variant: "danger",
             });
           },
         },
       );
     },
-    [sbomId, submitAnalysis, pushNotification],
+    [sbomId, submitAnalysis, trackJob],
   );
 
   const affectedVulnerabilities = React.useMemo(() => {
@@ -214,6 +232,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
         </Card>
       </StackItem>
       <StackItem>
+        {errorBanner && (
+          <Alert
+            isInline
+            variant="danger"
+            title={errorBanner.title}
+            actionClose={
+              <AlertActionCloseButton onClose={() => setErrorBanner(null)} />
+            }
+            timeout={8000}
+            onTimeout={() => setErrorBanner(null)}
+          >
+            {errorBanner.message}
+          </Alert>
+        )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
             <ToolbarItem {...paginationToolbarItemProps}>
