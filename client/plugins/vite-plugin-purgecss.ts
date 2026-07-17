@@ -26,8 +26,6 @@ export function purgeCSSPlugin(options: PurgeCSSPluginOptions = {}): Plugin {
         .map((asset) => asset.source as string)
         .join("\n");
 
-      const rawContent = jsContent + "\n" + htmlContent;
-
       const cssAssets = Object.entries(bundle).filter(
         ([key, asset]) =>
           key.endsWith(".css") &&
@@ -37,7 +35,10 @@ export function purgeCSSPlugin(options: PurgeCSSPluginOptions = {}): Plugin {
 
       for (const [, asset] of cssAssets) {
         const purged = await new PurgeCSS().purge({
-          content: [{ raw: rawContent, extension: "js" }],
+          content: [
+            { raw: jsContent, extension: "js" },
+            { raw: htmlContent, extension: "html" },
+          ],
           css: [{ raw: asset.source as string }],
           safelist: {
             standard: options.safelist ?? [],
