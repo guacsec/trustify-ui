@@ -426,7 +426,7 @@ Then(
     const totalResults = await searchPage.totalAutoFillResults();
     expect(totalResults).toBeLessThanOrEqual(arg * 4);
     await expect(searchPage).toHaveAutoFillCategoriesWithinLimit(arg);
-  }
+  },
 );
 
 // TC-3248: Verify Upload Advisory button should not appear on Search page
