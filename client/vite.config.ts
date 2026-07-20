@@ -17,6 +17,8 @@ import {
   encodeEnv,
 } from "@trustify-ui/common";
 
+import { purgeCSSPlugin } from "./plugins/vite-plugin-purgecss";
+
 const require = createRequire(import.meta.url);
 export const brandingAssetPath = () =>
   require
@@ -30,6 +32,9 @@ const faviconPath = path.resolve(brandingPath, "favicon.ico");
 export default defineConfig({
   plugins: [
     react(),
+    purgeCSSPlugin({
+      safelist: [/^pf-v6-u-/, "pf-v6-c-content", "pf-v6-c-icon"],
+    }),
     ...(process.env.COVERAGE === "true"
       ? [
           istanbul({

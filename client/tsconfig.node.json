@@ -14,5 +14,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", "test-setup.ts"]
+  "include": ["vite.config.ts", "test-setup.ts", "plugins/**/*.ts"]
 }
