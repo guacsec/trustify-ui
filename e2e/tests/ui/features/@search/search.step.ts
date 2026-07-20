@@ -1,11 +1,14 @@
 import { createBdd } from "playwright-bdd";
+
+import { test } from "../../fixtures";
+
 import { expect } from "../../assertions";
 import { SearchPage, type Tabs } from "../../pages/search-page/SearchPage";
 import { SearchPageTabs } from "../../pages/SearchPageTabs";
 import { DetailsPageLayout } from "../../pages/DetailsPageLayout";
 import { getTableInfo, toSingular, getDefaultSort } from "../../pages/utils";
 
-export const { Given, When, Then } = createBdd();
+export const { Given, When, Then } = createBdd(test);
 
 let Page!: SearchPage;
 let currentType = "";
@@ -423,5 +426,14 @@ Then(
     const totalResults = await searchPage.totalAutoFillResults();
     expect(totalResults).toBeLessThanOrEqual(arg * 4);
     await expect(searchPage).toHaveAutoFillCategoriesWithinLimit(arg);
+  }
+);
+
+// TC-3248: Verify Upload Advisory button should not appear on Search page
+Then(
+  "{string} button should not be displayed",
+  async ({ page }, buttonText: string) => {
+    const button = page.getByRole("button", { name: buttonText, exact: true });
+    await expect(button).not.toBeVisible();
   },
 );
