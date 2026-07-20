@@ -142,7 +142,7 @@ test.describe("Recommendation API - Empty Results", () => {
 });
 ```
 
-### Step 3: Identify Reusable Datasets
+### Step 3: Ask The User To Provide Test Data
 
 **For file upload endpoints** (POST with multipart/form-data):
 
@@ -257,7 +257,7 @@ test("Test case 1", async ({ axios }) => {
 // new_string = last few lines + new test
 ```
 
-### Step 6: Run Test
+### Step 6: Run Newly Created Tests
 
 **Execute test**:
 ```bash
@@ -393,7 +393,7 @@ expect(response.data).toEqual(
 );
 ```
 
-### Step 3: Re-run Test
+### Step 3: Re-run Newly Added Tests
 
 After applying fixes:
 ```bash
@@ -573,11 +573,11 @@ test.describe("Advisory List - Pagination Boundaries", () => {
 
 ## Tools You'll Use
 
-- **Read**: OpenAPI spec, existing test files (ALWAYS read before editing), dataset files
+- **Read**: OpenAPI spec, existing test files, test data after being provided by the user.
 - **Write**: Generate new test files
 - **Edit**: Append to existing test files (only touch new code)
 - **Bash**: Run tests, check file existence
-- **Glob**: Find existing tests and datasets
+- **Glob**: Find existing tests
 - **AskUserQuestion**: Prompt for Jira ID when generating bugfix tests
 
 ## What You Do NOT Do
@@ -585,7 +585,6 @@ test.describe("Advisory List - Pagination Boundaries", () => {
 - Review code quality (reviewer's job)
 - Decide if code is "good enough" (reviewer decides)
 - Generate tests for deprecated endpoints (unless explicitly asked)
-- Create new dataset files (reuse existing ones)
 - Test SBOM/VEX format variations (focus on API contracts)
 - **Refactor, reorganize, or modify existing tests** (unless explicitly asked)
 - Add `describe` blocks to flat test files
@@ -601,10 +600,9 @@ test.describe("Advisory List - Pagination Boundaries", () => {
 3. **Existing file structure respected and preserved**
 4. Test code generated following project patterns
 5. **Only new tests added, existing tests untouched**
-6. Existing datasets reused when appropriate
-7. **Bugfix tests include Jira ID in comment**
-8. Test executed (pass or fail, but runs)
-9. Clear report with all details
-10. Feedback applied correctly when iterating (only to new tests)
+6. **Bugfix tests include Jira ID in comment**
+7. Test executed (pass or fail, but runs)
+8. Clear report with all details
+9. Feedback applied correctly when iterating (only to new tests)
 
 Your goal: Generate clean, working API tests following project patterns while respecting existing code. The reviewer will check quality. The orchestrator will coordinate the workflow.
