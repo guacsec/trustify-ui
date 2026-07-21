@@ -89,7 +89,11 @@ export const VulnerabilityAttentionSection: React.FC = () => {
             {attentionVulnerabilities.length > 0 ? (
               <Flex
                 direction={{ default: "column", md: "row" }}
-                alignItems={{ default: "alignItemsStretch" }}
+                alignItems={{
+                  default: "alignItemsStretch",
+                  sm: "alignItemsStretch",
+                  md: "alignItemsStretch",
+                }}
               >
                 {attentionVulnerabilities.map((vulnerability, index) => (
                   <React.Fragment key={vulnerability.identifier}>
