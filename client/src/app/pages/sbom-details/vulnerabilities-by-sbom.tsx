@@ -4,6 +4,8 @@ import { generatePath, Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
+  Alert,
+  AlertActionCloseButton,
   Button,
   Card,
   CardBody,
@@ -23,6 +25,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 import {
+  ActionsColumn,
   ExpandableRowContent,
   Table,
   TableText,
@@ -47,10 +50,14 @@ import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
 import { useLocalTableControls } from "@app/hooks/table-controls";
+import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
+import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
+
+import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
 interface VulnerabilitiesBySbomProps {
@@ -70,6 +77,46 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
+
+  const [errorBanner, setErrorBanner] = React.useState<{
+    title: string;
+    message?: string;
+  } | null>(null);
+
+  const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
+    sbomId,
+    {
+      onJobFailed: (vulnerabilityId, errorMessage) => {
+        setErrorBanner({
+          title: `Exploit intelligence analysis failed for ${vulnerabilityId}`,
+          message: errorMessage,
+        });
+      },
+    },
+  );
+
+  const submitAnalysis = useSubmitExploitAnalysisMutation();
+
+  const handleRequestAnalysis = React.useCallback(
+    (vulnerabilityId: string) => {
+      submitAnalysis.mutate(
+        { sbom_id: sbomId, vulnerability_id: vulnerabilityId },
+        {
+          onSuccess: (data) => {
+            if (data.data?.job_id) {
+              trackJob(data.data.job_id);
+            }
+          },
+          onError: () => {
+            setErrorBanner({
+              title: `Failed to submit exploit analysis for ${vulnerabilityId}`,
+            });
+          },
+        },
+      );
+    },
+    [sbomId, submitAnalysis, trackJob],
+  );
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
@@ -91,11 +138,12 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       id: "Id",
       description: "Description",
       cvss: "CVSS",
+      exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
       published: "Published",
       updated: "Updated",
     },
-    hasActionsColumn: false,
+    hasActionsColumn: true,
     isSortEnabled: true,
     sortableColumns: [
       "id",
@@ -184,6 +232,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
         </Card>
       </StackItem>
       <StackItem>
+        {errorBanner && (
+          <Alert
+            isInline
+            variant="danger"
+            title={errorBanner.title}
+            actionClose={
+              <AlertActionCloseButton onClose={() => setErrorBanner(null)} />
+            }
+            timeout={8000}
+            onTimeout={() => setErrorBanner(null)}
+          >
+            {errorBanner.message}
+          </Alert>
+        )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
             <ToolbarItem {...paginationToolbarItemProps}>
@@ -203,6 +265,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
+                <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -216,6 +279,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             numRenderedColumns={numRenderedColumns}
           >
             {currentPageItems?.map((item, rowIndex) => {
+              const eiState = eiStates[item.vulnerability.identifier];
+              const isReanalysisDisabled =
+                !eiState ||
+                eiState.kind === "not_run" ||
+                (eiState.kind === "finding" &&
+                  eiState.finding.variant === "in_progress");
+
               return (
                 <Tbody
                   key={item._ui_unique_id}
@@ -243,7 +313,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={40}
+                            width={25}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -263,7 +333,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={20} {...getTdProps({ columnKey: "cvss" })}>
+                      <Td width={15} {...getTdProps({ columnKey: "cvss" })}>
                         <Flex>
                           <FlexItem>
                             <SeverityShieldAndText
@@ -304,6 +374,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         </Flex>
                       </Td>
                       <Td
+                        width={15}
+                        {...getTdProps({
+                          columnKey: "exploitAnalysis",
+                        })}
+                      >
+                        <ExploitIntelligenceAnalysisCell
+                          vulnerabilityIdentifier={
+                            item.vulnerability.identifier
+                          }
+                          state={eiState ?? { kind: "not_run" }}
+                          onRequestAnalysis={handleRequestAnalysis}
+                        />
+                      </Td>
+                      <Td
                         width={10}
                         modifier="truncate"
                         {...getTdProps({
@@ -328,6 +412,20 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         {...getTdProps({ columnKey: "updated" })}
                       >
                         {formatDate(item.vulnerability?.modified)}
+                      </Td>
+                      <Td isActionCell>
+                        <ActionsColumn
+                          items={[
+                            {
+                              title: "Request new analysis",
+                              onClick: () =>
+                                handleRequestAnalysis(
+                                  item.vulnerability.identifier,
+                                ),
+                              isDisabled: isReanalysisDisabled,
+                            },
+                          ]}
+                        />
                       </Td>
                     </TableRowContentWithControls>
                   </Tr>
