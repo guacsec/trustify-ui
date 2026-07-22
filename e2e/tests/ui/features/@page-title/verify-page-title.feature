@@ -6,6 +6,9 @@ Feature: Page Title Updates
 # Related to TC-3370: Page title does not change based on viewed page
 # The ensures page titles update when navigating to different pages
 
+Background: Authentication
+	Given User is authenticated
+
 # Verify page titles for main application pages
 Scenario Outline: Verify page title changes when navigating to <page> page
 	When User navigates to "<page>" page
