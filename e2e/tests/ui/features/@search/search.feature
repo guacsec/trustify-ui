@@ -3,6 +3,9 @@ Feature: Search Page
 	I want the Search page to only display relevant actions
 	So that I am not confused by buttons that don't apply to the current context
 
+Background: Authentication
+	Given User is authenticated
+
 # Related to TC-3248: Upload Advisory button should not appear on Search page
 Scenario: Verify Upload Advisory button is not displayed on Search page
 	When User navigates to "Search" page
