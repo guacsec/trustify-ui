@@ -52,6 +52,7 @@ import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerab
 import { useLocalTableControls } from "@app/hooks/table-controls";
 import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
 import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
+import { useIsExploitIntelligenceEnabled } from "@app/queries/trustifyInfo";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
@@ -78,13 +79,15 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
 
+  const isEiEnabled = useIsExploitIntelligenceEnabled();
+
   const [errorBanner, setErrorBanner] = React.useState<{
     title: string;
     message?: string;
   } | null>(null);
 
   const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
-    sbomId,
+    isEiEnabled ? sbomId : undefined,
     {
       onJobFailed: (vulnerabilityId, errorMessage) => {
         setErrorBanner({
@@ -143,7 +146,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       published: "Published",
       updated: "Updated",
     },
-    hasActionsColumn: true,
+    hasActionsColumn: isEiEnabled,
     isSortEnabled: true,
     sortableColumns: [
       "id",
@@ -265,7 +268,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
-                <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
+                {isEiEnabled && (
+                  <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
+                )}
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -373,20 +378,22 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </FlexItem>
                         </Flex>
                       </Td>
-                      <Td
-                        width={15}
-                        {...getTdProps({
-                          columnKey: "exploitAnalysis",
-                        })}
-                      >
-                        <ExploitIntelligenceAnalysisCell
-                          vulnerabilityIdentifier={
-                            item.vulnerability.identifier
-                          }
-                          state={eiState ?? { kind: "not_run" }}
-                          onRequestAnalysis={handleRequestAnalysis}
-                        />
-                      </Td>
+                      {isEiEnabled && (
+                        <Td
+                          width={15}
+                          {...getTdProps({
+                            columnKey: "exploitAnalysis",
+                          })}
+                        >
+                          <ExploitIntelligenceAnalysisCell
+                            vulnerabilityIdentifier={
+                              item.vulnerability.identifier
+                            }
+                            state={eiState ?? { kind: "not_run" }}
+                            onRequestAnalysis={handleRequestAnalysis}
+                          />
+                        </Td>
+                      )}
                       <Td
                         width={10}
                         modifier="truncate"
@@ -413,20 +420,22 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       >
                         {formatDate(item.vulnerability?.modified)}
                       </Td>
-                      <Td isActionCell>
-                        <ActionsColumn
-                          items={[
-                            {
-                              title: "Request new analysis",
-                              onClick: () =>
-                                handleRequestAnalysis(
-                                  item.vulnerability.identifier,
-                                ),
-                              isDisabled: isReanalysisDisabled,
-                            },
-                          ]}
-                        />
-                      </Td>
+                      {isEiEnabled && (
+                        <Td isActionCell>
+                          <ActionsColumn
+                            items={[
+                              {
+                                title: "Request new analysis",
+                                onClick: () =>
+                                  handleRequestAnalysis(
+                                    item.vulnerability.identifier,
+                                  ),
+                                isDisabled: isReanalysisDisabled,
+                              },
+                            ]}
+                          />
+                        </Td>
+                      )}
                     </TableRowContentWithControls>
                   </Tr>
                   {isCellExpanded(item) ? (
