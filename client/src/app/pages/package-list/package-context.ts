@@ -18,7 +18,7 @@ interface IPackageSearchContext {
     | "version"
     | "type"
     | "licenses"
-    | "recommendations"
+    | "remediation"
     | "path"
     | "qualifiers"
     | "vulnerabilities",
