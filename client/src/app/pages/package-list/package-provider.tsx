@@ -52,7 +52,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       version: "Version",
       type: "Type",
       licenses: "Licenses",
-      recommendations: "Recommendations",
+      remediation: "Remediation",
       path: "Path",
       qualifiers: "Qualifiers",
       vulnerabilities: "Vulnerabilities",
@@ -142,8 +142,11 @@ export const PackageSearchProvider: React.FunctionComponent<
     [enrichedPackages],
   );
 
-  const { recommendationsMap, isFetching: recIsFetching, fetchError: recFetchError } =
-    useFetchRecommendations(purls);
+  const {
+    recommendationsMap,
+    isFetching: recIsFetching,
+    fetchError: recFetchError,
+  } = useFetchRecommendations(purls);
 
   const tableControls = useTableControlProps({
     ...tableControlState,

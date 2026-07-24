@@ -21,11 +21,16 @@ import {
 import { Paths } from "@app/Routes";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
-import { List, ListItem } from "@patternfly/react-core";
+import {
+  Label,
+  LabelGroup,
+  List,
+  ListItem,
+  Tooltip,
+} from "@patternfly/react-core";
 import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
-import { PackageRecommendations } from "./components/PackageRecommendations";
-import { RecommendationsExpandedContent } from "./components/RecommendationsExpandedContent";
+import { decomposePurl, purlBaseEquals } from "@app/utils/utils";
 
 export const PackageTable: React.FC = () => {
   const {
@@ -62,7 +67,7 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
-              <Th {...getThProps({ columnKey: "recommendations" })} />
+              <Th {...getThProps({ columnKey: "remediation" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -140,22 +145,82 @@ export const PackageTable: React.FC = () => {
                         </Td>
                         <Td
                           width={10}
-                          modifier="truncate"
-                          {...getTdProps({
-                            columnKey: "recommendations",
-                            isCompoundExpandToggle: true,
-                            item,
-                            rowIndex,
-                          })}
+                          {...getTdProps({ columnKey: "remediation" })}
                         >
-                          <PackageRecommendations
-                            recommendations={
-                              recommendationsMap.get(item.purl) ?? []
+                          {(() => {
+                            const recommendations =
+                              recommendationsMap.get(item.purl) ?? [];
+
+                            const isApplied = recommendations.some((rec) =>
+                              purlBaseEquals(rec.package, item.purl),
+                            );
+
+                            if (isApplied) {
+                              return (
+                                <Label color="blue" isCompact>
+                                  Applied
+                                </Label>
+                              );
                             }
-                            isFetching={recIsFetching}
-                            fetchError={recFetchError}
-                            currentPurl={item.purl}
-                          />
+
+                            if (recommendations.length > 0) {
+                              return (
+                                <LabelGroup>
+                                  {recommendations.map((rec) => {
+                                    const version =
+                                      decomposePurl(rec.package)?.version ??
+                                      rec.package;
+                                    return (
+                                      <Tooltip
+                                        key={rec.package}
+                                        content={rec.package}
+                                      >
+                                        <Label color="green" isCompact>
+                                          {version}
+                                        </Label>
+                                      </Tooltip>
+                                    );
+                                  })}
+                                </LabelGroup>
+                              );
+                            }
+
+                            const fixedVersions: string[] = [];
+                            for (const advisory of pkg?.advisories ?? []) {
+                              for (const pkgStatus of advisory.status ?? []) {
+                                const versions = (
+                                  pkgStatus as unknown as {
+                                    fixed_versions?: string[];
+                                  }
+                                ).fixed_versions;
+                                if (versions) {
+                                  for (const v of versions) {
+                                    if (!fixedVersions.includes(v))
+                                      fixedVersions.push(v);
+                                  }
+                                }
+                              }
+                            }
+
+                            if (fixedVersions.length > 0) {
+                              return (
+                                <LabelGroup>
+                                  {fixedVersions.map((v) => (
+                                    <Label
+                                      key={v}
+                                      color="green"
+                                      variant="outline"
+                                      isCompact
+                                    >
+                                      {v}
+                                    </Label>
+                                  ))}
+                                </LabelGroup>
+                              );
+                            }
+
+                            return null;
+                          })()}
                         </Td>
                         <Td
                           width={10}
@@ -206,14 +271,6 @@ export const PackageTable: React.FC = () => {
                                     </ListItem>
                                   ))}
                                 </List>
-                              ) : null}
-                              {isCellExpanded(item, "recommendations") ? (
-                                <RecommendationsExpandedContent
-                                  recommendations={
-                                    recommendationsMap.get(item.purl) ?? []
-                                  }
-                                  currentPurl={item.purl}
-                                />
                               ) : null}
                             </div>
                           </ExpandableRowContent>
