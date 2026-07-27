@@ -37,6 +37,7 @@ import {
 } from "@patternfly/react-table";
 
 import { LoadingWrapper } from "@tsd-ui/core";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
@@ -79,6 +80,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
 
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const isEiEnabled = useIsExploitIntelligenceEnabled();
 
   const [errorBanner, setErrorBanner] = React.useState<{
@@ -391,6 +393,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                             }
                             state={eiState ?? { kind: "not_run" }}
                             onRequestAnalysis={handleRequestAnalysis}
+                            isDisabled={
+                              areMutationsDisabled || submitAnalysis.isPending
+                            }
                           />
                         </Td>
                       )}
@@ -430,7 +435,10 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                   handleRequestAnalysis(
                                     item.vulnerability.identifier,
                                   ),
-                                isDisabled: isReanalysisDisabled,
+                                isDisabled:
+                                  areMutationsDisabled ||
+                                  submitAnalysis.isPending ||
+                                  isReanalysisDisabled,
                               },
                             ]}
                           />
