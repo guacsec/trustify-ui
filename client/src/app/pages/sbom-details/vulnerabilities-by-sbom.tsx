@@ -83,19 +83,15 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const isEiEnabled = useIsExploitIntelligenceEnabled();
 
-  const [errorBanner, setErrorBanner] = React.useState<{
-    title: string;
-    message?: string;
-  } | null>(null);
+  const [errorBanner, setErrorBanner] = React.useState<string | null>(null);
 
   const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
     isEiEnabled ? sbomId : undefined,
     {
-      onJobFailed: (vulnerabilityId, errorMessage) => {
-        setErrorBanner({
-          title: `Exploit intelligence analysis failed for ${vulnerabilityId}`,
-          message: errorMessage,
-        });
+      onJobFailed: (vulnerabilityId) => {
+        setErrorBanner(
+          `Exploit intelligence analysis failed for ${vulnerabilityId}.`,
+        );
       },
     },
   );
@@ -113,9 +109,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             }
           },
           onError: () => {
-            setErrorBanner({
-              title: `Failed to submit exploit analysis for ${vulnerabilityId}`,
-            });
+            setErrorBanner(
+              `Failed to submit exploit analysis for ${vulnerabilityId}`,
+            );
           },
         },
       );
@@ -241,15 +237,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
           <Alert
             isInline
             variant="danger"
-            title={errorBanner.title}
+            title={errorBanner}
             actionClose={
               <AlertActionCloseButton onClose={() => setErrorBanner(null)} />
             }
             timeout={8000}
             onTimeout={() => setErrorBanner(null)}
-          >
-            {errorBanner.message}
-          </Alert>
+          />
         )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
