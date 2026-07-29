@@ -83,15 +83,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const isEiEnabled = useIsExploitIntelligenceEnabled();
 
-  const [errorBanner, setErrorBanner] = React.useState<string | null>(null);
+  const [showErrorBanner, setShowErrorBanner] = React.useState(false);
 
   const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
     isEiEnabled ? sbomId : undefined,
     {
-      onJobFailed: (vulnerabilityId) => {
-        setErrorBanner(
-          `Exploit intelligence analysis failed for ${vulnerabilityId}.`,
-        );
+      onJobFailed: () => {
+        setShowErrorBanner(true);
       },
     },
   );
@@ -109,9 +107,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             }
           },
           onError: () => {
-            setErrorBanner(
-              `Failed to submit exploit analysis for ${vulnerabilityId}`,
-            );
+            setShowErrorBanner(true);
           },
         },
       );
@@ -233,17 +229,24 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
         </Card>
       </StackItem>
       <StackItem>
-        {errorBanner && (
+        {showErrorBanner && (
           <Alert
             isInline
             variant="danger"
-            title={errorBanner}
+            title="Analysis failed"
+            style={{ marginBlockEnd: "var(--pf-t--global--spacer--md)" }}
             actionClose={
-              <AlertActionCloseButton onClose={() => setErrorBanner(null)} />
+              <AlertActionCloseButton
+                onClose={() => setShowErrorBanner(false)}
+              />
             }
             timeout={8000}
-            onTimeout={() => setErrorBanner(null)}
-          />
+            onTimeout={() => setShowErrorBanner(false)}
+          >
+            The analysis could not be completed due to an unsupported SBOM
+            format or a system error. Verify that your SBOM is in a supported
+            format. If the issue persists, contact your administrator.
+          </Alert>
         )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
