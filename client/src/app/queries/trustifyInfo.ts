@@ -18,3 +18,9 @@ export const useFetchTrustifyInfo = () => {
     error,
   };
 };
+
+/** Whether the exploit intelligence feature is configured on the server. */
+export const useIsExploitIntelligenceEnabled = (): boolean => {
+  const { data } = useFetchTrustifyInfo();
+  return data?.exploitIntelligence ?? false;
+};
