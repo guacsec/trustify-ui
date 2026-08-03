@@ -1,4 +1,5 @@
 import { expect, test } from "../fixtures";
+import { decodeAnalysisItemPurls } from "../helpers/general-helpers";
 
 // Effectively tests TC-2052 / TC-2053 - Denote image index to arch image variants relationship.
 
@@ -20,7 +21,7 @@ test("Variant of / CDX / Binary image has ancestors that include index image / G
     `/api/v3/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxBinaryImagePurl]),
@@ -44,7 +45,7 @@ test("Variant of / CDX / Index image has descendants that include binary image /
     `/api/v3/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxIndexImagePurl]),
@@ -68,7 +69,7 @@ test("Variant of / SPDX / Binary image has ancestors that include index image / 
     `/api/v3/analysis/component/${urlEncodedBinaryImagePurl}?ancestors=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxBinaryImagePurl]),
@@ -92,7 +93,7 @@ test("Variant of / SPDX / Index image has descendants that include binary image 
     `/api/v3/analysis/component/${urlEncodedIndexImagePurl}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxIndexImagePurl]),
