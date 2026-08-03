@@ -13,7 +13,6 @@ import {
   AdvisoryHead,
   type Labels,
   deleteAdvisory,
-  downloadAdvisory,
   getAdvisory,
   listAdvisories,
   listAdvisoryLabels,
@@ -125,28 +124,6 @@ export const useDeleteAdvisoryMutation = (
       await queryClient.invalidateQueries({ queryKey: [AdvisoriesQueryKey] });
     },
   });
-};
-
-export const useFetchAdvisorySourceById = (id: string, enabled = true) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: [AdvisoriesQueryKey, id, "source"],
-    queryFn: async () => {
-      const response = await downloadAdvisory({
-        client,
-        path: { key: id },
-        responseType: "text",
-        headers: { Accept: "text/plain" },
-      });
-      return String(response.data);
-    },
-    enabled: !!id && enabled,
-  });
-
-  return {
-    source: data ?? null,
-    isFetching: isLoading,
-    fetchError: error as AxiosError | null,
-  };
 };
 
 export const useUploadAdvisory = () => {
