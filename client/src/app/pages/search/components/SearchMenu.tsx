@@ -21,6 +21,7 @@ import { useFetchAdvisories } from "@app/queries/advisories";
 import { useFetchPackages } from "@app/queries/packages";
 import { useFetchSBOMs } from "@app/queries/sboms";
 import { useFetchVulnerabilities } from "@app/queries/vulnerabilities";
+import { decodePurl } from "@app/utils/utils";
 
 export interface IEntity {
   id: string;
@@ -107,7 +108,7 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
 
   const transformedPackages: IEntity[] = packages.map((item) => ({
     id: `package-${item.uuid}`,
-    title: item.purl,
+    title: decodePurl(item.purl),
     navLink: `/packages/${item.uuid}`,
     type: "Package",
     typeColor: "teal",

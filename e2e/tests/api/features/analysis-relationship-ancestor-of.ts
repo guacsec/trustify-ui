@@ -1,4 +1,5 @@
 import { expect, test } from "../fixtures";
+import { decodeAnalysisItemPurls } from "../helpers/general-helpers";
 
 // Effectively tests TC-2054 / TC-2055 - Denote upstream relationship.
 
@@ -19,7 +20,7 @@ test("Ancestor of / CDX / Upstream component has descendants that include downst
     `/api/v3/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxUpstreamPurl]),
@@ -42,7 +43,7 @@ test.skip("Ancestor of / CDX / Upstream component has descendants that include d
     `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxUpstreamPurl]),
@@ -66,7 +67,7 @@ test("Ancestor of / CDX / Downstream component has ancestors that include upstre
     `/api/v3/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxDownstreamPurl]),
@@ -89,7 +90,7 @@ test.skip("Ancestor of / CDX / Downstream component has ancestors that include u
     `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([cdxDownstreamPurl]),
@@ -113,7 +114,7 @@ test("Ancestor of / SPDX / Upstream component has descendants that include downs
     `/api/v3/analysis/component/${urlEncodedUpstreamPurl}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxUpstreamPurl]),
@@ -136,7 +137,7 @@ test.skip("Ancestor of / SPDX / Upstream component has descendants that include 
     `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxUpstreamPurl]),
@@ -160,7 +161,7 @@ test("Ancestor of / SPDX / Downstream component has ancestors that include upstr
     `/api/v3/analysis/component/${urlEncodedDownstreamPurl}?ancestors=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxDownstreamPurl]),
@@ -183,7 +184,7 @@ test.skip("Ancestor of / SPDX / Downstream component has ancestors that include 
     `/api/v3/analysis/component?q=${query}?descendants=10`,
   );
 
-  expect(response.data.items).toEqual(
+  expect(response.data.items.map(decodeAnalysisItemPurls)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         purl: expect.arrayContaining([spdxDownstreamPurl]),

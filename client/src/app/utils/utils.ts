@@ -117,6 +117,18 @@ export const decomposePurl = (purl: string) => {
   }
 };
 
+/** Decode a PURL for display. Falls back to the original value if decoding fails. */
+export const decodePurl = (purl: string | null | undefined): string => {
+  if (purl == null) {
+    return "";
+  }
+  try {
+    return decodeURIComponent(purl);
+  } catch {
+    return purl;
+  }
+};
+
 export const getString = (input: string | (() => string)) =>
   typeof input === "function" ? input() : input;
 
