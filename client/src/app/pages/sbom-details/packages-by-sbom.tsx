@@ -36,6 +36,7 @@ import {
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
+import { decodePurl } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
@@ -243,7 +244,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                             packageId: item.purl[0].uuid,
                           })}
                         >
-                          {item.purl[0].purl}
+                          {decodePurl(item.purl[0].purl)}
                         </Link>
                       ) : (
                         `${item.purl.length} PURLs`
@@ -297,7 +298,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                         packageId: e.uuid,
                                       })}
                                     >
-                                      {e.purl}
+                                      {decodePurl(e.purl)}
                                     </Link>
                                   </ListItem>
                                 );
