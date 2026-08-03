@@ -15,7 +15,7 @@
     "start:dev": "npm run generate && vite --port 3000 --host",
     "start": "vite preview",
     "test": "vitest --run",
-    "generate": "openapi-ts -f ./config/openapi-ts.config.ts && json2ts specs/csaf_v2.0_json_schema.json -o src/app/specs/csaf/csaf-v2.0-schema.d.ts",
+    "generate": "openapi-ts -f ./config/openapi-ts.config.ts && json2ts specs/csaf_v2.0_json_schema.json --cwd=specs -o src/app/specs/csaf/csaf-v2.0-schema.d.ts",
     "preview": "vite preview"
   },
   "dependencies": {
