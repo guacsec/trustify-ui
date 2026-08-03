@@ -19,6 +19,7 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
+import { decodePurl } from "@app/utils/utils";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { List, ListItem } from "@patternfly/react-core";
@@ -89,7 +90,7 @@ export const PackageTable: React.FC = () => {
                           >
                             {item.decomposedPurl
                               ? item.decomposedPurl?.name
-                              : item.purl}
+                              : decodePurl(item.purl)}
                           </NavLink>
                         </Td>
                         <Td
