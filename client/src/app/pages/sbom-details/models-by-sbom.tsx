@@ -32,6 +32,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchModelsBySbomId } from "@app/queries/sboms";
+import { decodePurl } from "@app/utils/utils";
 
 interface ModelsProps {
   sbomId: string;
@@ -139,7 +140,9 @@ export const ModelsBySbom: React.FC<ModelsProps> = ({ sbomId }) => {
                           </FlexItem>
                           <FlexItem>
                             <small>
-                              {model?.purls.map((e) => e.purl).join(",")}
+                              {model?.purls
+                                .map((e) => decodePurl(e.purl))
+                                .join(",")}
                             </small>
                           </FlexItem>
                           <FlexItem>

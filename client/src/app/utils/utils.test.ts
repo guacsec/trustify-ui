@@ -1,6 +1,6 @@
 import type { AxiosError } from "axios";
 
-import { getAxiosErrorMessage, getToolbarChipKey } from "./utils";
+import { decodePurl, getAxiosErrorMessage, getToolbarChipKey } from "./utils";
 
 const createAxiosError = (
   overrides: Partial<AxiosError> = {},
@@ -123,5 +123,24 @@ describe("utils", () => {
       },
     });
     expect(getAxiosErrorMessage(error)).toBe("SomeError: Something happened");
+  });
+
+  // decodePurl
+
+  it("decodePurl: decodes percent-encoded qualifiers", () => {
+    const encoded =
+      "pkg:maven/org.hdrhistogram/HdrHistogram@2.1.12.redhat-00002?repository_url=https:%2F%2Fmaven.repository.redhat.com%2Fga%2F&type=jar";
+    expect(decodePurl(encoded)).toBe(
+      "pkg:maven/org.hdrhistogram/HdrHistogram@2.1.12.redhat-00002?repository_url=https://maven.repository.redhat.com/ga/&type=jar",
+    );
+  });
+
+  it("decodePurl: returns original value for malformed URI sequences", () => {
+    expect(decodePurl("pkg:%")).toBe("pkg:%");
+  });
+
+  it("decodePurl: returns empty string for null or undefined", () => {
+    expect(decodePurl(null)).toBe("");
+    expect(decodePurl(undefined)).toBe("");
   });
 });
