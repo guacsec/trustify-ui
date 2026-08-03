@@ -57,3 +57,15 @@ export function formatTimeElapsed(endTime: number, startTime: number) {
 
   return formattedTime;
 }
+
+/** Decode percent-encoded qualifier values in analysis component purls. */
+export function decodeAnalysisItemPurls<
+  T extends { purl: string[]; ancestors?: T[]; descendants?: T[] },
+>(item: T): T {
+  return {
+    ...item,
+    purl: item.purl.map(decodeURIComponent),
+    ancestors: item.ancestors?.map(decodeAnalysisItemPurls),
+    descendants: item.descendants?.map(decodeAnalysisItemPurls),
+  };
+}
