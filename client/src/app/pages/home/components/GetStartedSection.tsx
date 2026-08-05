@@ -72,7 +72,7 @@ export const GetStartedSection: React.FC = () => {
   ];
 
   return (
-    <HomeSectionCard>
+    <HomeSectionCard testId="home-get-started-section">
       <Stack hasGutter>
         <StackItem>
           <Title headingLevel="h2" size="lg">
@@ -110,7 +110,10 @@ export const GetStartedSection: React.FC = () => {
                       }}
                     />
                   )}
-                  <FlexItem flex={{ default: "flex_1" }}>
+                  <FlexItem
+                    flex={{ default: "flex_1" }}
+                    data-testid={`home-get-started-action-${index}`}
+                  >
                     <Stack hasGutter>
                       <StackItem isFilled>
                         <Stack>

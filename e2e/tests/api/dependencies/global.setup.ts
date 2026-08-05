@@ -2,6 +2,7 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { logger, SETUP_TIMEOUT } from "../../common/constants";
+import { updateCveDatesForLastSevenDays } from "../../common/cve-date-updater";
 import { test as setup } from "../fixtures";
 import { uploadFiles } from "../helpers/general-helpers";
 
@@ -15,6 +16,8 @@ setup.describe("Ingest initial data", () => {
     setup.setTimeout(SETUP_TIMEOUT);
 
     logger.info("Setup: start uploading assets");
+
+    await updateCveDatesForLastSevenDays();
 
     const SBOM_FILES = await readDirectoryRecursively(
       path.join(__dirname, "../../common/dataset/sbom"),
