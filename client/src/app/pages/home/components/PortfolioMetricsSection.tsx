@@ -22,12 +22,12 @@ import { formatDateTime } from "@app/utils/utils";
 
 interface HomeSectionCardProps {
   children: React.ReactNode;
-  "data-testid"?: string;
+  testId?: string;
 }
 
 export const HomeSectionCard: React.FC<HomeSectionCardProps> = ({
   children,
-  "data-testid": testId,
+  testId,
 }) => {
   return (
     <Card data-testid={testId}>
@@ -61,7 +61,7 @@ export const PortfolioMetricsSection: React.FC = () => {
   const latestAdvisory = advisories[0] ?? null;
 
   return (
-    <HomeSectionCard data-testid="home-metrics-section">
+    <HomeSectionCard testId="home-metrics-section">
       <LoadingWrapper
         isFetching={isFetchingSboms || isFetchingAdvisories}
         fetchError={fetchErrorSboms || fetchErrorAdvisories}

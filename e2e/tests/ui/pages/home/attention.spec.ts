@@ -44,6 +44,8 @@ test.describe(
       for (let i = 0; i < 3; i++) {
         await expect(homePage.getAttentionItem(i)).toBeVisible();
       }
+
+      await expect(homePage.getAttentionItem(3)).toHaveCount(0);
     });
 
     test("should display severity badges on attention cards", async ({

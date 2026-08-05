@@ -73,7 +73,7 @@ export const VulnerabilityAttentionSection: React.FC = () => {
   );
 
   return (
-    <HomeSectionCard data-testid="home-attention-section">
+    <HomeSectionCard testId="home-attention-section">
       <Stack hasGutter>
         <StackItem>
           <Title headingLevel="h2" size="lg">
