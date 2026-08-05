@@ -72,7 +72,7 @@ export const GetStartedSection: React.FC = () => {
   ];
 
   return (
-    <HomeSectionCard>
+    <HomeSectionCard data-testid="home-get-started-section">
       <Stack hasGutter>
         <StackItem>
           <Title headingLevel="h2" size="lg">
