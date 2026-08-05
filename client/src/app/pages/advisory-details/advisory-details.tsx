@@ -42,7 +42,7 @@ import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
 } from "@app/queries/advisories";
-import { LoadingWrapper } from "@tsd-ui/core";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";

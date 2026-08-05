@@ -36,7 +36,7 @@ import {
   Tr,
 } from "@patternfly/react-table";
 
-import { LoadingWrapper } from "@tsd-ui/core";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
