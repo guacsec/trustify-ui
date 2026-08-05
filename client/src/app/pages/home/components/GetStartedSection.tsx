@@ -110,7 +110,10 @@ export const GetStartedSection: React.FC = () => {
                       }}
                     />
                   )}
-                  <FlexItem flex={{ default: "flex_1" }}>
+                  <FlexItem
+                    flex={{ default: "flex_1" }}
+                    data-testid={`home-get-started-action-${index}`}
+                  >
                     <Stack hasGutter>
                       <StackItem isFilled>
                         <Stack>

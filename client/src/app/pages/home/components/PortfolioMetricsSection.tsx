@@ -123,7 +123,7 @@ export const PortfolioMetricsSection: React.FC = () => {
             <DescriptionList>
               <DescriptionListGroup>
                 <DescriptionListTerm>Total SBOMs</DescriptionListTerm>
-                <DescriptionListDescription>
+                <DescriptionListDescription data-testid="home-metrics-total-sboms">
                   {totalSboms}
                 </DescriptionListDescription>
               </DescriptionListGroup>
@@ -133,7 +133,7 @@ export const PortfolioMetricsSection: React.FC = () => {
             <DescriptionList>
               <DescriptionListGroup>
                 <DescriptionListTerm>Total Advisories</DescriptionListTerm>
-                <DescriptionListDescription>
+                <DescriptionListDescription data-testid="home-metrics-total-advisories">
                   {totalAdvisories}
                 </DescriptionListDescription>
               </DescriptionListGroup>

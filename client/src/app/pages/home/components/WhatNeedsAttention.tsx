@@ -187,6 +187,7 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                 headingLevel="h4"
                 titleText="No vulnerabilities in the last 7 days"
                 variant={EmptyStateVariant.sm}
+                data-testid="home-attention-empty"
               >
                 <EmptyStateBody>
                   Newly published vulnerabilities will appear here as they
