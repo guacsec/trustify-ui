@@ -2,7 +2,7 @@ import type React from "react";
 import { Outlet } from "react-router-dom";
 import "./App.css";
 
-import { ThemeProvider, type ThemeMode } from "@tsd-ui/core";
+import { ThemeProvider, type ThemeMode } from "@app/components/Theme";
 
 import { useLocalStorage } from "@app/hooks/useStorage";
 
