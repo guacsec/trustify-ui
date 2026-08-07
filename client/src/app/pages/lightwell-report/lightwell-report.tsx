@@ -268,6 +268,7 @@ export const LightwellReport: React.FC = () => {
                         <Tr>
                           <Th>Package</Th>
                           <Th>Version</Th>
+                          <Th>Recommended version</Th>
                           <Th>Found in</Th>
                         </Tr>
                       </Thead>
@@ -276,6 +277,7 @@ export const LightwellReport: React.FC = () => {
                           <Tr key={`${p.packageName}-${p.version}`}>
                             <Td>{p.packageName}</Td>
                             <Td>{p.version}</Td>
+                            <Td>{p.recommendedVersion}</Td>
                             <Td>
                               <LabelGroup>
                                 {p.foundIn.map((name) => (

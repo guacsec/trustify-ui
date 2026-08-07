@@ -7,6 +7,21 @@ import type { RecommendEntry } from "@app/client";
 const BATCH_SIZE = 100;
 const MAX_CONCURRENCY = 2;
 
+const extractVersion = (purl: string): string => {
+  const afterAt = purl.split("@")[1] ?? "";
+  return afterAt.split("?")[0] ?? "";
+};
+
+const extractName = (purl: string): string => {
+  return (
+    purl
+      .split("@")[0]
+      ?.replace(/^pkg:[^/]+\//, "")
+      ?.split("/")
+      .pop() ?? purl
+  );
+};
+
 export interface SbomResult {
   sbomId: string;
   sbomName: string;
@@ -16,7 +31,7 @@ export interface SbomResult {
 export interface PackageResult {
   packageName: string;
   version: string;
-  recommendedPackage: string;
+  recommendedVersion: string;
   foundIn: string[];
   vulnerabilities: string[];
 }
@@ -193,18 +208,10 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
                     }
                   }
                 } else {
-                  const purlParts = purl.split("@");
-                  const name =
-                    purlParts[0]
-                      ?.replace(/^pkg:[^/]+\//, "")
-                      ?.split("/")
-                      .pop() ?? purl;
-                  const version = purlParts[1] ?? "";
-
                   packageMap.set(key, {
-                    packageName: name,
-                    version,
-                    recommendedPackage: entry.package,
+                    packageName: extractName(purl),
+                    version: extractVersion(purl),
+                    recommendedVersion: extractVersion(entry.package),
                     foundIn: [batch.sbomName],
                     vulnerabilities: entry.vulnerabilities.map((v) => v.id),
                   });
