@@ -269,6 +269,7 @@ export const LightwellReport: React.FC = () => {
                           <Th>Package</Th>
                           <Th>Version</Th>
                           <Th>Recommended version</Th>
+                          <Th>Vulnerabilities addressed</Th>
                           <Th>Found in</Th>
                         </Tr>
                       </Thead>
@@ -278,6 +279,15 @@ export const LightwellReport: React.FC = () => {
                             <Td>{p.packageName}</Td>
                             <Td>{p.version}</Td>
                             <Td>{p.recommendedVersion}</Td>
+                            <Td>
+                              <LabelGroup>
+                                {p.vulnerabilities.map((cve) => (
+                                  <Label key={cve} isCompact color="orange">
+                                    {cve}
+                                  </Label>
+                                ))}
+                              </LabelGroup>
+                            </Td>
                             <Td>
                               <LabelGroup>
                                 {p.foundIn.map((name) => (
