@@ -10,8 +10,19 @@ import {
   CardBody,
   CardTitle,
   Content,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  Flex,
+  FlexItem,
+  Label,
+  LabelGroup,
   PageSection,
   Progress,
+  Spinner,
+  Stack,
+  StackItem,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -19,6 +30,8 @@ import {
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
 import { Paths } from "@app/Routes";
+import { useBatchedRecommendations } from "./use-batched-recommendations";
+import { downloadCsv } from "./csv-export";
 
 export const LightwellReport: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -26,6 +39,15 @@ export const LightwellReport: React.FC = () => {
     const ids = searchParams.get("ids");
     return ids ? ids.split(",").filter(Boolean) : [];
   }, [searchParams]);
+
+  const {
+    progressPercent,
+    isLoading,
+    isComplete,
+    sbomResults,
+    packageResults,
+    error,
+  } = useBatchedRecommendations(sbomIds);
 
   if (sbomIds.length === 0) {
     return (
@@ -37,6 +59,13 @@ export const LightwellReport: React.FC = () => {
       </PageSection>
     );
   }
+
+  const addressableSboms = sbomResults.filter((s) => s.addressablePackages > 0);
+
+  const coverage =
+    sbomIds.length > 0
+      ? Math.round((addressableSboms.length / sbomIds.length) * 100)
+      : 0;
 
   return (
     <>
@@ -58,7 +87,11 @@ export const LightwellReport: React.FC = () => {
               </Content>
             </ToolbarItem>
             <ToolbarItem align={{ default: "alignEnd" }}>
-              <Button variant="primary" isDisabled>
+              <Button
+                variant="primary"
+                isDisabled={!isComplete || packageResults.length === 0}
+                onClick={() => downloadCsv(packageResults)}
+              >
                 Download
               </Button>
             </ToolbarItem>
@@ -67,9 +100,195 @@ export const LightwellReport: React.FC = () => {
       </PageSection>
 
       <PageSection>
-        <Content component="p">
-          Loading report for {sbomIds.length} SBOM(s)...
-        </Content>
+        <Stack hasGutter>
+          {isLoading && (
+            <StackItem>
+              <Card>
+                <CardBody>
+                  <Progress
+                    value={progressPercent}
+                    title="Generating report..."
+                    label={`${progressPercent}%`}
+                  />
+                </CardBody>
+              </Card>
+            </StackItem>
+          )}
+
+          {error && (
+            <StackItem>
+              <Alert variant="danger" title="Error generating report">
+                {error}
+              </Alert>
+            </StackItem>
+          )}
+
+          {isComplete && (
+            <>
+              <StackItem>
+                <Alert
+                  variant="info"
+                  title="Lightwell remediations available"
+                  isInline
+                >
+                  Based on the selected SBOMs, Lightwell can address{" "}
+                  {addressableSboms.length} of {sbomIds.length} and{" "}
+                  {packageResults.length} related packages.
+                </Alert>
+              </StackItem>
+
+              <StackItem>
+                <Card>
+                  <CardTitle>Impact summary</CardTitle>
+                  <CardBody>
+                    <Flex>
+                      <FlexItem>
+                        <DescriptionList isHorizontal>
+                          <DescriptionListGroup>
+                            <DescriptionListTerm>
+                              SBOMs Lightwell can address
+                            </DescriptionListTerm>
+                            <DescriptionListDescription>
+                              <Content component="h2">
+                                {addressableSboms.length} / {sbomIds.length}
+                              </Content>
+                              <Content component="small">
+                                You selected {sbomIds.length} SBOMs
+                              </Content>
+                            </DescriptionListDescription>
+                          </DescriptionListGroup>
+                        </DescriptionList>
+                      </FlexItem>
+                      <FlexItem>
+                        <DescriptionList isHorizontal>
+                          <DescriptionListGroup>
+                            <DescriptionListTerm>
+                              Packages Lightwell can address
+                            </DescriptionListTerm>
+                            <DescriptionListDescription>
+                              <Content component="h2">
+                                {packageResults.length}
+                              </Content>
+                              <Content component="small">
+                                Unique packages across selected SBOMs
+                              </Content>
+                            </DescriptionListDescription>
+                          </DescriptionListGroup>
+                        </DescriptionList>
+                      </FlexItem>
+                    </Flex>
+
+                    <Progress
+                      value={coverage}
+                      title="SBOM coverage"
+                      label={`${coverage}%`}
+                      style={{ marginTop: "1rem" }}
+                    />
+
+                    <DescriptionList isHorizontal style={{ marginTop: "1rem" }}>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          Selected SBOMs
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {sbomIds.length}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          Addressable SBOMs
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {addressableSboms.length}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                      <DescriptionListGroup>
+                        <DescriptionListTerm>
+                          Addressable packages
+                        </DescriptionListTerm>
+                        <DescriptionListDescription>
+                          {packageResults.length}
+                        </DescriptionListDescription>
+                      </DescriptionListGroup>
+                    </DescriptionList>
+                  </CardBody>
+                </Card>
+              </StackItem>
+
+              <StackItem>
+                <Card>
+                  <CardTitle>SBOMs Lightwell can help with</CardTitle>
+                  <CardBody>
+                    <Table aria-label="SBOMs Lightwell can help with">
+                      <Thead>
+                        <Tr>
+                          <Th>SBOM</Th>
+                          <Th>Addressable packages</Th>
+                          <Th>Status</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {addressableSboms.map((s) => (
+                          <Tr key={s.sbomId}>
+                            <Td>{s.sbomName}</Td>
+                            <Td>{s.addressablePackages}</Td>
+                            <Td>
+                              <Label color="grey" isCompact>
+                                Lightwell can help
+                              </Label>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </CardBody>
+                </Card>
+              </StackItem>
+
+              <StackItem>
+                <Card>
+                  <CardTitle>Packages Lightwell can help with</CardTitle>
+                  <CardBody>
+                    <Table aria-label="Packages Lightwell can help with">
+                      <Thead>
+                        <Tr>
+                          <Th>Package</Th>
+                          <Th>Version</Th>
+                          <Th>Found in</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {packageResults.map((p) => (
+                          <Tr key={`${p.packageName}-${p.version}`}>
+                            <Td>{p.packageName}</Td>
+                            <Td>{p.version}</Td>
+                            <Td>
+                              <LabelGroup>
+                                {p.foundIn.map((name) => (
+                                  <Label key={name} isCompact color="grey">
+                                    {name}
+                                  </Label>
+                                ))}
+                              </LabelGroup>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </CardBody>
+                </Card>
+              </StackItem>
+            </>
+          )}
+
+          {isLoading && !isComplete && (
+            <StackItem>
+              <Flex justifyContent={{ default: "justifyContentCenter" }}>
+                <Spinner size="lg" />
+              </Flex>
+            </StackItem>
+          )}
+        </Stack>
       </PageSection>
     </>
   );
