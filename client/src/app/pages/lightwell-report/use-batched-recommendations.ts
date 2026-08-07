@@ -26,6 +26,7 @@ export interface SbomResult {
   sbomId: string;
   sbomName: string;
   addressablePackages: number;
+  vulnerabilityCount: number;
 }
 
 export interface PackageResult {
@@ -165,8 +166,9 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
         }
       }
 
-      // Per-SBOM addressable package tracking
+      // Per-SBOM addressable package and CVE tracking
       const sbomAddressable = new Map<string, Set<string>>();
+      const sbomVulnerabilities = new Map<string, Set<string>>();
       // Global package dedup
       const packageMap = new Map<string, PackageResult>();
       const batchWarnings: string[] = [];
@@ -196,6 +198,13 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
                   sbomAddressable.set(batch.sbomId, new Set());
                 }
                 sbomAddressable.get(batch.sbomId)!.add(purl);
+
+                if (!sbomVulnerabilities.has(batch.sbomId)) {
+                  sbomVulnerabilities.set(batch.sbomId, new Set());
+                }
+                for (const v of entry.vulnerabilities) {
+                  sbomVulnerabilities.get(batch.sbomId)!.add(v.id);
+                }
 
                 if (packageMap.has(key)) {
                   const existing = packageMap.get(key)!;
@@ -248,6 +257,7 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
         sbomId: s.id,
         sbomName: s.name,
         addressablePackages: sbomAddressable.get(s.id)?.size ?? 0,
+        vulnerabilityCount: sbomVulnerabilities.get(s.id)?.size ?? 0,
       }));
 
       const packageResults = Array.from(packageMap.values());

@@ -238,6 +238,7 @@ export const LightwellReport: React.FC = () => {
                         <Tr>
                           <Th>SBOM</Th>
                           <Th>Addressable packages</Th>
+                          <Th>Vulnerabilities</Th>
                           <Th>Status</Th>
                         </Tr>
                       </Thead>
@@ -246,6 +247,7 @@ export const LightwellReport: React.FC = () => {
                           <Tr key={s.sbomId}>
                             <Td>{s.sbomName}</Td>
                             <Td>{s.addressablePackages}</Td>
+                            <Td>{s.vulnerabilityCount}</Td>
                             <Td>
                               <Label color="grey" isCompact>
                                 Lightwell can help
