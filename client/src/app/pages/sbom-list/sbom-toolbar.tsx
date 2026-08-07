@@ -2,7 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  Button,
+  Divider,
+  Dropdown,
   DropdownItem,
+  DropdownList,
+  MenuToggle,
+  type MenuToggleElement,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -10,8 +16,6 @@ import {
 
 import type { Group } from "@app/client";
 import { FilterToolbar } from "@app/components/FilterToolbar";
-import { KebabDropdown } from "@app/components/KebabDropdown";
-import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
@@ -20,6 +24,77 @@ import { Paths } from "@app/Routes";
 import { AddToGroupModal } from "./components/add-to-group-form";
 import { GroupFormModal } from "../sbom-groups/components/group-form";
 import { SbomSearchContext } from "./sbom-context";
+
+interface ActionsDropdownProps {
+  selectedItems: Array<{ id: string }>;
+  areMutationsDisabled: boolean;
+  onCreateGroup: () => void;
+  onAddToGroup: () => void;
+  onUploadSbom: () => void;
+  onGenerateReport: () => void;
+}
+
+const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
+  selectedItems,
+  areMutationsDisabled,
+  onCreateGroup,
+  onAddToGroup,
+  onUploadSbom,
+  onGenerateReport,
+}) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <Dropdown
+      popperProps={{ position: "right" }}
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      shouldFocusToggleOnSelect
+      onSelect={() => setIsOpen(false)}
+      toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+        <MenuToggle
+          ref={toggleRef}
+          isExpanded={isOpen}
+          onClick={() => setIsOpen(!isOpen)}
+          variant="secondary"
+        >
+          Actions
+        </MenuToggle>
+      )}
+    >
+      <DropdownList>
+        <DropdownItem
+          key="create-group"
+          isDisabled={areMutationsDisabled}
+          onClick={onCreateGroup}
+        >
+          Create group
+        </DropdownItem>
+        <DropdownItem
+          key="upload-sbom"
+          isDisabled={areMutationsDisabled}
+          onClick={onUploadSbom}
+        >
+          Upload SBOM
+        </DropdownItem>
+        <DropdownItem key="generate-report" onClick={onGenerateReport}>
+          Generate vulnerability report
+        </DropdownItem>
+        <Divider />
+        <DropdownItem
+          key="add-to-group"
+          isDisabled={areMutationsDisabled || selectedItems.length === 0}
+          onClick={onAddToGroup}
+        >
+          Add to group
+        </DropdownItem>
+        <DropdownItem key="run-policy" isDisabled>
+          Run policy evaluation
+        </DropdownItem>
+      </DropdownList>
+    </Dropdown>
+  );
+};
 
 interface SbomToolbarProps {
   showFilters?: boolean;
@@ -80,43 +155,26 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
           {showActions && (
             <>
               <ToolbarItem>
-                <ReadOnlyButton
-                  variant="primary"
-                  onClick={() => setSaveGroupModalState("create")}
-                >
-                  Create group
-                </ReadOnlyButton>
+                <ActionsDropdown
+                  selectedItems={selectedItems}
+                  areMutationsDisabled={areMutationsDisabled}
+                  onCreateGroup={() => setSaveGroupModalState("create")}
+                  onAddToGroup={() => setIsAddToGroupModalOpen(true)}
+                  onUploadSbom={() => navigate(Paths.sbomUpload)}
+                  onGenerateReport={() => navigate(Paths.sbomScan)}
+                />
               </ToolbarItem>
               <ToolbarItem>
-                <ReadOnlyButton
+                <Button
                   variant="secondary"
                   isDisabled={selectedItems.length === 0}
-                  onClick={() => setIsAddToGroupModalOpen(true)}
+                  onClick={() => {
+                    const ids = selectedItems.map((s) => s.id).join(",");
+                    navigate(`/sboms/lightwell-report?ids=${ids}`);
+                  }}
                 >
-                  Add to group
-                </ReadOnlyButton>
-              </ToolbarItem>
-              <ToolbarItem>
-                <KebabDropdown
-                  ariaLabel="SBOM actions"
-                  dropdownItems={[
-                    <DropdownItem
-                      key="upload-sbom"
-                      component="button"
-                      isDisabled={areMutationsDisabled}
-                      onClick={() => navigate(Paths.sbomUpload)}
-                    >
-                      Upload SBOM
-                    </DropdownItem>,
-                    <DropdownItem
-                      key="scan-sbom"
-                      component="button"
-                      onClick={() => navigate(Paths.sbomScan)}
-                    >
-                      Generate vulnerability report
-                    </DropdownItem>,
-                  ]}
-                />
+                  Lightwell remediation report
+                </Button>
               </ToolbarItem>
             </>
           )}
