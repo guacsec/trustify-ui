@@ -47,6 +47,7 @@ export const LightwellReport: React.FC = () => {
     sbomResults,
     packageResults,
     error,
+    warnings,
   } = useBatchedRecommendations(sbomIds);
 
   if (sbomIds.length === 0) {
@@ -119,6 +120,19 @@ export const LightwellReport: React.FC = () => {
             <StackItem>
               <Alert variant="danger" title="Error generating report">
                 {error}
+              </Alert>
+            </StackItem>
+          )}
+
+          {warnings.length > 0 && (
+            <StackItem>
+              <Alert variant="warning" title="Partial data warning">
+                Some recommendation batches failed. Results may be incomplete:
+                <ul>
+                  {warnings.map((w, i) => (
+                    <li key={i}>{w}</li>
+                  ))}
+                </ul>
               </Alert>
             </StackItem>
           )}
