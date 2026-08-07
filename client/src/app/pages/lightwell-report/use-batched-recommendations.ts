@@ -27,6 +27,7 @@ interface BatchedRecommendationsState {
   isLoading: boolean;
   isComplete: boolean;
   error: string | null;
+  warnings: string[];
   sbomResults: SbomResult[];
   packageResults: PackageResult[];
 }
@@ -38,11 +39,13 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
     isLoading: false,
     isComplete: false,
     error: null,
+    warnings: [],
     sbomResults: [],
     packageResults: [],
   });
 
   const abortRef = useRef<AbortController | null>(null);
+  const runCounterRef = useRef(0);
 
   const run = useCallback(async () => {
     if (sbomIds.length === 0) return;
@@ -51,12 +54,16 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
     const abort = new AbortController();
     abortRef.current = abort;
 
+    const currentRun = ++runCounterRef.current;
+    const isLatestRun = () => runCounterRef.current === currentRun;
+
     setState((s) => ({
       ...s,
       isLoading: true,
       isComplete: false,
       progress: 0,
       error: null,
+      warnings: [],
       sbomResults: [],
       packageResults: [],
     }));
@@ -78,23 +85,39 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
         });
         const sbomName = sbomRes.data?.name ?? sbomId;
 
-        // Fetch all packages (paginate to get all)
-        const pkgRes = await listPackages({
-          client,
-          path: { id: sbomId },
-          query: { limit: 10000 },
-        });
+        // Fetch all packages with pagination (backend max_limit: 1000)
+        const purls: string[] = [];
+        let offset = 0;
+        const pageSize = 1000;
 
-        const purls: string[] = (pkgRes.data?.items ?? [])
-          .map((p) => p.purl)
-          .filter((p): p is string => !!p);
+        while (true) {
+          if (abort.signal.aborted) return;
+
+          const pkgRes = await listPackages({
+            client,
+            path: { id: sbomId },
+            query: { limit: pageSize, offset },
+          });
+
+          const items = pkgRes.data?.items ?? [];
+          const pagePurls = items
+            .map((p) => p.purl)
+            .filter((p): p is string => !!p);
+
+          purls.push(...pagePurls);
+
+          if (items.length < pageSize) break;
+          offset += pageSize;
+        }
 
         sbomData.push({ id: sbomId, name: sbomName, purls });
 
-        setState((s) => ({
-          ...s,
-          progress: s.progress + 1,
-        }));
+        if (isLatestRun()) {
+          setState((s) => ({
+            ...s,
+            progress: s.progress + 1,
+          }));
+        }
       }
 
       // Calculate total steps
@@ -104,7 +127,9 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
       const totalBatches = batchCounts.reduce((a, b) => a + b, 0);
       const totalSteps = sbomIds.length + totalBatches;
 
-      setState((s) => ({ ...s, totalSteps }));
+      if (isLatestRun()) {
+        setState((s) => ({ ...s, totalSteps }));
+      }
 
       // Phase 2: Batch recommend calls with concurrency limit
       // Collect all batches with SBOM context
@@ -128,6 +153,7 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
       const sbomAddressable = new Map<string, Set<string>>();
       // Global package dedup
       const packageMap = new Map<string, PackageResult>();
+      const batchWarnings: string[] = [];
 
       // Process batches with concurrency limit
       let batchIndex = 0;
@@ -137,57 +163,66 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
           const idx = batchIndex++;
           const batch = allBatches[idx];
 
-          const res = await recommend({
-            client,
-            body: { purls: batch.purls },
-          });
+          try {
+            const res = await recommend({
+              client,
+              body: { purls: batch.purls },
+            });
 
-          const recs = res.data?.recommendations ?? {};
-          for (const [purl, entries] of Object.entries(recs)) {
-            if (entries.length === 0) continue;
+            const recs = res.data?.recommendations ?? {};
+            for (const [purl, entries] of Object.entries(recs)) {
+              if (entries.length === 0) continue;
 
-            for (const entry of entries) {
-              const key = `${purl}|${entry.package}`;
+              for (const entry of entries) {
+                const key = `${purl}|${entry.package}`;
 
-              if (!sbomAddressable.has(batch.sbomId)) {
-                sbomAddressable.set(batch.sbomId, new Set());
-              }
-              sbomAddressable.get(batch.sbomId)!.add(purl);
-
-              if (packageMap.has(key)) {
-                const existing = packageMap.get(key)!;
-                if (!existing.foundIn.includes(batch.sbomName)) {
-                  existing.foundIn.push(batch.sbomName);
+                if (!sbomAddressable.has(batch.sbomId)) {
+                  sbomAddressable.set(batch.sbomId, new Set());
                 }
-                for (const v of entry.vulnerabilities) {
-                  if (!existing.vulnerabilities.includes(v.id)) {
-                    existing.vulnerabilities.push(v.id);
+                sbomAddressable.get(batch.sbomId)!.add(purl);
+
+                if (packageMap.has(key)) {
+                  const existing = packageMap.get(key)!;
+                  if (!existing.foundIn.includes(batch.sbomName)) {
+                    existing.foundIn.push(batch.sbomName);
                   }
-                }
-              } else {
-                const purlParts = purl.split("@");
-                const name =
-                  purlParts[0]
-                    ?.replace(/^pkg:[^/]+\//, "")
-                    ?.split("/")
-                    .pop() ?? purl;
-                const version = purlParts[1] ?? "";
+                  for (const v of entry.vulnerabilities) {
+                    if (!existing.vulnerabilities.includes(v.id)) {
+                      existing.vulnerabilities.push(v.id);
+                    }
+                  }
+                } else {
+                  const purlParts = purl.split("@");
+                  const name =
+                    purlParts[0]
+                      ?.replace(/^pkg:[^/]+\//, "")
+                      ?.split("/")
+                      .pop() ?? purl;
+                  const version = purlParts[1] ?? "";
 
-                packageMap.set(key, {
-                  packageName: name,
-                  version,
-                  recommendedPackage: entry.package,
-                  foundIn: [batch.sbomName],
-                  vulnerabilities: entry.vulnerabilities.map((v) => v.id),
-                });
+                  packageMap.set(key, {
+                    packageName: name,
+                    version,
+                    recommendedPackage: entry.package,
+                    foundIn: [batch.sbomName],
+                    vulnerabilities: entry.vulnerabilities.map((v) => v.id),
+                  });
+                }
               }
             }
+          } catch (e) {
+            const errMsg = e instanceof Error ? e.message : String(e);
+            batchWarnings.push(
+              `Failed to fetch recommendations for batch ${idx + 1} (SBOM: ${batch.sbomName}): ${errMsg}`,
+            );
           }
 
-          setState((s) => ({
-            ...s,
-            progress: s.progress + 1,
-          }));
+          if (isLatestRun()) {
+            setState((s) => ({
+              ...s,
+              progress: s.progress + 1,
+            }));
+          }
         }
       };
 
@@ -209,17 +244,20 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
 
       const packageResults = Array.from(packageMap.values());
 
-      setState({
-        progress: totalSteps,
-        totalSteps,
-        isLoading: false,
-        isComplete: true,
-        error: null,
-        sbomResults,
-        packageResults,
-      });
+      if (isLatestRun()) {
+        setState({
+          progress: totalSteps,
+          totalSteps,
+          isLoading: false,
+          isComplete: true,
+          error: null,
+          warnings: batchWarnings,
+          sbomResults,
+          packageResults,
+        });
+      }
     } catch (e) {
-      if (!abort.signal.aborted) {
+      if (!abort.signal.aborted && isLatestRun()) {
         setState((s) => ({
           ...s,
           isLoading: false,
