@@ -170,7 +170,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                   isDisabled={selectedItems.length === 0}
                   onClick={() => {
                     const ids = selectedItems.map((s) => s.id).join(",");
-                    navigate(`/sboms/lightwell-report?ids=${ids}`);
+                    navigate(`${Paths.lightwellReport}?ids=${ids}`);
                   }}
                 >
                   Lightwell remediation report
