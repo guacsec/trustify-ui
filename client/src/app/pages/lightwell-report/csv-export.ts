@@ -21,7 +21,7 @@ export const downloadCsv = (results: PackageResult[]): void => {
   const rows = results.map((r) => [
     escapeField(r.packageName),
     escapeField(r.version),
-    escapeField(r.recommendedPackage),
+    escapeField(r.recommendedVersion),
     escapeField(r.foundIn.join("; ")),
     escapeField(r.vulnerabilities.join("; ")),
   ]);
