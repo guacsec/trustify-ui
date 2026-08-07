@@ -29,8 +29,20 @@ import {
 } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
+import { FilterToolbar, FilterType } from "@app/components/FilterToolbar";
+import { SimplePagination } from "@app/components/SimplePagination";
+import {
+  ConditionalTableBody,
+  TableHeaderContentWithControls,
+  TableRowContentWithControls,
+} from "@app/components/TableControls";
+import { useLocalTableControls } from "@app/hooks/table-controls";
+import { useWithUiId } from "@app/utils/query-utils";
 import { Paths } from "@app/Routes";
-import { useBatchedRecommendations } from "./use-batched-recommendations";
+import {
+  useBatchedRecommendations,
+  type PackageResult,
+} from "./use-batched-recommendations";
 import { downloadCsv } from "./csv-export";
 
 export const LightwellReport: React.FC = () => {
@@ -49,6 +61,78 @@ export const LightwellReport: React.FC = () => {
     error,
     warnings,
   } = useBatchedRecommendations(sbomIds);
+
+  const sbomNames = React.useMemo(
+    () => [...new Set(packageResults.flatMap((p) => p.foundIn))].sort(),
+    [packageResults],
+  );
+
+  const tableDataWithUiId = useWithUiId(
+    packageResults,
+    (d) => `${d.packageName}-${d.version}-${d.recommendedVersion}`,
+  );
+
+  const tableControls = useLocalTableControls({
+    tableName: "lightwell-packages",
+    idProperty: "_ui_unique_id",
+    items: tableDataWithUiId,
+    isLoading: false,
+    columnNames: {
+      packageName: "Package",
+      version: "Version",
+      recommendedVersion: "Recommended version",
+      vulnerabilities: "Vulnerabilities addressed",
+      foundIn: "Found in",
+    },
+    hasActionsColumn: false,
+    isSortEnabled: true,
+    sortableColumns: ["packageName"],
+    getSortValues: (item) => ({
+      packageName: item.packageName,
+    }),
+    isPaginationEnabled: true,
+    isFilterEnabled: true,
+    filterCategories: [
+      {
+        categoryKey: "foundIn",
+        title: "SBOM",
+        placeholderText: "Filter by SBOM...",
+        type: FilterType.multiselect,
+        selectOptions: sbomNames.map((name) => ({
+          value: name,
+          label: name,
+        })),
+        matcher: (filterValue: string, item: PackageResult) =>
+          item.foundIn.includes(filterValue),
+      },
+      {
+        categoryKey: "vulnerabilities",
+        title: "CVE",
+        placeholderText: "Filter by CVE...",
+        type: FilterType.search,
+        matcher: (filterValue: string, item: PackageResult) =>
+          item.vulnerabilities.some((v) =>
+            v.toLowerCase().includes(filterValue.toLowerCase()),
+          ),
+      },
+    ],
+    isExpansionEnabled: false,
+  });
+
+  const {
+    currentPageItems,
+    numRenderedColumns,
+    propHelpers: {
+      toolbarProps: pkgToolbarProps,
+      filterToolbarProps: pkgFilterToolbarProps,
+      paginationToolbarItemProps: pkgPaginationToolbarItemProps,
+      paginationProps: pkgPaginationProps,
+      tableProps: pkgTableProps,
+      getThProps,
+      getTrProps,
+      getTdProps,
+    },
+  } = tableControls;
 
   if (sbomIds.length === 0) {
     return (
@@ -239,7 +323,6 @@ export const LightwellReport: React.FC = () => {
                           <Th>SBOM</Th>
                           <Th>Addressable packages</Th>
                           <Th>Vulnerabilities</Th>
-                          <Th>Status</Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -248,11 +331,6 @@ export const LightwellReport: React.FC = () => {
                             <Td>{s.sbomName}</Td>
                             <Td>{s.addressablePackages}</Td>
                             <Td>{s.vulnerabilityCount}</Td>
-                            <Td>
-                              <Label color="grey" isCompact>
-                                Lightwell can help
-                              </Label>
-                            </Td>
                           </Tr>
                         ))}
                       </Tbody>
@@ -265,44 +343,125 @@ export const LightwellReport: React.FC = () => {
                 <Card>
                   <CardTitle>Packages Lightwell can help with</CardTitle>
                   <CardBody>
-                    <Table aria-label="Packages Lightwell can help with">
+                    <Toolbar {...pkgToolbarProps} aria-label="packages-toolbar">
+                      <ToolbarContent>
+                        <FilterToolbar {...pkgFilterToolbarProps} />
+                        <ToolbarItem {...pkgPaginationToolbarItemProps}>
+                          <SimplePagination
+                            idPrefix="lightwell-packages"
+                            isTop
+                            paginationProps={pkgPaginationProps}
+                          />
+                        </ToolbarItem>
+                      </ToolbarContent>
+                    </Toolbar>
+                    <Table
+                      {...pkgTableProps}
+                      aria-label="Packages Lightwell can help with"
+                    >
                       <Thead>
                         <Tr>
-                          <Th>Package</Th>
-                          <Th>Version</Th>
-                          <Th>Recommended version</Th>
-                          <Th>Vulnerabilities addressed</Th>
-                          <Th>Found in</Th>
+                          <TableHeaderContentWithControls {...tableControls}>
+                            <Th
+                              {...getThProps({
+                                columnKey: "packageName",
+                              })}
+                            />
+                            <Th
+                              {...getThProps({
+                                columnKey: "version",
+                              })}
+                            />
+                            <Th
+                              {...getThProps({
+                                columnKey: "recommendedVersion",
+                              })}
+                            />
+                            <Th
+                              {...getThProps({
+                                columnKey: "vulnerabilities",
+                              })}
+                            />
+                            <Th
+                              {...getThProps({
+                                columnKey: "foundIn",
+                              })}
+                            />
+                          </TableHeaderContentWithControls>
                         </Tr>
                       </Thead>
-                      <Tbody>
-                        {packageResults.map((p) => (
-                          <Tr key={`${p.packageName}-${p.version}`}>
-                            <Td>{p.packageName}</Td>
-                            <Td>{p.version}</Td>
-                            <Td>{p.recommendedVersion}</Td>
-                            <Td>
-                              <LabelGroup>
-                                {p.vulnerabilities.map((cve) => (
-                                  <Label key={cve} isCompact color="orange">
-                                    {cve}
-                                  </Label>
-                                ))}
-                              </LabelGroup>
-                            </Td>
-                            <Td>
-                              <LabelGroup>
-                                {p.foundIn.map((name) => (
-                                  <Label key={name} isCompact color="grey">
-                                    {name}
-                                  </Label>
-                                ))}
-                              </LabelGroup>
-                            </Td>
-                          </Tr>
+                      <ConditionalTableBody
+                        isLoading={false}
+                        isError={false}
+                        isNoData={packageResults.length === 0}
+                        numRenderedColumns={numRenderedColumns}
+                      >
+                        {currentPageItems?.map((item, rowIndex) => (
+                          <Tbody key={item._ui_unique_id}>
+                            <Tr {...getTrProps({ item })}>
+                              <TableRowContentWithControls
+                                {...tableControls}
+                                item={item}
+                                rowIndex={rowIndex}
+                              >
+                                <Td
+                                  {...getTdProps({
+                                    columnKey: "packageName",
+                                  })}
+                                >
+                                  {item.packageName}
+                                </Td>
+                                <Td
+                                  {...getTdProps({
+                                    columnKey: "version",
+                                  })}
+                                >
+                                  {item.version}
+                                </Td>
+                                <Td
+                                  {...getTdProps({
+                                    columnKey: "recommendedVersion",
+                                  })}
+                                >
+                                  {item.recommendedVersion}
+                                </Td>
+                                <Td
+                                  {...getTdProps({
+                                    columnKey: "vulnerabilities",
+                                  })}
+                                >
+                                  <LabelGroup>
+                                    {item.vulnerabilities.map((cve) => (
+                                      <Label key={cve} isCompact color="orange">
+                                        {cve}
+                                      </Label>
+                                    ))}
+                                  </LabelGroup>
+                                </Td>
+                                <Td
+                                  {...getTdProps({
+                                    columnKey: "foundIn",
+                                  })}
+                                >
+                                  <LabelGroup>
+                                    {item.foundIn.map((name) => (
+                                      <Label key={name} isCompact color="grey">
+                                        {name}
+                                      </Label>
+                                    ))}
+                                  </LabelGroup>
+                                </Td>
+                              </TableRowContentWithControls>
+                            </Tr>
+                          </Tbody>
                         ))}
-                      </Tbody>
+                      </ConditionalTableBody>
                     </Table>
+                    <SimplePagination
+                      idPrefix="lightwell-packages"
+                      isTop={false}
+                      paginationProps={pkgPaginationProps}
+                    />
                   </CardBody>
                 </Card>
               </StackItem>
