@@ -101,7 +101,8 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
 
           const items = pkgRes.data?.items ?? [];
           const pagePurls = items
-            .map((p) => p.purl)
+            .flatMap((p) => p.purl)
+            .map((ps) => ps.purl)
             .filter((p): p is string => !!p);
 
           purls.push(...pagePurls);
