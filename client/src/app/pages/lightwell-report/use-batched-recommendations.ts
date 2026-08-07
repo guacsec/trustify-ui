@@ -192,12 +192,15 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
               if (entries.length === 0) continue;
 
               for (const entry of entries) {
-                const key = `${purl}|${entry.package}`;
+                const name = extractName(purl);
+                const version = extractVersion(purl);
+                const recVersion = extractVersion(entry.package);
+                const key = `${name}@${version}|${recVersion}`;
 
                 if (!sbomAddressable.has(batch.sbomId)) {
                   sbomAddressable.set(batch.sbomId, new Set());
                 }
-                sbomAddressable.get(batch.sbomId)!.add(purl);
+                sbomAddressable.get(batch.sbomId)!.add(`${name}@${version}`);
 
                 if (!sbomVulnerabilities.has(batch.sbomId)) {
                   sbomVulnerabilities.set(batch.sbomId, new Set());
@@ -218,9 +221,9 @@ export const useBatchedRecommendations = (sbomIds: string[]) => {
                   }
                 } else {
                   packageMap.set(key, {
-                    packageName: extractName(purl),
-                    version: extractVersion(purl),
-                    recommendedVersion: extractVersion(entry.package),
+                    packageName: name,
+                    version,
+                    recommendedVersion: recVersion,
                     foundIn: [batch.sbomName],
                     vulnerabilities: entry.vulnerabilities.map((v) => v.id),
                   });
