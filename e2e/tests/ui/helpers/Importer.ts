@@ -122,6 +122,11 @@ export const ensureAllImportersExist = async (page: Page): Promise<void> => {
 
   if (anyCreated) {
     await page.reload();
-    await page.waitForTimeout(1000);
+    await Promise.all([
+      page.waitForLoadState("networkidle"),
+      page.waitForSelector('[data-testid="importers-table"]', {
+        state: "visible",
+      }),
+    ]);
   }
 };
