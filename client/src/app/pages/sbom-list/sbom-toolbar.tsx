@@ -56,7 +56,7 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
           ref={toggleRef}
           isExpanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          variant="secondary"
+          variant="default"
         >
           Actions
         </MenuToggle>
