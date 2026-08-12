@@ -5,8 +5,8 @@ import { login } from "../../helpers/Auth";
 import { HomePage } from "./HomePage";
 
 const EXPECTED_TOP_3 = [
-  { identifier: "CVE-2026-18236", severity: /critical/i },
   { identifier: "CVE-2026-63223", severity: /critical/i },
+  { identifier: "CVE-2026-18236", severity: /critical/i },
   { identifier: "CVE-2026-18358", severity: /high/i },
 ] as const;
 
