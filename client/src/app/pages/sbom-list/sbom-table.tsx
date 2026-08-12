@@ -20,10 +20,7 @@ import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  ReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -36,7 +33,10 @@ import {
   sbomDeletedSuccessMessage,
 } from "@app/Constants";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
-import { useDeleteSbomMutation } from "@app/queries/sboms";
+import {
+  useDeleteSbomMutation,
+  useRemoveSBOMFromGroupMutation,
+} from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { formatDate } from "@app/utils/utils";
 
@@ -49,6 +49,7 @@ export const SbomTable: React.FC = () => {
   const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const {
+    sbomGroupId,
     isFetching,
     fetchError,
     tableControls,
@@ -108,6 +109,35 @@ export const SbomTable: React.FC = () => {
 
   const { mutate: deleteSbom, isPending: isDeletingSbom } =
     useDeleteSbomMutation(onDeleteSbomSuccess, onDeleteAdvisoryError);
+
+  // Remove from group action
+
+  const [sbomToRemoveFromGroup, setSbomToRemoveFromGroup] =
+    React.useState<SbomHead | null>(null);
+
+  const onRemoveFromGroupSuccess = (payload: {
+    groupId: string;
+    sbom: SbomHead;
+  }) => {
+    setSbomToRemoveFromGroup(null);
+    pushNotification({
+      title: `SBOM "${payload.sbom.name}" removed from group`,
+      variant: "success",
+    });
+  };
+
+  const onRemoveFromGroupError = (error: AxiosError) => {
+    pushNotification({
+      title: `Failed to remove SBOM from group: ${error.message}`,
+      variant: "danger",
+    });
+  };
+
+  const { mutate: removeSbomFromGroup, isPending: isRemovingFromGroup } =
+    useRemoveSBOMFromGroupMutation(
+      onRemoveFromGroupSuccess,
+      onRemoveFromGroupError,
+    );
 
   return (
     <>
@@ -256,6 +286,17 @@ export const SbomTable: React.FC = () => {
                             },
                             isDisabled: areMutationsDisabled,
                           },
+                          ...(sbomGroupId
+                            ? [
+                                {
+                                  title: "Delete SBOM from group",
+                                  onClick: () => {
+                                    setSbomToRemoveFromGroup(item);
+                                  },
+                                  isDisabled: areMutationsDisabled,
+                                },
+                              ]
+                            : []),
                         ]}
                       />
                     </Td>
@@ -301,6 +342,27 @@ export const SbomTable: React.FC = () => {
         onConfirm={() => {
           if (sbomToDelete) {
             deleteSbom(sbomToDelete);
+          }
+        }}
+      />
+
+      <ConfirmDialog
+        title="Delete SBOM from group"
+        message={`Are you sure you want to remove "${sbomToRemoveFromGroup?.name}" from this group? The SBOM itself will not be deleted.`}
+        inProgress={isRemovingFromGroup}
+        titleIconVariant="warning"
+        isOpen={!!sbomToRemoveFromGroup}
+        confirmBtnVariant={ButtonVariant.danger}
+        confirmBtnLabel="Remove"
+        cancelBtnLabel="Cancel"
+        onCancel={() => setSbomToRemoveFromGroup(null)}
+        onClose={() => setSbomToRemoveFromGroup(null)}
+        onConfirm={() => {
+          if (sbomToRemoveFromGroup && sbomGroupId) {
+            removeSbomFromGroup({
+              groupId: sbomGroupId,
+              sbom: sbomToRemoveFromGroup,
+            });
           }
         }}
       />

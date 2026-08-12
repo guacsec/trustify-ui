@@ -166,7 +166,7 @@ export class Toolbar<
   }
 
   /**
-   * Clears all applied filters by clicking the "Clear all filters" button
+   * Clears all applied filters by clicking the "Clear all filters" button.
    */
   async clearAllFilters() {
     const clearButton = this._toolbar.getByRole("button", {
@@ -175,7 +175,6 @@ export class Toolbar<
     await expect(clearButton).toBeVisible();
     await clearButton.click();
 
-    // Verify all filter chips are removed
     await expect(this._toolbar.locator(".pf-m-label-group")).toHaveCount(0);
   }
 

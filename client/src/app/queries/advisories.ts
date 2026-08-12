@@ -10,9 +10,9 @@ import type { HubRequestParams, Label } from "@app/api/models";
 import { client } from "@app/axios-config/apiInit";
 import {
   type AdvisoryDetails,
+  AdvisoryHead,
   type Labels,
   deleteAdvisory,
-  downloadAdvisory,
   getAdvisory,
   listAdvisories,
   listAdvisoryLabels,
@@ -107,17 +107,16 @@ export const useFetchAdvisoryById = (id: string) => {
 };
 
 export const useDeleteAdvisoryMutation = (
-  onSuccess: (payload: AdvisoryDetails, id: string) => void,
+  onSuccess: (payload: AdvisoryHead) => void,
   onError: (err: AxiosError) => void,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await deleteAdvisory({ client, path: { key: id } });
-      return response.data as AdvisoryDetails;
+    mutationFn: async (payload: AdvisoryHead) => {
+      await deleteAdvisory({ client, path: { key: payload.uuid } });
     },
-    onSuccess: async (response, id) => {
-      onSuccess(response, id);
+    onSuccess: async (_response, payload) => {
+      onSuccess(payload);
       await queryClient.invalidateQueries({ queryKey: [AdvisoriesQueryKey] });
     },
     onError: async (err: AxiosError) => {
@@ -125,28 +124,6 @@ export const useDeleteAdvisoryMutation = (
       await queryClient.invalidateQueries({ queryKey: [AdvisoriesQueryKey] });
     },
   });
-};
-
-export const useFetchAdvisorySourceById = (id: string, enabled = true) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: [AdvisoriesQueryKey, id, "source"],
-    queryFn: async () => {
-      const response = await downloadAdvisory({
-        client,
-        path: { key: id },
-        responseType: "text",
-        headers: { Accept: "text/plain" },
-      });
-      return String(response.data);
-    },
-    enabled: !!id && enabled,
-  });
-
-  return {
-    source: data ?? null,
-    isFetching: isLoading,
-    fetchError: error as AxiosError | null,
-  };
 };
 
 export const useUploadAdvisory = () => {

@@ -29,7 +29,7 @@ RUN sed -i 's/trustify-ui = { git = "https:\/\/github.com\/guacsec\/trustify-ui.
 FROM registry.access.redhat.com/ubi10/ubi:latest AS server-builder
 
 # Dependencies
-RUN dnf install -y openssl-devel gcc clang-libs
+RUN dnf install -y openssl-devel gcc clang
 
 RUN mkdir /stage/ && \
     dnf install --installroot /stage/ --setop install_weak_deps=false --nodocs -y zlib openssl krb5-libs libzstd lz4-libs libxml2 && \

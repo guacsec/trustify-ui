@@ -60,7 +60,7 @@ const useStorage = <T>({
   key,
   defaultValue,
 }: IUseStorageOptions<T>): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [cachedValue, setCachedValue] = React.useState<T>(
+  const [cachedValue, setCachedValue] = React.useState<T>(() =>
     getValueFromStorage(type, key, defaultValue),
   );
 

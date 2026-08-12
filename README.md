@@ -6,9 +6,9 @@ Trustify UI Component
 
 # Build and Test Status
 
-| branch | last merge CI | last merge image build | nightly CI |
-| :----- | :------------ | :--------------------- | :--------- |
-| main   | [![CI (repo level)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml?query=branch%3Amain+event%3Apush)           | [![Multiple Architecture Image Build](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml?query=branch%3Amain+event%3Apush)                    | [![Nightly CI (repo level @main)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml?query=branch%3Amain+event%3Aschedule)       |
+| branch | last merge CI | last merge image build | nightly CI | nightly server build |
+| :----- | :------------ | :--------------------- | :--------- | :------------------- |
+| main   | [![CI (repo level)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml?query=branch%3Amain+event%3Apush)           | [![Multiple Architecture Image Build](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml?query=branch%3Amain+event%3Apush)                    | [![Nightly CI (repo level @main)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml?query=branch%3Amain+event%3Aschedule)       | [![CI (test server image build)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml?query=branch%3Amain+event%3Aschedule) |
 
 | branch | last merge e2e CI | nightly e2e CI |
 | :----- | :---------------- | :------------- |

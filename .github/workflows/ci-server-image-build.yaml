@@ -1,0 +1,45 @@
+name: CI (test server image build)
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "release/*"
+    paths:
+      - "Dockerfile.server"
+
+  schedule:
+    - cron: "35 5 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  discover-envs:
+    runs-on: ubuntu-latest
+    outputs:
+      server_branch: ${{ steps.set-outputs.outputs.server_branch }}
+    steps:
+      - name: Extract server branch from PR target
+        id: set-outputs
+        env:
+          base_ref: ${{ github.event.pull_request.base.ref || github.ref }}
+        run: |
+          branch=$(echo "${base_ref#refs/heads/}")
+          echo "server_branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "Server branch: $branch"
+
+  test-server-image-build:
+    runs-on: ubuntu-latest
+    needs: discover-envs
+
+    concurrency:
+      group: test-server-image-build-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Test build server image
+        run: |
+          docker build . -t trustd:pr-test -f Dockerfile.server \
+            --build-arg server_branch=${{ needs.discover-envs.outputs.server_branch }}

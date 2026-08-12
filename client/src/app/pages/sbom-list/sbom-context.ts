@@ -49,6 +49,7 @@ interface ISbomSearchContext {
     >;
   };
 
+  sbomGroupId?: string;
   totalItemCount: number;
   isFetching: boolean;
   fetchError: AxiosError | null;

@@ -325,3 +325,30 @@ export const useAddSBOMsToGroupsMutation = (
     onError: onError,
   });
 };
+
+export const useRemoveSBOMFromGroupMutation = (
+  onSuccess: (payload: { groupId: string; sbom: SbomHead }) => void,
+  onError: (err: AxiosError) => void,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { groupId: string; sbom: SbomHead }) => {
+      const { sbom, groupId } = payload;
+      const response = await patchSbomGroupAssignments({
+        client,
+        body: {
+          sbom_ids: [sbom.id],
+          remove: [groupId],
+        },
+      });
+      return response.data;
+    },
+    onSuccess: async (_response, payload) => {
+      await queryClient.invalidateQueries({
+        queryKey: [SBOMsQueryKey, payload.groupId],
+      });
+      onSuccess(payload);
+    },
+    onError: onError,
+  });
+};

@@ -24,7 +24,7 @@ import {
   type ExtendedSeverity,
   extendedSeverityFromSeverity,
 } from "@app/api/models";
-import type { AdvisorySummary } from "@app/client";
+import type { AdvisoryHead, AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LabelsAsList } from "@app/components/LabelsAsList.tsx";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -83,7 +83,7 @@ export const AdvisoryTable: React.FC = () => {
   const [advisoryToDelete, setAdvisoryToDelete] =
     React.useState<AdvisorySummary | null>(null);
 
-  const onDeleteAdvisorySuccess = (advisory: AdvisorySummary) => {
+  const onDeleteAdvisorySuccess = (advisory: AdvisoryHead) => {
     setAdvisoryToDelete(null);
     pushNotification({
       title: `The Advisory ${advisory.identifier} was deleted`,
@@ -284,7 +284,7 @@ export const AdvisoryTable: React.FC = () => {
         onClose={() => setAdvisoryToDelete(null)}
         onConfirm={() => {
           if (advisoryToDelete) {
-            deleteAdvisory(advisoryToDelete.uuid);
+            deleteAdvisory(advisoryToDelete);
           }
         }}
       />

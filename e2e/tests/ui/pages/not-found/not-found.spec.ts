@@ -26,6 +26,12 @@ test.describe("Not Found page", { tag: "@tier1" }, () => {
     await expectNotFound(page);
   });
 
+  // TC-3218: Verify /upload route shows 404 page
+  test("Shows 404 page for /upload route", async ({ page }) => {
+    await page.goto("/upload");
+    await expectNotFound(page);
+  });
+
   test("Shows 404 page for non-existent advisory", async ({ page }) => {
     await page.goto(`/advisories/${NON_EXISTENT_UUID}`);
     await expectNotFound(page);

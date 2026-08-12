@@ -68,6 +68,10 @@ Feature: Importer Explorer - View importers details
         Then A confirmation dialog should appear
         And User confirms the action
         Then The "<importerName>" importer should show "Scheduled" state or progress indicator
+        When User disables the "<importerName>" importer
+        Then A confirmation dialog should appear
+        And User confirms the action
+        Then The "<importerName>" importer state should be "Disabled"
 
         Examples:
             | importerName                |
@@ -80,6 +84,10 @@ Feature: Importer Explorer - View importers details
         And User confirms the action
         Then A success message should be displayed
         And The "<importerName>" importer should show progress indicator
+        When User disables the "<importerName>" importer
+        Then A confirmation dialog should appear
+        And User confirms the action
+        Then The "<importerName>" importer state should be "Disabled"
 
         Examples:
             | importerName |

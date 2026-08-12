@@ -49,7 +49,7 @@ export const SbomGroupsProvider: React.FunctionComponent<
 
   // Track manually expanded node IDs (browse mode only)
   const [expandedNodeIds, setExpandedNodeIds] = React.useState<Set<string>>(
-    new Set(),
+    () => new Set(),
   );
 
   const toggleExpandedNodes = React.useCallback((node: SbomGroupItem) => {

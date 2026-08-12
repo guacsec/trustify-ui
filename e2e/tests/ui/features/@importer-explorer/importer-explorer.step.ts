@@ -187,6 +187,7 @@ Then(
     const maxPages = 10; // Safety limit to prevent infinite loops
 
     // If looking for enabled importers, first check if any exist, if not enable one
+    let enabledImporterName = "";
     if (!isDisabledState) {
       let hasEnabledImporter = false;
       let checkPage = 1;
@@ -237,7 +238,8 @@ Then(
           const firstNameCell = nameColumn.first();
           const importerName = (await firstNameCell.textContent()) || "";
 
-          // Enable the first importer
+          // Enable the first importer and track it for cleanup
+          enabledImporterName = importerName;
           await listPage.performImporterAction(importerName, "Enable");
 
           // Confirm the action
@@ -309,6 +311,13 @@ Then(
     }
 
     expect(foundMatchingRow).toBe(true);
+
+    // Cleanup: disable the importer if we enabled one for this test
+    if (enabledImporterName) {
+      await listPage.performImporterAction(enabledImporterName, "Disable");
+      const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
+      await dialog.clickConfirm();
+    }
   },
 );
 
