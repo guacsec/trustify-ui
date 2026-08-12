@@ -1,5 +1,10 @@
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import {
+  type BlockerFunction,
+  Link,
+  useBlocker,
+  useSearchParams,
+} from "react-router-dom";
 
 import {
   Alert,
@@ -18,6 +23,10 @@ import {
   FlexItem,
   Label,
   LabelGroup,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   PageSection,
   Progress,
   Spinner,
@@ -28,6 +37,8 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
+
+import DownloadIcon from "@patternfly/react-icons/dist/esm/icons/download-icon";
 
 import { FilterToolbar, FilterType } from "@app/components/FilterToolbar";
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -134,6 +145,31 @@ export const LightwellReport: React.FC = () => {
     },
   } = tableControls;
 
+  // Tracks whether the user has already saved (downloaded) the report, so we
+  // only warn about losing unsaved results.
+  const [hasDownloaded, setHasDownloaded] = React.useState(false);
+
+  // Block in-app navigation away from the page while an unsaved report exists.
+  const shouldBlock = React.useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) => {
+      return (
+        isComplete &&
+        packageResults.length > 0 &&
+        !hasDownloaded &&
+        currentLocation.pathname !== nextLocation.pathname
+      );
+    },
+    [isComplete, packageResults.length, hasDownloaded],
+  );
+
+  const blocker = useBlocker(shouldBlock);
+
+  // Downloads the report as CSV and marks it as saved.
+  const handleDownload = () => {
+    downloadCsv(packageResults);
+    setHasDownloaded(true);
+  };
+
   if (sbomIds.length === 0) {
     return (
       <PageSection>
@@ -175,7 +211,7 @@ export const LightwellReport: React.FC = () => {
               <Button
                 variant="primary"
                 isDisabled={!isComplete || packageResults.length === 0}
-                onClick={() => downloadCsv(packageResults)}
+                onClick={handleDownload}
               >
                 Download
               </Button>
@@ -477,6 +513,53 @@ export const LightwellReport: React.FC = () => {
           )}
         </Stack>
       </PageSection>
+
+      <Modal
+        variant="small"
+        isOpen={blocker.state === "blocked"}
+        onClose={() => blocker.state === "blocked" && blocker.reset()}
+        aria-label="Leave Lightwell remediation report"
+      >
+        <ModalHeader title="Leave Lightwell remediation report?" />
+        <ModalBody>
+          This report is not saved and will be unavailable after leaving this
+          page. To save the report, download it.
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            key="download-and-leave"
+            aria-label="download and leave"
+            variant="primary"
+            icon={<DownloadIcon />}
+            onClick={() => {
+              handleDownload();
+              if (blocker.state === "blocked") blocker.proceed();
+            }}
+          >
+            Download and leave
+          </Button>
+          <Button
+            key="leave-without-downloading"
+            aria-label="leave without downloading"
+            variant="secondary"
+            onClick={() => {
+              if (blocker.state === "blocked") blocker.proceed();
+            }}
+          >
+            Leave without downloading
+          </Button>
+          <Button
+            key="cancel"
+            aria-label="cancel"
+            variant="link"
+            onClick={() => {
+              if (blocker.state === "blocked") blocker.reset();
+            }}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };
