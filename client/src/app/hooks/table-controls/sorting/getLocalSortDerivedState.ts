@@ -1,4 +1,4 @@
-import { createComparator } from "@tsd-ui/core";
+import { createComparator } from "@app/utils/utils";
 import type { ISortState } from "./useSortState";
 
 /**
