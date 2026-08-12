@@ -2,26 +2,26 @@
 
 ## Language and Framework
 
-- TypeScript 5.7, React 19
+- TypeScript 6.0, React 19
 - UI component library: PatternFly 6 (`@patternfly/react-core`, `@patternfly/react-table`)
-- Build tool: Rsbuild (client), Rollup (common, server)
+- Build tool: Vite (client), Rollup (common, server)
 - Routing: react-router-dom v7 with lazy-loaded routes
 - Data fetching: TanStack React Query v5
 - API client: auto-generated from OpenAPI spec via `@hey-api/openapi-ts` with Axios
 - Forms: react-hook-form + yup validation
 - E2E testing: Playwright with playwright-bdd (Gherkin features)
-- Unit testing: Jest
-- Linting/formatting: Biome (not ESLint/Prettier)
+- Unit testing: Vitest
+- Linting/formatting: ESLint + Prettier
 - Package manager: npm workspaces (Node.js >= 22)
 
 ## Code Style
 
-- Formatter: Biome with space indentation (2 spaces), double quotes
+- Formatter: Prettier with space indentation (2 spaces), double quotes
 - Line length: 80 characters (`.editorconfig`)
 - Line endings: LF
-- Run `npm run check` (biome check with `--error-on-warnings`) before committing
+- Run `npm run lint` before committing
 - Run `npm run format:fix` to auto-format
-- Organize imports: disabled in Biome config (manual ordering)
+- Organize imports: disabled in ESLint config (manual ordering)
 - **Import Order**: Group imports alphabetically and follow the order below,
   with each block separated by a blank line:
   1. **React/Router block**: Dependencies from `react`, `react-dom`,
@@ -80,7 +80,8 @@ common/                 # shared ESM module (branding, environment config)
 client/                 # React SPA
 server/                 # Express.js production server (proxying, env injection)
 e2e/                    # Playwright end-to-end tests
-biome.json              # root Biome config
+eslint.config.mjs       # ESLint config
+.prettierrc.mjs         # Prettier config
 ```
 
 ### Client structure (`client/src/app/`)
@@ -94,11 +95,12 @@ dayjs.ts                # dayjs setup
 
 pages/                  # page components, one directory per page
   <domain>-list/        # list page for a domain
-    index.ts            # re-export: `export { Component as default } from "./component"`
+    index.ts            # re-export: `export { DomainList as default } from "./domain-list"`
     <domain>-list.tsx   # main page component
     <domain>-table.tsx  # table component
     <domain>-toolbar.tsx # toolbar with filters/actions
-    <domain>-context.tsx # search/filter context provider
+    <domain>-context.ts  # React context definition and interface
+    <domain>-provider.tsx # context provider with table state, data fetching
     helpers.ts          # page-specific helpers
     components/         # page-specific sub-components
 
@@ -163,8 +165,9 @@ api/                    # API-level tests
   dependencies/         # setup (global.setup.ts)
 
 common/                 # shared test assets
-  assets/sbom/          # test SBOM files
-  assets/csaf/          # test CSAF files
+  dataset/sbom/              # test SBOM files
+  dataset/advisory/csaf/     # test CSAF advisory files
+  dataset/advisory/csaf_security/  # test CSAF security files
   constants.ts
 ```
 
@@ -173,7 +176,7 @@ common/                 # shared test assets
 - API errors are typed as `AxiosError` and propagated through query hooks via `fetchError` return values
 - Mutation hooks accept `onSuccess` and `onError` callbacks, handling query invalidation internally
 - Top-level error boundary via `react-error-boundary` with `ErrorFallback` component
-- Query hooks return a normalized shape: `{ result: { data, total }, isFetching, fetchError, refetch }`
+- Query hooks return a normalized shape: `{ result: { data, total, params }, isFetching, fetchError, refetch }`
 - Components display errors using `StateError` component for failed data fetches
 - `StateNoData` and `StateNoResults` for empty states
 
@@ -216,7 +219,7 @@ time from the backend and displays the server-reported total in the PatternFly
 ### Request flow
 
 ```
-Context provider (e.g., pages/advisory-list/advisory-context.tsx)
+Context provider (e.g., pages/advisory-list/advisory-provider.tsx)
   └─ useTableControlState() → { pageNumber (1-indexed), itemsPerPage }
   └─ getHubRequestParams(tableControlState) → HubRequestParams { page, sort, filters }
   └─ Spread extra params: { ...hubRequestParams, total: true }
@@ -268,8 +271,12 @@ the query hook — do not change the manual types to optional.
 
 ### Axios interceptors
 
-Response interceptors are registered in `axios-config/apiInit.ts`:
+Interceptors are registered in `axios-config/apiInit.ts`:
 
+Request interceptor:
+- Bearer token injection — attaches the OIDC access token to outgoing requests
+
+Response interceptors:
 - Read-only detection (503) — invalidates trustify info cache
 - Auth token refresh (401) — silent re-auth with one retry
 
@@ -289,15 +296,15 @@ When the backend OpenAPI spec changes:
 6. Update `Constants.ts` if server limits changed
 7. Add interceptor in `apiInit.ts` if new error codes need centralized handling
 8. Update manual types in `api/models.ts` and `api/rest.ts` if needed
-9. Run `npm run check` and verify the build
+9. Run `npm run lint` and verify the build
 
 ## Testing Conventions
 
-### Unit tests (Jest)
+### Unit tests (Vitest)
 
 - Run with `npm run test` (from root or `client` workspace)
-- Config at `client/config/jest.config.ts`
-- CI runs: `npm run test -- --coverage --watchAll=false`
+- Config in `client/vite.config.ts` (test block)
+- CI runs: `npm run test -- --coverage`
 
 ### E2E tests (Playwright)
 
@@ -322,7 +329,7 @@ When the backend OpenAPI spec changes:
 - Use caret ranges (`^`) for dependencies in `client/package.json`
 - Key dependencies: `react` 19, `@patternfly/react-core` 6, `@tanstack/react-query` 5, `axios`, `react-router-dom` 7, `react-hook-form`, `yup`
 - API client generated from `client/openapi/trustd.yaml` — update the spec, then `npm run generate -w client`
-- Dependabot configured for automated dependency updates (groups `@biomejs/*`)
+- Dependabot configured for automated dependency updates
 
 ## Page Patterns
 
@@ -330,10 +337,11 @@ When the backend OpenAPI spec changes:
 
 Each list page follows a consistent architecture:
 
-1. **Context provider** (`<domain>-context.tsx`): creates a `<Domain>SearchContext` that manages table state via `useTableControlState`, fetches data with the domain query hook, and provides `tableControls` to children
-2. **Page component** (`<domain>-list.tsx`): renders `PageSection` with title, wraps content in the context provider, renders toolbar and table
-3. **Toolbar** (`<domain>-toolbar.tsx`): consumes context for pagination and filter props
-4. **Table** (`<domain>-table.tsx`): consumes context for data, columns, sorting, and row rendering
+1. **Context definition** (`<domain>-context.ts`): creates the `<Domain>SearchContext` with `React.createContext()` and defines the context interface
+2. **Context provider** (`<domain>-provider.tsx`): manages table state via `useTableControlState`, fetches data with the domain query hook, and provides values through `<Context.Provider>`
+3. **Page component** (`<domain>-list.tsx`): renders `PageSection` with title, wraps content in the context provider, renders toolbar and table
+4. **Toolbar** (`<domain>-toolbar.tsx`): consumes context for pagination and filter props
+5. **Table** (`<domain>-table.tsx`): consumes context for data, columns, sorting, and row rendering
 
 ### Detail pages
 
@@ -381,7 +389,7 @@ double-nesting `PageSection` elements.
 - Export a query key constant (e.g., `export const SBOMsQueryKey = "sboms"`)
 - Fetch hooks use `useQuery` with the shared `client` Axios instance
 - Mutation hooks use `useMutation` with `queryClient.invalidateQueries` on success/error
-- Fetch hooks return `{ result: { data, total }, isFetching, fetchError, refetch }`
+- Fetch hooks return `{ result: { data, total, params }, isFetching, fetchError, refetch }`
 
 ### Routing
 
