@@ -1,4 +1,6 @@
 import { type Page } from "@playwright/test";
+import { AUTH_REQUIRED, TRUSTIFY_API_URL } from "../../common/constants";
+import { getAccessToken } from "./Auth";
 
 export interface ImporterConfig {
   [importerType: string]: object;
@@ -31,6 +33,14 @@ export const IMPORTER_CONFIGS: Record<string, ImporterConfig> = {
   importer3: { cwe: { disabled: true, period: "1d" } },
   importer4: { cwe: { disabled: true, period: "1d" } },
   importer5: { cwe: { disabled: true, period: "1d" } },
+  cve: {
+    cve: {
+      disabled: true,
+      period: "5m",
+      description: "CVE List V5",
+      source: "https://github.com/CVEProject/cvelistV5",
+    },
+  },
   "cve-from-2024": {
     cve: {
       disabled: true,
@@ -40,93 +50,86 @@ export const IMPORTER_CONFIGS: Record<string, ImporterConfig> = {
       startYear: 2024,
     },
   },
+  "fake-importer-disable": {
+    osv: {
+      disabled: true,
+      period: "1day",
+      description: "GitHub Advisory Database",
+      source: "https://github.com/matejnesuta/sample_advisories",
+      path: "advisories",
+    },
+  },
+  "fake-importer-enable": {
+    osv: {
+      disabled: true,
+      period: "1day",
+      description: "GitHub Advisory Database",
+      source: "https://github.com/matejnesuta/sample_advisories",
+      path: "advisories",
+    },
+  },
+  "fake-importer-run": {
+    osv: {
+      disabled: true,
+      period: "1day",
+      description: "GitHub Advisory Database",
+      source: "https://github.com/matejnesuta/sample_advisories",
+      path: "advisories",
+    },
+  },
 };
 
-const getOidcAccessToken = (page: Page): Promise<string | null> =>
-  page.evaluate(() => {
-    for (let i = 0; i < window.sessionStorage.length; i++) {
-      const key = window.sessionStorage.key(i);
-      if (key?.startsWith("oidc.user:")) {
-        const raw = window.sessionStorage.getItem(key);
-        if (raw) {
-          try {
-            return (
-              (JSON.parse(raw) as { access_token?: string }).access_token ??
-              null
-            );
-          } catch {
-            return null;
-          }
-        }
-      }
-    }
-    return null;
-  });
-
-/**
- * Creates the importer via the API if it does not already exist (HTTP 404),
- * then reloads the page so the table reflects the new entry.
- */
-export const ensureImporterExists = async (
-  page: Page,
-  importerName: string,
-  importerConfig: ImporterConfig,
-) => {
-  const accessToken = await getOidcAccessToken(page);
-
-  const baseUrl = process.env.TRUSTIFY_UI_URL ?? "http://localhost:3000";
-  const url = `${baseUrl}/api/v3/importer/${encodeURIComponent(importerName)}`;
-  const headers: Record<string, string> = {};
-  if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
-  }
-
-  const checkResponse = await page.request.get(url, { headers });
-  if (checkResponse.status() === 404) {
-    await page.request.post(url, {
-      headers: { ...headers, "Content-Type": "application/json" },
-      data: importerConfig,
-    });
-    await page.reload();
-    await page.waitForTimeout(1000);
-  }
-};
-
-/**
- * Ensures every entry in IMPORTER_CONFIGS exists, creating missing ones in a
- * single pass. Must be called after the page has navigated to the app so that
- * sessionStorage is accessible. Reloads once if any importer was created.
- */
 export const ensureAllImportersExist = async (page: Page): Promise<void> => {
-  const accessToken = await getOidcAccessToken(page);
-  const baseUrl = process.env.TRUSTIFY_UI_URL ?? "http://localhost:3000";
-  const headers: Record<string, string> = {};
-  if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
-  }
+  // Ensure the app is loaded so sessionStorage (and the OIDC token) is
+  // accessible. When auth is disabled the page may still be on about:blank,
+  // where page.evaluate() throws a SecurityError.
+  await page.goto("/importers");
 
-  let anyCreated = false;
+  // Use the API base URL (which may differ from the UI host on downstream
+  // deployments) so importer creation targets the real API and not the UI's
+  // SPA fallback, which would answer /api/v3/... with a 200 HTML page.
+  const baseUrl = TRUSTIFY_API_URL.replace(/\/+$/, "");
+  const accessToken = await getAccessToken(page);
+  if (AUTH_REQUIRED === "true" && !accessToken) {
+    throw new Error(
+      "ensureAllImportersExist: auth is required but no OIDC access token was " +
+        "found in sessionStorage. Ensure login() ran and succeeded before this.",
+    );
+  }
+  const headers: Record<string, string> = {};
+  if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+
   for (const [importerName, importerConfig] of Object.entries(
     IMPORTER_CONFIGS,
   )) {
     const url = `${baseUrl}/api/v3/importer/${encodeURIComponent(importerName)}`;
     const checkResponse = await page.request.get(url, { headers });
-    if (checkResponse.status() === 404) {
-      await page.request.post(url, {
-        headers: { ...headers, "Content-Type": "application/json" },
-        data: importerConfig,
-      });
-      anyCreated = true;
+    const checkStatus = checkResponse.status();
+
+    if (checkStatus === 200) {
+      continue; // Already exists.
+    }
+    if (checkStatus !== 404) {
+      throw new Error(
+        `ensureAllImportersExist: unexpected status ${checkStatus} checking ` +
+          `"${importerName}" at ${url}. Body: ${await checkResponse.text()}`,
+      );
+    }
+
+    const createResponse = await page.request.post(url, {
+      headers: { ...headers, "Content-Type": "application/json" },
+      data: importerConfig,
+    });
+    // 409 means another parallel worker created it between our GET and POST;
+    // the importer now exists, which is exactly what we want.
+    if (!createResponse.ok() && createResponse.status() !== 409) {
+      throw new Error(
+        `ensureAllImportersExist: failed to create "${importerName}" ` +
+          `(status ${createResponse.status()}). Body: ${await createResponse.text()}`,
+      );
     }
   }
-
-  if (anyCreated) {
-    await page.reload();
-    await Promise.all([
-      page.waitForLoadState("networkidle"),
-      page.waitForSelector('[data-testid="importers-table"]', {
-        state: "visible",
-      }),
-    ]);
-  }
+  // Importers are created server-side via the API above. Each scenario's first
+  // step navigates to the Importers page (fetching fresh data), so there is no
+  // need to reload/re-render here.
 };

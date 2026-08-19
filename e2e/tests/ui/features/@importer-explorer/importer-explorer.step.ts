@@ -1,11 +1,7 @@
 import { createBdd } from "playwright-bdd";
 import { expect } from "../../assertions";
 import { test } from "../../fixtures";
-import {
-  ensureAllImportersExist,
-  ensureImporterExists,
-  IMPORTER_CONFIGS,
-} from "../../helpers/Importer";
+import { ensureAllImportersExist } from "../../helpers/Importer";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { ImporterListPage } from "../../pages/importer-list/ImporterListPage";
 
@@ -14,6 +10,9 @@ export const { Given, When, Then } = createBdd(test);
 // Navigation
 When("User navigates to Importers page", async ({ page }) => {
   await ImporterListPage.build(page);
+});
+
+When("All importers are present", async ({ page }) => {
   await ensureAllImportersExist(page);
 });
 
@@ -89,15 +88,6 @@ Then("The filter toggle button should be available", async ({ page }) => {
 When(
   "User applies filter {string} with value {string}",
   async ({ page }, _filterName, filterValue) => {
-    // Ensure any IMPORTER_CONFIGS entries that would match this filter exist
-    for (const [importerName, importerConfig] of Object.entries(
-      IMPORTER_CONFIGS,
-    )) {
-      if (importerName.includes(filterValue)) {
-        await ensureImporterExists(page, importerName, importerConfig);
-      }
-    }
-
     const listPage = new ImporterListPage(page);
     const toolbar = await listPage.getToolbar();
 
@@ -377,14 +367,6 @@ When(
   "User enables a disabled importer {string}",
   async ({ page }, importerName) => {
     test.setTimeout(90_000);
-
-    if (IMPORTER_CONFIGS[importerName]) {
-      await ensureImporterExists(
-        page,
-        importerName,
-        IMPORTER_CONFIGS[importerName],
-      );
-    }
 
     const listPage = new ImporterListPage(page);
 
