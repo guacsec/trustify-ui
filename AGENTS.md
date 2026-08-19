@@ -4,32 +4,40 @@ Repository-specific guidance for AI coding agents working on Trustify UI.
 
 ## Project Overview
 
-Trustify UI is a React-based web application for software supply chain security (SBOMs, advisories, vulnerabilities). It uses a monorepo structure with npm workspaces and connects to the Trustify backend API.
+Trustify UI is a React-based web application for software supply chain security (SBOMs, advisories, vulnerabilities). It uses a monorepo structure with npm workspaces and connects to the Trustify backend API. See [CONVENTIONS.md](CONVENTIONS.md) for detailed coding standards (naming, imports, file organization, error handling).
 
-## Repository Floorplan
+## Domain Concepts
 
-Four npm workspaces:
+- **SBOM (Software Bill of Materials)**: Inventory of software components and dependencies
+- **Advisory**: Security advisory (CVE, CSAF, etc.)
+- **Vulnerability**: Known security weakness (CVE)
+- **Package**: Software package referenced in SBOMs
+- **Importer**: Backend job that ingests external data sources
 
-- **`common/`** — Shared ESM module for environment config and branding
-  - Exports `TrustificationEnvType`, `encodeEnv`, `decodeEnv`, branding assets
-  - Built with Rollup to both ESM (.mjs) and CommonJS (.cjs)
-- **`client/`** — React SPA
-  - Tech: ReactJS, TypeScript, Vite, PatternFly
-  - Dev server: port 3000 with proxy to backend
-  - Key paths (with `@app` alias mapping to `client/src/app/`):
-    - `@app/Routes.tsx` — route definitions with lazy() imports
-    - `@app/pages/` — page components, one directory per page
-    - `@app/queries/` — TanStack Query hooks, one file per domain
-    - `@app/components/` — shared UI components
-    - `@app/hooks/` — custom hooks (table-controls, domain-controls)
-    - `@app/api/` — custom REST calls (uploads, downloads)
-    - `@app/client/` — **auto-generated API client (DO NOT EDIT)**
-    - `@app/axios-config/` — Axios instance and interceptors
-- **`server/`** — Express.js production server (proxying, env injection)
-- **`e2e/`** — Playwright end-to-end tests
-  - `tests/ui/features/` — BDD .feature files (Gherkin)
-  - `tests/ui/pages/` — Page Object Model classes
-  - `tests/api/` — API-level tests
+## Repository Architecture
+
+Four npm workspaces (`@app` alias maps to `client/src/app/`):
+
+```
+├── common/                   # shared ESM module (branding, env config)
+│                             #   built with Rollup → ESM (.mjs) + CJS (.cjs)
+├── client/                   # React SPA (Vite, TypeScript, PatternFly)
+│   └── src/app/              #   dev server: port 3000 with proxy to backend
+│       ├── Routes.tsx        # route definitions with lazy() imports
+│       ├── pages/            # page components, one directory per page
+│       ├── queries/          # TanStack Query hooks, one file per domain
+│       ├── components/       # shared UI components
+│       ├── hooks/            # custom hooks (table-controls, domain-controls)
+│       ├── api/              # custom REST calls (uploads, downloads)
+│       ├── client/           # auto-generated API client (DO NOT EDIT)
+│       └── axios-config/     # Axios instance and interceptors
+├── server/                   # Express.js production server (proxying, env injection)
+└── e2e/                      # Playwright end-to-end tests
+    └── tests/
+        ├── ui/features/      # BDD .feature files (Gherkin)
+        ├── ui/pages/         # Page Object Model classes
+        └── api/              # API-level tests
+```
 
 ## Key Commands
 
@@ -47,7 +55,7 @@ npm run lint
 npm run lint:fix
 npm run format:fix
 
-# Unit tests (Jest)
+# Unit tests (Vitest)
 npm test
 
 # E2E tests (Playwright)
@@ -62,84 +70,157 @@ npm run generate
 npm run build
 ```
 
-## Golden Rules
+## Tech Stack
 
-- **Prefer small, focused changes.** One feature or fix per PR.
-- **Follow existing architecture and naming conventions.** Match surrounding code.
-- **Do not introduce new dependencies** unless there is a clear, justified reason. Check for existing solutions first.
-- **Remove obsolete code** instead of leaving commented-out or dead code behind.
-- **Always read files before modifying them.** Context matters.
-- **Read [CONVENTIONS.md](CONVENTIONS.md) for detailed coding standards** (naming, imports, file organization, error handling).
+- **Language**: [TypeScript](https://www.typescriptlang.org/docs/)
+- **UI framework**: [React](https://react.dev/learn)
+- **Component library**: [PatternFly](https://www.patternfly.org/) (`@patternfly/react-core`, `@patternfly/react-table`)
+- **Build**: [Vite](https://vite.dev/guide/) (client), [Rollup](https://rollupjs.org/) (common, server)
+- **Routing**: [react-router-dom](https://reactrouter.com/) with lazy-loaded routes
+- **Data fetching**: [TanStack React Query](https://tanstack.com/query/latest)
+- **HTTP client**: [Axios](https://axios-http.com/)
+- **API client codegen**: [@hey-api/openapi-ts](https://heyapi.dev/)
+- **Forms**: [react-hook-form](https://react-hook-form.com/) + [yup](https://github.com/jquense/yup)
+- **Auth**: [react-oidc-context](https://github.com/authts/react-oidc-context) + [oidc-client-ts](https://github.com/authts/oidc-client-ts)
+- **Unit testing**: [Vitest](https://vitest.dev/)
+- **E2E testing**: [Playwright](https://playwright.dev/) + [playwright-bdd](https://vitalets.github.io/playwright-bdd/)
+- **Linting**: [ESLint](https://eslint.org/)
+- **Formatting**: [Prettier](https://prettier.io/)
+- **Package manager**: [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces)
 
-## Generated-File Boundaries
+### PatternFly & UI Patterns
 
-**DO NOT EDIT** files in `client/src/app/client/` directly — this directory is auto-generated from the OpenAPI spec.
-
-To update the API client:
-
-1. Update `client/openapi/trustd.yaml` with the new backend spec
-2. Run `npm run generate -w client`
-3. Follow the [CONVENTIONS.md § Adapting to upstream API changes](CONVENTIONS.md#adapting-to-upstream-api-changes) checklist
-
-## Domain Concepts
-
-- **SBOM (Software Bill of Materials)**: Inventory of software components and dependencies
-- **Advisory**: Security advisory (CVE, CSAF, etc.)
-- **Vulnerability**: Known security weakness (CVE)
-- **Package**: Software package referenced in SBOMs
-- **Importer**: Backend job that ingests external data sources
-
-## API and Data-Fetching
-
-- **All list pages use server-side pagination.** Frontend requests one page at a time.
-- **Add `total: true`** to request params when calling query hooks that need total counts for pagination.
-- **Query hooks** in `queries/` bridge generated SDK functions and normalize responses into `{ result: { data, total }, isFetching, fetchError, refetch }`.
-- **Mutations** invalidate related queries automatically via `queryClient.invalidateQueries`.
-- **Error handling**: Errors propagate via `fetchError` return value. Use `StateError` component to display.
-- **Axios interceptors** (in `axios-config/apiInit.ts`):
-  - Read-only mode detection (503)
-  - Auth token refresh (401) with silent retry
-
-See [CONVENTIONS.md § API Client Pipeline](CONVENTIONS.md#api-client-pipeline) and [§ Server-Side Pagination](CONVENTIONS.md#server-side-pagination) for full details.
-
-## UI and PatternFly Expectations
-
-- **Use PatternFly 6 components** for all UI (`@patternfly/react-core`, `@patternfly/react-table`).
+- **Use PatternFly components** for all UI.
 - **Table controls pattern**: Use `useTableControlState()` + `useTableControlProps()` for pagination/sorting/filtering.
   - State persists to URL params, localStorage, sessionStorage, or React state.
   - Enables shareable URLs with filters/sort/pagination state.
 - **List pages** follow: Context provider → Page component → Toolbar + Table.
-- **Detail pages** use tab-based layouts. Tab content components **must not** include their own `<PageSection>` wrapper (see [CONVENTIONS.md § Tab content components](CONVENTIONS.md#tab-content-components)).
+- **Detail pages** use tab-based layouts. Tab content components **must not** include their own `<PageSection>` wrapper.
 - **Forms**: Use `react-hook-form` + `yup` validation.
 - **Empty states**: Use `StateNoData` and `StateNoResults` components.
 
-See [CONVENTIONS.md § Page Patterns](CONVENTIONS.md#page-patterns) for canonical examples.
+### API & Data Fetching
 
-## Testing Expectations
+- **Generated SDK**: `@hey-api/openapi-ts` generates types and SDK functions from the OpenAPI spec into `client/src/app/client/` (DO NOT EDIT).
+- **Query hooks** in `queries/` wrap generated SDK calls with TanStack React Query (`useQuery`/`useMutation`) and normalize responses into `{ result: { data, total, params }, isFetching, fetchError, refetch }`.
+- **Mutations** invalidate related queries automatically via `queryClient.invalidateQueries`.
+- **Server-side pagination**: all list pages request one page at a time.
+- **Axios interceptors** (`axios-config/apiInit.ts`): read-only mode detection (503), auth token refresh (401) with silent retry.
 
-### Unit Tests
+## Development
+
+### `npm run start:dev` (development mode)
+
+Builds `common` once, then concurrently watches `common` (rollup rebuild on change) and runs the Vite dev server on port 3000 with HMR.
+
+The **`server/` workspace is not started** in dev mode — Vite handles both static serving and API proxying directly:
+
+| Path | Proxied to | Default |
+|------|-----------|---------|
+| `/api` | `TRUSTIFY_API_URL` | `http://localhost:8080` |
+| `/auth` | `OIDC_SERVER_URL` | `http://localhost:8090` |
+| `/.well-known/trustify` | `TRUSTIFY_API_URL` | `http://localhost:8080` |
+
+Environment variables are injected into `index.html` via `ViteEjsPlugin` at startup.
+
+### `npm run start` (production mode)
+
+Builds `common` and `client`, then starts the Express server from `server/` on port 8080.
+
+The Express server (`server/src/index.ts`):
+- Serves `client/dist/` as static files
+- Renders `index.html.ejs` per-request via EJS, injecting runtime env vars
+
+Use this mode only if you want to see how you app behaves with minified JS, CSS, etc. resources, just like when it will be deployed in production.
+
+## Testing
+
+### Unit Tests (Vitest)
 
 - Run with `npm test`
 - Test files colocated with source code (`.test.ts`, `.test.tsx`)
+- Config in `client/vite.config.ts` (test block)
 - Mock API calls and use React Testing Library for component tests
 
-### E2E Tests
+### E2E Tests (Playwright)
 
 - **Two test styles**:
-  1. BDD features (`.feature` files + `.step.ts` step definitions)
+  1. BDD features (`.feature` files + `.step.ts` step definitions via `playwright-bdd`)
   2. Spec files (`.spec.ts` organized by concern: columns, filter, sort, pagination, actions)
 - **Page Object Model**: Each page has a class (e.g., `SbomListPage`) with `static build()` factory.
-- **Custom assertions**: Always prefer custom assertions from `e2e/tests/ui/assertions/` over manual DOM queries.
-- **Tags for tiers**: `{ tag: "@tier1" }` for critical paths.
+- **Custom assertions**: Prefer custom assertions from `e2e/tests/ui/assertions/` over manual DOM queries.
 
-See [CONVENTIONS.md § Testing Conventions](CONVENTIONS.md#testing-conventions) for details.
+## Rust Crate (Backend Embedding)
+
+The `crate/` directory is a Rust crate (`trustify-ui`) that embeds the built frontend into the Trustify backend binary (`trustd`). The frontend is not a standalone deployment — it ships inside the Rust server.
+
+**How it works:**
+
+The backend points to this Rust Crate in [Cargo.toml](https://github.com/guacsec/trustify/blob/main/Cargo.toml) using something similar to:
+
+```toml
+trustify-ui = { git = "https://github.com/guacsec/trustify-ui.git", branch = "publish/main" }
+```
+
+## Branding
+
+Branding (logo, application name, URLs) is selected at **build time** via the `BRANDING` environment variable and baked into the output. There is no runtime branding switch.
+
+**Default branding directory** (`./branding`):
+
+```
+branding/
+  strings.json          # primary branding config
+  manifest.json         # PWA web app manifest
+  favicon.ico           # browser tab icon
+  images/
+    masthead-logo.svg   # masthead header logo
+    logo.png            # full-size logo
+    logo192.png         # 192px PWA icon
+    logo512.png         # 512px PWA icon
+```
+
+**`strings.json` structure:**
+
+```json
+{
+  "application": {
+    "title": "Trustification",
+    "name": "Trustification UI",
+    "description": "Trustification UI"
+  },
+  "about": {
+    "displayName": "Trustification",
+    "imageSrc": "<%= brandingRoot %>/images/masthead-logo.svg",
+    "documentationUrl": "https://trustification.io/"
+  },
+  "masthead": {
+    "leftBrand": { "src": "<%= brandingRoot %>/images/masthead-logo.svg", "alt": "brand", "height": "40px" },
+    "leftTitle": null,
+    "rightBrand": null,
+    "supportUrl": "https://github.com/trustification/trustify/issues"
+  }
+}
+```
+
+Image paths must use `<%= brandingRoot %>` — this is resolved to `branding` at build time via EJS.
+
+**Creating a custom-branded build:**
+
+1. Create a directory (e.g., `branding-custom/`) with the same structure as `branding/`.
+2. Customize `strings.json` and replace image assets.
+3. Build with: `BRANDING=./branding-custom npm run build`
+
+**What branding controls:** tab title, HTML meta tags, masthead logo/text, About modal, Get Started section, support URL, favicon, and PWA manifest.
+
+**What branding does not control:** colors/theme (PatternFly), layout, routes, or behavior.
 
 ## Common Pitfalls
 
 - **Forgetting `total: true`**: Server-side pagination requires `total: true` in request params. Omitting it returns `total: null`.
 - **Editing generated files**: Never edit `client/src/app/client/` manually. Always regenerate with `npm run generate`.
 - **Incorrect import order**: Follow the 5-block import order in [CONVENTIONS.md § Code Style](CONVENTIONS.md#code-style).
-- **Wrapping tab content in `<PageSection>`**: Tab content components should not include their own `PageSection` wrapper (detail page provides it).
+- **Wrapping tab content in `<PageSection>`**: Tab content components should not include their own PageSection wrapper (detail page provides it).
 - **Using `URLSearchParams` for new paginated endpoints**: Use `requestParamsQuery` (plain object) instead of legacy `serializeRequestParamsForHub`.
 - **Hardcoding pagination limits**: Use `MAX_ITEMS_PER_PAGE` from `Constants.ts` (mirrors server default).
 - **Not running `npm ci` after dependency changes**: Always run after pulling updates to ensure workspace links are correct.

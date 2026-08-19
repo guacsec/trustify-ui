@@ -21,7 +21,7 @@ import {
   extendedSeverityFromSeverity,
   type HubRequestParams,
 } from "@app/api/models";
-import { LoadingWrapper } from "@tsd-ui/core";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useFetchVulnerabilities } from "@app/queries/vulnerabilities";
@@ -73,7 +73,7 @@ export const VulnerabilityAttentionSection: React.FC = () => {
   );
 
   return (
-    <HomeSectionCard>
+    <HomeSectionCard testId="home-attention-section">
       <Stack hasGutter>
         <StackItem>
           <Title headingLevel="h2" size="lg">
@@ -89,7 +89,11 @@ export const VulnerabilityAttentionSection: React.FC = () => {
             {attentionVulnerabilities.length > 0 ? (
               <Flex
                 direction={{ default: "column", md: "row" }}
-                alignItems={{ default: "alignItemsStretch" }}
+                alignItems={{
+                  default: "alignItemsStretch",
+                  sm: "alignItemsStretch",
+                  md: "alignItemsStretch",
+                }}
               >
                 {attentionVulnerabilities.map((vulnerability, index) => (
                   <React.Fragment key={vulnerability.identifier}>
@@ -101,7 +105,10 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                         }}
                       />
                     )}
-                    <FlexItem flex={{ default: "flex_1" }}>
+                    <FlexItem
+                      flex={{ default: "flex_1" }}
+                      data-testid={`home-attention-item-${index}`}
+                    >
                       <Stack hasGutter>
                         <StackItem isFilled>
                           <Stack>
@@ -116,7 +123,9 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                                 spaceItems={{ default: "spaceItemsSm" }}
                                 flexWrap={{ default: "wrap" }}
                               >
-                                <FlexItem>
+                                <FlexItem
+                                  data-testid={`home-attention-severity-${index}`}
+                                >
                                   <SeverityShieldAndText
                                     value={extendedSeverityFromSeverity(
                                       vulnerability.base_score?.severity,
@@ -128,7 +137,9 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                                     showScore
                                   />
                                 </FlexItem>
-                                <FlexItem>
+                                <FlexItem
+                                  data-testid={`home-attention-id-${index}`}
+                                >
                                   <Link
                                     to={generatePath(
                                       Paths.vulnerabilityDetails,
@@ -176,6 +187,7 @@ export const VulnerabilityAttentionSection: React.FC = () => {
                 headingLevel="h4"
                 titleText="No vulnerabilities in the last 7 days"
                 variant={EmptyStateVariant.sm}
+                data-testid="home-attention-empty"
               >
                 <EmptyStateBody>
                   Newly published vulnerabilities will appear here as they
