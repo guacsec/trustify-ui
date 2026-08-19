@@ -249,11 +249,12 @@ Then(
 When(
   "User Applies {string} filter with {string} on the Vulnerability Report",
   async ({ page }, filter: string, value: string) => {
+    const toolbarTable = new ToolbarTable(page, "Vulnerability table");
+    await toolbarTable.waitForTableContent();
+
     // Click the filter dropdown and select the filter type
     await page.getByLabel("filtered-by").click();
     await page.getByRole("menuitem", { name: filter }).click();
-
-    const toolbarTable = new ToolbarTable(page, "Vulnerability table");
 
     // For multi-select filters (Severity, Importer), select the value
     // For text filters (Vulnerability ID), this step only selects the filter type
