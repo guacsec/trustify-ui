@@ -2,7 +2,7 @@ import { logger } from "../../common/constants";
 import { expect, test } from "../fixtures";
 import { formatTimeElapsed } from "../helpers/general-helpers";
 
-// This is a set of tests that are designed to run againt an Atlas instance, as they assume that certain data is already ingested.
+// This is a set of tests that are designed to run against an Atlas instance, as they assume that certain data is already ingested.
 
 // This is a list of purl which were reported by Atlas as problematic and not returning a response in time.
 const purlsReportedByAtlas = [
