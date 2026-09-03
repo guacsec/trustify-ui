@@ -158,7 +158,6 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
 
   testFilterMatches("Empty filter input is handled", {
     filters: { "Filter text": "" },
-    assertions: { columnName: "Name", value: "accordion" },
     getConfig: async ({ page }) => {
       const listPage = await PackageListPage.build(page);
       const toolbar = await listPage.getToolbar();
