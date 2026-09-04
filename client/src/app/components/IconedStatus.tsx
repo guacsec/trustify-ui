@@ -21,11 +21,7 @@ export type IconedStatusPreset =
   | "Unknown";
 
 export type IconedStatusStatusType =
-  | "custom"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+  "custom" | "info" | "success" | "warning" | "danger";
 
 type IconedStatusPresetType = {
   [key in IconedStatusPreset]: Omit<IIconedStatusProps, "preset">;
