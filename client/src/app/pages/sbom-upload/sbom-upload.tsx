@@ -59,8 +59,8 @@ export const SbomUpload: React.FC = () => {
               <Content component="h1">Upload SBOM</Content>
               <Content component="p">
                 Upload a Software Bill of Materials (SBOM) document. We accept
-                CycloneDX versions 1.3, 1.4, 1.5 and 1.6, and System Package
-                Data Exchange (SPDX) versions 2.2, and 2.3.
+                CycloneDX versions 1.3, 1.4, 1.5, 1.6 and 1.7, and System
+                Package Data Exchange (SPDX) versions 2.2, and 2.3.
               </Content>
             </Content>
           </PageSection>
