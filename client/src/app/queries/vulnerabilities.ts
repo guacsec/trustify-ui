@@ -40,7 +40,10 @@ export const useFetchVulnerabilities = (
   };
 };
 
-export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
+export const useFetchVulnerabilitiesByPackageIds = (
+  ids: string[],
+  includeResolved = false,
+) => {
   const chunkedIds = ids.reduce<string[][]>((chunks, item, index) => {
     if (index % 100 === 0) {
       chunks.push([item]);
@@ -52,11 +55,14 @@ export const useFetchVulnerabilitiesByPackageIds = (ids: string[]) => {
 
   const userQueries = useQueries({
     queries: chunkedIds.map((chunkIds) => ({
-      queryKey: [VulnerabilitiesQueryKey, chunkIds],
+      queryKey: [VulnerabilitiesQueryKey, chunkIds, { includeResolved }],
       queryFn: async () => {
         const response = await analyzeV3({
           client,
-          body: { purls: chunkIds },
+          body: {
+            purls: chunkIds,
+            include_resolved: includeResolved || undefined,
+          },
         });
         return response.data ?? null;
       },
