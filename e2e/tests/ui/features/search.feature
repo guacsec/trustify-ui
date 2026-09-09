@@ -66,14 +66,14 @@ Scenario: Search bar should not preview anything when no matches are found
 	When user starts typing a "non-existent name" in the search bar
 	Then The autofill drop down should not show any values
 
-Scenario Outline: User searches for a specific <type> 
+Scenario Outline: User searches for a specific <type>
 	When user types a <type-name> in the search bar
 	And user presses Enter
 	And user toggles the <types> list
-	Then the <types> list should display the specific <type-name> 
-	And the user should be able to filter <types> 
+	Then the <types> list should display the specific <type-name>
+	And the user should be able to filter <types>
 	And user clicks on the "<type>" name
-	And the user should be navigated to the specific "<type>" page 
+	And the user should be navigated to the specific "<type>" page
 
 	Examples:
 	|type|types|type-name|

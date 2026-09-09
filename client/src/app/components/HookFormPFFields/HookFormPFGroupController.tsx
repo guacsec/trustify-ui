@@ -92,6 +92,7 @@ export const HookFormPFGroupController = <
 );
 
 // Utility for pulling props needed by this component and passing the rest to a rendered input
+// eslint-disable-next-line react-refresh/only-export-components
 export const extractGroupControllerProps = <
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,

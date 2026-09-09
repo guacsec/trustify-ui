@@ -4,14 +4,20 @@ import { generatePath, Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
+  Alert,
+  AlertActionCloseButton,
+  Button,
   Card,
   CardBody,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Flex,
+  FlexItem,
   Grid,
   GridItem,
+  Popover,
   Stack,
   StackItem,
   Toolbar,
@@ -19,6 +25,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 import {
+  ActionsColumn,
   ExpandableRowContent,
   Table,
   TableText,
@@ -29,17 +36,8 @@ import {
   Tr,
 } from "@patternfly/react-table";
 
-import {
-  type VulnerabilityStatus,
-  extendedSeverityFromSeverity,
-} from "@app/api/models";
-import type {
-  PurlSummary,
-  SbomAdvisory,
-  SbomPackage,
-  SbomStatus,
-} from "@app/client";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
@@ -53,23 +51,16 @@ import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
 import { useLocalTableControls } from "@app/hooks/table-controls";
+import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
+import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
+import { useIsExploitIntelligenceEnabled } from "@app/queries/trustifyInfo";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate } from "@app/utils/utils";
 
-interface TableData {
-  vulnerability: SbomStatus;
-  vulnerabilityStatus: VulnerabilityStatus;
-  relatedPackages: {
-    advisory: SbomAdvisory;
-    packages: SbomPackage[];
-  }[];
-  summary: {
-    totalPackages: number;
-    allPackages: SbomPackage[];
-  };
-}
+import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
+import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -89,37 +80,49 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfSbom(sbomId);
 
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
+  const isEiEnabled = useIsExploitIntelligenceEnabled();
+
+  const [showErrorBanner, setShowErrorBanner] = React.useState(false);
+
+  const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
+    isEiEnabled ? sbomId : undefined,
+    {
+      onJobFailed: () => {
+        setShowErrorBanner(true);
+      },
+    },
+  );
+
+  const submitAnalysis = useSubmitExploitAnalysisMutation();
+
+  const handleRequestAnalysis = React.useCallback(
+    (vulnerabilityId: string) => {
+      submitAnalysis.mutate(
+        { sbom_id: sbomId, vulnerability_id: vulnerabilityId },
+        {
+          onSuccess: (data) => {
+            if (data.data?.job_id) {
+              trackJob(data.data.job_id);
+            }
+          },
+          onError: () => {
+            setShowErrorBanner(true);
+          },
+        },
+      );
+    },
+    [sbomId, submitAnalysis, trackJob],
+  );
+
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
       (item) => item.vulnerabilityStatus === "affected",
     );
   }, [vulnerabilities]);
 
-  const tableData = React.useMemo(() => {
-    return affectedVulnerabilities.map((item) => {
-      const allPackages = item.relatedPackages
-        .flatMap((i) => i.packages)
-        .reduce((prev, current) => {
-          const existingElement = prev.find((item) => item.id === current.id);
-          if (!existingElement) {
-            prev.push(current);
-          }
-          return prev;
-        }, [] as SbomPackage[]);
-      const result: TableData = {
-        ...item,
-        summary: {
-          totalPackages: allPackages.length,
-          allPackages,
-        },
-      };
-
-      return result;
-    });
-  }, [affectedVulnerabilities]);
-
   const tableDataWithUiId = useWithUiId(
-    tableData,
+    affectedVulnerabilities,
     (d) => `${d.vulnerability.identifier}-${d.vulnerabilityStatus}`,
   );
 
@@ -132,11 +135,12 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       id: "Id",
       description: "Description",
       cvss: "CVSS",
+      exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
       published: "Published",
       updated: "Updated",
     },
-    hasActionsColumn: false,
+    hasActionsColumn: isEiEnabled,
     isSortEnabled: true,
     sortableColumns: [
       "id",
@@ -147,8 +151,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     ],
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
-      cvss: item.vulnerability.average_score,
-      affectedDependencies: item.summary.totalPackages,
+      cvss: item.opinionatedAdvisory.score?.value ?? 0,
+      affectedDependencies: item.purls.size,
       published: item.vulnerability?.published
         ? dayjs(item.vulnerability.published).valueOf()
         : 0,
@@ -225,6 +229,25 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
         </Card>
       </StackItem>
       <StackItem>
+        {showErrorBanner && (
+          <Alert
+            isInline
+            variant="danger"
+            title="Analysis failed"
+            style={{ marginBlockEnd: "var(--pf-t--global--spacer--md)" }}
+            actionClose={
+              <AlertActionCloseButton
+                onClose={() => setShowErrorBanner(false)}
+              />
+            }
+            timeout={8000}
+            onTimeout={() => setShowErrorBanner(false)}
+          >
+            The analysis could not be completed due to an unsupported SBOM
+            format or a system error. Verify that your SBOM is in a supported
+            format. If the issue persists, contact your administrator.
+          </Alert>
+        )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
             <ToolbarItem {...paginationToolbarItemProps}>
@@ -244,6 +267,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
+                {isEiEnabled && (
+                  <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
+                )}
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
@@ -257,6 +283,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             numRenderedColumns={numRenderedColumns}
           >
             {currentPageItems?.map((item, rowIndex) => {
+              const eiState = eiStates[item.vulnerability.identifier];
+              const isReanalysisDisabled =
+                !eiState ||
+                eiState.kind === "not_run" ||
+                (eiState.kind === "finding" &&
+                  eiState.finding.variant === "in_progress");
+
               return (
                 <Tbody
                   key={item._ui_unique_id}
@@ -269,7 +302,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       rowIndex={rowIndex}
                     >
                       <Td
-                        width={15}
+                        width={10}
                         modifier="breakWord"
                         {...getTdProps({ columnKey: "id" })}
                       >
@@ -284,7 +317,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={35}
+                            width={25}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -304,18 +337,67 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={10} {...getTdProps({ columnKey: "cvss" })}>
-                        <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(
-                            item.vulnerability.average_severity,
-                          )}
-                          score={item.vulnerability.average_score}
-                          showLabel
-                          showScore
-                        />
+                      <Td width={15} {...getTdProps({ columnKey: "cvss" })}>
+                        <Flex>
+                          <FlexItem>
+                            <SeverityShieldAndText
+                              value={item.opinionatedAdvisory.extendedSeverity}
+                              score={
+                                item.opinionatedAdvisory.score?.value ?? null
+                              }
+                              showLabel
+                              showScore
+                            />
+                          </FlexItem>
+                          <FlexItem>
+                            <Popover
+                              hasAutoWidth
+                              aria-label="CVSS Score Breakdown"
+                              headerContent={<div>CVSS Score Breakdown</div>}
+                              bodyContent={
+                                <VulnerabilityScoreBreakdown
+                                  opinionatedAdvisory={{
+                                    advisory: item.opinionatedAdvisory.advisory,
+                                    score: item.opinionatedAdvisory.score,
+                                    extendedSeverity:
+                                      item.opinionatedAdvisory.extendedSeverity,
+                                  }}
+                                  advisories={Array.from(
+                                    item.advisories.values(),
+                                  )}
+                                />
+                              }
+                            >
+                              <Button
+                                variant="link"
+                                disabled
+                                size="sm"
+                              >{`${item.advisories.size} Sources`}</Button>
+                            </Popover>
+                          </FlexItem>
+                        </Flex>
                       </Td>
+                      {isEiEnabled && (
+                        <Td
+                          width={15}
+                          {...getTdProps({
+                            columnKey: "exploitAnalysis",
+                          })}
+                        >
+                          <ExploitIntelligenceAnalysisCell
+                            vulnerabilityIdentifier={
+                              item.vulnerability.identifier
+                            }
+                            state={eiState ?? { kind: "not_run" }}
+                            onRequestAnalysis={handleRequestAnalysis}
+                            isDisabled={
+                              areMutationsDisabled || submitAnalysis.isPending
+                            }
+                          />
+                        </Td>
+                      )}
                       <Td
-                        width={15}
+                        width={10}
                         modifier="truncate"
                         {...getTdProps({
                           columnKey: "affectedDependencies",
@@ -324,7 +406,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           rowIndex,
                         })}
                       >
-                        {item.summary.totalPackages}
+                        {item.purls.size}
                       </Td>
                       <Td
                         width={10}
@@ -340,6 +422,25 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       >
                         {formatDate(item.vulnerability?.modified)}
                       </Td>
+                      {isEiEnabled && (
+                        <Td isActionCell>
+                          <ActionsColumn
+                            items={[
+                              {
+                                title: "Request new analysis",
+                                onClick: () =>
+                                  handleRequestAnalysis(
+                                    item.vulnerability.identifier,
+                                  ),
+                                isDisabled:
+                                  areMutationsDisabled ||
+                                  submitAnalysis.isPending ||
+                                  isReanalysisDisabled,
+                              },
+                            ]}
+                          />
+                        </Td>
+                      )}
                     </TableRowContentWithControls>
                   </Tr>
                   {isCellExpanded(item) ? (
@@ -363,34 +464,9 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                 </Tr>
                               </Thead>
                               <Tbody>
-                                {item.summary.allPackages
-                                  .flatMap((item) => {
-                                    // Some packages do not have purl neither ID. So we render only the parent name meanwhile
-                                    type EnrichedPurlSummary = {
-                                      parentName: string;
-                                      purlSummary?: PurlSummary;
-                                    };
-
-                                    const hasNoPurlsButOnlyName =
-                                      item.name && item.purl.length === 0;
-
-                                    if (hasNoPurlsButOnlyName) {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                      };
-                                      return [result];
-                                    }
-
-                                    return item.purl.map((i) => {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                        purlSummary: i,
-                                      };
-                                      return result;
-                                    });
-                                  })
-                                  .map((purl, index) => {
-                                    if (purl.purlSummary) {
+                                {Array.from(item.purls.values()).map(
+                                  (purl, index) => {
+                                    if (!purl.isOrphan) {
                                       const decomposedPurl = decomposePurl(
                                         purl.purlSummary.purl,
                                       );
@@ -424,21 +500,22 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                           </Td>
                                         </Tr>
                                       );
+                                    } else {
+                                      return (
+                                        <Tr
+                                          key={`${purl.parentName}-${index}-name`}
+                                        >
+                                          <Td />
+                                          <Td />
+                                          <Td>{purl.parentName}</Td>
+                                          <Td />
+                                          <Td />
+                                          <Td />
+                                        </Tr>
+                                      );
                                     }
-
-                                    return (
-                                      <Tr
-                                        key={`${purl.parentName}-${index}-name`}
-                                      >
-                                        <Td />
-                                        <Td />
-                                        <Td>{purl.parentName}</Td>
-                                        <Td />
-                                        <Td />
-                                        <Td />
-                                      </Tr>
-                                    );
-                                  })}
+                                  },
+                                )}
                               </Tbody>
                             </Table>
                           ) : null}

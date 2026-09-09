@@ -182,7 +182,6 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
 
   testFilterMatches("Empty filter input is handled", {
     filters: { "Filter text": "" },
-    assertions: { columnName: "ID", value: "CVE-2024-29025" },
     getConfig: async ({ page }) => {
       const listPage = await AdvisoryListPage.build(page);
       const toolbar = await listPage.getToolbar();

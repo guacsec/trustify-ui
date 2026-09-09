@@ -45,4 +45,8 @@ export class Pagination {
 
     await expect(this._pagination.locator("input")).toHaveValue("1");
   }
+
+  getPageInput() {
+    return this._pagination.getByRole("spinbutton", { name: "Current page" });
+  }
 }

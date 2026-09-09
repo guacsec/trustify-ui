@@ -1,4 +1,4 @@
-import { universalComparator } from "@app/utils/utils";
+import { createComparator } from "@app/utils/utils";
 import type { ISortState } from "./useSortState";
 
 /**
@@ -49,12 +49,15 @@ export const getLocalSortDerivedState = <
     return { sortedItems: items };
   }
 
-  let sortedItems = items;
-  sortedItems = [...items].sort((a: TItem, b: TItem) => {
+  const compare = createComparator({
+    locale: "en",
+    direction: activeSort.direction,
+  });
+
+  const sortedItems = [...items].sort((a: TItem, b: TItem) => {
     const aValue = getSortValues(a)[activeSort.columnKey];
     const bValue = getSortValues(b)[activeSort.columnKey];
-    const compareValue = universalComparator(aValue, bValue, "en");
-    return activeSort.direction === "asc" ? compareValue : -compareValue;
+    return compare(aValue, bValue);
   });
 
   return { sortedItems };

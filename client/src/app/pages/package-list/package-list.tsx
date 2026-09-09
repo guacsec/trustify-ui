@@ -2,7 +2,7 @@ import type React from "react";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
-import { PackageSearchProvider } from "./package-context";
+import { PackageSearchProvider } from "./package-provider";
 import { PackageTable } from "./package-table";
 import { PackageToolbar } from "./package-toolbar";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";

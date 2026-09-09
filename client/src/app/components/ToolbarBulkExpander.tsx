@@ -28,7 +28,7 @@ export const ToolbarBulkExpander = ({
         variant="control"
         title={`${!areAllExpanded ? "Expand" : "Collapse"} all`}
         onClick={() => {
-          areAllExpanded !== undefined && toggleCollapseAll(areAllExpanded);
+          if (areAllExpanded !== undefined) toggleCollapseAll(areAllExpanded);
         }}
       >
         {areAllExpanded ? <AngleDownIcon /> : <AngleRightIcon />}

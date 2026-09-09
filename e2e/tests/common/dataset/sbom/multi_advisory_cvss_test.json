@@ -1,0 +1,170 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "dataLicense": "CC0-1.0",
+  "name": "multi-advisory-cvss-test",
+  "documentNamespace": "https://test.example.com/sbom/multi-advisory-cvss-test",
+  "creationInfo": {
+    "created": "2026-05-29T12:00:00Z",
+    "creators": ["Tool: test-sbom-generator"],
+    "licenseListVersion": "3.22"
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "name": "multi-advisory-cvss-test",
+      "versionInfo": "1.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "supplier": "Organization: Test"
+    },
+    {
+      "SPDXID": "SPDXRef-a3d6b74d-0537-4137-b03a-9d2e2d8895f6",
+      "name": "minimist",
+      "versionInfo": "0.0.10",
+      "downloadLocation": "https://www.npmjs.com/package/minimist",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:npm/minimist@0.0.10",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-25bccc80-e1b3-4a63-b1ef-6e01677f0034",
+      "name": "nodejs-nodemon",
+      "versionInfo": "2.0.3-6.el9",
+      "downloadLocation": "https://access.redhat.com/downloads",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "supplier": "Organization: Red Hat",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:rpm/redhat/nodejs-nodemon@2.0.3-6.el9?arch=noarch",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-9dc7d97b-00ef-413d-bfd9-4b119fa317f3",
+      "name": "uri",
+      "versionInfo": "0.10.0",
+      "downloadLocation": "https://rubygems.org/gems/uri",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Ruby",
+      "copyrightText": "NOASSERTION",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:gem/uri@0.10.0",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-ef7a189e-1c56-4003-8635-652847c4110a",
+      "name": "ruby",
+      "versionInfo": "3.0.3-159.el9",
+      "downloadLocation": "https://access.redhat.com/downloads",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "supplier": "Organization: Red Hat",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:rpm/redhat/ruby@3.0.3-159.el9?arch=src",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-d1e0aaee-a508-4fa4-8fbe-97ae372bef31",
+      "name": "velocity",
+      "versionInfo": "1.7",
+      "downloadLocation": "https://repo1.maven.org/maven2/org/apache/velocity/velocity/1.7",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:maven/org.apache.velocity/velocity@1.7",
+          "referenceType": "purl"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-372a3fe3-5622-4e6e-8cde-a29efce9a5e6",
+      "name": "velocity",
+      "versionInfo": "1.7-38.el9",
+      "downloadLocation": "https://access.redhat.com/downloads",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "supplier": "Organization: Red Hat",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE_MANAGER",
+          "referenceLocator": "pkg:rpm/redhat/velocity@1.7-38.el9?arch=src",
+          "referenceType": "purl"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-a3d6b74d-0537-4137-b03a-9d2e2d8895f6"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-25bccc80-e1b3-4a63-b1ef-6e01677f0034"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-9dc7d97b-00ef-413d-bfd9-4b119fa317f3"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-ef7a189e-1c56-4003-8635-652847c4110a"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-d1e0aaee-a508-4fa4-8fbe-97ae372bef31"
+    },
+    {
+      "spdxElementId": "SPDXRef-2e71ba01-c951-43a2-a80e-cf8b13c121ce",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-372a3fe3-5622-4e6e-8cde-a29efce9a5e6"
+    }
+  ]
+}

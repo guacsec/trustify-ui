@@ -16,7 +16,7 @@ interface IAutocompleteHandlersProps {
   menuRef: React.RefObject<HTMLDivElement | null>;
   searchInputRef: React.RefObject<HTMLDivElement | null>;
   onCreateNewOption?: (value: string) => AutocompleteOptionProps;
-  validateNewOption?: (value: string) => boolean;
+  validateNewOption?: (value: string) => boolean | string;
   onSearchChange?: (value: string) => void;
 }
 
@@ -90,8 +90,10 @@ export const useAutocompleteHandlers = ({
 
   const handleOnCreateNewOption = (value: string) => {
     if (value !== "" && onCreateNewOption) {
-      const isValid = validateNewOption ? validateNewOption(value) : true;
-      if (isValid) {
+      const validationResult = validateNewOption
+        ? validateNewOption(value)
+        : true;
+      if (validationResult && typeof validationResult !== "string") {
         const newOption = onCreateNewOption(value);
         handleOnSelect(newOption);
       }

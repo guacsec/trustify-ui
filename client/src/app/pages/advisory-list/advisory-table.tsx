@@ -24,10 +24,11 @@ import {
   type ExtendedSeverity,
   extendedSeverityFromSeverity,
 } from "@app/api/models";
-import type { AdvisorySummary } from "@app/client";
+import type { AdvisoryHead, AdvisorySummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
 import { LabelsAsList } from "@app/components/LabelsAsList.tsx";
-import { NotificationsContext } from "@app/components/NotificationsContext.tsx";
+import { NotificationsContext } from "@app/components/NotificationsContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -46,9 +47,11 @@ import { advisoryDeleteDialogProps } from "@app/Constants";
 
 export const AdvisoryTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
-  const { isFetching, fetchError, totalItemCount, tableControls } =
-    React.useContext(AdvisorySearchContext);
+  const { isFetching, fetchError, tableControls } = React.useContext(
+    AdvisorySearchContext,
+  );
 
   const [editLabelsModalState, setEditLabelsModalState] =
     React.useState<AdvisorySummary | null>(null);
@@ -80,7 +83,7 @@ export const AdvisoryTable: React.FC = () => {
   const [advisoryToDelete, setAdvisoryToDelete] =
     React.useState<AdvisorySummary | null>(null);
 
-  const onDeleteAdvisorySuccess = (advisory: AdvisorySummary) => {
+  const onDeleteAdvisorySuccess = (advisory: AdvisoryHead) => {
     setAdvisoryToDelete(null);
     pushNotification({
       title: `The Advisory ${advisory.identifier} was deleted`,
@@ -116,7 +119,7 @@ export const AdvisoryTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
@@ -132,7 +135,7 @@ export const AdvisoryTable: React.FC = () => {
 
             const severities = item.vulnerabilities.reduce((prev, current) => {
               const extendedSeverity = extendedSeverityFromSeverity(
-                current.severity,
+                current.base_score?.severity,
               );
               prev[extendedSeverity] = prev[extendedSeverity] + 1;
               return prev;
@@ -218,6 +221,7 @@ export const AdvisoryTable: React.FC = () => {
                             onClick: () => {
                               setEditLabelsModalState(item);
                             },
+                            isDisabled: areMutationsDisabled,
                           },
                           {
                             title: "Download",
@@ -234,6 +238,7 @@ export const AdvisoryTable: React.FC = () => {
                             onClick: () => {
                               setAdvisoryToDelete(item);
                             },
+                            isDisabled: areMutationsDisabled,
                           },
                         ]}
                       />
@@ -279,7 +284,7 @@ export const AdvisoryTable: React.FC = () => {
         onClose={() => setAdvisoryToDelete(null)}
         onConfirm={() => {
           if (advisoryToDelete) {
-            deleteAdvisory(advisoryToDelete.uuid);
+            deleteAdvisory(advisoryToDelete);
           }
         }}
       />

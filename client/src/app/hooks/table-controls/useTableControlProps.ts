@@ -2,10 +2,10 @@ import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import { objectKeys } from "@app/utils/utils";
 import { useActiveItemPropHelpers } from "./active-item";
-import { useExpansionPropHelpers } from "./expansion";
-import { useFilterPropHelpers } from "./filtering";
+import { getExpansionPropHelpers } from "./expansion";
+import { getFilterPropHelpers } from "./filtering";
 import { usePaginationPropHelpers } from "./pagination";
-import { useSortPropHelpers } from "./sorting";
+import { getSortPropHelpers } from "./sorting";
 import type { ITableControls, IUseTableControlPropsArgs } from "./types";
 import { handlePropagatedRowClick } from "./utils";
 
@@ -83,8 +83,8 @@ export const useTableControlProps = <
     columnKeys.length + numColumnsBeforeData + numColumnsAfterData;
 
   const { filterPropsForToolbar, propsForFilterToolbar } =
-    useFilterPropHelpers(args);
-  const { getSortThProps } = useSortPropHelpers({ ...args, columnKeys });
+    getFilterPropHelpers(args);
+  const { getSortThProps } = getSortPropHelpers({ ...args, columnKeys });
   const { paginationProps, paginationToolbarItemProps } =
     usePaginationPropHelpers(args);
   const {
@@ -92,7 +92,7 @@ export const useTableControlProps = <
     getSingleExpandButtonTdProps,
     getCompoundExpandTdProps,
     getExpandedContentTdProps,
-  } = useExpansionPropHelpers({ ...args, columnKeys, numRenderedColumns });
+  } = getExpansionPropHelpers({ ...args, columnKeys, numRenderedColumns });
   const { activeItemDerivedState, getActiveItemTrProps } =
     useActiveItemPropHelpers(args);
 

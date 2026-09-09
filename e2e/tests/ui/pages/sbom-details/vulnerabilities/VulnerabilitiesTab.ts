@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+
 import { Pagination } from "../../Pagination";
 import { Table } from "../../Table";
 import { Toolbar } from "../../Toolbar";
@@ -6,7 +7,7 @@ import { SbomDetailsPage } from "../SbomDetailsPage";
 
 export class VulnerabilitiesTab {
   private readonly _page: Page;
-  _detailsPage: SbomDetailsPage;
+  private readonly _detailsPage: SbomDetailsPage;
 
   private constructor(page: Page, layout: SbomDetailsPage) {
     this._page = page;
@@ -51,6 +52,15 @@ export class VulnerabilitiesTab {
       ],
       [],
     );
+  }
+
+  async clickSourcesButton(vulnerabilityID: string) {
+    const pagination = await this.getPagination();
+    await pagination.selectItemsPerPage(20);
+    const table = await this.getTable();
+    const rows = await table.getRowsByCellValue({ Id: vulnerabilityID });
+    const sourcesButton = rows.getByRole("button", { name: /Sources/i });
+    await sourcesButton.click();
   }
 
   async getPagination(top: boolean = true) {

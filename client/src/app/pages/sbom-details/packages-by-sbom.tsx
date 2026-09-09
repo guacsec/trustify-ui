@@ -36,6 +36,7 @@ import {
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
+import { decodePurl } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
@@ -87,7 +88,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         logicOperator: "OR",
         selectOptions: licenseIds.map((license) => ({
           value: license.license_id,
-          label: license.license_name,
+          label: license.license_name.toUpperCase(),
         })),
       },
     ],
@@ -99,15 +100,15 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackagesBySbomId(
-    sbomId,
-    getHubRequestParams({
+  } = useFetchPackagesBySbomId(sbomId, {
+    ...getHubRequestParams({
       ...tableControlState,
       hubSortFieldKeys: {
         name: "name",
       },
     }),
-  );
+    total: true,
+  });
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -165,7 +166,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
@@ -243,7 +244,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                             packageId: item.purl[0].uuid,
                           })}
                         >
-                          {item.purl[0].purl}
+                          {decodePurl(item.purl[0].purl)}
                         </Link>
                       ) : (
                         `${item.purl.length} PURLs`
@@ -297,7 +298,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                         packageId: e.uuid,
                                       })}
                                     >
-                                      {e.purl}
+                                      {decodePurl(e.purl)}
                                     </Link>
                                   </ListItem>
                                 );

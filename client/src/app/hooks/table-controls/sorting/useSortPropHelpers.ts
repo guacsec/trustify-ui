@@ -2,7 +2,7 @@ import type { ThProps } from "@patternfly/react-table";
 import type { ISortState } from "./useSortState";
 
 /**
- * Args for useSortPropHelpers that come from outside useTableControlProps
+ * Args for getSortPropHelpers that come from outside useTableControlProps
  * - Partially satisfied by the object returned by useTableControlState (ITableControlState)
  * - Makes up part of the arguments object taken by useTableControlProps (IUseTableControlPropsArgs)
  * @see ITableControlState
@@ -23,7 +23,7 @@ export interface ISortPropHelpersExternalArgs<
 }
 
 /**
- * Additional args for useSortPropHelpers that come from logic inside useTableControlProps
+ * Additional args for getSortPropHelpers that come from logic inside useTableControlProps
  * @see useTableControlProps
  */
 export interface ISortPropHelpersInternalArgs<TColumnKey extends string> {
@@ -39,7 +39,7 @@ export interface ISortPropHelpersInternalArgs<TColumnKey extends string> {
  * - "Derived state" here refers to values and convenience functions derived at render time.
  * - "source of truth" (persisted) state and "derived state" are kept separate to prevent out-of-sync duplicated state.
  */
-export const useSortPropHelpers = <
+export const getSortPropHelpers = <
   TColumnKey extends string,
   TSortableColumnKey extends TColumnKey,
 >(

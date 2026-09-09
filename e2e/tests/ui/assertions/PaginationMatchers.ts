@@ -98,16 +98,14 @@ const verifyPreviousPage = async (
   // Verify that "previous" button
   const prevPageButton = pagination.getPreviousPageButton();
   await baseExpect(prevPageButton).toBeVisible();
-  await (isEnabled
-    ? baseExpect(prevPageButton)
-    : baseExpect(prevPageButton).not
+  await (
+    isEnabled ? baseExpect(prevPageButton) : baseExpect(prevPageButton).not
   ).toBeEnabled();
 
   // Verify that "go to first page" button
   const firstPageButton = pagination.getFirstPageButton();
   await baseExpect(firstPageButton).toBeVisible();
-  await (isEnabled
-    ? baseExpect(firstPageButton)
-    : baseExpect(firstPageButton).not
+  await (
+    isEnabled ? baseExpect(firstPageButton) : baseExpect(firstPageButton).not
   ).toBeEnabled();
 };

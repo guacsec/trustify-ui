@@ -1,11 +1,10 @@
-import fs from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-import type { AxiosInstance } from "axios";
-
 import { logger, SETUP_TIMEOUT } from "../../common/constants";
+import { updateCveDatesForLastSevenDays } from "../../common/cve-date-updater";
 import { test as setup } from "../fixtures";
+import { uploadFiles } from "../helpers/general-helpers";
 
 setup.describe("Ingest initial data", () => {
   setup.skip(
@@ -17,6 +16,8 @@ setup.describe("Ingest initial data", () => {
     setup.setTimeout(SETUP_TIMEOUT);
 
     logger.info("Setup: start uploading assets");
+
+    await updateCveDatesForLastSevenDays();
 
     const SBOM_FILES = await readDirectoryRecursively(
       path.join(__dirname, "../../common/dataset/sbom"),
@@ -31,24 +32,6 @@ setup.describe("Ingest initial data", () => {
     logger.info("Setup: upload finished successfully");
   });
 });
-
-const uploadFiles = async (
-  axios: AxiosInstance,
-  type: "sbom" | "advisory",
-  files: string[],
-) => {
-  const uploads = files.map((file) => {
-    const fileStream = fs.createReadStream(file);
-    const contentType = file.endsWith(".bz2")
-      ? "application/json+bzip2"
-      : "application/json";
-    return axios.post(`/api/v2/${type}`, fileStream, {
-      headers: { "Content-Type": contentType },
-    });
-  });
-
-  await Promise.all(uploads);
-};
 
 const readDirectoryRecursively = async (dir: string) => {
   const result: string[] = [];

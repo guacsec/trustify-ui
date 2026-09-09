@@ -18,7 +18,7 @@ export interface ConfirmDialogProps {
     | "danger"
     | "warning"
     | "info"
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     | React.ComponentType<any>;
   message: string | React.ReactNode;
 

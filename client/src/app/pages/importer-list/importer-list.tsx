@@ -36,6 +36,7 @@ import {
   type ConfirmDialogProps,
 } from "@app/components/ConfirmDialog";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import {
   useFetchImporterReports,
   useFetchImporters,
@@ -70,7 +71,7 @@ type ImporterStatus = "disabled" | "scheduled" | "running";
 
 const getImporterStatus = (importer: Importer): ImporterStatus => {
   const importerType = Object.keys(importer.configuration ?? {})[0];
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   const configValues = (importer.configuration as any)[
     importerType
   ] as SbomImporter;
@@ -83,6 +84,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -113,7 +115,7 @@ export const ImporterList: React.FC = () => {
 
   const execEnableDisableImporter = (row: Importer, enable: boolean) => {
     const importerType = Object.keys(row.configuration ?? {})[0];
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     const currentConfigValues = (row.configuration as any)[
       importerType
     ] as SbomImporter;
@@ -285,7 +287,7 @@ export const ImporterList: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <Toolbar {...toolbarProps}>
+          <Toolbar {...toolbarProps} aria-label="importer-toolbar">
             <ToolbarContent>
               <FilterToolbar showFiltersSideBySide {...filterToolbarProps} />
               <ToolbarItem {...paginationToolbarItemProps}>
@@ -319,7 +321,7 @@ export const ImporterList: React.FC = () => {
             >
               {currentPageItems?.map((item, rowIndex) => {
                 const importerType = Object.keys(item.configuration ?? {})[0];
-                // biome-ignore lint/suspicious/noExplicitAny: allowed
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
                 const configValues = (item.configuration as any)[
                   importerType
                 ] as SbomImporter;
@@ -392,6 +394,7 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]
                                 : [
@@ -400,13 +403,16 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("run", item);
                                       },
-                                      isDisabled: importerStatus === "running",
+                                      isDisabled:
+                                        importerStatus === "running" ||
+                                        areMutationsDisabled,
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]),
                             ]}
@@ -659,24 +665,11 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const LogButton = ({ children }: { children: React.ReactNode }) => {
-              if (item.messages) {
-                return (
-                  <Button
-                    isInline
-                    variant="link"
-                    onClick={() => {
-                      const newLogData = messagesToLogData(item.messages ?? {});
-                      setLogData(newLogData);
-                      toggleLogModal();
-                    }}
-                  >
-                    {children}
-                  </Button>
-                );
-              }
-              return children;
-            };
+            const statusIcon = item.error ? (
+              <IconedStatus preset="Failed" label={item.error} />
+            ) : (
+              <IconedStatus preset="Completed" label="Finished successfully" />
+            );
 
             return (
               <Tbody key={item.id}>
@@ -714,17 +707,19 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
                     >
                       {item.isRunning ? (
                         <ImporterStatusIcon state="running" />
+                      ) : item.messages ? (
+                        <Button
+                          isInline
+                          variant="link"
+                          onClick={() => {
+                            setLogData(messagesToLogData(item.messages ?? {}));
+                            toggleLogModal();
+                          }}
+                        >
+                          {statusIcon}
+                        </Button>
                       ) : (
-                        <LogButton>
-                          {item.error ? (
-                            <IconedStatus preset="Failed" label={item.error} />
-                          ) : (
-                            <IconedStatus
-                              preset="Completed"
-                              label="Finished successfully"
-                            />
-                          )}
-                        </LogButton>
+                        statusIcon
                       )}
                     </Td>
                     <Td

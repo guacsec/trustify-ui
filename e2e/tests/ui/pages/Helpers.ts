@@ -29,15 +29,11 @@ export const resolveAssetPath = (
  * @returns The suggested filename
  */
 export const verifyDownload = async (download: Download): Promise<string> => {
-  // Verify download completed successfully by checking if path exists
-  let filename = "";
   try {
-    filename = download.suggestedFilename();
+    return download.suggestedFilename();
   } catch (error) {
-    throw new Error(`Download verification failed: ${error}`);
+    throw new Error(`Download verification failed: ${error}`, { cause: error });
   }
-  // Return the suggested filename for further assertions
-  return filename;
 };
 
 /**

@@ -8,16 +8,27 @@ import type { ToolbarLabel } from "@patternfly/react-core";
 
 // Axios error
 
-// biome-ignore lint/suspicious/noExplicitAny: allowed
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
 export const getAxiosErrorMessage = (axiosError: AxiosError<any>) => {
-  if (axiosError.response?.data?.errorMessage) {
-    return axiosError.response.data.errorMessage;
+  const data = axiosError.response?.data;
+
+  const error = typeof data?.error === "string" ? data.error : undefined;
+  const message = typeof data?.message === "string" ? data.message : undefined;
+  const details = typeof data?.details === "string" ? data.details : undefined;
+
+  if (error && message) {
+    const base = `${error}: ${message}`;
+    return details ? `${base}\n${details}` : base;
   }
-  if (
-    axiosError.response?.data?.error &&
-    typeof axiosError?.response?.data?.error === "string"
-  ) {
-    return axiosError?.response?.data?.error;
+  if (message) {
+    return message;
+  }
+  if (error) {
+    return error;
+  }
+
+  if (typeof data === "string") {
+    return data;
   }
   return axiosError.message;
 };
@@ -53,7 +64,7 @@ export const duplicateNameCheck = <T extends { name?: string }>(
   nameValue: T["name"],
 ) => duplicateFieldCheck("name", itemList, currentItem, nameValue);
 
-// biome-ignore lint/suspicious/noExplicitAny: allowed
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
 export const dedupeFunction = (arr: any[]) =>
   arr?.filter(
     (value, index, self) =>
@@ -73,8 +84,7 @@ export const parseMaybeNumericString = (
   return Number.isNaN(num) ? numOrStr : num;
 };
 
-// biome-ignore lint/complexity/noBannedTypes: safe to use
-export const objectKeys = <T extends Object>(obj: T) =>
+export const objectKeys = <T extends object>(obj: T) =>
   Object.keys(obj) as (keyof T)[];
 
 export const getValidatedFromErrors = (
@@ -107,16 +117,17 @@ export const decomposePurl = (purl: string) => {
   }
 };
 
-/**
- * Uses native string localCompare method with numeric option enabled.
- *
- * @param locale to be used by string compareFn
- */
-export const localeNumericCompare = (
-  a: string,
-  b: string,
-  locale: string,
-): number => a.localeCompare(b, locale ?? "en", { numeric: true });
+/** Decode a PURL for display. Falls back to the original value if decoding fails. */
+export const decodePurl = (purl: string | null | undefined): string => {
+  if (purl == null) {
+    return "";
+  }
+  try {
+    return decodeURIComponent(purl);
+  } catch {
+    return purl;
+  }
+};
 
 export const getString = (input: string | (() => string)) =>
   typeof input === "function" ? input() : input;
@@ -128,25 +139,32 @@ export const getFilenameFromContentDisposition = (
   return match ? match[1] : null;
 };
 
-/**
- * Compares all types by converting them to string.
- * Nullish entities are converted to empty string.
- * @see localeNumericCompare
- * @param locale to be used by string compareFn
- */
-export const universalComparator = (
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
-  a: any,
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
-  b: any,
-  locale: string,
-) => {
-  if (typeof a === "number" && typeof b === "number") {
-    return a - b;
-  }
-  return localeNumericCompare(String(a ?? ""), String(b ?? ""), locale);
-};
-
 export const parseBooleanIfPossible = (value?: string): boolean => {
   return value?.toLocaleLowerCase() === "true";
+};
+
+export interface ComparatorOptions {
+  locale?: string;
+  direction?: "asc" | "desc";
+  nulls?: "first" | "last";
+}
+
+/**
+ * Creates a reusable comparator function with baked-in locale, direction,
+ * and null-positioning configuration. Uses `Intl.Collator` internally for
+ * optimal performance when sorting large arrays.
+ */
+export const createComparator = (opts: ComparatorOptions = {}) => {
+  const { locale = "en", direction = "asc", nulls = "first" } = opts;
+  const collator = new Intl.Collator(locale, { numeric: true });
+  const dir = direction === "desc" ? -1 : 1;
+
+  return (a: unknown, b: unknown): number => {
+    if (a == null && b == null) return 0;
+    if (a == null) return nulls === "first" ? -1 : 1;
+    if (b == null) return nulls === "first" ? 1 : -1;
+
+    if (typeof a === "number" && typeof b === "number") return (a - b) * dir;
+    return collator.compare(String(a), String(b)) * dir;
+  };
 };

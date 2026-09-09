@@ -1,0 +1,11 @@
+# Library, IDE and build locations
+**/node_modules/
+**/coverage/
+**/dist/
+.vscode/
+.idea/
+.eslintcache/
+
+# App excluded files
+client/src/app/client/**
+e2e/tests/common/assets/**

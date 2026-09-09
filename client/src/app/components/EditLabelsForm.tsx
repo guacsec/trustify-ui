@@ -14,13 +14,14 @@ import {
   StackItem,
 } from "@patternfly/react-core";
 
-import type { Label as LabelModel } from "@app/api/models";
-import { getString } from "@app/utils/utils";
-
+import { LABEL_VALIDATION_REGEX } from "@app/Constants";
 import {
   joinKeyValueAsString,
   splitStringAsKeyValue,
 } from "@app/api/model-utils";
+import type { Label as LabelModel } from "@app/api/models";
+import { getString } from "@app/utils/utils";
+
 import { Autocomplete } from "./Autocomplete/Autocomplete";
 import type { AutocompleteOptionProps } from "./Autocomplete/type-utils";
 
@@ -126,20 +127,10 @@ export const EditLabelsForm: React.FC<EditLabelsFormProps> = ({
               };
               return option;
             }}
-            // The following regex ensures:
-            // - No backslashes anywhere in the string
-            // - The string does not start with whitespace or '='
-            // - The string does not start with a backslash
-            // - The string contains an optional '=' with optional whitespace around it
-            // - Both key and value parts do not contain backslashes or are empty
-            // - The key does not start with whitespace or '='
-            // This is used to validate new label options in the form.
             validateNewOption={(value) =>
               !!value &&
               value.trim().length > 0 &&
-              /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/.test(
-                value,
-              )
+              LABEL_VALIDATION_REGEX.test(value)
             }
             filterBeforeOnChange={(selections, newOption) => {
               const newOptionKeyValue = splitStringAsKeyValue(

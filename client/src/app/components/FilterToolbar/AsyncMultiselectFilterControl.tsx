@@ -15,8 +15,9 @@ import type {
   IAsyncMultiselectFilterCategory,
 } from "./FilterToolbar";
 
-export interface IMultiselectFilterControlProps<TItem>
-  extends IFilterControlProps<TItem, string> {
+export interface IMultiselectFilterControlProps<
+  TItem,
+> extends IFilterControlProps<TItem, string> {
   category: IAsyncMultiselectFilterCategory<TItem, string>;
 }
 

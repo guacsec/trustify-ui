@@ -19,6 +19,7 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
+import { decodePurl } from "@app/utils/utils";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { List, ListItem } from "@patternfly/react-core";
@@ -26,7 +27,7 @@ import { WithPackage } from "../../components/WithPackage";
 import { PackageLicenses } from "./components/PackageLicences";
 
 export const PackageTable: React.FC = () => {
-  const { isFetching, fetchError, totalItemCount, tableControls } =
+  const { isFetching, fetchError, tableControls } =
     React.useContext(PackageSearchContext);
 
   const {
@@ -63,7 +64,7 @@ export const PackageTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
@@ -89,7 +90,7 @@ export const PackageTable: React.FC = () => {
                           >
                             {item.decomposedPurl
                               ? item.decomposedPurl?.name
-                              : item.purl}
+                              : decodePurl(item.purl)}
                           </NavLink>
                         </Td>
                         <Td

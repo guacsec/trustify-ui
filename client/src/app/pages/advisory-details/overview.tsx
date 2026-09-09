@@ -3,7 +3,6 @@ import React from "react";
 import prettyBytes from "pretty-bytes";
 
 import {
-  Button,
   ButtonVariant,
   Card,
   CardBody,
@@ -22,6 +21,7 @@ import PenIcon from "@patternfly/react-icons/dist/esm/icons/pen-icon";
 
 import type { AdvisorySummary } from "@app/client";
 import { LabelsAsList } from "@app/components/LabelsAsList";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { formatDate } from "@app/utils/utils";
 
 import { AdvisoryEditLabelsForm } from "../advisory-list/components/AdvisoryEditLabelsForm";
@@ -66,7 +66,7 @@ export const Overview: React.FC<InfoProps> = ({ advisory }) => {
                 <DescriptionListGroup>
                   <DescriptionListTerm>
                     Labels {""}
-                    <Button
+                    <ReadOnlyButton
                       variant={ButtonVariant.link}
                       size="sm"
                       icon={<PenIcon />}
@@ -74,7 +74,7 @@ export const Overview: React.FC<InfoProps> = ({ advisory }) => {
                       onClick={() => setShowEditLabels(true)}
                     >
                       Edit
-                    </Button>
+                    </ReadOnlyButton>
                   </DescriptionListTerm>
                   <DescriptionListDescription>
                     <Card isCompact>

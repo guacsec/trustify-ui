@@ -1,0 +1,254 @@
+import React from "react";
+
+import type { AxiosError } from "axios";
+
+import { ButtonVariant, Skeleton } from "@patternfly/react-core";
+import {
+  ActionsColumn,
+  Table,
+  Tbody,
+  Td,
+  TreeRowWrapper,
+  type IAction,
+  type TdProps,
+} from "@patternfly/react-table";
+
+import type { Group } from "@app/client";
+import { ConfirmDialog } from "@app/components/ConfirmDialog.tsx";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { NotificationsContext } from "@app/components/NotificationsContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
+import { SimplePagination } from "@app/components/SimplePagination";
+import { TableCellError } from "@app/components/TableCellError";
+import { ConditionalTableBody } from "@app/components/TableControls";
+import { groupDeleteDialogProps } from "./utils";
+import {
+  useDeleteSbomGroupMutation,
+  useFetchSBOMGroups,
+} from "@app/queries/sbom-groups";
+
+import { SbomGroupTableData } from "./sbom-group-table-data";
+import { SbomGroupsContext, type SbomGroupItem } from "./sbom-groups-context";
+
+export const SbomGroupsTable: React.FC = () => {
+  const { pushNotification } = React.useContext(NotificationsContext);
+
+  const {
+    isFetching,
+    fetchError,
+    tableControls,
+    setGroupCreateUpdateModalState,
+  } = React.useContext(SbomGroupsContext);
+
+  const {
+    numRenderedColumns,
+    propHelpers: { paginationProps, tableProps },
+    currentPageItems,
+  } = tableControls;
+
+  // Delete action
+  const [groupToDelete, setGroupToDelete] =
+    React.useState<SbomGroupItem | null>(null);
+
+  const onDeleteGroupSuccess = (group: Group) => {
+    setGroupToDelete(null);
+    pushNotification({
+      title: `The group ${group.name} was deleted`,
+      variant: "success",
+    });
+  };
+
+  const onDeleteGroupError = (_error: AxiosError) => {
+    pushNotification({
+      title: "Error occurred while deleting group",
+      variant: "danger",
+    });
+  };
+
+  const { mutate: deleteGroup, isPending: isDeletingGroup } =
+    useDeleteSbomGroupMutation(onDeleteGroupSuccess, onDeleteGroupError);
+
+  return (
+    <>
+      <Table
+        {...tableProps}
+        isTreeTable
+        isExpandable={false}
+        aria-label="sbom-groups-table"
+      >
+        <ConditionalTableBody
+          isLoading={isFetching}
+          isError={!!fetchError}
+          isNoData={currentPageItems.length === 0}
+          numRenderedColumns={numRenderedColumns}
+        >
+          <Tbody>
+            {currentPageItems.map((node, i) => (
+              <SbomGroupRow
+                key={node.id}
+                node={node}
+                level={1}
+                posinset={i + 1}
+                numRenderedColumns={numRenderedColumns}
+                onEdit={setGroupCreateUpdateModalState}
+                onDelete={setGroupToDelete}
+              />
+            ))}
+          </Tbody>
+        </ConditionalTableBody>
+      </Table>
+      <SimplePagination
+        idPrefix="sbom-groups-table"
+        isTop={false}
+        paginationProps={paginationProps}
+      />
+
+      <ConfirmDialog
+        {...groupDeleteDialogProps(groupToDelete)}
+        inProgress={isDeletingGroup}
+        titleIconVariant="warning"
+        isOpen={!!groupToDelete}
+        confirmBtnVariant={
+          !groupToDelete?.number_of_groups
+            ? ButtonVariant.danger
+            : ButtonVariant.primary
+        }
+        confirmBtnLabel={!groupToDelete?.number_of_groups ? "Delete" : "Close"}
+        cancelBtnLabel={!groupToDelete?.number_of_groups ? "Cancel" : ""}
+        onCancel={() => setGroupToDelete(null)}
+        onClose={() => setGroupToDelete(null)}
+        onConfirm={() => {
+          if (groupToDelete && !groupToDelete?.number_of_groups) {
+            deleteGroup(groupToDelete);
+          } else {
+            setGroupToDelete(null);
+          }
+        }}
+      />
+    </>
+  );
+};
+
+const SbomGroupRow: React.FC<{
+  node: SbomGroupItem;
+  level: number;
+  posinset: number;
+  numRenderedColumns: number;
+  onEdit: (node: SbomGroupItem) => void;
+  onDelete: (node: SbomGroupItem) => void;
+}> = ({ node, level, posinset, numRenderedColumns, onEdit, onDelete }) => {
+  const {
+    treeExpansion: { isNodeExpanded, toggleExpandedNodes },
+  } = React.useContext(SbomGroupsContext);
+  const isExpanded = isNodeExpanded(node);
+
+  // Latches true on first expand so the query stays active after collapsing (instant re-expand, no refetch)
+  const hasBeenExpanded = React.useRef(false);
+  if (isExpanded) hasBeenExpanded.current = true;
+
+  // Fetch children on demand — enabled only after the node has been expanded at least once
+  const {
+    result: { data: children },
+    isFetching,
+    fetchError,
+  } = useFetchSBOMGroups(
+    node.id,
+    {},
+    { totals: true },
+    isExpanded || hasBeenExpanded.current,
+  );
+
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
+
+  const actions: IAction[] = [
+    {
+      title: "Edit",
+      onClick: () => onEdit(node),
+      isDisabled: areMutationsDisabled,
+    },
+    {
+      title: "Delete",
+      onClick: () => onDelete(node),
+      isDisabled: areMutationsDisabled,
+    },
+  ];
+
+  const treeRow: TdProps["treeRow"] = {
+    onCollapse: () => toggleExpandedNodes(node),
+    rowIndex: 0,
+    props: {
+      isExpanded,
+      isHidden: false,
+      "aria-level": level,
+      "aria-posinset": posinset,
+      "aria-setsize": node.number_of_groups ?? 1,
+    },
+  };
+
+  return (
+    <>
+      <TreeRowWrapper row={{ props: treeRow.props }}>
+        <Td dataLabel="name" treeRow={treeRow}>
+          <SbomGroupTableData item={node} />
+        </Td>
+        <Td isActionCell style={{ verticalAlign: "middle" }}>
+          <ActionsColumn items={actions} />
+        </Td>
+      </TreeRowWrapper>
+      {isExpanded && (
+        <LoadingWrapper
+          isFetching={isFetching}
+          fetchError={fetchError}
+          isFetchingState={
+            <TreeRowWrapper
+              row={{
+                props: {
+                  isHidden: false,
+                  "aria-level": level + 1,
+                  "aria-posinset": 1,
+                  "aria-setsize": 1,
+                },
+              }}
+            >
+              <Td colSpan={numRenderedColumns}>
+                <Skeleton
+                  screenreaderText="Loading child groups"
+                  fontSize="lg"
+                  width="60%"
+                />
+              </Td>
+            </TreeRowWrapper>
+          }
+          fetchErrorState={(error) => (
+            <TreeRowWrapper
+              row={{
+                props: {
+                  isHidden: false,
+                  "aria-level": level + 1,
+                  "aria-posinset": 1,
+                  "aria-setsize": 1,
+                },
+              }}
+            >
+              <Td colSpan={numRenderedColumns}>
+                <TableCellError error={error} />
+              </Td>
+            </TreeRowWrapper>
+          )}
+        >
+          {children.map((child, i) => (
+            <SbomGroupRow
+              key={child.id}
+              node={child}
+              level={level + 1}
+              posinset={i + 1}
+              numRenderedColumns={numRenderedColumns}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </LoadingWrapper>
+      )}
+    </>
+  );
+};

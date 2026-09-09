@@ -8,8 +8,9 @@ import type {
 } from "../FilterToolbar";
 import type { IFilterControlProps } from "./FilterControl";
 
-export interface IAutocompleteLabelFilterControlProps<TItem>
-  extends IFilterControlProps<TItem, string> {
+export interface IAutocompleteLabelFilterControlProps<
+  TItem,
+> extends IFilterControlProps<TItem, string> {
   category: IAsyncMultiselectFilterCategory<TItem, string>;
 }
 

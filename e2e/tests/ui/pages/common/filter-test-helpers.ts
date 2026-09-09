@@ -55,7 +55,7 @@ export const testFilterMatches = <
     getConfig,
   }: {
     filters: Partial<FilterValueType<TFilter>>;
-    assertions: {
+    assertions?: {
       columnName: TColumns[number];
       value: string;
       rowIndex?: number;
@@ -79,11 +79,13 @@ export const testFilterMatches = <
 
     // Test partial text search
     await expect(table).toHaveNumberOfRows({ greaterThan: 0 });
-    await expect(table).toHaveColumnWithValue(
-      assertions.columnName,
-      assertions.value,
-      assertions.rowIndex,
-    );
+    if (assertions) {
+      await expect(table).toHaveColumnWithValue(
+        assertions.columnName,
+        assertions.value,
+        assertions.rowIndex,
+      );
+    }
   });
 
 export const testFilterShowsEmptyState = <

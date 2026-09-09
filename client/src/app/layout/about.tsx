@@ -4,7 +4,7 @@ import { AboutModal, Content, ContentVariants } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import ENV from "@app/env";
-import useBranding from "@app/hooks/useBranding";
+import getBranding from "@app/hooks/useBranding";
 
 interface IButtonAboutAppProps {
   isOpen: boolean;
@@ -14,11 +14,13 @@ interface IButtonAboutAppProps {
 const TRANSPARENT_1x1_GIF =
   "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw== ";
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const AboutApp: React.FC<IButtonAboutAppProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { about } = useBranding();
+  const { about } = getBranding();
 
   return (
     <AboutModal
@@ -27,7 +29,7 @@ export const AboutApp: React.FC<IButtonAboutAppProps> = ({
       productName={about.displayName}
       brandImageAlt="Logo"
       brandImageSrc={about.imageSrc ?? TRANSPARENT_1x1_GIF}
-      trademark={`COPYRIGHT © 2020, ${new Date().getFullYear()}`}
+      trademark={`COPYRIGHT © 2020, ${CURRENT_YEAR}`}
     >
       <Content>
         <Content component={ContentVariants.p}>

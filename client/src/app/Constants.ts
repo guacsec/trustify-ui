@@ -1,9 +1,11 @@
 import type { AxiosError } from "axios";
-import type { AdvisorySummary, SbomSummary } from "./client";
+import type { AdvisoryHead, AdvisorySummary, SbomHead } from "./client";
 import ENV from "./env";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
 export const FILTER_NULL_VALUE = "\0";
+
+export const MAX_ITEMS_PER_PAGE = 1000;
 
 export const RENDER_DATE_FORMAT = "MMM DD, YYYY";
 export const RENDER_DATETIME_FORMAT = "MMM DD, YYYY | HH:mm:ss";
@@ -11,14 +13,29 @@ export const FILTER_DATE_FORMAT = "YYYY-MM-DD";
 
 export const DEFAULT_REFETCH_INTERVAL = 5000;
 
+export const PRODUCT_LABEL_KEY = "Product";
+
+// The following regex ensures:
+// - No backslashes anywhere in the string
+// - The string does not start with whitespace or '='
+// - The string does not start with a backslash
+// - The string contains an optional '=' with optional whitespace around it
+// - Both key and value parts do not contain backslashes or are empty
+// - The key does not start with whitespace or '='
+// This is used to validate new label options in the form.
+export const LABEL_VALIDATION_REGEX =
+  /^(?!.*\\)(?!\s*\\)(?!\s*=)[^=\\\s][^=\\]*\s*=?\s*[^=\\]+$/;
+
 export const TablePersistenceKeyPrefixes = {
   products: "pd",
   advisories: "ad",
   vulnerabilities: "vn",
   sboms: "sb",
+  sbomGroups: "sbg",
   sboms_by_package: "sbk",
   packages: "pk",
   licenses: "li",
+  models: "mo",
 };
 
 // URL param prefixes: should be short, must be unique for each table that uses one
@@ -51,7 +68,7 @@ export const ANSICOLOR = {
   red: "\x1b[31m",
 };
 
-export const sbomDeleteDialogProps = (sbom?: SbomSummary | null) => ({
+export const sbomDeleteDialogProps = (sbom?: SbomHead | null) => ({
   title: "Permanently delete SBOM?",
   message: `This action permanently deletes the ${sbom?.name} SBOM.`,
 });
@@ -63,13 +80,13 @@ export const advisoryDeleteDialogProps = (
   message: `This action permanently deletes the ${advisory?.document_id} Advisory.`,
 });
 
-export const sbomDeletedSuccessMessage = (sbom: SbomSummary) =>
+export const sbomDeletedSuccessMessage = (sbom: SbomHead) =>
   `The SBOM ${sbom.name} was deleted`;
 
 export const sbomDeletedErrorMessage = (_error: AxiosError) =>
   "Error occurred while deleting the SBOM";
 
-export const advisoryDeletedSuccessMessage = (sbom: AdvisorySummary) =>
+export const advisoryDeletedSuccessMessage = (sbom: AdvisoryHead) =>
   `The Advisory ${sbom.document_id} was deleted`;
 
 export const advisoryDeletedErrorMessage = (_error: AxiosError) =>

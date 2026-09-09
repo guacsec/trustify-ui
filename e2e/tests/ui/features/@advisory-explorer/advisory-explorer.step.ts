@@ -60,7 +60,7 @@ Then(
   "The advisory {string} shows in the results",
   async ({ page }, advisoryID) => {
     await expect(
-      page.getByRole("gridcell").filter({ hasText: advisoryID }),
+      page.locator('td[data-label="ID"]').filter({ hasText: advisoryID }),
     ).toBeVisible();
   },
 );
@@ -90,7 +90,7 @@ Then(
   },
 );
 
-// Advisory Explorer / Vulenrabilities
+// Advisory Explorer / Vulnerabilities
 
 Then(
   "User navigates to the Vulnerabilities tab on the Advisory Overview page",
@@ -115,7 +115,6 @@ Then(
     const match = totalText?.match(/of\s+(\d+)/);
     expect(match, "unable to parse pagination total").not.toBeNull();
 
-    // biome-ignore lint/style/noNonNullAssertion: allowed
     const total = Number(match![1]);
     expect(total).toBeGreaterThan(0);
   },
@@ -149,7 +148,7 @@ Then(
 Then(
   "User visits Vulnerability details Page of {string} by clicking it",
   async ({ page }, vulnerabilityID) => {
-    const link = page.getByRole("link", { name: vulnerabilityID });
+    const link = page.getByRole("link", { name: vulnerabilityID, exact: true });
 
     await Promise.all([
       page.waitForURL(new RegExp(`/vulnerabilities/${vulnerabilityID}$`)),
@@ -181,9 +180,7 @@ When(
   "User select Delete button from the Permanently delete Advisory model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
-    await expect(dialog).toHaveDialogTitle(
-      "Warning alert:Permanently delete Advisory?",
-    );
+    await expect(dialog).toHaveDialogTitle("Permanently delete Advisory?");
     await dialog.clickConfirm();
   },
 );

@@ -2,6 +2,7 @@
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface ProcessEnv extends Partial<Readonly<TrustificationEnvType>> {}
   }
 }
@@ -40,6 +41,9 @@ export type TrustificationEnvType = {
   /** The Keycloak Realm */
   OIDC_SERVER_EMBEDDED_PATH?: string;
 
+  /** Whether or not call to /loaduser endpoint on Auth flow */
+  OIDC_LOAD_USER?: "true" | "false";
+
   /** Target URL for the UI server's `/api` proxy */
   TRUSTIFY_API_URL?: string;
 
@@ -68,6 +72,7 @@ export const buildTrustificationEnv = ({
   AUTH_REQUIRED = "true",
   OIDC_CLIENT_ID,
   OIDC_SCOPE,
+  OIDC_LOAD_USER = "true",
 
   UI_INGRESS_PROXY_BODY_SIZE = "500m",
   TRUSTIFY_API_URL,
@@ -81,6 +86,7 @@ export const buildTrustificationEnv = ({
   OIDC_SERVER_URL,
   OIDC_SERVER_IS_EMBEDDED,
   OIDC_SERVER_EMBEDDED_PATH,
+  OIDC_LOAD_USER,
   AUTH_REQUIRED,
   OIDC_CLIENT_ID,
   OIDC_SCOPE,

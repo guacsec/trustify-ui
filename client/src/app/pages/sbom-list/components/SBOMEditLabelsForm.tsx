@@ -3,7 +3,7 @@ import React from "react";
 import type { AxiosError } from "axios";
 import { useDebounceValue } from "usehooks-ts";
 
-import type { SbomSummary } from "@app/client";
+import type { SbomHead } from "@app/client";
 import { EditLabelsForm } from "@app/components/EditLabelsForm";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@app/queries/sboms";
 
 interface SBOMEditLabelsFormProps {
-  sbom: SbomSummary;
+  sbom: SbomHead;
   onClose: () => void;
 }
 

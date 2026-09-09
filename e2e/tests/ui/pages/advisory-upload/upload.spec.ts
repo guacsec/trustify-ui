@@ -5,6 +5,7 @@ import { login } from "../../helpers/Auth";
 import {
   testInvalidFileExtensions,
   testRemoveFiles,
+  testUploadApiErrorMessage,
   testUploadFilesParallel,
   testUploadFilesSequentially,
 } from "../common/upload-test-helpers";
@@ -141,6 +142,22 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
 
   testInvalidFileExtensions({
     filesPaths: [TEST_FILES.INVALID_TXT],
+    getConfig: async ({ page }) => {
+      const uploadPage = await AdvisoryUploadPage.buildFromBrowserPath(page);
+      const fileUploader = await uploadPage.getFileUploader();
+      return { fileUploader };
+    },
+  });
+
+  testUploadApiErrorMessage("displays API error message for advisory", {
+    filePath: TEST_FILES.INVALID_JSON,
+    apiRoutePattern: "**/api/v3/advisory",
+    errorResponseBody: {
+      error: "InvalidFormat",
+      message: "not a valid CSAF, CVE, or OSV document",
+    },
+    expectedErrorMessage:
+      "InvalidFormat: not a valid CSAF, CVE, or OSV document",
     getConfig: async ({ page }) => {
       const uploadPage = await AdvisoryUploadPage.buildFromBrowserPath(page);
       const fileUploader = await uploadPage.getFileUploader();

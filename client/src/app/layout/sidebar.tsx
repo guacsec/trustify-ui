@@ -54,6 +54,16 @@ export const SidebarApp: React.FC = () => {
                 All SBOMs
               </NavLink>
             </li>
+            <li className={nav.navItem}>
+              <NavLink
+                to={Paths.sbomGroups}
+                className={({ isActive }) => {
+                  return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
+                }}
+              >
+                Groups
+              </NavLink>
+            </li>
           </NavExpandable>
           <li className={nav.navItem}>
             <NavLink
@@ -83,6 +93,16 @@ export const SidebarApp: React.FC = () => {
               }}
             >
               Licenses
+            </NavLink>
+          </li>
+          <li className={nav.navItem}>
+            <NavLink
+              to={Paths.models}
+              className={({ isActive }) => {
+                return css(LINK_CLASS, isActive ? ACTIVE_LINK_CLASS : "");
+              }}
+            >
+              Models
             </NavLink>
           </li>
           <li className={nav.navItem}>

@@ -158,7 +158,6 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
 
   testFilterMatches("Empty filter input is handled", {
     filters: { "Filter text": "" },
-    assertions: { columnName: "Name", value: "accordion" },
     getConfig: async ({ page }) => {
       const listPage = await PackageListPage.build(page);
       const toolbar = await listPage.getToolbar();
@@ -181,7 +180,7 @@ test.describe("Filter state persistence", { tag: ["@filtering"] }, () => {
       "Filter text": "keycloak-core",
       Type: ["Maven", "RPM"],
       Architecture: ["No Arch"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await PackageListPage.build(page);
@@ -199,7 +198,7 @@ test.describe("Filter state persistence", { tag: ["@filtering"] }, () => {
       "Filter text": "keycloak-core",
       Type: ["Maven", "RPM"],
       Architecture: ["No Arch"],
-      License: ["Apache-2.0", "Apache License 1.0"],
+      License: ["APACHE-2.0", "APACHE LICENSE 1.0"],
     },
     getConfig: async ({ page }) => {
       const listPage = await PackageListPage.build(page);

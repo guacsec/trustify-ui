@@ -28,6 +28,7 @@ export interface HubRequestParams {
     pageNumber: number; // 1-indexed
     itemsPerPage: number;
   };
+  total?: boolean;
 }
 
 export interface HubPaginatedResult<T> {
@@ -58,15 +59,6 @@ export type ExtendedSeverity = Severity | "unknown";
 export const extendedSeverityFromSeverity = (
   value?: Severity | null,
 ): ExtendedSeverity => value ?? "unknown";
-
-// User preferences
-
-export interface WatchedSboms {
-  sbom1Id: string | null;
-  sbom2Id: string | null;
-  sbom3Id: string | null;
-  sbom4Id: string | null;
-}
 
 //
 

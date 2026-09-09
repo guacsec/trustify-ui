@@ -12,6 +12,8 @@ use std::collections::HashMap;
 use std::str::from_utf8;
 use std::sync::OnceLock;
 
+mod test;
+
 #[derive(Serialize, Clone, Default)]
 pub struct UI {
     #[serde(rename(serialize = "VERSION"))]
@@ -28,6 +30,9 @@ pub struct UI {
 
     #[serde(rename(serialize = "OIDC_SCOPE"))]
     pub oidc_scope: String,
+
+    #[serde(rename(serialize = "OIDC_LOAD_USER"))]
+    pub oidc_load_user: String,
 }
 
 pub fn trustify_ui_resources() -> HashMap<&'static str, Resource> {

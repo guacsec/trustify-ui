@@ -35,7 +35,7 @@ import {
   sbomDeletedSuccessMessage,
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
-import type { SbomSummary } from "@app/client";
+import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { NotificationsContext } from "@app/components/NotificationsContext";
@@ -43,6 +43,7 @@ import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useDeleteSbomMutation, useFetchSBOMById } from "@app/queries/sboms";
 
+import { ModelsBySbom } from "./models-by-sbom";
 import { Overview } from "./overview";
 import { PackagesBySbom } from "./packages-by-sbom";
 import { VulnerabilitiesBySbom } from "./vulnerabilities-by-sbom";
@@ -69,7 +70,7 @@ export const SbomDetails: React.FC = () => {
   // Delete action
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
-  const onDeleteSbomSuccess = (sbom: SbomSummary) => {
+  const onDeleteSbomSuccess = (sbom: SbomHead) => {
     setIsDeleteDialogOpen(false);
     pushNotification({
       title: sbomDeletedSuccessMessage(sbom),
@@ -96,15 +97,16 @@ export const SbomDetails: React.FC = () => {
   } = useTabControls({
     persistenceKeyPrefix: "sd", // sb="sbom details"
     persistTo: "urlParams",
-    tabKeys: ["info", "packages", "vulnerabilities"],
+    tabKeys: ["info", "packages", "vulnerabilities", "models"],
   });
 
-  const infoTabRef = React.createRef<HTMLElement>();
-  const packagesTabRef = React.createRef<HTMLElement>();
-  const vulnerabilitiesTabRef = React.createRef<HTMLElement>();
+  const infoTabRef = React.useRef<HTMLElement>(null);
+  const packagesTabRef = React.useRef<HTMLElement>(null);
+  const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
+  const modelsTabRef = React.useRef<HTMLElement>(null);
 
   // Tabs popover refs
-  const vulnerabilitiesTabPopoverRef = React.createRef<HTMLElement>();
+  const vulnerabilitiesTabPopoverRef = React.useRef<HTMLElement>(null);
 
   return (
     <>
@@ -227,6 +229,11 @@ export const SbomDetails: React.FC = () => {
               </>
             }
           />
+          <Tab
+            {...getTabProps("models")}
+            title={<TabTitleText>Models</TabTitleText>}
+            tabContentRef={modelsTabRef}
+          />
         </Tabs>
       </PageSection>
       <PageSection>
@@ -253,6 +260,13 @@ export const SbomDetails: React.FC = () => {
         >
           {sbomId && <VulnerabilitiesBySbom sbomId={sbomId} />}
         </TabContent>
+        <TabContent
+          {...getTabContentProps("models")}
+          ref={modelsTabRef}
+          aria-label="AI models within the SBOM"
+        >
+          {sbomId && <ModelsBySbom sbomId={sbomId} />}
+        </TabContent>
       </PageSection>
 
       <ConfirmDialog
@@ -267,7 +281,7 @@ export const SbomDetails: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => {
           if (sbom) {
-            deleteSbom(sbom.id);
+            deleteSbom(sbom);
           }
         }}
       />

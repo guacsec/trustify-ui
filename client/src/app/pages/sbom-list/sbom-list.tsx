@@ -4,7 +4,7 @@ import { Content, PageSection } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
-import { SbomSearchProvider } from "./sbom-context";
+import { SbomSearchProvider } from "./sbom-provider";
 import { SbomTable } from "./sbom-table";
 import { SbomToolbar } from "./sbom-toolbar";
 
