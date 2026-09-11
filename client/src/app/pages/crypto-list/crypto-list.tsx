@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 
 import {
   Card,
@@ -7,6 +7,9 @@ import {
   Grid,
   GridItem,
   PageSection,
+  Tab,
+  TabTitleText,
+  Tabs,
 } from "@patternfly/react-core";
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
@@ -14,6 +17,8 @@ import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { useFetchCryptoSummary } from "@app/queries/crypto";
 
 import { CryptoSearchProvider } from "./crypto-provider";
+import { CryptoTable } from "./crypto-table";
+import { CryptoToolbar } from "./crypto-toolbar";
 
 /** Formats a ratio as a percentage string. Returns "0%" when the total is zero. */
 const formatPercent = (count: number, total: number): string => {
@@ -24,6 +29,7 @@ const formatPercent = (count: number, total: number): string => {
 /** Cryptography page showing PQC readiness KPI cards and the algorithm list. */
 export const CryptoList: React.FC = () => {
   const { result: summary, isFetching, fetchError } = useFetchCryptoSummary();
+  const [activeTab, setActiveTab] = React.useState<string>("algorithms");
 
   const pqcPercent = formatPercent(
     summary?.pqcAlgorithms ?? 0,
@@ -37,6 +43,9 @@ export const CryptoList: React.FC = () => {
     summary?.pqcSboms ?? 0,
     summary?.totalSboms ?? 0,
   );
+
+  const assetType =
+    activeTab === "keys" ? "related-crypto-material" : "algorithm";
 
   return (
     <>
@@ -112,11 +121,26 @@ export const CryptoList: React.FC = () => {
         </LoadingWrapper>
       </PageSection>
       <PageSection hasBodyWrapper={false}>
-        <div>
-          <CryptoSearchProvider>
-            <></>
-          </CryptoSearchProvider>
-        </div>
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(_event, tabKey) => setActiveTab(String(tabKey))}
+        >
+          <Tab
+            eventKey="algorithms"
+            title={<TabTitleText>Algorithms</TabTitleText>}
+          >
+            <CryptoSearchProvider assetType={assetType}>
+              <CryptoToolbar />
+              <CryptoTable />
+            </CryptoSearchProvider>
+          </Tab>
+          <Tab eventKey="keys" title={<TabTitleText>Keys</TabTitleText>}>
+            <CryptoSearchProvider assetType={assetType}>
+              <CryptoToolbar />
+              <CryptoTable />
+            </CryptoSearchProvider>
+          </Tab>
+        </Tabs>
       </PageSection>
     </>
   );

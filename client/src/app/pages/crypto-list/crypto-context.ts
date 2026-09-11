@@ -8,9 +8,16 @@ import type { ITableControls } from "@app/hooks/table-controls";
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
     CryptoAlgorithm,
-    "name" | "type" | "standard" | "pqcReady",
+    | "name"
+    | "primitive"
+    | "occurrences"
+    | "policy"
+    | "recommendation"
+    | "usage"
+    | "packages"
+    | "sboms",
     "name",
-    "",
+    "" | "policy",
     string
   >;
 
@@ -21,12 +28,16 @@ export interface ICryptoSearchContext {
 
 /** Shape of a single cryptographic algorithm returned by the API. */
 export interface CryptoAlgorithm {
-  id: string;
+  node_id: string;
   name: string;
-  type: string;
-  standard: string;
-  pqcReady: boolean;
+  asset_type: string;
+  oid: string | null;
+  properties: Record<string, unknown>;
+  policy_status: PolicyVerdict;
 }
+
+/** Policy compliance verdict for a cryptographic algorithm. */
+export type PolicyVerdict = "compliant" | "warning" | "non_compliant";
 
 /** Shape of the portfolio-level PQC readiness summary returned by the API. */
 export interface CryptoSummary {

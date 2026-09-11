@@ -14,20 +14,25 @@ import type {
 export const CryptoAlgorithmsQueryKey = "crypto-algorithms";
 export const CryptoSummaryQueryKey = "crypto-summary";
 
-/** Fetches a paginated list of cryptographic algorithms. */
+/** Fetches a paginated list of cryptographic algorithms, optionally filtered by asset type. */
 export const useFetchCryptoAlgorithms = (
   params: HubRequestParams = {},
-  disableQuery = false,
+  assetType?: string,
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [CryptoAlgorithmsQueryKey, params],
+    queryKey: [CryptoAlgorithmsQueryKey, params, assetType],
     queryFn: () => {
+      const query = requestParamsQuery(params);
       return axios.get<{ items: CryptoAlgorithm[]; total: number | null }>(
         "/api/v3/crypto/algorithm",
-        { params: requestParamsQuery(params) },
+        {
+          params: {
+            ...query,
+            ...(assetType ? { asset_type: assetType } : {}),
+          },
+        },
       );
     },
-    enabled: !disableQuery,
   });
 
   return {

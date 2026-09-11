@@ -16,21 +16,27 @@ import { CryptoSearchContext } from "./crypto-context";
 
 interface ICryptoProvider {
   children: React.ReactNode;
+  assetType?: string;
 }
 
 /** Context provider that manages table state and data fetching for the cryptography algorithm list. */
 export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
   children,
+  assetType,
 }) => {
   const tableControlState = useTableControlState({
     tableName: "crypto",
     persistenceKeyPrefix: TablePersistenceKeyPrefixes.cryptography,
     persistTo: "urlParams",
     columnNames: {
-      name: "Name",
-      type: "Type",
-      standard: "Standard",
-      pqcReady: "PQC Ready",
+      name: "Algorithm",
+      primitive: "Primitive",
+      occurrences: "Occurrences",
+      policy: "Policy",
+      recommendation: "Recommendation",
+      usage: "Usage",
+      packages: "Packages",
+      sboms: "SBOMs",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
@@ -44,8 +50,19 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
       {
         categoryKey: FILTER_TEXT_CATEGORY_KEY,
         title: "Filter",
-        placeholderText: "Search",
+        placeholderText: "Search by algorithm name",
         type: FilterType.search,
+      },
+      {
+        categoryKey: "policy",
+        title: "Policy",
+        type: FilterType.select,
+        selectOptions: [
+          { value: "compliant", label: "Compliant" },
+          { value: "warning", label: "Warning" },
+          { value: "non_compliant", label: "Non-compliant" },
+        ],
+        serverFilterField: "policy_status",
       },
     ],
     isExpansionEnabled: false,
@@ -65,12 +82,12 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
       }),
       total: true,
     },
-    false,
+    assetType,
   );
 
   const tableControls = useTableControlProps({
     ...tableControlState,
-    idProperty: "id",
+    idProperty: "node_id",
     currentPageItems: algorithms,
     totalItemCount,
     isLoading: isFetching,
