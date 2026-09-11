@@ -1,1 +1,0 @@
-import{t as e}from"./react-C_KK3IH-.js";import{bt as t}from"./useBranding-Daxyln0E.js";var n=e(),r=({value:e})=>(0,n.jsx)(n.Fragment,{children:Object.entries(e).map(([e,r])=>(0,n.jsx)(t,{isCompact:!0,children:`${e}=${r}`},`${e}=${r}`))});export{r as t};
