@@ -21,7 +21,7 @@ const formatPercent = (count: number, total: number): string => {
   return `${Math.round((count / total) * 100)}%`;
 };
 
-/** Cryptography page showing PQC readiness KPI cards and the algorithm list. */
+/** Cryptography page showing policy evaluation KPI cards and the algorithm list. */
 export const CryptoList: React.FC = () => {
   const {
     result: summary,
