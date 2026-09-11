@@ -3,10 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
-import type {
-  CryptoAlgorithm,
-  CryptoPolicySummary,
-} from "./crypto-context";
+import type { CryptoAlgorithm, CryptoPolicySummary } from "./crypto-context";
 
 const mockSummary: CryptoPolicySummary = {
   total: 22,
