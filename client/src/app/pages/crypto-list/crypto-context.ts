@@ -8,9 +8,17 @@ import type { ITableControls } from "@app/hooks/table-controls";
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
     CryptoAlgorithm,
-    "name" | "asset_type" | "policy_status",
+    | "name"
+    | "primitive"
+    | "occurrences"
+    | "policy"
+    | "recommendation"
+    | "usage"
+    | "packages"
+    | "sboms"
+    | "type",
     "name",
-    "",
+    "" | "policy_status",
     string
   >;
 
@@ -19,7 +27,7 @@ export interface ICryptoSearchContext {
   fetchError: AxiosError | null;
 }
 
-/** Shape of a single cryptographic algorithm returned by the backend. */
+/** Shape of a single cryptographic algorithm returned by the backend API. */
 export interface CryptoAlgorithm {
   node_id: string;
   name: string;
