@@ -28,8 +28,8 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
     persistTo: "urlParams",
     columnNames: {
       name: "Name",
-      assetType: "Asset type",
-      policyStatus: "Policy status",
+      asset_type: "Asset type",
+      policy_status: "Policy status",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,

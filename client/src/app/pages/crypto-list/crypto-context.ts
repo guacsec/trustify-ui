@@ -8,7 +8,7 @@ import type { ITableControls } from "@app/hooks/table-controls";
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
     CryptoAlgorithm,
-    "name" | "assetType" | "policyStatus",
+    "name" | "asset_type" | "policy_status",
     "name",
     "",
     string
