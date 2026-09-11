@@ -8,13 +8,13 @@ import { requestParamsQuery } from "@app/hooks/table-controls";
 
 import type {
   CryptoAlgorithm,
-  CryptoSummary,
+  CryptoPolicySummary,
 } from "@app/pages/crypto-list/crypto-context";
 
 export const CryptoAlgorithmsQueryKey = "crypto-algorithms";
-export const CryptoSummaryQueryKey = "crypto-summary";
+export const CryptoPolicySummaryQueryKey = "crypto-policy-summary";
 
-/** Fetches a paginated list of cryptographic algorithms. */
+/** Fetches a paginated list of cryptographic algorithms from GET /v3/crypto/algorithm. */
 export const useFetchCryptoAlgorithms = (
   params: HubRequestParams = {},
   disableQuery = false,
@@ -42,18 +42,20 @@ export const useFetchCryptoAlgorithms = (
   };
 };
 
-/** Fetches the portfolio-level PQC readiness summary for KPI cards. */
-export const useFetchCryptoSummary = (disableQuery = false) => {
+/** Fetches the policy evaluation summary from POST /v3/crypto/policy/evaluate. */
+export const useFetchCryptoPolicySummary = (disableQuery = false) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [CryptoSummaryQueryKey],
+    queryKey: [CryptoPolicySummaryQueryKey],
     queryFn: () => {
-      return axios.get<CryptoSummary>("/api/v3/crypto/summary");
+      return axios.post<{
+        summary: CryptoPolicySummary;
+      }>("/api/v3/crypto/policy/evaluate", {});
     },
     enabled: !disableQuery,
   });
 
   return {
-    result: data?.data ?? null,
+    result: data?.data?.summary ?? null,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,

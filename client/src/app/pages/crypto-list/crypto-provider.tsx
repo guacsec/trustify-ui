@@ -28,9 +28,8 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
     persistTo: "urlParams",
     columnNames: {
       name: "Name",
-      type: "Type",
-      standard: "Standard",
-      pqcReady: "PQC Ready",
+      assetType: "Asset type",
+      policyStatus: "Policy status",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
@@ -70,7 +69,7 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
 
   const tableControls = useTableControlProps({
     ...tableControlState,
-    idProperty: "id",
+    idProperty: "node_id",
     currentPageItems: algorithms,
     totalItemCount,
     isLoading: isFetching,

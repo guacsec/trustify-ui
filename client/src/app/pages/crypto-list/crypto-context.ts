@@ -8,7 +8,7 @@ import type { ITableControls } from "@app/hooks/table-controls";
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
     CryptoAlgorithm,
-    "name" | "type" | "standard" | "pqcReady",
+    "name" | "assetType" | "policyStatus",
     "name",
     "",
     string
@@ -19,22 +19,22 @@ export interface ICryptoSearchContext {
   fetchError: AxiosError | null;
 }
 
-/** Shape of a single cryptographic algorithm returned by the API. */
+/** Shape of a single cryptographic algorithm returned by the backend. */
 export interface CryptoAlgorithm {
-  id: string;
+  node_id: string;
   name: string;
-  type: string;
-  standard: string;
-  pqcReady: boolean;
+  asset_type: string;
+  oid: string | null;
+  properties: Record<string, unknown>;
+  policy_status: string;
 }
 
-/** Shape of the portfolio-level PQC readiness summary returned by the API. */
-export interface CryptoSummary {
-  pqcAlgorithms: number;
-  classicalAlgorithms: number;
-  totalAlgorithms: number;
-  pqcSboms: number;
-  totalSboms: number;
+/** Shape of the policy evaluation summary returned by POST /v3/crypto/policy/evaluate. */
+export interface CryptoPolicySummary {
+  total: number;
+  compliant: number;
+  warning: number;
+  non_compliant: number;
 }
 
 const contextDefaultValue = {} as ICryptoSearchContext;
