@@ -17,6 +17,8 @@ import {
   encodeEnv,
 } from "@trustify-ui/common";
 
+import { mockCryptoPlugin } from "./mock/crypto";
+
 const require = createRequire(import.meta.url);
 export const brandingAssetPath = () =>
   require
@@ -30,6 +32,7 @@ const faviconPath = path.resolve(brandingPath, "favicon.ico");
 export default defineConfig({
   plugins: [
     react(),
+    mockCryptoPlugin(),
     ...(process.env.COVERAGE === "true"
       ? [
           istanbul({
