@@ -5,8 +5,6 @@ import {
   Card,
   CardBody,
   CardTitle,
-  CodeBlock,
-  CodeBlockCode,
   Content,
   DescriptionList,
   DescriptionListDescription,
@@ -48,46 +46,29 @@ const policyReasonMap: Record<string, { label: string; description: string }> =
     },
   };
 
-/** Extracts nested algorithm or related-crypto-material properties. */
-const getAlgProps = (
-  algorithm: CryptoAlgorithm,
-): Record<string, unknown> | undefined => {
-  const props = algorithm.properties as Record<string, unknown>;
-  return (props?.algorithmProperties ??
-    props?.relatedCryptoMaterialProperties) as
-    Record<string, unknown> | undefined;
-};
-
-/** Drawer content component for a selected cryptographic algorithm or key. */
 export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
   algorithm,
 }) => {
   const props = algorithm.properties as Record<string, unknown>;
-  const algProps = getAlgProps(algorithm);
 
-  const primitive =
-    (algProps?.primitive as string) ?? (algProps?.type as string) ?? undefined;
-  const cryptoFunctions = algProps?.cryptoFunctions as string[] | undefined;
-  const usage = props?.detectionContext as string | undefined;
-  const occurrences = (props?.occurrences as number) ?? 1;
-
-  const executionEnvironment = algProps?.executionEnvironment as
-    string | undefined;
-  const implementationPlatform = algProps?.implementationPlatform as
-    string | undefined;
-  const scanner = props?.scanner as string | undefined;
-  const source = props?.source as string | undefined;
-
-  const detectionRules = props?.detectionRules as string[] | undefined;
-  const analysisMethod = props?.analysisMethod as string | undefined;
-
-  const evidence = props?.evidence as
-    | Array<{
-        file: string;
-        line: number;
-        snippet: string;
-      }>
-    | undefined;
+  const primitive = (props?.primitive as string) ?? undefined;
+  const type = (props?.type as string) ?? undefined;
+  const cryptoFunctions = props?.cryptoFunctions as string[] | undefined;
+  const parameterSetIdentifier =
+    (props?.parameterSetIdentifier as string) ?? undefined;
+  const curve = (props?.curve as string) ?? undefined;
+  const mode = (props?.mode as string) ?? undefined;
+  const padding = (props?.padding as string) ?? undefined;
+  const executionEnvironment =
+    (props?.executionEnvironment as string) ?? undefined;
+  const implementationPlatform =
+    (props?.implementationPlatform as string) ?? undefined;
+  const certificationLevel =
+    (props?.certificationLevel as string[]) ?? undefined;
+  const classicalSecurityLevel =
+    (props?.classicalSecurityLevel as number) ?? undefined;
+  const nistQuantumSecurityLevel =
+    (props?.nistQuantumSecurityLevel as number) ?? undefined;
 
   const relatedSboms = props?.relatedSboms as
     Array<{ id: string; name: string }> | undefined;
@@ -114,13 +95,21 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
                   <Label color="blue">{algorithm.asset_type}</Label>
                 </DescriptionListDescription>
               </DescriptionListGroup>
-              {primitive && (
+              {algorithm.oid && (
+                <DescriptionListGroup>
+                  <DescriptionListTerm>OID</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {algorithm.oid}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              )}
+              {(primitive || type) && (
                 <DescriptionListGroup>
                   <DescriptionListTerm>
                     Primitive / material
                   </DescriptionListTerm>
                   <DescriptionListDescription>
-                    <Label color="blue">{primitive}</Label>
+                    <Label color="blue">{primitive ?? type}</Label>
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               )}
@@ -136,50 +125,51 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               )}
-              {usage && (
+              {parameterSetIdentifier && (
                 <DescriptionListGroup>
-                  <DescriptionListTerm>Usage</DescriptionListTerm>
+                  <DescriptionListTerm>Parameter set</DescriptionListTerm>
                   <DescriptionListDescription>
-                    <Label color="blue">{usage}</Label>
+                    {parameterSetIdentifier}
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               )}
-              <DescriptionListGroup>
-                <DescriptionListTerm>Occurrences</DescriptionListTerm>
-                <DescriptionListDescription>
-                  {occurrences}
-                </DescriptionListDescription>
-              </DescriptionListGroup>
+              {curve && (
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Curve</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {curve}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              )}
+              {mode && (
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Mode</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {mode}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              )}
+              {padding && (
+                <DescriptionListGroup>
+                  <DescriptionListTerm>Padding</DescriptionListTerm>
+                  <DescriptionListDescription>
+                    {padding}
+                  </DescriptionListDescription>
+                </DescriptionListGroup>
+              )}
             </DescriptionList>
           </CardBody>
         </Card>
       </StackItem>
 
-      {(scanner ||
-        source ||
-        executionEnvironment ||
-        implementationPlatform) && (
+      {(executionEnvironment ||
+        implementationPlatform ||
+        certificationLevel) && (
         <StackItem>
           <Card isCompact>
-            <CardTitle>Detection</CardTitle>
+            <CardTitle>Environment</CardTitle>
             <CardBody>
               <DescriptionList isCompact>
-                {scanner && (
-                  <DescriptionListGroup>
-                    <DescriptionListTerm>Scanner</DescriptionListTerm>
-                    <DescriptionListDescription>
-                      {scanner}
-                    </DescriptionListDescription>
-                  </DescriptionListGroup>
-                )}
-                {source && (
-                  <DescriptionListGroup>
-                    <DescriptionListTerm>Source</DescriptionListTerm>
-                    <DescriptionListDescription>
-                      {source}
-                    </DescriptionListDescription>
-                  </DescriptionListGroup>
-                )}
                 {executionEnvironment && (
                   <DescriptionListGroup>
                     <DescriptionListTerm>Execution</DescriptionListTerm>
@@ -196,52 +186,46 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
                     </DescriptionListDescription>
                   </DescriptionListGroup>
                 )}
+                {certificationLevel && certificationLevel.length > 0 && (
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>Certification</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {certificationLevel.join(", ")}
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                )}
               </DescriptionList>
             </CardBody>
           </Card>
         </StackItem>
       )}
 
-      {detectionRules && detectionRules.length > 0 && (
+      {(classicalSecurityLevel !== undefined ||
+        nistQuantumSecurityLevel !== undefined) && (
         <StackItem>
           <Card isCompact>
-            <CardTitle>Detection rules</CardTitle>
+            <CardTitle>Security levels</CardTitle>
             <CardBody>
-              <CodeBlock>
-                <CodeBlockCode>{detectionRules.join("\n")}</CodeBlockCode>
-              </CodeBlock>
-              {analysisMethod && (
-                <Content component="small">{analysisMethod}</Content>
-              )}
-            </CardBody>
-          </Card>
-        </StackItem>
-      )}
-
-      {evidence && evidence.length > 0 && (
-        <StackItem>
-          <Card isCompact>
-            <CardTitle>Evidence</CardTitle>
-            <CardBody>
-              <Content component="p" style={{ marginBottom: 8 }}>
-                {evidence.length} site{evidence.length !== 1 ? "s" : ""} in
-                source
-              </Content>
-              <Stack hasGutter>
-                {evidence.map((e, i) => (
-                  <StackItem key={i}>
-                    <Content component="small">
-                      {e.file}
-                      {e.line != null && `:${e.line}`}
-                    </Content>
-                    {e.snippet && (
-                      <CodeBlock>
-                        <CodeBlockCode>{e.snippet}</CodeBlockCode>
-                      </CodeBlock>
-                    )}
-                  </StackItem>
-                ))}
-              </Stack>
+              <DescriptionList isCompact>
+                {classicalSecurityLevel !== undefined && (
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>Classical</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {classicalSecurityLevel} bits
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                )}
+                {nistQuantumSecurityLevel !== undefined && (
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>
+                      NIST quantum level
+                    </DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {nistQuantumSecurityLevel}
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                )}
+              </DescriptionList>
             </CardBody>
           </Card>
         </StackItem>

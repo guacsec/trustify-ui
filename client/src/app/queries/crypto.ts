@@ -12,7 +12,6 @@ import type {
 } from "@app/pages/crypto-list/crypto-context";
 
 export const CryptoAlgorithmsQueryKey = "crypto-algorithms";
-export const CryptoAlgorithmDetailQueryKey = "crypto-algorithm-detail";
 export const CryptoPolicySummaryQueryKey = "crypto-policy-summary";
 
 /** Fetches a paginated list of cryptographic algorithms, optionally filtered by asset type. */
@@ -43,24 +42,6 @@ export const useFetchCryptoAlgorithms = (
       total: data?.data?.total ?? 0,
       params: params,
     },
-    isFetching: isLoading,
-    fetchError: error as AxiosError | null,
-    refetch,
-  };
-};
-
-/** Fetches detail for a single cryptographic algorithm by ID. */
-export const useFetchCryptoAlgorithmDetail = (algorithmId: string | null) => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [CryptoAlgorithmDetailQueryKey, algorithmId],
-    queryFn: () => {
-      return axios.get(`/api/v3/crypto/algorithm/${algorithmId}`);
-    },
-    enabled: !!algorithmId,
-  });
-
-  return {
-    result: data?.data ?? null,
     isFetching: isLoading,
     fetchError: error as AxiosError | null,
     refetch,

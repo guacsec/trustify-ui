@@ -28,28 +28,22 @@ const policyPresetMap: Record<string, IconedStatusPreset> = {
   NonCompliant: "NonCompliant",
 };
 
-/** Extracts the primitive value from the nested algorithm properties. */
+/** Extracts the primitive value from algorithm properties. */
 const getPrimitive = (item: CryptoAlgorithm): string => {
   const props = item.properties as Record<string, unknown>;
-  const algProps = props?.algorithmProperties as
-    Record<string, unknown> | undefined;
-  return (algProps?.primitive as string) ?? "--";
+  return (props?.primitive as string) ?? "--";
 };
 
-/** Extracts the type value from the nested related crypto material properties. */
+/** Extracts the type value from related crypto material properties. */
 const getKeyType = (item: CryptoAlgorithm): string => {
   const props = item.properties as Record<string, unknown>;
-  const matProps = props?.relatedCryptoMaterialProperties as
-    Record<string, unknown> | undefined;
-  return (matProps?.type as string) ?? item.asset_type ?? "--";
+  return (props?.type as string) ?? item.asset_type ?? "--";
 };
 
-/** Extracts the recommendation from algorithm properties, or returns "--" for compliant items. */
+/** Extracts the recommendation from algorithm properties. */
 const getRecommendation = (item: CryptoAlgorithm): string => {
   const props = item.properties as Record<string, unknown>;
-  const algProps = props?.algorithmProperties as
-    Record<string, unknown> | undefined;
-  return (algProps?.recommendation as string) ?? "--";
+  return (props?.recommendation as string) ?? "--";
 };
 
 /** Extracts the usage context from crypto properties. */
