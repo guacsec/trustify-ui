@@ -1,12 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import { Button, Content } from "@patternfly/react-core";
+import { Button } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
 import type { IconedStatusPreset } from "@app/components/IconedStatus";
 import { IconedStatus } from "@app/components/IconedStatus";
-import { PageDrawerContent } from "@app/components/PageDrawerContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -16,10 +15,10 @@ import {
 
 import type { CryptoAlgorithm } from "./crypto-context";
 import { CryptoSearchContext } from "./crypto-context";
-import { CryptoAlgorithmDetail } from "./components/CryptoAlgorithmDetail";
 
 interface CryptoTableProps {
   assetType: string;
+  onSelectAlgorithm: (item: CryptoAlgorithm) => void;
 }
 
 /** Maps a backend policy_status string to an IconedStatus preset name. */
@@ -78,10 +77,10 @@ const getSbomsCount = (item: CryptoAlgorithm): number => {
 };
 
 /** Master algorithm/key table component with tab-aware column rendering. */
-export const CryptoTable: React.FC<CryptoTableProps> = ({ assetType }) => {
-  const [selectedAlgorithm, setSelectedAlgorithm] =
-    React.useState<CryptoAlgorithm | null>(null);
-
+export const CryptoTable: React.FC<CryptoTableProps> = ({
+  assetType,
+  onSelectAlgorithm,
+}) => {
   const { isFetching, fetchError, tableControls } =
     React.useContext(CryptoSearchContext);
 
@@ -149,7 +148,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({ assetType }) => {
                     <Button
                       variant="link"
                       isInline
-                      onClick={() => setSelectedAlgorithm(item)}
+                      onClick={() => onSelectAlgorithm(item)}
                     >
                       {item.name}
                     </Button>
@@ -299,17 +298,6 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({ assetType }) => {
         isTop={false}
         paginationProps={paginationProps}
       />
-
-      <PageDrawerContent
-        isExpanded={selectedAlgorithm !== null}
-        onCloseClick={() => setSelectedAlgorithm(null)}
-        header={<Content component="h2">{selectedAlgorithm?.name}</Content>}
-        pageKey="crypto-algorithm-detail"
-      >
-        {selectedAlgorithm && (
-          <CryptoAlgorithmDetail algorithm={selectedAlgorithm} />
-        )}
-      </PageDrawerContent>
     </>
   );
 };

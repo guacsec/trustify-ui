@@ -14,11 +14,14 @@ import {
 
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { PageDrawerContent } from "@app/components/PageDrawerContext";
 import {
   useFetchCryptoAlgorithms,
   useFetchCryptoPolicySummary,
 } from "@app/queries/crypto";
 
+import type { CryptoAlgorithm } from "./crypto-context";
+import { CryptoAlgorithmDetail } from "./components/CryptoAlgorithmDetail";
 import { CryptoSearchProvider } from "./crypto-provider";
 import { CryptoTable } from "./crypto-table";
 import { CryptoToolbar } from "./crypto-toolbar";
@@ -37,6 +40,8 @@ export const CryptoList: React.FC = () => {
     fetchError,
   } = useFetchCryptoPolicySummary();
   const [activeTabKey, setActiveTabKey] = useState<string>("algorithms");
+  const [selectedAlgorithm, setSelectedAlgorithm] =
+    useState<CryptoAlgorithm | null>(null);
 
   const {
     result: { total: algorithmsTotal },
@@ -140,7 +145,10 @@ export const CryptoList: React.FC = () => {
           >
             <CryptoSearchProvider assetType="algorithm">
               <CryptoToolbar showFilters />
-              <CryptoTable assetType="algorithm" />
+              <CryptoTable
+                assetType="algorithm"
+                onSelectAlgorithm={setSelectedAlgorithm}
+              />
             </CryptoSearchProvider>
           </Tab>
           <Tab
@@ -149,11 +157,25 @@ export const CryptoList: React.FC = () => {
           >
             <CryptoSearchProvider assetType="related-crypto-material">
               <CryptoToolbar />
-              <CryptoTable assetType="related-crypto-material" />
+              <CryptoTable
+                assetType="related-crypto-material"
+                onSelectAlgorithm={setSelectedAlgorithm}
+              />
             </CryptoSearchProvider>
           </Tab>
         </Tabs>
       </PageSection>
+
+      <PageDrawerContent
+        isExpanded={selectedAlgorithm !== null}
+        onCloseClick={() => setSelectedAlgorithm(null)}
+        header={<Content component="h2">{selectedAlgorithm?.name}</Content>}
+        pageKey="crypto-algorithm-detail"
+      >
+        {selectedAlgorithm && (
+          <CryptoAlgorithmDetail algorithm={selectedAlgorithm} />
+        )}
+      </PageDrawerContent>
     </>
   );
 };
