@@ -65,7 +65,7 @@ describe("ReadOnlyContext", () => {
     expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("false");
   });
 
-  it("disables mutations while loading", () => {
+  it("allows mutations while loading", () => {
     mockedUseFetchTrustifyInfo.mockReturnValue({
       data: undefined,
       isLoading: true,
@@ -75,7 +75,7 @@ describe("ReadOnlyContext", () => {
     renderWithProvider();
 
     expect(screen.getByTestId("loading")).toHaveTextContent("true");
-    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("true");
+    expect(screen.getByTestId("mutations-disabled")).toHaveTextContent("false");
   });
 
   it("allows mutations when the fetch errors", () => {

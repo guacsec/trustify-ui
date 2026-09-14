@@ -7,5 +7,5 @@ interface IReadOnlyContext {
 
 export const ReadOnlyContext = React.createContext<IReadOnlyContext>({
   isLoading: true,
-  areMutationsDisabled: true,
+  areMutationsDisabled: false,
 });
