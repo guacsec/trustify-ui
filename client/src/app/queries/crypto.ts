@@ -48,6 +48,47 @@ export const useFetchCryptoAlgorithms = (
   };
 };
 
+export const CryptoBySbomQueryKey = "crypto-by-sbom";
+
+/** Fetches cryptographic algorithms associated with a specific SBOM. */
+export const useFetchCryptoBySbom = (
+  sbomId: string,
+  params: HubRequestParams = {},
+) => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: [CryptoBySbomQueryKey, sbomId, params],
+    queryFn: () => {
+      const serialized = requestParamsQuery(params);
+      const sbomFilter = `sbom_id=${sbomId}`;
+      const combinedQ = serialized.q
+        ? `${serialized.q}&${sbomFilter}`
+        : sbomFilter;
+
+      return axios.get<{ items: CryptoAlgorithm[]; total: number | null }>(
+        "/api/v3/crypto/algorithm",
+        {
+          params: {
+            ...serialized,
+            q: combinedQ,
+          },
+        },
+      );
+    },
+    enabled: !!sbomId,
+  });
+
+  return {
+    result: {
+      data: data?.data?.items || [],
+      total: data?.data?.total ?? 0,
+      params: params,
+    },
+    isFetching: isLoading,
+    fetchError: error as AxiosError | null,
+    refetch,
+  };
+};
+
 /** Fetches the policy evaluation summary from POST /v3/crypto/policy/evaluate. */
 export const useFetchCryptoPolicySummary = (disableQuery = false) => {
   const { data, isLoading, error, refetch } = useQuery({

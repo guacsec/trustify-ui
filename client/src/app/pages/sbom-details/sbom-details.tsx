@@ -43,6 +43,7 @@ import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
 import { useDeleteSbomMutation, useFetchSBOMById } from "@app/queries/sboms";
 
+import { CbomBySbom } from "./cbom-by-sbom";
 import { ModelsBySbom } from "./models-by-sbom";
 import { Overview } from "./overview";
 import { PackagesBySbom } from "./packages-by-sbom";
@@ -97,13 +98,14 @@ export const SbomDetails: React.FC = () => {
   } = useTabControls({
     persistenceKeyPrefix: "sd", // sb="sbom details"
     persistTo: "urlParams",
-    tabKeys: ["info", "packages", "vulnerabilities", "models"],
+    tabKeys: ["info", "packages", "vulnerabilities", "models", "cbom"],
   });
 
   const infoTabRef = React.useRef<HTMLElement>(null);
   const packagesTabRef = React.useRef<HTMLElement>(null);
   const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
   const modelsTabRef = React.useRef<HTMLElement>(null);
+  const cbomTabRef = React.useRef<HTMLElement>(null);
 
   // Tabs popover refs
   const vulnerabilitiesTabPopoverRef = React.useRef<HTMLElement>(null);
@@ -235,6 +237,11 @@ export const SbomDetails: React.FC = () => {
             title={<TabTitleText>Models</TabTitleText>}
             tabContentRef={modelsTabRef}
           />
+          <Tab
+            {...getTabProps("cbom")}
+            title={<TabTitleText>CBOM</TabTitleText>}
+            tabContentRef={cbomTabRef}
+          />
         </Tabs>
       </PageSection>
       <PageSection>
@@ -267,6 +274,13 @@ export const SbomDetails: React.FC = () => {
           aria-label="AI models within the SBOM"
         >
           {sbomId && <ModelsBySbom sbomId={sbomId} />}
+        </TabContent>
+        <TabContent
+          {...getTabContentProps("cbom")}
+          ref={cbomTabRef}
+          aria-label="Cryptographic assets within the SBOM"
+        >
+          {sbomId && <CbomBySbom sbomId={sbomId} />}
         </TabContent>
       </PageSection>
 
