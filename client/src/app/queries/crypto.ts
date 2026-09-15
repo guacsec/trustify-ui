@@ -50,13 +50,14 @@ export const useFetchCryptoAlgorithms = (
 
 export const CryptoBySbomQueryKey = "crypto-by-sbom";
 
-/** Fetches cryptographic algorithms associated with a specific SBOM. */
+/** Fetches cryptographic assets associated with a specific SBOM, optionally filtered by asset type. */
 export const useFetchCryptoBySbom = (
   sbomId: string,
   params: HubRequestParams = {},
+  assetType?: string,
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [CryptoBySbomQueryKey, sbomId, params],
+    queryKey: [CryptoBySbomQueryKey, sbomId, params, assetType],
     queryFn: () => {
       const serialized = requestParamsQuery(params);
       const sbomFilter = `sbom_id=${sbomId}`;
@@ -70,6 +71,7 @@ export const useFetchCryptoBySbom = (
           params: {
             ...serialized,
             q: combinedQ,
+            ...(assetType ? { asset_type: assetType } : {}),
           },
         },
       );
