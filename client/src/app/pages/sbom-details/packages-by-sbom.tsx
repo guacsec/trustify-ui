@@ -36,7 +36,7 @@ import {
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
-import { decodePurl } from "@app/utils/utils";
+import { decodePurl, decomposePurl } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
@@ -63,6 +63,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     columnNames: {
       name: "Name",
       version: "Version",
+      recommendedVersion: "Recommended version",
       vulnerabilities: "Vulnerabilities",
       licenses: "Licenses",
       purls: "PURLs",
@@ -156,6 +157,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
             <TableHeaderContentWithControls {...tableControls}>
               <Th {...getThProps({ columnKey: "name" })} />
               <Th {...getThProps({ columnKey: "version" })} />
+              <Th {...getThProps({ columnKey: "recommendedVersion" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
               <Th {...getThProps({ columnKey: "purls" })} />
@@ -187,6 +189,16 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {...getTdProps({ columnKey: "version" })}
                     >
                       {item?.version}
+                    </Td>
+                    <Td
+                      width={15}
+                      modifier="truncate"
+                      {...getTdProps({ columnKey: "recommendedVersion" })}
+                    >
+                      {item.recommended_purl
+                        ? (decomposePurl(item.recommended_purl)?.version ??
+                          item.recommended_purl)
+                        : "—"}
                     </Td>
                     <Td
                       width={10}
