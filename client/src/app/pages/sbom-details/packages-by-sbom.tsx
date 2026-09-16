@@ -3,6 +3,7 @@ import { generatePath, Link } from "react-router-dom";
 
 import {
   Label,
+  LabelGroup,
   List,
   ListItem,
   Toolbar,
@@ -36,13 +37,15 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
-import { decodePurl, decomposePurl } from "@app/utils/utils";
+import { decodePurl, decomposePurl, purlBaseEquals } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
 import { VulnerabilityGallery } from "@app/components/VulnerabilityGallery";
+import { useMemo } from "react";
 
 const renderLicenseWithMappings = (
   license: string,
@@ -65,9 +68,9 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     columnNames: {
       name: "Name",
       version: "Version",
-      recommendedVersion: "Recommended version",
       vulnerabilities: "Vulnerabilities",
       licenses: "Licenses",
+      remediation: "Remediation",
       purls: "PURLs",
       cpes: "CPEs",
     },
@@ -112,6 +115,16 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     }),
     total: true,
   });
+
+  const purls = useMemo(
+    () =>
+      packages
+        .map((item) => item.purl[0]?.purl)
+        .filter((p): p is string => Boolean(p)),
+    [packages],
+  );
+
+  const { recommendationsMap } = useFetchRecommendations(purls);
 
   const tableControls = useTableControlProps({
     ...tableControlState,
@@ -159,9 +172,9 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
             <TableHeaderContentWithControls {...tableControls}>
               <Th {...getThProps({ columnKey: "name" })} />
               <Th {...getThProps({ columnKey: "version" })} />
-              <Th {...getThProps({ columnKey: "recommendedVersion" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "remediation" })} />
               <Th {...getThProps({ columnKey: "purls" })} />
               <Th {...getThProps({ columnKey: "cpes" })} />
             </TableHeaderContentWithControls>
@@ -193,20 +206,88 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {item?.version}
                     </Td>
                     <Td
-                      width={15}
-                      modifier="fitContent"
-                      {...getTdProps({ columnKey: "recommendedVersion" })}
+                      width={10}
+                      {...getTdProps({ columnKey: "remediation" })}
                     >
-                      {item.recommended_purl ? (
-                        <Tooltip content={item.recommended_purl}>
-                          <Label color="green" variant="outline" isCompact>
-                            {decomposePurl(item.recommended_purl)?.version ??
-                              item.recommended_purl}
-                          </Label>
-                        </Tooltip>
-                      ) : (
-                        "—"
-                      )}
+                      {item.purl[0] ? (
+                        <WithPackage packageId={item.purl[0].uuid}>
+                          {(pkg) => {
+                            const currentPurl = item.purl[0]?.purl;
+                            const recommendations =
+                              recommendationsMap.get(currentPurl ?? "") ?? [];
+
+                            const isApplied = recommendations.some((rec) =>
+                              purlBaseEquals(rec.package, currentPurl ?? ""),
+                            );
+
+                            if (isApplied) {
+                              return (
+                                <Label color="blue" isCompact>
+                                  Applied
+                                </Label>
+                              );
+                            }
+
+                            if (recommendations.length > 0) {
+                              return (
+                                <LabelGroup>
+                                  {recommendations.map((rec) => {
+                                    const version =
+                                      decomposePurl(rec.package)?.version ??
+                                      rec.package;
+                                    return (
+                                      <Tooltip
+                                        key={rec.package}
+                                        content={rec.package}
+                                      >
+                                        <Label color="green" isCompact>
+                                          {version}
+                                        </Label>
+                                      </Tooltip>
+                                    );
+                                  })}
+                                </LabelGroup>
+                              );
+                            }
+
+                            const fixedVersions: string[] = [];
+                            for (const advisory of pkg?.advisories ?? []) {
+                              for (const pkgStatus of advisory.status ?? []) {
+                                const versions = (
+                                  pkgStatus as unknown as {
+                                    fixed_versions?: string[];
+                                  }
+                                ).fixed_versions;
+                                if (versions) {
+                                  for (const v of versions) {
+                                    if (!fixedVersions.includes(v))
+                                      fixedVersions.push(v);
+                                  }
+                                }
+                              }
+                            }
+
+                            if (fixedVersions.length > 0) {
+                              return (
+                                <LabelGroup>
+                                  {fixedVersions.map((v) => (
+                                    <Label
+                                      key={v}
+                                      color="green"
+                                      variant="outline"
+                                      isCompact
+                                    >
+                                      {v}
+                                    </Label>
+                                  ))}
+                                </LabelGroup>
+                              );
+                            }
+
+                            return null;
+                          }}
+                        </WithPackage>
+                      ) : null}
                     </Td>
                     <Td
                       width={10}
