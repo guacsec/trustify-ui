@@ -36,10 +36,7 @@ import {
   type ConfirmDialogProps,
 } from "@app/components/ConfirmDialog";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  useReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import {
   useFetchImporterReports,
   useFetchImporters,
@@ -86,7 +83,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = useReadOnlyContext();
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -145,6 +142,7 @@ export const ImporterList: React.FC = () => {
       variant: "success",
     });
   };
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const onRunImporterError = (error: AxiosError) => {
     pushNotification({
@@ -185,6 +183,7 @@ export const ImporterList: React.FC = () => {
     filterCategories: [
       {
         categoryKey: "name",
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
         title: "Name",
         type: FilterType.search,
         placeholderText: "Search by name...",
@@ -395,7 +394,8 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
+
                                     },
                                   ]
                                 : [
@@ -405,16 +405,15 @@ export const ImporterList: React.FC = () => {
                                         prepareActionOnRow("run", item);
                                       },
                                       isAriaDisabled:
-                                        isReadOnly ||
                                         importerStatus === "running",
-                                      ...readOnlyActionProps(isReadOnly),
+                                         isDisabled: areMutationsDisabled,
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
-                                      ...readOnlyActionProps(isReadOnly),
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]),
                             ]}
