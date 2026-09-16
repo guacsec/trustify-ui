@@ -142,8 +142,7 @@ export const ImporterList: React.FC = () => {
       variant: "success",
     });
   };
-  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
-
+  
   const onRunImporterError = (error: AxiosError) => {
     pushNotification({
       title: getAxiosErrorMessage(error),
