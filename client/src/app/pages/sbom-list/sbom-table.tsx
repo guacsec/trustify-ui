@@ -20,10 +20,7 @@ import type { SbomSummary } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
-import {
-  readOnlyActionProps,
-  useReadOnlyContext,
-} from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -46,7 +43,7 @@ import { SbomSearchContext } from "./sbom-context";
 
 export const SbomTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
-  const { isReadOnly } = useReadOnlyContext();
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const { isFetching, fetchError, totalItemCount, tableControls } =
     React.useContext(SbomSearchContext);
@@ -217,7 +214,7 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setEditLabelsModalState(item);
                             },
-                            ...readOnlyActionProps(isReadOnly),
+                            isDisabled: areMutationsDisabled,
                           },
                           {
                             isSeparator: true,
@@ -242,7 +239,7 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setSbomToDelete(item);
                             },
-                            ...readOnlyActionProps(isReadOnly),
+                            isDisabled: areMutationsDisabled,
                           },
                         ]}
                       />

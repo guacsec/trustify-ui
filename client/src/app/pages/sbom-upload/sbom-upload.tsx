@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import type { AxiosError, AxiosResponse } from "axios";
@@ -14,13 +14,13 @@ import {
 } from "@patternfly/react-core";
 import LockIcon from "@patternfly/react-icons/dist/esm/icons/lock-icon";
 
-import { useReadOnlyContext } from "@app/components/ReadOnlyContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { UploadFiles } from "@app/components/UploadFiles";
 import { useUploadSBOM } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 
 export const SbomUpload: React.FC = () => {
-  const { isReadOnly } = useReadOnlyContext();
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } = useUploadSBOM();
 
   return (
@@ -33,7 +33,7 @@ export const SbomUpload: React.FC = () => {
           <BreadcrumbItem isActive>Upload SBOM</BreadcrumbItem>
         </Breadcrumb>
       </PageSection>
-      {isReadOnly ? (
+      {areMutationsDisabled ? (
         <PageSection>
           <EmptyState
             headingLevel="h1"
