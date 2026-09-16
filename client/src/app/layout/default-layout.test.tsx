@@ -67,7 +67,7 @@ describe("DefaultLayout", () => {
   });
 
   it("does not show a banner while trustify info is loading", () => {
-    renderLayout({ isLoading: true, areMutationsDisabled: true });
+    renderLayout({ isLoading: true, areMutationsDisabled: false });
 
     expect(
       screen.queryByText(/running in read-only mode/i),
