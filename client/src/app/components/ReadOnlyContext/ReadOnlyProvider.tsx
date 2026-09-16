@@ -14,7 +14,7 @@ export const ReadOnlyProvider: React.FunctionComponent<IReadOnlyProvider> = ({
 }) => {
   const { data: trustifyInfo, isLoading } = useFetchTrustifyInfo();
   const isReadOnly = trustifyInfo?.readOnly ?? false;
-  const areMutationsDisabled = isLoading || isReadOnly;
+  const areMutationsDisabled = isReadOnly;
 
   return (
     <ReadOnlyContext.Provider value={{ isLoading, areMutationsDisabled }}>
