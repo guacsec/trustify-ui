@@ -6351,11 +6351,6 @@ components:
                 items:
                   $ref: '#/components/schemas/PurlSummary'
                 description: PURLs identifying the package
-              recommended_purl:
-                type:
-                - string
-                - 'null'
-                description: The PURL of the vendor-recommended version for this package, if a recommendation exists
               version:
                 type:
                 - string
@@ -7269,11 +7264,6 @@ components:
           items:
             $ref: '#/components/schemas/PurlSummary'
           description: PURLs identifying the package
-        recommended_purl:
-          type:
-          - string
-          - 'null'
-          description: The PURL of the vendor-recommended version for this package, if a recommendation exists
         version:
           type:
           - string
