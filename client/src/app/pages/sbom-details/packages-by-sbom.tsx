@@ -207,6 +207,46 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                     </Td>
                     <Td
                       width={10}
+                      modifier="breakWord"
+                      {...getTdProps({ columnKey: "vulnerabilities" })}
+                    >
+                      {item.purl[0] ? (
+                        <WithPackage packageId={item.purl[0].uuid}>
+                          {(pkg, isFetching, fetchError) => (
+                            <PackageVulnerabilities
+                              pkg={pkg}
+                              isFetching={isFetching}
+                              fetchError={fetchError}
+                            />
+                          )}
+                        </WithPackage>
+                      ) : (
+                        <VulnerabilityGallery
+                          severities={{
+                            critical: 0,
+                            high: 0,
+                            medium: 0,
+                            low: 0,
+                            none: 0,
+                            unknown: 0,
+                          }}
+                        />
+                      )}
+                    </Td>
+                    <Td
+                      width={20}
+                      modifier="breakWord"
+                      {...getTdProps({
+                        columnKey: "licenses",
+                        isCompoundExpandToggle: item.licenses.length > 0,
+                        item: item,
+                        rowIndex,
+                      })}
+                    >
+                      {item.licenses.length} Licenses
+                    </Td>
+                    <Td
+                      width={10}
                       {...getTdProps({ columnKey: "remediation" })}
                     >
                       {item.purl[0] ? (
@@ -288,46 +328,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                           }}
                         </WithPackage>
                       ) : null}
-                    </Td>
-                    <Td
-                      width={10}
-                      modifier="breakWord"
-                      {...getTdProps({ columnKey: "vulnerabilities" })}
-                    >
-                      {item.purl[0] ? (
-                        <WithPackage packageId={item.purl[0].uuid}>
-                          {(pkg, isFetching, fetchError) => (
-                            <PackageVulnerabilities
-                              pkg={pkg}
-                              isFetching={isFetching}
-                              fetchError={fetchError}
-                            />
-                          )}
-                        </WithPackage>
-                      ) : (
-                        <VulnerabilityGallery
-                          severities={{
-                            critical: 0,
-                            high: 0,
-                            medium: 0,
-                            low: 0,
-                            none: 0,
-                            unknown: 0,
-                          }}
-                        />
-                      )}
-                    </Td>
-                    <Td
-                      width={20}
-                      modifier="breakWord"
-                      {...getTdProps({
-                        columnKey: "licenses",
-                        isCompoundExpandToggle: item.licenses.length > 0,
-                        item: item,
-                        rowIndex,
-                      })}
-                    >
-                      {item.licenses.length} Licenses
                     </Td>
                     <Td
                       width={20}
