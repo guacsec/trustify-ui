@@ -18,7 +18,6 @@ import { SidebarApp } from "./sidebar";
 import { LoadingWrapper } from "@tsd-ui/core";
 import { getAxiosErrorMessage } from "@app/utils/utils";
 import type { AxiosError } from "axios";
-
 interface DefaultLayoutProps {
   children?: React.ReactNode;
 }
