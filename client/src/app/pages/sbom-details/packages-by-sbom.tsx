@@ -2,11 +2,13 @@ import type React from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import {
+  Label,
   List,
   ListItem,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 import {
@@ -192,13 +194,19 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                     </Td>
                     <Td
                       width={15}
-                      modifier="truncate"
+                      modifier="fitContent"
                       {...getTdProps({ columnKey: "recommendedVersion" })}
                     >
-                      {item.recommended_purl
-                        ? (decomposePurl(item.recommended_purl)?.version ??
-                          item.recommended_purl)
-                        : "—"}
+                      {item.recommended_purl ? (
+                        <Tooltip content={item.recommended_purl}>
+                          <Label color="green" variant="outline" isCompact>
+                            {decomposePurl(item.recommended_purl)?.version ??
+                              item.recommended_purl}
+                          </Label>
+                        </Tooltip>
+                      ) : (
+                        "—"
+                      )}
                     </Td>
                     <Td
                       width={10}
