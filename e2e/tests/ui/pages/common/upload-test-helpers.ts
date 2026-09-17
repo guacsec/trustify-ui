@@ -148,12 +148,28 @@ export const testUploadApiErrorMessage = (
     apiRoutePattern,
     errorResponseBody,
     expectedErrorMessage,
+    httpStatus = 400,
     getConfig,
   }: {
     filePath: string;
     apiRoutePattern: string;
-    errorResponseBody: { error: string; message?: string; details?: string };
+    errorResponseBody: {
+      error: string;
+      message?: string;
+      details?: string;
+      validation?: {
+        validator: string;
+        findings: {
+          severity: string;
+          message: string;
+          path?: string;
+          rule?: string;
+        }[];
+        outcome: string;
+      }[];
+    };
     expectedErrorMessage: string;
+    httpStatus?: number;
     getConfig: ({ page }: { page: Page }) => Promise<UploadTestConfig>;
   },
 ) =>
@@ -163,7 +179,7 @@ export const testUploadApiErrorMessage = (
 
     await page.route(apiRoutePattern, async (route) => {
       await route.fulfill({
-        status: 400,
+        status: httpStatus,
         contentType: "application/json",
         body: JSON.stringify(errorResponseBody),
       });
