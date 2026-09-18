@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-QTnfLwEv.js";import{i as t}from"./react-C_KK3IH-.js";import{Tn as n}from"./useBranding-RHCQqHa4.js";var r=e(t(),1),i=(e,t)=>(0,r.useMemo)(()=>!e||e.length===0?[]:e.map(e=>({...e,[n]:t(e)})),[e,t]);export{i as t};
