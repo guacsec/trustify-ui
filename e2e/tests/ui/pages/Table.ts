@@ -70,7 +70,7 @@ export class Table<
 
   async expandCell(columnName: TColumns[number], rowIndex: number) {
     const column = await this.getColumn(columnName);
-    await column.nth(rowIndex).click();
+    await column.nth(rowIndex).getByRole("button").click();
 
     const expandedCell = column.nth(rowIndex + 1);
     await expect(expandedCell).toBeVisible();
