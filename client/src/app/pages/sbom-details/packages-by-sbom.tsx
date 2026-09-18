@@ -187,6 +187,13 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
+            const currentPurl = item.purl[0]?.purl;
+            const rowRecommendations =
+              recommendationsMap.get(currentPurl ?? "") ?? [];
+            const isRemediationApplied = rowRecommendations.some((rec) =>
+              purlBaseEquals(rec.package, currentPurl ?? ""),
+            );
+
             return (
               <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
                 <Tr {...getTrProps({ item })}>
@@ -249,47 +256,28 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       width={15}
                       {...getTdProps({ columnKey: "remediation" })}
                     >
-                      {item.purl[0] ? (
+                      {isRemediationApplied ? (
+                        <Label color="blue" isCompact>
+                          Applied
+                        </Label>
+                      ) : rowRecommendations.length > 0 ? (
+                        <LabelGroup>
+                          {rowRecommendations.map((rec) => {
+                            const version =
+                              decomposePurl(rec.package)?.version ??
+                              rec.package;
+                            return (
+                              <Tooltip key={rec.package} content={rec.package}>
+                                <Label color="green" isCompact>
+                                  {version}
+                                </Label>
+                              </Tooltip>
+                            );
+                          })}
+                        </LabelGroup>
+                      ) : item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
                           {(pkg) => {
-                            const currentPurl = item.purl[0]?.purl;
-                            const recommendations =
-                              recommendationsMap.get(currentPurl ?? "") ?? [];
-
-                            const isApplied = recommendations.some((rec) =>
-                              purlBaseEquals(rec.package, currentPurl ?? ""),
-                            );
-
-                            if (isApplied) {
-                              return (
-                                <Label color="blue" isCompact>
-                                  Applied
-                                </Label>
-                              );
-                            }
-
-                            if (recommendations.length > 0) {
-                              return (
-                                <LabelGroup>
-                                  {recommendations.map((rec) => {
-                                    const version =
-                                      decomposePurl(rec.package)?.version ??
-                                      rec.package;
-                                    return (
-                                      <Tooltip
-                                        key={rec.package}
-                                        content={rec.package}
-                                      >
-                                        <Label color="green" isCompact>
-                                          {version}
-                                        </Label>
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </LabelGroup>
-                              );
-                            }
-
                             const fixedVersions: string[] = [];
                             for (const advisory of pkg?.advisories ?? []) {
                               for (const pkgStatus of advisory.status ?? []) {
@@ -306,7 +294,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 }
                               }
                             }
-
                             if (fixedVersions.length > 0) {
                               return (
                                 <LabelGroup>
@@ -323,7 +310,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 </LabelGroup>
                               );
                             }
-
                             return null;
                           }}
                         </WithPackage>
