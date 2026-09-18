@@ -18,6 +18,7 @@ import {
   Grid,
   GridItem,
   Label,
+  LabelGroup,
   Popover,
   Stack,
   StackItem,
@@ -59,11 +60,12 @@ import {
 import { useLocalTableControls } from "@app/hooks/table-controls";
 import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
 import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { useIsExploitIntelligenceEnabled } from "@app/queries/trustifyInfo";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
-import { decomposePurl, formatDate } from "@app/utils/utils";
+import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
 import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
@@ -140,6 +142,18 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     (d) => `${d.vulnerability.identifier}-${d.vulnerabilityStatus}`,
   );
 
+  const allPurls = React.useMemo(
+    () =>
+      affectedVulnerabilities.flatMap((vuln) =>
+        Array.from(vuln.purls.values())
+          .filter((p) => !p.isOrphan)
+          .map((p) => p.purlSummary.purl),
+      ),
+    [affectedVulnerabilities],
+  );
+
+  const { recommendationsMap } = useFetchRecommendations(allPurls);
+
   const tableControls = useLocalTableControls({
     tableName: "vulnerability-table",
     idProperty: "_ui_unique_id",
@@ -151,6 +165,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       cvss: "CVSS",
       exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
+      remediation: "Remediation",
       published: "Published",
       updated: "Updated",
     },
@@ -295,6 +310,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                   <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
                 )}
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
+                <Th {...getThProps({ columnKey: "remediation" })} />
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
               </TableHeaderContentWithControls>
@@ -316,6 +332,24 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
               const purlResolutions = vexByPurl.get(
                 item.vulnerability.identifier,
               );
+
+              const rowPurls = Array.from(item.purls.values())
+                .filter((p) => !p.isOrphan)
+                .map((p) => p.purlSummary.purl);
+
+              const isRemediationApplied = rowPurls.some((purl) =>
+                (recommendationsMap.get(purl) ?? []).some((rec) =>
+                  purlBaseEquals(rec.package, purl),
+                ),
+              );
+
+              const rowRecommendations = rowPurls
+                .flatMap((purl) => recommendationsMap.get(purl) ?? [])
+                .filter(
+                  (rec, idx, all) =>
+                    all.findIndex((r) => r.package === rec.package) === idx,
+                );
+
               const hasVexResolution =
                 purlResolutions &&
                 Array.from(item.purls.values()).some(
@@ -366,7 +400,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={25}
+                            width={20}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -456,6 +490,34 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                         })}
                       >
                         {item.purls.size}
+                      </Td>
+                      <Td
+                        width={15}
+                        {...getTdProps({ columnKey: "remediation" })}
+                      >
+                        {isRemediationApplied ? (
+                          <Label color="blue" isCompact>
+                            Applied
+                          </Label>
+                        ) : rowRecommendations.length > 0 ? (
+                          <LabelGroup>
+                            {rowRecommendations.map((rec) => {
+                              const version =
+                                decomposePurl(rec.package)?.version ??
+                                rec.package;
+                              return (
+                                <Tooltip
+                                  key={rec.package}
+                                  content={rec.package}
+                                >
+                                  <Label color="green" isCompact>
+                                    {version}
+                                  </Label>
+                                </Tooltip>
+                              );
+                            })}
+                          </LabelGroup>
+                        ) : null}
                       </Td>
                       <Td
                         width={10}
