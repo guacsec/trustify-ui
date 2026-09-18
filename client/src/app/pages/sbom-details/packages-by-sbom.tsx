@@ -199,7 +199,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {[item.name, item.group].filter(Boolean).join("/")}
                     </Td>
                     <Td
-                      width={15}
+                      width={10}
                       modifier="truncate"
                       {...getTdProps({ columnKey: "version" })}
                     >
@@ -234,7 +234,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       )}
                     </Td>
                     <Td
-                      width={20}
+                      width={15}
                       modifier="breakWord"
                       {...getTdProps({
                         columnKey: "licenses",
@@ -246,7 +246,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       {item.licenses.length} Licenses
                     </Td>
                     <Td
-                      width={10}
+                      width={15}
                       {...getTdProps({ columnKey: "remediation" })}
                     >
                       {item.purl[0] ? (
@@ -352,7 +352,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       )}
                     </Td>
                     <Td
-                      width={20}
+                      width={15}
                       modifier="breakWord"
                       {...getTdProps({
                         columnKey: "cpes",
