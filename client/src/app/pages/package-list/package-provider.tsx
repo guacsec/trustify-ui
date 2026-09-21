@@ -54,6 +54,7 @@ export const PackageSearchProvider: React.FunctionComponent<
       path: "Path",
       qualifiers: "Qualifiers",
       vulnerabilities: "Vulnerabilities",
+      remediation: "Remediation",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
