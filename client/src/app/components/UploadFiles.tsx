@@ -21,6 +21,7 @@ import {
 } from "@patternfly/react-core";
 
 import FileIcon from "@patternfly/react-icons/dist/esm/icons/file-code-icon";
+import ExclamationTriangleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-triangle-icon";
 import UploadIcon from "@patternfly/react-icons/dist/esm/icons/upload-icon";
 
 interface Upload {
@@ -93,9 +94,26 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
     setRejectedFiles(fileRejections);
   };
 
-  const successFileCount = Array.from(uploads.values()).filter(
-    (upload) => upload.response,
+  const currentUploads = Array.from(uploads.values());
+  const duplicateFileCount = currentUploads.filter(
+    (upload) => upload.response && isDuplicate?.(upload.response),
   ).length;
+  const successFileCount = currentUploads.filter(
+    (upload) => upload.response && !isDuplicate?.(upload.response),
+  ).length;
+
+  const statusToggleText =
+    duplicateFileCount > 0
+      ? `${successFileCount} uploaded, ${duplicateFileCount} already existed`
+      : `${successFileCount} of ${uploads.size} files uploaded`;
+
+  const statusToggleIcon:
+    "danger" | "success" | "inProgress" | React.ReactNode =
+    statusIcon === "success" && duplicateFileCount > 0 ? (
+      <ExclamationTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />
+    ) : (
+      statusIcon
+    );
 
   return (
     <MultipleFileUpload
@@ -117,8 +135,8 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
       />
       {showStatus && (
         <MultipleFileUploadStatus
-          statusToggleText={`${successFileCount} of ${uploads.size} files uploaded`}
-          statusToggleIcon={statusIcon}
+          statusToggleText={statusToggleText}
+          statusToggleIcon={statusToggleIcon}
         >
           {Array.from(uploads.entries()).map(([file, upload], index) => (
             <MultipleFileUploadStatusItem
