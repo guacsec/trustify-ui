@@ -44,6 +44,7 @@ const SBOMGroupDetails = lazy(() => import("./pages/sbom-group-details"));
 const Search = lazy(() => import("./pages/search"));
 const ImporterList = lazy(() => import("./pages/importer-list"));
 const LicenseList = lazy(() => import("./pages/license-list"));
+const CryptoList = lazy(() => import("./pages/crypto-list"));
 const ModelList = lazy(() => import("./pages/model-list"));
 const NotFound = lazy(() => import("./pages/not-found"));
 /* eslint-enable react-refresh/only-export-components */
@@ -72,6 +73,7 @@ export const Paths = {
   search: "/search",
   importers: "/importers",
   licenses: "/licenses",
+  cryptography: "/cryptography",
   models: "/models",
   sbomGroups: "/sbom-groups",
   sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
@@ -151,6 +153,15 @@ export const AppRoutes = createBrowserRouter([
           <LazyRouteElement
             identifier="license-list"
             component={<LicenseList />}
+          />
+        ),
+      },
+      {
+        path: Paths.cryptography,
+        element: (
+          <LazyRouteElement
+            identifier="crypto-list"
+            component={<CryptoList />}
           />
         ),
       },
