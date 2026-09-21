@@ -38,6 +38,7 @@ export interface IUploadFilesProps {
   handleRemoveUpload: (file: File) => void;
   extractSuccessMessage: (response: AxiosResponse) => string;
   extractErrorMessage: (error: AxiosError) => string;
+  isDuplicate?: (response: AxiosResponse) => boolean;
   fileUploadProps?: Omit<
     MultipleFileUploadProps,
     "onFileDrop" | "dropzoneProps"
@@ -50,6 +51,7 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
   handleRemoveUpload,
   extractSuccessMessage,
   extractErrorMessage,
+  isDuplicate,
   fileUploadProps,
 }) => {
   const [showStatus, setShowStatus] = React.useState(false);
@@ -131,7 +133,9 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
                 upload.error
                   ? "danger"
                   : upload.response
-                    ? "success"
+                    ? isDuplicate?.(upload.response)
+                      ? "warning"
+                      : "success"
                     : undefined
               }
               progressHelperText={
@@ -150,7 +154,11 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
                   </HelperText>
                 ) : upload.response ? (
                   <HelperText isLiveRegion>
-                    <HelperTextItem variant="default">
+                    <HelperTextItem
+                      variant={
+                        isDuplicate?.(upload.response) ? "warning" : "default"
+                      }
+                    >
                       {extractSuccessMessage(upload.response)}
                     </HelperTextItem>
                   </HelperText>
