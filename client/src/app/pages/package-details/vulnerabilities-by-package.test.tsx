@@ -80,6 +80,20 @@ describe("VulnerabilitiesByPackage remediation column", () => {
     expect(screen.getByText("2.17.2")).toBeInTheDocument();
   });
 
+  /** Verifies that a vulnerability row renders a blue Applied badge when the recommended PURL matches the package's current PURL. */
+  it("renders Applied badge when recommendation matches the current package PURL", () => {
+    // Given a recommendation whose PURL base-equals the package's current PURL
+    mockRecommendationsMap.set(mockPackagePurl, [
+      { package: mockPackagePurl, vulnerabilities: [] },
+    ]);
+
+    // When rendering the vulnerabilities tab
+    renderComponent();
+
+    // Then the blue Applied badge is shown
+    expect(screen.getByText("Applied")).toBeInTheDocument();
+  });
+
   /** Verifies that a vulnerability row renders no remediation content when no recommendations exist. */
   it("renders no remediation content when no recommendations exist", () => {
     renderComponent();
