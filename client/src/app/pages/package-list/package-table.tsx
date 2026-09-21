@@ -63,10 +63,10 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "remediation" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
-              <Th {...getThProps({ columnKey: "remediation" })} />
             </TableHeaderContentWithControls>
           </Tr>
         </Thead>
@@ -145,34 +145,7 @@ export const PackageTable: React.FC = () => {
                           />
                         </Td>
                         <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "path" })}
-                        >
-                          {item.decomposedPurl?.path}
-                        </Td>
-                        <Td
-                          width={20}
-                          {...getTdProps({ columnKey: "qualifiers" })}
-                        >
-                          {item.decomposedPurl?.qualifiers && (
-                            <PackageQualifiers
-                              value={item.decomposedPurl?.qualifiers}
-                            />
-                          )}
-                        </Td>
-                        <Td
-                          width={10}
-                          {...getTdProps({ columnKey: "vulnerabilities" })}
-                        >
-                          <PackageVulnerabilities
-                            pkg={pkg}
-                            isFetching={packageIsFetching}
-                            fetchError={packageFetchError}
-                          />
-                        </Td>
-                        <Td
-                          width={10}
+                          width={15}
                           {...getTdProps({ columnKey: "remediation" })}
                         >
                           {isRemediationApplied ? (
@@ -198,6 +171,33 @@ export const PackageTable: React.FC = () => {
                               })}
                             </LabelGroup>
                           ) : null}
+                        </Td>
+                        <Td
+                          width={10}
+                          modifier="truncate"
+                          {...getTdProps({ columnKey: "path" })}
+                        >
+                          {item.decomposedPurl?.path}
+                        </Td>
+                        <Td
+                          width={20}
+                          {...getTdProps({ columnKey: "qualifiers" })}
+                        >
+                          {item.decomposedPurl?.qualifiers && (
+                            <PackageQualifiers
+                              value={item.decomposedPurl?.qualifiers}
+                            />
+                          )}
+                        </Td>
+                        <Td
+                          width={10}
+                          {...getTdProps({ columnKey: "vulnerabilities" })}
+                        >
+                          <PackageVulnerabilities
+                            pkg={pkg}
+                            isFetching={packageIsFetching}
+                            fetchError={packageFetchError}
+                          />
                         </Td>
                       </TableRowContentWithControls>
                     </Tr>
