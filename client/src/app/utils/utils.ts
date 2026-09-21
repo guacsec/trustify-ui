@@ -14,17 +14,37 @@ export const getAxiosErrorMessage = (axiosError: AxiosError<any>) => {
 
   const error = typeof data?.error === "string" ? data.error : undefined;
   const message = typeof data?.message === "string" ? data.message : undefined;
-  const details = typeof data?.details === "string" ? data.details : undefined;
+
+  // Prefer an inline details string; fall back to extracting finding messages
+  // from validation reports (e.g. ValidationRejected responses).
+  let details: string | undefined;
+  if (typeof data?.details === "string") {
+    details = data.details;
+  } else if (Array.isArray(data?.validation)) {
+    const msgs: string[] = [];
+    for (const report of data.validation) {
+      if (Array.isArray(report?.findings)) {
+        for (const f of report.findings) {
+          if (typeof f?.message === "string") {
+            msgs.push(f.message);
+          }
+        }
+      }
+    }
+    if (msgs.length > 0) {
+      details = msgs.join("\n");
+    }
+  }
 
   if (error && message) {
     const base = `${error}: ${message}`;
     return details ? `${base}\n${details}` : base;
   }
   if (message) {
-    return message;
+    return details ? `${message}\n${details}` : message;
   }
   if (error) {
-    return error;
+    return details ? `${error}\n${details}` : error;
   }
 
   if (typeof data === "string") {
@@ -114,6 +134,22 @@ export const decomposePurl = (purl: string) => {
   } catch (error) {
     console.error(error);
     return undefined;
+  }
+};
+
+/** Compare two PURLs by type, namespace, name, and version, ignoring qualifiers. */
+export const purlBaseEquals = (a: string, b: string): boolean => {
+  try {
+    const pa = PackageURL.fromString(a);
+    const pb = PackageURL.fromString(b);
+    return (
+      pa.type === pb.type &&
+      pa.namespace === pb.namespace &&
+      pa.name === pb.name &&
+      pa.version === pb.version
+    );
+  } catch {
+    return a === b;
   }
 };
 

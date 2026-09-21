@@ -4,6 +4,7 @@ import { Flex, FlexItem, Icon, Tooltip } from "@patternfly/react-core";
 
 import CheckCircleIcon from "@patternfly/react-icons/dist/esm/icons/check-circle-icon";
 import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
+import ExclamationTriangleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-triangle-icon";
 import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
 import PendingIcon from "@patternfly/react-icons/dist/esm/icons/pending-icon";
 import TimesCircleIcon from "@patternfly/react-icons/dist/esm/icons/times-circle-icon";
@@ -12,20 +13,19 @@ import UnknownIcon from "@patternfly/react-icons/dist/esm/icons/unknown-icon";
 export type IconedStatusPreset =
   | "Canceled"
   | "Completed"
+  | "Compliant"
   | "Error"
   | "Failed"
   | "InProgress"
+  | "NonCompliant"
   | "NotStarted"
   | "Ok"
   | "Scheduled"
-  | "Unknown";
+  | "Unknown"
+  | "Warning";
 
 export type IconedStatusStatusType =
-  | "custom"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+  "custom" | "info" | "success" | "warning" | "danger";
 
 type IconedStatusPresetType = {
   [key in IconedStatusPreset]: Omit<IIconedStatusProps, "preset">;
@@ -52,6 +52,11 @@ const presets: IconedStatusPresetType = {
     status: "success",
     label: "Completed",
   },
+  Compliant: {
+    icon: <CheckCircleIcon />,
+    status: "success",
+    label: "Compliant",
+  },
   Error: {
     icon: <ExclamationCircleIcon />,
     status: "danger",
@@ -66,6 +71,11 @@ const presets: IconedStatusPresetType = {
     icon: <InProgressIcon />,
     status: "info",
     label: "In-progress",
+  },
+  NonCompliant: {
+    icon: <ExclamationCircleIcon />,
+    status: "danger",
+    label: "Non-compliant",
   },
   NotStarted: {
     icon: <TimesCircleIcon />,
@@ -82,6 +92,11 @@ const presets: IconedStatusPresetType = {
   },
   Unknown: {
     icon: <UnknownIcon />,
+  },
+  Warning: {
+    icon: <ExclamationTriangleIcon />,
+    status: "warning",
+    label: "Warning",
   },
 };
 

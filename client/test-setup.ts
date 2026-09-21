@@ -7,10 +7,6 @@ import { expect } from "vitest";
 import * as matchers from "@testing-library/jest-dom/matchers";
 
 declare global {
-  interface Window {
-    matchMedia: (query: string) => MediaQueryList;
-  }
-
   interface Global {
     matchMedia?: Window["matchMedia"];
   }

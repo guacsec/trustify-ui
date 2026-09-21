@@ -163,4 +163,33 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
       return { fileUploader };
     },
   });
+
+  testUploadApiErrorMessage(
+    "displays validation finding messages for ValidationRejected SBOM",
+    {
+      filePath: TEST_FILES.INVALID_JSON,
+      apiRoutePattern: "**/api/v3/sbom",
+      httpStatus: 422,
+      errorResponseBody: {
+        error: "ValidationRejected",
+        message: "document rejected by validation",
+        validation: [
+          {
+            validator: "scheck",
+            findings: [
+              { severity: "fatal", message: "missing field 'SPDXID'" },
+            ],
+            outcome: "failed",
+          },
+        ],
+      },
+      expectedErrorMessage:
+        "ValidationRejected: document rejected by validation\nmissing field 'SPDXID'",
+      getConfig: async ({ page }) => {
+        const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
+        const fileUploader = await uploadPage.getFileUploader();
+        return { fileUploader };
+      },
+    },
+  );
 });

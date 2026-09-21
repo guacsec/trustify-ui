@@ -88,10 +88,7 @@ export const isPersistenceProvider = (
  * - "sessionStorage" - Browser sessionStorage API. Persists on page/history navigation/reload. Resets when the tab/window is closed.
  */
 export type PersistTarget =
-  | "state"
-  | "urlParams"
-  | "localStorage"
-  | "sessionStorage";
+  "state" | "urlParams" | "localStorage" | "sessionStorage";
 
 /**
  * Common persistence-specific args

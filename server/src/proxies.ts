@@ -1,7 +1,7 @@
 import type http from "node:http";
 import type { Options } from "http-proxy-middleware";
 
-import * as cookie from "cookie";
+import { parseCookie } from "cookie";
 import { TRUSTIFICATION_ENV } from "@trustify-ui/common";
 
 const logger =
@@ -48,7 +48,7 @@ export const proxyMap: Record<string, Options> = {
         req: http.IncomingMessage,
         _res: http.ServerResponse,
       ) => {
-        const cookies = cookie.parse(req.headers.cookie ?? "");
+        const cookies = parseCookie(req.headers.cookie ?? "");
         const bearerToken = cookies.keycloak_cookie;
         if (bearerToken && !req.headers.authorization) {
           proxyReq.setHeader("Authorization", `Bearer ${bearerToken}`);

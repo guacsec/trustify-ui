@@ -130,6 +130,111 @@ describe("utils", () => {
     expect(getAxiosErrorMessage(error)).toBe("SomeError: Something happened");
   });
 
+  it("getAxiosErrorMessage: appends finding messages from validation reports", () => {
+    const error = createAxiosError({
+      response: {
+        data: {
+          error: "ValidationRejected",
+          message: "document rejected by validation",
+          validation: [
+            {
+              validator: "scheck",
+              findings: [
+                { severity: "fatal", message: "missing field 'SPDXID'" },
+                { severity: "error", message: "invalid package version" },
+              ],
+              outcome: "failed",
+            },
+          ],
+        },
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: {},
+        config: {} as never,
+      },
+    });
+    expect(getAxiosErrorMessage(error)).toBe(
+      "ValidationRejected: document rejected by validation\nmissing field 'SPDXID'\ninvalid package version",
+    );
+  });
+
+  it("getAxiosErrorMessage: collects findings from multiple validation reports", () => {
+    const error = createAxiosError({
+      response: {
+        data: {
+          error: "ValidationRejected",
+          message: "document rejected by validation",
+          validation: [
+            {
+              validator: "first",
+              findings: [{ severity: "fatal", message: "finding A" }],
+              outcome: "failed",
+            },
+            {
+              validator: "second",
+              findings: [{ severity: "error", message: "finding B" }],
+              outcome: "failed",
+            },
+          ],
+        },
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: {},
+        config: {} as never,
+      },
+    });
+    expect(getAxiosErrorMessage(error)).toBe(
+      "ValidationRejected: document rejected by validation\nfinding A\nfinding B",
+    );
+  });
+
+  it("getAxiosErrorMessage: ignores validation array when findings are empty", () => {
+    const error = createAxiosError({
+      response: {
+        data: {
+          error: "ValidationRejected",
+          message: "document rejected by validation",
+          validation: [
+            { validator: "scheck", findings: [], outcome: "failed" },
+          ],
+        },
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: {},
+        config: {} as never,
+      },
+    });
+    expect(getAxiosErrorMessage(error)).toBe(
+      "ValidationRejected: document rejected by validation",
+    );
+  });
+
+  it("getAxiosErrorMessage: prefers details string over validation findings", () => {
+    const error = createAxiosError({
+      response: {
+        data: {
+          error: "SomeError",
+          message: "something went wrong",
+          details: "inline detail",
+          validation: [
+            {
+              validator: "scheck",
+              findings: [{ severity: "fatal", message: "should be ignored" }],
+              outcome: "failed",
+            },
+          ],
+        },
+        status: 400,
+        statusText: "Bad Request",
+        headers: {},
+        config: {} as never,
+      },
+    });
+    expect(getAxiosErrorMessage(error)).toBe(
+      "SomeError: something went wrong\ninline detail",
+    );
+  });
+
   // decodePurl
 
   it("decodePurl: decodes percent-encoded qualifiers", () => {

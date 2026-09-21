@@ -173,8 +173,7 @@ export const FilterToolbar = <TItem, TFilterCategoryKey extends string>({
   const [currentFilterCategoryKey, setCurrentFilterCategoryKey] =
     React.useState(
       filteredFilterCategories[0]?.categoryKey as
-        | TFilterCategoryKey
-        | undefined,
+        TFilterCategoryKey | undefined,
     );
 
   const onCategorySelect = (
