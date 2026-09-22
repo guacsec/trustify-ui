@@ -96,8 +96,17 @@ describe("RemediationReport", () => {
     // Given a loaded report with 1 addressable SBOM and 2 addressable packages
     renderReport();
 
-    // Then the impact summary shows the SBOM and package counts
-    expect(screen.getByText("1 / 1")).toBeInTheDocument();
+    // Then the impact summary shows the SBOM and package counts.
+    // After the redesign the fraction is split across two child elements
+    // (.rr-report__stat-value + .rr-report__stat-suffix), so we match the
+    // container's full text content with whitespace stripped.
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.className === "rr-report__stat-value" &&
+          (element.textContent ?? "").replace(/\s/g, "") === "1/1",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText(/1 of 1 SBOMs/i)).toBeInTheDocument();
     expect(screen.getByText(/2 related packages/i)).toBeInTheDocument();
   });

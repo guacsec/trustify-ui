@@ -19,8 +19,11 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
-  Flex,
-  FlexItem,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateVariant,
   Label,
   LabelGroup,
   Modal,
@@ -29,9 +32,9 @@ import {
   ModalHeader,
   PageSection,
   Progress,
+  ProgressMeasureLocation,
+  ProgressSize,
   Spinner,
-  Stack,
-  StackItem,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -58,6 +61,7 @@ import type { RecommendReportPackage } from "@app/client";
 
 import { downloadCsv } from "./csv-export";
 import { extractName, extractVersion } from "./purl-utils";
+import "./remediation-report.css";
 
 /** View model for a package row in the packages-with-remediations table. */
 interface PackageRow {
@@ -207,17 +211,6 @@ export const RemediationReport: React.FC = () => {
     setHasDownloaded(true);
   };
 
-  if (sbomIds.length === 0) {
-    return (
-      <PageSection>
-        <Alert variant="warning" title="No SBOMs selected">
-          Go back to the SBOMs page and select one or more SBOMs to generate a
-          report.
-        </Alert>
-      </PageSection>
-    );
-  }
-
   const addressableSboms = (report?.sboms ?? []).filter(
     (s) => s.addressable_packages > 0,
   );
@@ -225,290 +218,333 @@ export const RemediationReport: React.FC = () => {
 
   return (
     <>
-      <PageSection>
+      {/* Breadcrumb section */}
+      <PageSection type="breadcrumb">
         <Breadcrumb>
           <BreadcrumbItem>
             <Link to={Paths.sboms}>SBOMs</Link>
           </BreadcrumbItem>
           <BreadcrumbItem isActive>Remediation report</BreadcrumbItem>
         </Breadcrumb>
+      </PageSection>
 
-        <Toolbar>
-          <ToolbarContent>
-            <ToolbarItem>
+      {/* Header section */}
+      <PageSection>
+        <div className="rr-report__header">
+          <div className="rr-report__header-text">
+            <Content>
               <Content component="h1">Remediation report</Content>
               <Content component="p">
                 Impact summary for your selected SBOMs. Download a copy if you
                 want to keep it.
               </Content>
-            </ToolbarItem>
-            <ToolbarItem align={{ default: "alignEnd" }}>
-              <Button
-                variant="primary"
-                isDisabled={!report || packageRows.length === 0}
-                onClick={handleDownload}
-                icon={<DownloadIcon />}
-              >
-                Download CSV
-              </Button>
-            </ToolbarItem>
-          </ToolbarContent>
-        </Toolbar>
+            </Content>
+          </div>
+          {report ? (
+            <Button
+              variant="primary"
+              isDisabled={packageRows.length === 0}
+              onClick={handleDownload}
+              icon={<DownloadIcon />}
+            >
+              Download CSV
+            </Button>
+          ) : null}
+        </div>
       </PageSection>
 
+      {/* Content section */}
       <PageSection>
-        <Stack hasGutter>
-          {isFetching && (
-            <StackItem>
-              <Flex justifyContent={{ default: "justifyContentCenter" }}>
-                <FlexItem>
-                  <Spinner size="lg" />
-                </FlexItem>
-                <FlexItem>
-                  <Content component="p">Generating report…</Content>
-                </FlexItem>
-              </Flex>
-            </StackItem>
-          )}
-
-          {isLimitExceeded && (
-            <StackItem>
-              <Alert variant="danger" title="Package limit exceeded" isInline>
-                The selected SBOMs contain too many packages to process at once.
-                Select fewer SBOMs and try again.
-              </Alert>
-            </StackItem>
-          )}
-
-          {fetchError && !isLimitExceeded && (
-            <StackItem>
-              <Alert variant="danger" title="Error generating report" isInline>
-                {fetchError.message}
-              </Alert>
-            </StackItem>
-          )}
-
-          {report && (
-            <>
-              <StackItem>
-                <Alert
-                  variant="info"
-                  title={`${REMEDIATION_VENDOR_LABEL} remediations available`}
-                  isInline
+        {/* No SBOMs selected */}
+        {sbomIds.length === 0 ? (
+          <EmptyState
+            headingLevel="h4"
+            titleText="No SBOMs selected"
+            variant={EmptyStateVariant.sm}
+          >
+            <EmptyStateBody>
+              Go back to the SBOMs page and select one or more SBOMs to generate
+              a report.
+            </EmptyStateBody>
+            <EmptyStateFooter>
+              <EmptyStateActions>
+                <Button
+                  variant="primary"
+                  component={(props) => <Link {...props} to={Paths.sboms} />}
                 >
-                  Based on the selected SBOMs, {REMEDIATION_VENDOR_LABEL} can
-                  address {addressableSboms.length} of {sbomIds.length} SBOMs
-                  and {impact?.addressable_packages ?? 0} related packages.
-                </Alert>
-              </StackItem>
+                  Go to SBOMs
+                </Button>
+              </EmptyStateActions>
+            </EmptyStateFooter>
+          </EmptyState>
+        ) : isFetching ? (
+          /* Loading */
+          <EmptyState
+            titleText="Generating remediation report"
+            headingLevel="h4"
+            icon={Spinner}
+          >
+            <EmptyStateBody>
+              Analyzing {sbomIds.length} selected SBOM
+              {sbomIds.length === 1 ? "" : "s"} for remediations.
+            </EmptyStateBody>
+          </EmptyState>
+        ) : isLimitExceeded ? (
+          /* 413 error */
+          <Alert variant="danger" title="Package limit exceeded" isInline>
+            The selected SBOMs contain too many packages to process at once.
+            Select fewer SBOMs and try again.
+          </Alert>
+        ) : fetchError ? (
+          /* Generic error */
+          <Alert variant="danger" title="Error generating report" isInline>
+            {fetchError.message}
+          </Alert>
+        ) : report ? (
+          /* Report content */
+          <div className="rr-report">
+            <Alert
+              variant="custom"
+              title={`${REMEDIATION_VENDOR_LABEL} remediations available`}
+              isInline
+            >
+              Based on the selected SBOMs, {REMEDIATION_VENDOR_LABEL} can
+              address {addressableSboms.length} of {sbomIds.length} SBOMs and{" "}
+              {impact?.addressable_packages ?? 0} related package
+              {(impact?.addressable_packages ?? 0) === 1 ? "" : "s"}.
+            </Alert>
 
-              <StackItem>
-                <Card>
-                  <CardTitle>Impact summary</CardTitle>
-                  <CardBody>
-                    <Flex>
-                      <FlexItem>
-                        <DescriptionList isHorizontal>
-                          <DescriptionListGroup>
-                            <DescriptionListTerm>
-                              SBOMs with remediations
-                            </DescriptionListTerm>
-                            <DescriptionListDescription>
-                              <Content component="h2">
-                                {impact?.sboms_with_recommendations ?? 0} /{" "}
-                                {sbomIds.length}
-                              </Content>
-                              <Content component="small">
-                                You selected {sbomIds.length} SBOMs
-                              </Content>
-                            </DescriptionListDescription>
-                          </DescriptionListGroup>
-                        </DescriptionList>
-                      </FlexItem>
-                      <FlexItem>
-                        <DescriptionList isHorizontal>
-                          <DescriptionListGroup>
-                            <DescriptionListTerm>
-                              Addressable packages
-                            </DescriptionListTerm>
-                            <DescriptionListDescription>
-                              <Content component="h2">
-                                {impact?.addressable_packages ?? 0}
-                              </Content>
-                            </DescriptionListDescription>
-                          </DescriptionListGroup>
-                        </DescriptionList>
-                      </FlexItem>
-                      <FlexItem flex={{ default: "flex_1" }}>
-                        <DescriptionList isHorizontal>
-                          <DescriptionListGroup>
-                            <DescriptionListTerm>Coverage</DescriptionListTerm>
-                            <DescriptionListDescription>
-                              <Progress
-                                value={
-                                  sbomIds.length > 0
-                                    ? Math.round(
-                                        (addressableSboms.length /
-                                          sbomIds.length) *
-                                          100,
-                                      )
-                                    : 0
-                                }
-                                title="SBOMs with remediations"
-                                aria-label="SBOMs coverage"
-                              />
-                            </DescriptionListDescription>
-                          </DescriptionListGroup>
-                        </DescriptionList>
-                      </FlexItem>
-                    </Flex>
-                  </CardBody>
-                </Card>
-              </StackItem>
+            {/* Impact summary card */}
+            <Card>
+              <CardTitle>
+                <span className="rr-report__card-title">Impact summary</span>
+              </CardTitle>
+              <CardBody>
+                <div className="rr-report__impact-grid">
+                  <div className="rr-report__stat">
+                    <div className="rr-report__stat-label">
+                      SBOMs with remediations
+                    </div>
+                    <div className="rr-report__stat-value">
+                      {impact?.sboms_with_recommendations ?? 0}
+                      <span className="rr-report__stat-suffix">
+                        / {sbomIds.length}
+                      </span>
+                    </div>
+                    <div className="rr-report__stat-help">
+                      You selected {sbomIds.length} SBOM
+                      {sbomIds.length === 1 ? "" : "s"}
+                    </div>
+                  </div>
+                  <div className="rr-report__stat">
+                    <div className="rr-report__stat-label">
+                      Addressable packages
+                    </div>
+                    <div className="rr-report__stat-value">
+                      {impact?.addressable_packages ?? 0}
+                    </div>
+                    <div className="rr-report__stat-help">
+                      Unique packages across selected SBOMs
+                    </div>
+                  </div>
+                </div>
 
-              <StackItem>
-                <Card>
-                  <CardTitle>SBOMs with remediations</CardTitle>
-                  <CardBody>
-                    <Table aria-label="SBOMs with remediations">
-                      <Thead>
-                        <Tr>
-                          <Th>SBOM</Th>
-                          <Th>Addressable packages</Th>
-                          <Th>Vulnerabilities</Th>
+                <div className="rr-report__progress">
+                  <Progress
+                    value={
+                      sbomIds.length > 0
+                        ? Math.round(
+                            (addressableSboms.length / sbomIds.length) * 100,
+                          )
+                        : 0
+                    }
+                    title="SBOM coverage"
+                    measureLocation={ProgressMeasureLocation.outside}
+                    size={ProgressSize.md}
+                    aria-label="Percent of selected SBOMs with remediations"
+                  />
+                </div>
+
+                <DescriptionList
+                  isHorizontal
+                  isCompact
+                  horizontalTermWidthModifier={{ default: "20ch" }}
+                >
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>Selected SBOMs</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {sbomIds.length}
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>Addressable SBOMs</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {impact?.sboms_with_recommendations ?? 0}
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>
+                      Addressable packages
+                    </DescriptionListTerm>
+                    <DescriptionListDescription>
+                      {impact?.addressable_packages ?? 0}
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                </DescriptionList>
+              </CardBody>
+            </Card>
+
+            {/* SBOMs with remediations card */}
+            <Card>
+              <CardTitle>
+                <span className="rr-report__card-title">
+                  SBOMs with remediations
+                </span>
+              </CardTitle>
+              <CardBody>
+                {addressableSboms.length === 0 ? (
+                  <Content component="p" className="rr-report__empty">
+                    None of the selected SBOMs have remediations available.
+                  </Content>
+                ) : (
+                  <Table aria-label="SBOMs with remediations" variant="compact">
+                    <Thead>
+                      <Tr>
+                        <Th width={40}>SBOM</Th>
+                        <Th width={30}>Addressable packages</Th>
+                        <Th width={30}>Vulnerabilities</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {addressableSboms.map((sbom) => (
+                        <Tr key={sbom.id}>
+                          <Td dataLabel="SBOM">{sbom.name}</Td>
+                          <Td dataLabel="Addressable packages">
+                            {sbom.addressable_packages}
+                          </Td>
+                          <Td dataLabel="Vulnerabilities">
+                            {sbom.vulnerability_count}
+                          </Td>
                         </Tr>
-                      </Thead>
-                      <Tbody>
-                        {(report.sboms ?? [])
-                          .filter((s) => s.addressable_packages > 0)
-                          .map((sbom) => (
-                            <Tr key={sbom.id}>
-                              <Td>{sbom.name}</Td>
-                              <Td>{sbom.addressable_packages}</Td>
-                              <Td>{sbom.vulnerability_count}</Td>
-                            </Tr>
-                          ))}
-                      </Tbody>
-                    </Table>
-                  </CardBody>
-                </Card>
-              </StackItem>
+                      ))}
+                    </Tbody>
+                  </Table>
+                )}
+              </CardBody>
+            </Card>
 
-              <StackItem>
-                <Card>
-                  <CardTitle>Packages with remediations</CardTitle>
-                  <CardBody>
-                    <Toolbar {...pkgToolbarProps} aria-label="packages-toolbar">
-                      <ToolbarContent>
-                        <FilterToolbar {...pkgFilterToolbarProps} />
-                        <ToolbarItem {...pkgPaginationToolbarItemProps}>
-                          <SimplePagination
-                            idPrefix="remediation-packages"
-                            isTop
-                            paginationProps={pkgPaginationProps}
-                          />
-                        </ToolbarItem>
-                      </ToolbarContent>
-                    </Toolbar>
-                    <Table
-                      {...pkgTableProps}
-                      aria-label="Packages with remediations"
-                    >
-                      <Thead>
-                        <Tr>
-                          <TableHeaderContentWithControls {...tableControls}>
-                            <Th {...getThProps({ columnKey: "packageName" })} />
-                            <Th {...getThProps({ columnKey: "version" })} />
-                            <Th
-                              {...getThProps({
+            {/* Packages with remediations card */}
+            <Card>
+              <CardTitle>
+                <span className="rr-report__card-title">
+                  Packages with remediations
+                </span>
+              </CardTitle>
+              <CardBody>
+                <Toolbar {...pkgToolbarProps} aria-label="packages-toolbar">
+                  <ToolbarContent>
+                    <FilterToolbar {...pkgFilterToolbarProps} />
+                    <ToolbarItem {...pkgPaginationToolbarItemProps}>
+                      <SimplePagination
+                        idPrefix="remediation-packages"
+                        isTop
+                        paginationProps={pkgPaginationProps}
+                      />
+                    </ToolbarItem>
+                  </ToolbarContent>
+                </Toolbar>
+                <Table
+                  {...pkgTableProps}
+                  aria-label="Packages with remediations"
+                  variant="compact"
+                >
+                  <Thead>
+                    <Tr>
+                      <TableHeaderContentWithControls {...tableControls}>
+                        <Th {...getThProps({ columnKey: "packageName" })} />
+                        <Th {...getThProps({ columnKey: "version" })} />
+                        <Th
+                          {...getThProps({ columnKey: "recommendedVersion" })}
+                        />
+                        <Th {...getThProps({ columnKey: "vulnerabilities" })} />
+                        <Th {...getThProps({ columnKey: "foundInNames" })} />
+                      </TableHeaderContentWithControls>
+                    </Tr>
+                  </Thead>
+                  <ConditionalTableBody
+                    isLoading={false}
+                    isError={false}
+                    isNoData={packageRows.length === 0}
+                    numRenderedColumns={numRenderedColumns}
+                  >
+                    {currentPageItems?.map((item, rowIndex) => (
+                      <Tbody key={item._ui_unique_id}>
+                        <Tr {...getTrProps({ item })}>
+                          <TableRowContentWithControls
+                            {...tableControls}
+                            item={item}
+                            rowIndex={rowIndex}
+                          >
+                            <Td {...getTdProps({ columnKey: "packageName" })}>
+                              {item.packageName}
+                            </Td>
+                            <Td {...getTdProps({ columnKey: "version" })}>
+                              {item.version}
+                            </Td>
+                            <Td
+                              {...getTdProps({
                                 columnKey: "recommendedVersion",
                               })}
-                            />
-                            <Th
-                              {...getThProps({ columnKey: "vulnerabilities" })}
-                            />
-                            <Th
-                              {...getThProps({ columnKey: "foundInNames" })}
-                            />
-                          </TableHeaderContentWithControls>
+                            >
+                              <Tooltip content={item.recommendedPurl}>
+                                <Label color="green" isCompact>
+                                  {item.recommendedVersion}
+                                </Label>
+                              </Tooltip>
+                            </Td>
+                            <Td
+                              {...getTdProps({ columnKey: "vulnerabilities" })}
+                            >
+                              <LabelGroup>
+                                {item.vulnerabilities.map((cve) => (
+                                  <Label key={cve} isCompact color="orange">
+                                    {cve}
+                                  </Label>
+                                ))}
+                              </LabelGroup>
+                            </Td>
+                            <Td {...getTdProps({ columnKey: "foundInNames" })}>
+                              <div className="rr-report__app-labels">
+                                {item.foundInNames.map((name) => (
+                                  <Label
+                                    key={name}
+                                    isCompact
+                                    color="grey"
+                                    variant="outline"
+                                  >
+                                    {name}
+                                  </Label>
+                                ))}
+                              </div>
+                            </Td>
+                          </TableRowContentWithControls>
                         </Tr>
-                      </Thead>
-                      <ConditionalTableBody
-                        isLoading={isFetching}
-                        isError={!!fetchError && !isLimitExceeded}
-                        isNoData={packageRows.length === 0}
-                        numRenderedColumns={numRenderedColumns}
-                      >
-                        {currentPageItems?.map((item, rowIndex) => (
-                          <Tbody key={item._ui_unique_id}>
-                            <Tr {...getTrProps({ item })}>
-                              <TableRowContentWithControls
-                                {...tableControls}
-                                item={item}
-                                rowIndex={rowIndex}
-                              >
-                                <Td
-                                  {...getTdProps({ columnKey: "packageName" })}
-                                >
-                                  {item.packageName}
-                                </Td>
-                                <Td {...getTdProps({ columnKey: "version" })}>
-                                  {item.version}
-                                </Td>
-                                <Td
-                                  {...getTdProps({
-                                    columnKey: "recommendedVersion",
-                                  })}
-                                >
-                                  <Tooltip content={item.recommendedPurl}>
-                                    <Label color="green" isCompact>
-                                      {item.recommendedVersion}
-                                    </Label>
-                                  </Tooltip>
-                                </Td>
-                                <Td
-                                  {...getTdProps({
-                                    columnKey: "vulnerabilities",
-                                  })}
-                                >
-                                  <LabelGroup>
-                                    {item.vulnerabilities.map((cve) => (
-                                      <Label key={cve} isCompact color="orange">
-                                        {cve}
-                                      </Label>
-                                    ))}
-                                  </LabelGroup>
-                                </Td>
-                                <Td
-                                  {...getTdProps({ columnKey: "foundInNames" })}
-                                >
-                                  <LabelGroup>
-                                    {item.foundInNames.map((name) => (
-                                      <Label key={name} isCompact color="grey">
-                                        {name}
-                                      </Label>
-                                    ))}
-                                  </LabelGroup>
-                                </Td>
-                              </TableRowContentWithControls>
-                            </Tr>
-                          </Tbody>
-                        ))}
-                      </ConditionalTableBody>
-                    </Table>
-                    <SimplePagination
-                      idPrefix="remediation-packages"
-                      isTop={false}
-                      paginationProps={pkgPaginationProps}
-                    />
-                  </CardBody>
-                </Card>
-              </StackItem>
-            </>
-          )}
-        </Stack>
+                      </Tbody>
+                    ))}
+                  </ConditionalTableBody>
+                </Table>
+                <SimplePagination
+                  idPrefix="remediation-packages"
+                  isTop={false}
+                  paginationProps={pkgPaginationProps}
+                />
+              </CardBody>
+            </Card>
+          </div>
+        ) : null}
       </PageSection>
 
+      {/* Leave-page modal — unchanged */}
       <Modal
         variant="small"
         isOpen={blocker.state === "blocked"}
