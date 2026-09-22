@@ -1,0 +1,1 @@
+import{In as e,a as t}from"./useBranding-C4SzDsst.js";import{t as n,w as r}from"./apiInit-CHEvDESO.js";var i=`licenses`,a=(a={},o=!1)=>{let{data:s,isLoading:c,error:l,refetch:u}=e({queryKey:[i,a],queryFn:()=>r({client:n,query:{...t(a)}}),enabled:!o});return{result:{data:s?.data?.items||[],total:s?.data?.total??0,params:a},isFetching:c,fetchError:l,refetch:u}};export{a as t};
