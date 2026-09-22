@@ -35,6 +35,7 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
@@ -61,6 +62,7 @@ import { extractName, extractVersion } from "./purl-utils";
 /** View model for a package row in the packages-with-remediations table. */
 interface PackageRow {
   purl: string;
+  recommendedPurl: string;
   packageName: string;
   version: string;
   recommendedVersion: string;
@@ -77,6 +79,7 @@ const toPackageRows = (
     .filter((pkg) => pkg.purl !== pkg.recommended_purl)
     .map((pkg) => ({
       purl: pkg.purl,
+      recommendedPurl: pkg.recommended_purl,
       packageName: extractName(pkg.purl),
       version: extractVersion(pkg.purl),
       recommendedVersion: extractVersion(pkg.recommended_purl),
@@ -451,7 +454,11 @@ export const RemediationReport: React.FC = () => {
                                     columnKey: "recommendedVersion",
                                   })}
                                 >
-                                  {item.recommendedVersion}
+                                  <Tooltip content={item.recommendedPurl}>
+                                    <Label color="green" isCompact>
+                                      {item.recommendedVersion}
+                                    </Label>
+                                  </Tooltip>
                                 </Td>
                                 <Td
                                   {...getTdProps({
