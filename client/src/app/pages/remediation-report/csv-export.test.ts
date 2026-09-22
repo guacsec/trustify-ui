@@ -66,6 +66,21 @@ describe("downloadCsv", () => {
     expect(dataLine).toContain("CVE-2021-44228; CVE-2022-0001");
   });
 
+  it("wraps fields containing double quotes per RFC 4180", async () => {
+    mockedSaveAs.mockClear();
+
+    // Package name contains a double-quote — e.g. a display name with inch symbol
+    const sbomNameById = new Map([["sbom-id-1", 'sbom "primary"']]);
+    const packages = [makePackage()];
+
+    downloadCsv(packages, sbomNameById);
+
+    const [blob] = mockedSaveAs.mock.calls[0] as [Blob, string];
+    const text = await blob.text();
+    // RFC 4180: field containing " must be enclosed in " and each " doubled
+    expect(text).toContain('"sbom ""primary"""');
+  });
+
   it("resolves unknown SBOM IDs to the raw ID when not in the name map", async () => {
     mockedSaveAs.mockClear();
 

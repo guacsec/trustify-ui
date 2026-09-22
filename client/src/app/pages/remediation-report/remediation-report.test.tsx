@@ -144,6 +144,33 @@ describe("RemediationReport", () => {
     expect(screen.getByText("commons-text")).toBeInTheDocument();
   });
 
+  it("hides packages where recommended_purl equals purl (no actionable upgrade)", () => {
+    // Given a report where one package has the same purl and recommended_purl
+    mockedUseFetchRemediationReport.mockReturnValue(
+      makeHookResult({
+        report: {
+          ...sampleReport,
+          packages: [
+            ...sampleReport.packages,
+            {
+              purl: "pkg:maven/org.example/unchanged@1.0.0",
+              recommended_purl: "pkg:maven/org.example/unchanged@1.0.0",
+              vulnerabilities: ["CVE-2099-0001"],
+              found_in: ["sbom-id-1"],
+              advisory_id: null,
+            },
+          ],
+        },
+      }),
+    );
+    renderReport();
+
+    // Then the no-upgrade package does not appear in the packages table
+    expect(screen.queryByText("unchanged")).not.toBeInTheDocument();
+    // And the packages with real upgrades still appear
+    expect(screen.getByText("log4j-core")).toBeInTheDocument();
+  });
+
   it("shows a limit-exceeded error when the server returns 413", () => {
     // Given the server rejected the request because too many purls were sent
     mockedUseFetchRemediationReport.mockReturnValue(
