@@ -109,7 +109,11 @@ export const RemediationReport: React.FC = () => {
   }, [report]);
 
   const sbomNames = React.useMemo(
-    () => (report?.sboms ?? []).map((s) => s.name).sort(),
+    () =>
+      (report?.sboms ?? [])
+        .filter((s) => s.addressable_packages > 0)
+        .map((s) => s.name)
+        .sort(),
     [report],
   );
 
@@ -375,13 +379,15 @@ export const RemediationReport: React.FC = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {(report.sboms ?? []).map((sbom) => (
-                          <Tr key={sbom.id}>
-                            <Td>{sbom.name}</Td>
-                            <Td>{sbom.addressable_packages}</Td>
-                            <Td>{sbom.vulnerability_count}</Td>
-                          </Tr>
-                        ))}
+                        {(report.sboms ?? [])
+                          .filter((s) => s.addressable_packages > 0)
+                          .map((sbom) => (
+                            <Tr key={sbom.id}>
+                              <Td>{sbom.name}</Td>
+                              <Td>{sbom.addressable_packages}</Td>
+                              <Td>{sbom.vulnerability_count}</Td>
+                            </Tr>
+                          ))}
                       </Tbody>
                     </Table>
                   </CardBody>
