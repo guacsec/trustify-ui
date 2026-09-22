@@ -123,7 +123,7 @@ export const RemediationReport: React.FC = () => {
     columnNames: {
       packageName: "Package",
       version: "Version",
-      recommendedVersion: "Remediation",
+      recommendedVersion: "Recommended version",
       vulnerabilities: "Vulnerabilities addressed",
       foundInNames: "Found in",
     },
@@ -446,7 +446,13 @@ export const RemediationReport: React.FC = () => {
                                     columnKey: "recommendedVersion",
                                   })}
                                 >
-                                  {item.recommendedVersion}
+                                  {item.recommendedVersion === item.version ? (
+                                    <Label color="blue" isCompact>
+                                      Applied
+                                    </Label>
+                                  ) : (
+                                    item.recommendedVersion
+                                  )}
                                 </Td>
                                 <Td
                                   {...getTdProps({
