@@ -10,6 +10,7 @@ import {
   Tr,
 } from "@patternfly/react-table";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
+import { Label, LabelGroup, Tooltip } from "@patternfly/react-core";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -19,7 +20,8 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
-import { decodePurl } from "@app/utils/utils";
+import { decodePurl, decomposePurl, purlBaseEquals } from "@app/utils/utils";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
 import { List, ListItem } from "@patternfly/react-core";
@@ -44,6 +46,12 @@ export const PackageTable: React.FC = () => {
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
 
+  const allPurls = React.useMemo(
+    () => [...currentPageItems.map((item) => item.purl)].sort(),
+    [currentPageItems],
+  );
+  const { recommendationsMap } = useFetchRecommendations(allPurls);
+
   return (
     <>
       <Table {...tableProps} aria-label="Package table">
@@ -55,6 +63,7 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
+              <Th {...getThProps({ columnKey: "remediation" })} />
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
@@ -68,6 +77,11 @@ export const PackageTable: React.FC = () => {
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
+            const rowRecs = recommendationsMap.get(item.purl) ?? [];
+            const isRemediationApplied = rowRecs.some((rec) =>
+              purlBaseEquals(rec.package, item.purl),
+            );
+
             return (
               <WithPackage key={item.uuid} packageId={item.uuid}>
                 {(pkg, packageIsFetching, packageFetchError) => (
@@ -129,6 +143,34 @@ export const PackageTable: React.FC = () => {
                             isFetching={packageIsFetching}
                             fetchError={packageFetchError}
                           />
+                        </Td>
+                        <Td
+                          width={15}
+                          {...getTdProps({ columnKey: "remediation" })}
+                        >
+                          {isRemediationApplied ? (
+                            <Label color="blue" isCompact>
+                              Applied
+                            </Label>
+                          ) : rowRecs.length > 0 ? (
+                            <LabelGroup>
+                              {rowRecs.map((rec) => {
+                                const version =
+                                  decomposePurl(rec.package)?.version ??
+                                  rec.package;
+                                return (
+                                  <Tooltip
+                                    key={rec.package}
+                                    content={rec.package}
+                                  >
+                                    <Label color="green" isCompact>
+                                      {version}
+                                    </Label>
+                                  </Tooltip>
+                                );
+                              })}
+                            </LabelGroup>
+                          ) : null}
                         </Td>
                         <Td
                           width={10}

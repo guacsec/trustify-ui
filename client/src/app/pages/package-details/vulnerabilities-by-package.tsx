@@ -3,7 +3,14 @@ import { generatePath, Link } from "react-router-dom";
 
 import dayjs from "dayjs";
 
-import { Toolbar, ToolbarContent, ToolbarItem } from "@patternfly/react-core";
+import {
+  Label,
+  LabelGroup,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
+  Tooltip,
+} from "@patternfly/react-core";
 import {
   Table,
   TableText,
@@ -25,9 +32,11 @@ import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
 import { useVulnerabilitiesOfPackageId } from "@app/hooks/domain-controls/useVulnerabilitiesOfPackage";
 import { useLocalTableControls } from "@app/hooks/table-controls";
+import { useFetchPackageById } from "@app/queries/packages";
+import { useFetchRecommendations } from "@app/queries/recommendations";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
-import { formatDate } from "@app/utils/utils";
+import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
 interface VulnerabilitiesByPackageProps {
   packageId: string;
@@ -36,11 +45,19 @@ interface VulnerabilitiesByPackageProps {
 export const VulnerabilitiesByPackage: React.FC<
   VulnerabilitiesByPackageProps
 > = ({ packageId }) => {
+  const { pkg } = useFetchPackageById(packageId);
+
   const {
     data: { vulnerabilities },
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
   } = useVulnerabilitiesOfPackageId(packageId);
+
+  const packagePurls = React.useMemo(
+    () => (pkg?.purl ? [pkg.purl] : []),
+    [pkg?.purl],
+  );
+  const { recommendationsMap } = useFetchRecommendations(packagePurls);
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
@@ -63,6 +80,7 @@ export const VulnerabilitiesByPackage: React.FC<
       description: "Description",
       severity: "CVSS",
       published: "Date published",
+      remediation: "Remediation",
     },
     hasActionsColumn: false,
     isSortEnabled: true,
@@ -119,6 +137,7 @@ export const VulnerabilitiesByPackage: React.FC<
               <Th {...getThProps({ columnKey: "description" })} />
               <Th {...getThProps({ columnKey: "severity" })} />
               <Th {...getThProps({ columnKey: "published" })} />
+              <Th {...getThProps({ columnKey: "remediation" })} />
             </TableHeaderContentWithControls>
           </Tr>
         </Thead>
@@ -129,6 +148,11 @@ export const VulnerabilitiesByPackage: React.FC<
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
+            const rowRecs = recommendationsMap.get(pkg?.purl ?? "") ?? [];
+            const isRemediationApplied = rowRecs.some((rec) =>
+              purlBaseEquals(rec.package, pkg?.purl ?? ""),
+            );
+
             return (
               <Tbody key={item._ui_unique_id} isExpanded={isCellExpanded(item)}>
                 <Tr {...getTrProps({ item })}>
@@ -189,6 +213,31 @@ export const VulnerabilitiesByPackage: React.FC<
                       {...getTdProps({ columnKey: "published" })}
                     >
                       {formatDate(item.vulnerability?.published)}
+                    </Td>
+                    <Td
+                      width={15}
+                      {...getTdProps({ columnKey: "remediation" })}
+                    >
+                      {isRemediationApplied ? (
+                        <Label color="blue" isCompact>
+                          Applied
+                        </Label>
+                      ) : rowRecs.length > 0 ? (
+                        <LabelGroup>
+                          {rowRecs.map((rec) => {
+                            const version =
+                              decomposePurl(rec.package)?.version ??
+                              rec.package;
+                            return (
+                              <Tooltip key={rec.package} content={rec.package}>
+                                <Label color="green" isCompact>
+                                  {version}
+                                </Label>
+                              </Tooltip>
+                            );
+                          })}
+                        </LabelGroup>
+                      ) : null}
                     </Td>
                   </TableRowContentWithControls>
                 </Tr>
