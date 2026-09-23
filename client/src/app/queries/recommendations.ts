@@ -9,8 +9,8 @@ import type { RecommendEntry } from "../client";
 export { type RecommendEntry };
 
 /**
- * Mirrors the RecommendReportPackage schema from trustify PR #2656.
- * Defined locally until the backend is backported to release/0.6.z.
+ * Local mirrors of RecommendReport* schemas from trustify PR #2656.
+ * Defined here until the backend and openapi spec are backported to release/0.6.z.
  */
 export type RecommendReportPackage = {
   advisory_id?: string | null;
@@ -18,6 +18,24 @@ export type RecommendReportPackage = {
   purl: string;
   recommended_purl: string;
   vulnerabilities: string[];
+};
+
+export type RecommendReportImpactSummary = {
+  addressable_packages: number;
+  sboms_with_recommendations: number;
+};
+
+export type RecommendReportSbom = {
+  addressable_packages: number;
+  id: string;
+  name: string;
+  vulnerability_count: number;
+};
+
+export type RecommendReportResponse = {
+  impact_summary: RecommendReportImpactSummary;
+  packages: RecommendReportPackage[];
+  sboms: RecommendReportSbom[];
 };
 
 export const RecommendationsQueryKey = "recommendations";
@@ -64,10 +82,13 @@ export const RemediationReportQueryKey = "remediation-report";
  * Returns a permanently-loading stub until the backend is backported (trustify PR #2656).
  */
 export const useFetchRemediationReport = (_sbomIds: string[]) => {
-  return {
-    report: null,
-    isFetching: false,
-    fetchError: null,
-    isLimitExceeded: false,
-  };
+  return useMemo(
+    () => ({
+      report: null as RecommendReportResponse | null,
+      isFetching: false,
+      fetchError: null as AxiosError | null,
+      isLimitExceeded: false,
+    }),
+    [],
+  );
 };

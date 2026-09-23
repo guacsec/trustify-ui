@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { RecommendReportPackage } from "@app/client";
+import type { RecommendReportPackage } from "@app/queries/recommendations";
 import { downloadCsv } from "./csv-export";
 
 const { mockedSaveAs } = vi.hoisted(() => ({ mockedSaveAs: vi.fn() }));

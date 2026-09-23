@@ -13,7 +13,7 @@ import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { RemediationReport } from "./remediation-report";
 import { downloadCsv } from "./csv-export";
 import { useFetchRemediationReport } from "@app/queries/recommendations";
-import type { RecommendReportResponse } from "@app/client";
+import type { RecommendReportResponse } from "@app/queries/recommendations";
 
 vi.mock("./csv-export");
 vi.mock("@app/queries/recommendations", async (importOriginal) => {
