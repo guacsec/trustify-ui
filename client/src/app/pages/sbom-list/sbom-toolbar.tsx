@@ -2,7 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  Button,
   DropdownItem,
+  Tooltip,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -20,6 +22,9 @@ import { Paths } from "@app/Routes";
 import { AddToGroupModal } from "./components/add-to-group-form";
 import { GroupFormModal } from "../sbom-groups/components/group-form";
 import { SbomSearchContext } from "./sbom-context";
+
+/** Maximum number of SBOMs that can be selected for a remediation report. The server enforces the actual purl limit via 413. */
+const MAX_REMEDIATION_REPORT_SBOMS = 10;
 
 interface SbomToolbarProps {
   showFilters?: boolean;
@@ -117,6 +122,28 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                     </DropdownItem>,
                   ]}
                 />
+              </ToolbarItem>
+              <ToolbarItem>
+                {selectedItems.length > MAX_REMEDIATION_REPORT_SBOMS ? (
+                  <Tooltip
+                    content={`Select at most ${MAX_REMEDIATION_REPORT_SBOMS} SBOMs to generate a remediation report.`}
+                  >
+                    <Button variant="secondary" isAriaDisabled>
+                      Generate remediation report
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    isDisabled={selectedItems.length === 0}
+                    onClick={() => {
+                      const ids = selectedItems.map((s) => s.id).join(",");
+                      navigate(`${Paths.remediationReport}?ids=${ids}`);
+                    }}
+                  >
+                    Generate remediation report
+                  </Button>
+                )}
               </ToolbarItem>
             </>
           )}
