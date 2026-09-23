@@ -1,6 +1,6 @@
 import { saveAs } from "file-saver";
 
-import type { RecommendReportPackage } from "@app/client";
+import type { RecommendReportPackage } from "@app/queries/recommendations";
 import { extractName, extractVersion } from "./purl-utils";
 
 const escapeField = (value: string): string => {

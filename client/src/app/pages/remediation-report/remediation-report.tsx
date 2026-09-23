@@ -56,8 +56,10 @@ import {
 import { useLocalTableControls } from "@app/hooks/table-controls";
 import { useWithUiId } from "@app/utils/query-utils";
 import { Paths } from "@app/Routes";
-import { useFetchRemediationReport } from "@app/queries/recommendations";
-import type { RecommendReportPackage } from "@app/client";
+import {
+  useFetchRemediationReport,
+  type RecommendReportPackage,
+} from "@app/queries/recommendations";
 
 import { downloadCsv } from "./csv-export";
 import { extractName, extractVersion } from "./purl-utils";
