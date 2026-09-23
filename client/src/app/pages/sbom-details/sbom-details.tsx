@@ -221,8 +221,9 @@ export const SbomDetails: React.FC = () => {
                   triggerRef={vulnerabilitiesTabPopoverRef}
                   bodyContent={
                     <div>
-                      Any found vulnerabilities related to this SBOM. Fixed
-                      vulnerabilities are not listed.
+                      Any found vulnerabilities related to this SBOM. Use the
+                      &quot;Show VEX resolutions&quot; toggle to reveal
+                      vulnerabilities that have been resolved by VEX data.
                     </div>
                   }
                 />
