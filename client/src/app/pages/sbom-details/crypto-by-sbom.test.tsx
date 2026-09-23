@@ -12,12 +12,9 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     asset_type: "algorithm",
     oid: null,
     properties: {
-      primitive: "block-cipher",
-      occurrences: 3,
-      detectionContext: "TLS handshake",
-      packages: 2,
+      algorithmProperties: { primitive: "block-cipher" },
     },
-    policy_status: "Compliant",
+    policy_status: "compliant",
   },
   {
     node_id: "alg-2",
@@ -25,12 +22,9 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     asset_type: "algorithm",
     oid: null,
     properties: {
-      primitive: "pke",
-      parameterSetIdentifier: "2048",
-      recommendation: "Replace with ML-KEM-768",
-      occurrences: 1,
+      algorithmProperties: { primitive: "pke", parameterSetIdentifier: "2048" },
     },
-    policy_status: "Warning",
+    policy_status: "warning",
   },
   {
     node_id: "alg-3",
@@ -38,9 +32,9 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     asset_type: "algorithm",
     oid: null,
     properties: {
-      primitive: "hash",
+      algorithmProperties: { primitive: "hash" },
     },
-    policy_status: "NonCompliant",
+    policy_status: "non_compliant",
   },
 ];
 
@@ -51,11 +45,9 @@ const mockKeys: CryptoAlgorithm[] = [
     asset_type: "related-crypto-material",
     oid: null,
     properties: {
-      type: "private-key",
-      occurrences: 2,
-      detectionContext: "certificate store",
+      relatedCryptoMaterialProperties: { type: "private-key" },
     },
-    policy_status: "Compliant",
+    policy_status: "compliant",
   },
 ];
 
@@ -149,7 +141,6 @@ describe("CryptoBySbom", () => {
     expect(screen.getByText("SHA-256")).toBeInTheDocument();
     expect(screen.getByText("Compliant")).toBeInTheDocument();
     expect(screen.getByText("Non-compliant")).toBeInTheDocument();
-    expect(screen.getByText("Replace with ML-KEM-768")).toBeInTheDocument();
   });
 
   it("renders parameter set subtitle when present", () => {
