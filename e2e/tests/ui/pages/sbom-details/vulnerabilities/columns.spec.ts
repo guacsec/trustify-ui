@@ -44,8 +44,6 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       idIndex,
     );
 
-    await page.waitForLoadState("networkidle");
-
     const expandedCell = await table.expandCell(
       "Affected dependencies",
       idIndex,
