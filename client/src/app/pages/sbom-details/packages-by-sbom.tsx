@@ -301,14 +301,24 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                             return (
                               <LabelGroup>
                                 {vendorVersions.map((v) => (
-                                  <Tooltip key={v} content={v}>
-                                    <Label color="green" isCompact>
+                                  <Tooltip
+                                    key={v}
+                                    content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                                  >
+                                    <Label
+                                      color="blue"
+                                      variant="outline"
+                                      isCompact
+                                    >
                                       {v}
                                     </Label>
                                   </Tooltip>
                                 ))}
                                 {nonVendorFixedVersions.map((v) => (
-                                  <Tooltip key={v} content={v}>
+                                  <Tooltip
+                                    key={v}
+                                    content="Version upgrade — move to this newer release to get the fix."
+                                  >
                                     <Label variant="outline" isCompact>
                                       {v}
                                     </Label>
@@ -325,8 +335,11 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                               decomposePurl(rec.package)?.version ??
                               rec.package;
                             return (
-                              <Tooltip key={rec.package} content={rec.package}>
-                                <Label color="green" isCompact>
+                              <Tooltip
+                                key={rec.package}
+                                content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                              >
+                                <Label color="blue" variant="outline" isCompact>
                                   {version}
                                 </Label>
                               </Tooltip>

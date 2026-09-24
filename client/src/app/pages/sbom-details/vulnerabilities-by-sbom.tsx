@@ -548,14 +548,24 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                               return (
                                 <LabelGroup>
                                   {vendorVersions.map((v) => (
-                                    <Tooltip key={v} content={v}>
-                                      <Label color="green" isCompact>
+                                    <Tooltip
+                                      key={v}
+                                      content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                                    >
+                                      <Label
+                                        color="blue"
+                                        variant="outline"
+                                        isCompact
+                                      >
                                         {v}
                                       </Label>
                                     </Tooltip>
                                   ))}
                                   {nonVendorFixedVersions.map((v) => (
-                                    <Tooltip key={v} content={v}>
+                                    <Tooltip
+                                      key={v}
+                                      content="Version upgrade — move to this newer release to get the fix."
+                                    >
                                       <Label variant="outline" isCompact>
                                         {v}
                                       </Label>
@@ -574,9 +584,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                               return (
                                 <Tooltip
                                   key={rec.package}
-                                  content={rec.package}
+                                  content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
                                 >
-                                  <Label color="green" isCompact>
+                                  <Label
+                                    color="blue"
+                                    variant="outline"
+                                    isCompact
+                                  >
                                     {version}
                                   </Label>
                                 </Tooltip>
