@@ -352,15 +352,17 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                     all.findIndex((r) => r.package === rec.package) === idx,
                 );
 
-              const firstNonOrphanPurlUuid = Array.from(
-                item.purls.values(),
-              ).find((p) => !p.isOrphan)?.purlSummary.uuid;
-
-              const recommendedVersionSet = new Set(
-                rowRecommendations.map(
-                  (rec) => decomposePurl(rec.package)?.version ?? rec.package,
-                ),
+              const firstNonOrphan = Array.from(item.purls.values()).find(
+                (p) => !p.isOrphan,
               );
+              const firstNonOrphanPurlUuid = firstNonOrphan?.purlSummary.uuid;
+              // Scope recommendations to the first non-orphan PURL so that
+              // vendor-vs-upgrade classification matches the fixed_versions
+              // fetched by WithPackage for that same PURL.
+              const firstPurlRecommendations = firstNonOrphan
+                ? (recommendationsMap.get(firstNonOrphan.purlSummary.purl) ??
+                  [])
+                : [];
 
               const hasVexResolution =
                 purlResolutions &&
@@ -530,14 +532,18 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                   }
                                 }
                               }
-                              const vendorVersions = rowRecommendations.map(
-                                (rec) =>
-                                  decomposePurl(rec.package)?.version ??
-                                  rec.package,
+                              const vendorVersions =
+                                firstPurlRecommendations.map(
+                                  (rec) =>
+                                    decomposePurl(rec.package)?.version ??
+                                    rec.package,
+                                );
+                              const firstPurlRecommendedSet = new Set(
+                                vendorVersions,
                               );
                               const nonVendorFixedVersions =
                                 fixedVersions.filter(
-                                  (v) => !recommendedVersionSet.has(v),
+                                  (v) => !firstPurlRecommendedSet.has(v),
                                 );
                               if (
                                 vendorVersions.length === 0 &&
