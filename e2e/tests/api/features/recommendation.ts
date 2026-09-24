@@ -1,6 +1,29 @@
+import axios from "axios";
+import { TRUSTIFY_API_URL } from "../../common/constants";
 import { expect, test } from "../fixtures";
 
 const recommendationsEndpoint = "/api/v3/purl/recommend";
+
+let serviceAvailable = true;
+
+test.beforeAll(async () => {
+  try {
+    await axios.post(`${TRUSTIFY_API_URL}${recommendationsEndpoint}`, {
+      purls: [],
+    });
+  } catch (err: unknown) {
+    if ((err as { response?: { status?: number } })?.response?.status === 503) {
+      serviceAvailable = false;
+    }
+  }
+});
+
+test.beforeEach(() => {
+  test.skip(
+    !serviceAvailable,
+    "Recommendation service unavailable (TRUSTD_RECOMMEND_PATTERNS not configured)",
+  );
+});
 
 test("Recommendations - Empty PURL list", async ({ axios }) => {
   const res = await axios.post(recommendationsEndpoint, { purls: [] });
