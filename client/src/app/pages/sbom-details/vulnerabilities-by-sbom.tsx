@@ -67,6 +67,8 @@ import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
+import { WithPackage } from "@app/components/WithPackage";
+
 import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
@@ -350,6 +352,10 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                     all.findIndex((r) => r.package === rec.package) === idx,
                 );
 
+              const firstNonOrphanPurlUuid = Array.from(
+                item.purls.values(),
+              ).find((p) => !p.isOrphan)?.purlSummary.uuid;
+
               const hasVexResolution =
                 purlResolutions &&
                 Array.from(item.purls.values()).some(
@@ -517,6 +523,44 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                               );
                             })}
                           </LabelGroup>
+                        ) : firstNonOrphanPurlUuid ? (
+                          <WithPackage packageId={firstNonOrphanPurlUuid}>
+                            {(pkg) => {
+                              const fixedVersions: string[] = [];
+                              for (const advisory of pkg?.advisories ?? []) {
+                                for (const pkgStatus of advisory.status ?? []) {
+                                  const versions = (
+                                    pkgStatus as unknown as {
+                                      fixed_versions?: string[];
+                                    }
+                                  ).fixed_versions;
+                                  if (versions) {
+                                    for (const v of versions) {
+                                      if (!fixedVersions.includes(v))
+                                        fixedVersions.push(v);
+                                    }
+                                  }
+                                }
+                              }
+                              if (fixedVersions.length > 0) {
+                                return (
+                                  <LabelGroup>
+                                    {fixedVersions.map((v) => (
+                                      <Label
+                                        key={v}
+                                        color="green"
+                                        variant="outline"
+                                        isCompact
+                                      >
+                                        {v}
+                                      </Label>
+                                    ))}
+                                  </LabelGroup>
+                                );
+                              }
+                              return null;
+                            }}
+                          </WithPackage>
                         ) : null}
                       </Td>
                       <Td
