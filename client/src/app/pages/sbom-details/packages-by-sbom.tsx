@@ -284,53 +284,38 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 }
                               }
                             }
-                            if (fixedVersions.length > 0) {
-                              return (
-                                <LabelGroup>
-                                  {fixedVersions.map((v) => (
-                                    <Tooltip key={v} content={v}>
-                                      <Label
-                                        color={
-                                          recommendedVersionSet.has(v)
-                                            ? "green"
-                                            : undefined
-                                        }
-                                        variant={
-                                          recommendedVersionSet.has(v)
-                                            ? undefined
-                                            : "outline"
-                                        }
-                                        isCompact
-                                      >
-                                        {v}
-                                      </Label>
-                                    </Tooltip>
-                                  ))}
-                                </LabelGroup>
-                              );
+                            const vendorVersions = rowRecommendations.map(
+                              (rec) =>
+                                decomposePurl(rec.package)?.version ??
+                                rec.package,
+                            );
+                            const nonVendorFixedVersions = fixedVersions.filter(
+                              (v) => !recommendedVersionSet.has(v),
+                            );
+                            if (
+                              vendorVersions.length === 0 &&
+                              nonVendorFixedVersions.length === 0
+                            ) {
+                              return null;
                             }
-                            if (rowRecommendations.length > 0) {
-                              return (
-                                <LabelGroup>
-                                  {rowRecommendations.map((rec) => {
-                                    const version =
-                                      decomposePurl(rec.package)?.version ??
-                                      rec.package;
-                                    return (
-                                      <Tooltip
-                                        key={rec.package}
-                                        content={rec.package}
-                                      >
-                                        <Label color="green" isCompact>
-                                          {version}
-                                        </Label>
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </LabelGroup>
-                              );
-                            }
-                            return null;
+                            return (
+                              <LabelGroup>
+                                {vendorVersions.map((v) => (
+                                  <Tooltip key={v} content={v}>
+                                    <Label color="green" isCompact>
+                                      {v}
+                                    </Label>
+                                  </Tooltip>
+                                ))}
+                                {nonVendorFixedVersions.map((v) => (
+                                  <Tooltip key={v} content={v}>
+                                    <Label variant="outline" isCompact>
+                                      {v}
+                                    </Label>
+                                  </Tooltip>
+                                ))}
+                              </LabelGroup>
+                            );
                           }}
                         </WithPackage>
                       ) : rowRecommendations.length > 0 ? (
