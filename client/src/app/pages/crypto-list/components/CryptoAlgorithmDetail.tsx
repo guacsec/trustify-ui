@@ -1,11 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
-
 import {
   Card,
   CardBody,
   CardTitle,
-  Content,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -25,22 +22,22 @@ interface ICryptoAlgorithmDetailProps {
 }
 
 const policyPresetMap: Record<string, IconedStatusPreset> = {
-  Compliant: "Compliant",
-  Warning: "Warning",
-  NonCompliant: "NonCompliant",
+  compliant: "Compliant",
+  warning: "Warning",
+  non_compliant: "NonCompliant",
 };
 
 const policyReasonMap: Record<string, { label: string; description: string }> =
   {
-    Compliant: {
+    compliant: {
       label: "Post-quantum",
       description: "Post-quantum safe algorithm",
     },
-    Warning: {
+    warning: {
       label: "Classical only",
       description: "Classical algorithm, not post-quantum",
     },
-    NonCompliant: {
+    non_compliant: {
       label: "Weak / broken",
       description: "Weak or broken algorithm",
     },
@@ -50,28 +47,26 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
   algorithm,
 }) => {
   const props = algorithm.properties as Record<string, unknown>;
+  const ap = (props?.algorithmProperties as Record<string, unknown>) ?? {};
+  const rcm =
+    (props?.relatedCryptoMaterialProperties as Record<string, unknown>) ?? {};
 
-  const primitive = (props?.primitive as string) ?? undefined;
-  const type = (props?.type as string) ?? undefined;
-  const cryptoFunctions = props?.cryptoFunctions as string[] | undefined;
+  const primitive = (ap.primitive as string) ?? undefined;
+  const type = (rcm.type as string) ?? undefined;
+  const cryptoFunctions = ap.cryptoFunctions as string[] | undefined;
   const parameterSetIdentifier =
-    (props?.parameterSetIdentifier as string) ?? undefined;
-  const curve = (props?.curve as string) ?? undefined;
-  const mode = (props?.mode as string) ?? undefined;
-  const padding = (props?.padding as string) ?? undefined;
-  const executionEnvironment =
-    (props?.executionEnvironment as string) ?? undefined;
+    (ap.parameterSetIdentifier as string) ?? undefined;
+  const curve = (ap.curve as string) ?? undefined;
+  const mode = (ap.mode as string) ?? undefined;
+  const padding = (ap.padding as string) ?? undefined;
+  const executionEnvironment = (ap.executionEnvironment as string) ?? undefined;
   const implementationPlatform =
-    (props?.implementationPlatform as string) ?? undefined;
-  const certificationLevel =
-    (props?.certificationLevel as string[]) ?? undefined;
+    (ap.implementationPlatform as string) ?? undefined;
+  const certificationLevel = (ap.certificationLevel as string[]) ?? undefined;
   const classicalSecurityLevel =
-    (props?.classicalSecurityLevel as number) ?? undefined;
+    (ap.classicalSecurityLevel as number) ?? undefined;
   const nistQuantumSecurityLevel =
-    (props?.nistQuantumSecurityLevel as number) ?? undefined;
-
-  const relatedSboms = props?.relatedSboms as
-    Array<{ id: string; name: string }> | undefined;
+    (ap.nistQuantumSecurityLevel as number) ?? undefined;
 
   const policyStatus = algorithm.policy_status;
   const reason = policyReasonMap[policyStatus];
@@ -250,9 +245,9 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
                   <DescriptionListDescription>
                     <Label
                       color={
-                        policyStatus === "Compliant"
+                        policyStatus === "compliant"
                           ? "green"
-                          : policyStatus === "NonCompliant"
+                          : policyStatus === "non_compliant"
                             ? "red"
                             : "orange"
                       }
@@ -267,26 +262,6 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
           </CardBody>
         </Card>
       </StackItem>
-
-      {relatedSboms && relatedSboms.length > 0 && (
-        <StackItem>
-          <Card isCompact>
-            <CardTitle>Related SBOMs</CardTitle>
-            <CardBody>
-              <Content component="p" style={{ marginBottom: 8 }}>
-                SBOMs in this workspace that reference this finding.
-              </Content>
-              <Stack>
-                {relatedSboms.map((sbom) => (
-                  <StackItem key={sbom.id}>
-                    <Link to={`/sboms/${sbom.id}`}>{sbom.name}</Link>
-                  </StackItem>
-                ))}
-              </Stack>
-            </CardBody>
-          </Card>
-        </StackItem>
-      )}
     </Stack>
   );
 };
