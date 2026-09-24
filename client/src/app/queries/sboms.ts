@@ -215,12 +215,9 @@ export const useFetchSbomsByPackageId = (
   };
 };
 
-export const useFetchSbomsAdvisory = (
-  sbomId: string,
-  includeResolved = false,
-) => {
+export const useFetchSbomsAdvisory = (sbomId: string) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: [SBOMsQueryKey, sbomId, "advisory", { includeResolved }],
+    queryKey: [SBOMsQueryKey, sbomId, "advisory"],
     queryFn: () => {
       return getSbomAdvisories({
         client,
@@ -240,12 +237,7 @@ export const useFetchSbomsAdvisoryBatch = (sbomIds: string[]) => {
   const userQueries = useQueries({
     queries: sbomIds.map((sbomId) => {
       return {
-        queryKey: [
-          SBOMsQueryKey,
-          sbomId,
-          "advisory",
-          { includeResolved: false },
-        ],
+        queryKey: [SBOMsQueryKey, sbomId, "advisory"],
         queryFn: () => {
           return getSbomAdvisories({
             client,
