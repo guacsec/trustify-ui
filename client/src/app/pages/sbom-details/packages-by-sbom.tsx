@@ -319,7 +319,11 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                     key={v}
                                     content="Version upgrade — move to this newer release to get the fix."
                                   >
-                                    <Label variant="outline" isCompact>
+                                    <Label
+                                      color="green"
+                                      variant="outline"
+                                      isCompact
+                                    >
                                       {v}
                                     </Label>
                                   </Tooltip>
