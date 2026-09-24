@@ -3,39 +3,21 @@ import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import { client } from "../axios-config/apiInit";
-import { recommend } from "../client";
-import type { RecommendEntry } from "../client";
+import { recommend, recommendReport } from "../client";
+import type {
+  RecommendEntry,
+  RecommendReportImpactSummary,
+  RecommendReportPackage,
+  RecommendReportResponse,
+  RecommendReportSbom,
+} from "../client";
 
 export { type RecommendEntry };
-
-/**
- * Local mirrors of RecommendReport* schemas from trustify PR #2656.
- * Defined here until the backend and openapi spec are backported to release/0.6.z.
- */
-export type RecommendReportPackage = {
-  advisory_id?: string | null;
-  found_in: string[];
-  purl: string;
-  recommended_purl: string;
-  vulnerabilities: string[];
-};
-
-export type RecommendReportImpactSummary = {
-  addressable_packages: number;
-  sboms_with_recommendations: number;
-};
-
-export type RecommendReportSbom = {
-  addressable_packages: number;
-  id: string;
-  name: string;
-  vulnerability_count: number;
-};
-
-export type RecommendReportResponse = {
-  impact_summary: RecommendReportImpactSummary;
-  packages: RecommendReportPackage[];
-  sboms: RecommendReportSbom[];
+export type {
+  RecommendReportImpactSummary,
+  RecommendReportPackage,
+  RecommendReportResponse,
+  RecommendReportSbom,
 };
 
 export const RecommendationsQueryKey = "recommendations";
@@ -74,21 +56,27 @@ export const useFetchRecommendations = (purls: string[]) => {
 
 export const RemediationReportQueryKey = "remediation-report";
 
-/**
- * Fetch an aggregated vendor remediation report for the given SBOM IDs
- * via POST /api/v3/purl/recommend/report.
- *
- * NOTE (backport release/0.6.z): endpoint not yet available on this stream.
- * Returns a permanently-loading stub until the backend is backported (trustify PR #2656).
- */
-export const useFetchRemediationReport = (_sbomIds: string[]) => {
-  return useMemo(
-    () => ({
-      report: null as RecommendReportResponse | null,
-      isFetching: false,
-      fetchError: null as AxiosError | null,
-      isLimitExceeded: false,
-    }),
-    [],
-  );
+/** Fetch an aggregated vendor remediation report for the given SBOM IDs via POST /api/v3/purl/recommend/report. */
+export const useFetchRemediationReport = (sbomIds: string[]) => {
+  const sortedIds = useMemo(() => [...sbomIds].sort(), [sbomIds]);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: [RemediationReportQueryKey, sortedIds],
+    queryFn: () =>
+      recommendReport({
+        client,
+        body: { sbom_ids: sortedIds },
+      }),
+    enabled: sortedIds.length > 0,
+  });
+
+  const axiosError = error as AxiosError | null;
+  const isLimitExceeded = axiosError?.response?.status === 413;
+
+  return {
+    report: data?.data ?? null,
+    isFetching: isLoading,
+    fetchError: isLimitExceeded ? null : axiosError,
+    isLimitExceeded,
+  };
 };
