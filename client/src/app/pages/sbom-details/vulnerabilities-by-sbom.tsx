@@ -546,12 +546,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                 return (
                                   <LabelGroup>
                                     {fixedVersions.map((v) => (
-                                      <Label
-                                        key={v}
-                                        color="green"
-                                        variant="outline"
-                                        isCompact
-                                      >
+                                      <Label key={v} color="green" isCompact>
                                         {v}
                                       </Label>
                                     ))}

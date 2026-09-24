@@ -298,12 +298,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                               return (
                                 <LabelGroup>
                                   {fixedVersions.map((v) => (
-                                    <Label
-                                      key={v}
-                                      color="green"
-                                      variant="outline"
-                                      isCompact
-                                    >
+                                    <Label key={v} color="green" isCompact>
                                       {v}
                                     </Label>
                                   ))}
