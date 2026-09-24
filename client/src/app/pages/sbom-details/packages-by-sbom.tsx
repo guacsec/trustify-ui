@@ -193,6 +193,11 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
             const isRemediationApplied = rowRecommendations.some((rec) =>
               purlBaseEquals(rec.package, currentPurl ?? ""),
             );
+            const recommendedVersionSet = new Set(
+              rowRecommendations.map(
+                (rec) => decomposePurl(rec.package)?.version ?? rec.package,
+              ),
+            );
 
             return (
               <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
@@ -260,21 +265,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                         <Label color="blue" isCompact>
                           Applied
                         </Label>
-                      ) : rowRecommendations.length > 0 ? (
-                        <LabelGroup>
-                          {rowRecommendations.map((rec) => {
-                            const version =
-                              decomposePurl(rec.package)?.version ??
-                              rec.package;
-                            return (
-                              <Tooltip key={rec.package} content={rec.package}>
-                                <Label color="green" isCompact>
-                                  {version}
-                                </Label>
-                              </Tooltip>
-                            );
-                          })}
-                        </LabelGroup>
                       ) : item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
                           {(pkg) => {
@@ -298,16 +288,66 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                               return (
                                 <LabelGroup>
                                   {fixedVersions.map((v) => (
-                                    <Label key={v} color="green" isCompact>
-                                      {v}
-                                    </Label>
+                                    <Tooltip key={v} content={v}>
+                                      <Label
+                                        color={
+                                          recommendedVersionSet.has(v)
+                                            ? "green"
+                                            : undefined
+                                        }
+                                        variant={
+                                          recommendedVersionSet.has(v)
+                                            ? undefined
+                                            : "outline"
+                                        }
+                                        isCompact
+                                      >
+                                        {v}
+                                      </Label>
+                                    </Tooltip>
                                   ))}
+                                </LabelGroup>
+                              );
+                            }
+                            if (rowRecommendations.length > 0) {
+                              return (
+                                <LabelGroup>
+                                  {rowRecommendations.map((rec) => {
+                                    const version =
+                                      decomposePurl(rec.package)?.version ??
+                                      rec.package;
+                                    return (
+                                      <Tooltip
+                                        key={rec.package}
+                                        content={rec.package}
+                                      >
+                                        <Label color="green" isCompact>
+                                          {version}
+                                        </Label>
+                                      </Tooltip>
+                                    );
+                                  })}
                                 </LabelGroup>
                               );
                             }
                             return null;
                           }}
                         </WithPackage>
+                      ) : rowRecommendations.length > 0 ? (
+                        <LabelGroup>
+                          {rowRecommendations.map((rec) => {
+                            const version =
+                              decomposePurl(rec.package)?.version ??
+                              rec.package;
+                            return (
+                              <Tooltip key={rec.package} content={rec.package}>
+                                <Label color="green" isCompact>
+                                  {version}
+                                </Label>
+                              </Tooltip>
+                            );
+                          })}
+                        </LabelGroup>
                       ) : null}
                     </Td>
                     <Td
