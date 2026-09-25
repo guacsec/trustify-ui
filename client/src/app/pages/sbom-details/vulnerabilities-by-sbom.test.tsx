@@ -93,6 +93,12 @@ vi.mock("@app/components/SbomVulnerabilitiesDonutChart", () => ({
   SbomVulnerabilitiesDonutChart: () => null,
 }));
 
+vi.mock("@app/components/WithPackage", () => ({
+  WithPackage: ({ children }: { children: (pkg: null) => React.ReactNode }) => (
+    <>{children(null)}</>
+  ),
+}));
+
 vi.mock("@app/components/LoadingWrapper", () => ({
   LoadingWrapper: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>

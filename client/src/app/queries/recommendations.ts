@@ -54,6 +54,25 @@ export const useFetchRecommendations = (purls: string[]) => {
   };
 };
 
+/** Probe whether the recommendation feature is configured on the server.
+ * Returns false only when the endpoint responds with 503 and the structured
+ * error code is FEATURE_UNCONFIGURED; transient 503s are treated as enabled. */
+export const useIsRecommendationEnabled = (): boolean => {
+  const { error, isLoading } = useQuery({
+    queryKey: ["recommendation-feature-probe"],
+    queryFn: () => recommend({ client, body: { purls: [] } }),
+    retry: false,
+    staleTime: Infinity,
+  });
+  if (isLoading) return true;
+  const axiosErr = error as AxiosError | null;
+  if (axiosErr?.response?.status !== 503) return true;
+  return (
+    (axiosErr.response.data as { code?: string } | null)?.code !==
+    "FEATURE_UNCONFIGURED"
+  );
+};
+
 export const RemediationReportQueryKey = "remediation-report";
 
 /** Fetch an aggregated vendor remediation report for the given SBOM IDs via POST /api/v3/purl/recommend/report. */

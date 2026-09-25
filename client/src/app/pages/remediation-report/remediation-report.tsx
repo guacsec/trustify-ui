@@ -499,7 +499,7 @@ export const RemediationReport: React.FC = () => {
                               })}
                             >
                               <Tooltip content={item.recommendedPurl}>
-                                <Label color="green" isCompact>
+                                <Label color="blue" variant="outline" isCompact>
                                   {item.recommendedVersion}
                                 </Label>
                               </Tooltip>
@@ -509,7 +509,12 @@ export const RemediationReport: React.FC = () => {
                             >
                               <LabelGroup>
                                 {item.vulnerabilities.map((cve) => (
-                                  <Label key={cve} isCompact color="orange">
+                                  <Label
+                                    key={cve}
+                                    isCompact
+                                    color="orange"
+                                    variant="outline"
+                                  >
                                     {cve}
                                   </Label>
                                 ))}
