@@ -1,6 +1,7 @@
 Feature: Importer Explorer - View importers details
     Background: Authentication
         Given User is authenticated
+        And All importers are present
 
     Scenario: Navigate to Importers page and verify basic elements
         When User navigates to Importers page
@@ -52,9 +53,9 @@ Feature: Importer Explorer - View importers details
         Then The "<importerName>" importer state should be "Disabled"
 
         Examples:
-            | importerName |
-            | cve          |
-        
+            | importerName          |
+            | fake-importer-disable |
+
 
     Scenario: Verify disabled importer does not show Disable option
         When User navigates to Importers page
@@ -74,8 +75,8 @@ Feature: Importer Explorer - View importers details
         Then The "<importerName>" importer state should be "Disabled"
 
         Examples:
-            | importerName                |
-            | clearly-defined-curations   |
+            | importerName         |
+            | fake-importer-enable |
 
     Scenario Outline: Run an enabled importer
         When User navigates to Importers page
@@ -90,6 +91,5 @@ Feature: Importer Explorer - View importers details
         Then The "<importerName>" importer state should be "Disabled"
 
         Examples:
-            | importerName |
-            | cve          |
-               
+            | importerName      |
+            | fake-importer-run |
