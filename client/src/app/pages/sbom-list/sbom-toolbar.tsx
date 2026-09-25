@@ -17,6 +17,7 @@ import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
 import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import { ToolbarBulkSelector } from "@app/components/ToolbarBulkSelector";
+import { useIsRecommendationEnabled } from "@app/queries/recommendations";
 import { Paths } from "@app/Routes";
 
 import { AddToGroupModal } from "./components/add-to-group-form";
@@ -37,6 +38,7 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
+  const isRecommendationEnabled = useIsRecommendationEnabled();
 
   // Create Form Modal
   const [saveGroupModalState, setSaveGroupModalState] = React.useState<
@@ -123,28 +125,30 @@ export const SbomToolbar: React.FC<SbomToolbarProps> = ({
                   ]}
                 />
               </ToolbarItem>
-              <ToolbarItem>
-                {selectedItems.length > MAX_REMEDIATION_REPORT_SBOMS ? (
-                  <Tooltip
-                    content={`Select at most ${MAX_REMEDIATION_REPORT_SBOMS} SBOMs to generate a remediation report.`}
-                  >
-                    <Button variant="secondary" isAriaDisabled>
+              {isRecommendationEnabled && (
+                <ToolbarItem>
+                  {selectedItems.length > MAX_REMEDIATION_REPORT_SBOMS ? (
+                    <Tooltip
+                      content={`Select at most ${MAX_REMEDIATION_REPORT_SBOMS} SBOMs to generate a remediation report.`}
+                    >
+                      <Button variant="secondary" isAriaDisabled>
+                        Generate remediation report
+                      </Button>
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      isDisabled={selectedItems.length === 0}
+                      onClick={() => {
+                        const ids = selectedItems.map((s) => s.id).join(",");
+                        navigate(`${Paths.remediationReport}?ids=${ids}`);
+                      }}
+                    >
                       Generate remediation report
                     </Button>
-                  </Tooltip>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    isDisabled={selectedItems.length === 0}
-                    onClick={() => {
-                      const ids = selectedItems.map((s) => s.id).join(",");
-                      navigate(`${Paths.remediationReport}?ids=${ids}`);
-                    }}
-                  >
-                    Generate remediation report
-                  </Button>
-                )}
-              </ToolbarItem>
+                  )}
+                </ToolbarItem>
+              )}
             </>
           )}
           <ToolbarItem {...paginationToolbarItemProps}>

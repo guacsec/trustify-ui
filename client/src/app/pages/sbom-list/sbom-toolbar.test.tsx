@@ -12,6 +12,10 @@ vi.mock("@app/queries/sbom-groups", () => ({
   useFetchSbomGroups: vi.fn().mockReturnValue({ result: { data: [] } }),
 }));
 
+vi.mock("@app/queries/recommendations", () => ({
+  useIsRecommendationEnabled: () => true,
+}));
+
 const makeControls = (selectedIds: string[] = []) => ({
   tableControls: {
     propHelpers: {

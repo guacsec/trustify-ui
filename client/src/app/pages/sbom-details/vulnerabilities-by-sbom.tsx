@@ -67,6 +67,8 @@ import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
 import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
+import { WithPackage } from "@app/components/WithPackage";
+
 import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
 import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
@@ -350,6 +352,18 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                     all.findIndex((r) => r.package === rec.package) === idx,
                 );
 
+              const firstNonOrphan = Array.from(item.purls.values()).find(
+                (p) => !p.isOrphan,
+              );
+              const firstNonOrphanPurlUuid = firstNonOrphan?.purlSummary.uuid;
+              // Scope recommendations to the first non-orphan PURL so that
+              // vendor-vs-upgrade classification matches the fixed_versions
+              // fetched by WithPackage for that same PURL.
+              const firstPurlRecommendations = firstNonOrphan
+                ? (recommendationsMap.get(firstNonOrphan.purlSummary.purl) ??
+                  [])
+                : [];
+
               const hasVexResolution =
                 purlResolutions &&
                 Array.from(item.purls.values()).some(
@@ -499,6 +513,78 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           <Label color="blue" isCompact>
                             Applied
                           </Label>
+                        ) : firstNonOrphanPurlUuid ? (
+                          <WithPackage packageId={firstNonOrphanPurlUuid}>
+                            {(pkg) => {
+                              const fixedVersions: string[] = [];
+                              for (const advisory of pkg?.advisories ?? []) {
+                                for (const pkgStatus of advisory.status ?? []) {
+                                  const versions = (
+                                    pkgStatus as unknown as {
+                                      fixed_versions?: string[];
+                                    }
+                                  ).fixed_versions;
+                                  if (versions) {
+                                    for (const v of versions) {
+                                      if (!fixedVersions.includes(v))
+                                        fixedVersions.push(v);
+                                    }
+                                  }
+                                }
+                              }
+                              const vendorVersions =
+                                firstPurlRecommendations.map(
+                                  (rec) =>
+                                    decomposePurl(rec.package)?.version ??
+                                    rec.package,
+                                );
+                              const firstPurlRecommendedSet = new Set(
+                                vendorVersions,
+                              );
+                              const nonVendorFixedVersions =
+                                fixedVersions.filter(
+                                  (v) => !firstPurlRecommendedSet.has(v),
+                                );
+                              if (
+                                vendorVersions.length === 0 &&
+                                nonVendorFixedVersions.length === 0
+                              ) {
+                                return null;
+                              }
+                              return (
+                                <LabelGroup>
+                                  {vendorVersions.map((v) => (
+                                    <Tooltip
+                                      key={v}
+                                      content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                                    >
+                                      <Label
+                                        color="blue"
+                                        variant="outline"
+                                        isCompact
+                                      >
+                                        {v}
+                                      </Label>
+                                    </Tooltip>
+                                  ))}
+                                  {nonVendorFixedVersions.map((v) => (
+                                    <Tooltip
+                                      key={v}
+                                      content="Version upgrade — move to this newer release to get the fix."
+                                    >
+                                      <Label
+                                        color="green"
+                                        variant="outline"
+                                        isCompact
+                                      >
+                                        {v}
+                                      </Label>
+                                    </Tooltip>
+                                  ))}
+                                </LabelGroup>
+                              );
+                            }}
+                          </WithPackage>
                         ) : rowRecommendations.length > 0 ? (
                           <LabelGroup>
                             {rowRecommendations.map((rec) => {
@@ -508,9 +594,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                               return (
                                 <Tooltip
                                   key={rec.package}
-                                  content={rec.package}
+                                  content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
                                 >
-                                  <Label color="green" isCompact>
+                                  <Label
+                                    color="blue"
+                                    variant="outline"
+                                    isCompact
+                                  >
                                     {version}
                                   </Label>
                                 </Tooltip>

@@ -193,6 +193,11 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
             const isRemediationApplied = rowRecommendations.some((rec) =>
               purlBaseEquals(rec.package, currentPurl ?? ""),
             );
+            const recommendedVersionSet = new Set(
+              rowRecommendations.map(
+                (rec) => decomposePurl(rec.package)?.version ?? rec.package,
+              ),
+            );
 
             return (
               <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
@@ -260,21 +265,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                         <Label color="blue" isCompact>
                           Applied
                         </Label>
-                      ) : rowRecommendations.length > 0 ? (
-                        <LabelGroup>
-                          {rowRecommendations.map((rec) => {
-                            const version =
-                              decomposePurl(rec.package)?.version ??
-                              rec.package;
-                            return (
-                              <Tooltip key={rec.package} content={rec.package}>
-                                <Label color="green" isCompact>
-                                  {version}
-                                </Label>
-                              </Tooltip>
-                            );
-                          })}
-                        </LabelGroup>
                       ) : item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
                           {(pkg) => {
@@ -294,25 +284,72 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 }
                               }
                             }
-                            if (fixedVersions.length > 0) {
-                              return (
-                                <LabelGroup>
-                                  {fixedVersions.map((v) => (
+                            const vendorVersions = rowRecommendations.map(
+                              (rec) =>
+                                decomposePurl(rec.package)?.version ??
+                                rec.package,
+                            );
+                            const nonVendorFixedVersions = fixedVersions.filter(
+                              (v) => !recommendedVersionSet.has(v),
+                            );
+                            if (
+                              vendorVersions.length === 0 &&
+                              nonVendorFixedVersions.length === 0
+                            ) {
+                              return null;
+                            }
+                            return (
+                              <LabelGroup>
+                                {vendorVersions.map((v) => (
+                                  <Tooltip
+                                    key={v}
+                                    content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                                  >
                                     <Label
-                                      key={v}
+                                      color="blue"
+                                      variant="outline"
+                                      isCompact
+                                    >
+                                      {v}
+                                    </Label>
+                                  </Tooltip>
+                                ))}
+                                {nonVendorFixedVersions.map((v) => (
+                                  <Tooltip
+                                    key={v}
+                                    content="Version upgrade — move to this newer release to get the fix."
+                                  >
+                                    <Label
                                       color="green"
                                       variant="outline"
                                       isCompact
                                     >
                                       {v}
                                     </Label>
-                                  ))}
-                                </LabelGroup>
-                              );
-                            }
-                            return null;
+                                  </Tooltip>
+                                ))}
+                              </LabelGroup>
+                            );
                           }}
                         </WithPackage>
+                      ) : rowRecommendations.length > 0 ? (
+                        <LabelGroup>
+                          {rowRecommendations.map((rec) => {
+                            const version =
+                              decomposePurl(rec.package)?.version ??
+                              rec.package;
+                            return (
+                              <Tooltip
+                                key={rec.package}
+                                content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                              >
+                                <Label color="blue" variant="outline" isCompact>
+                                  {version}
+                                </Label>
+                              </Tooltip>
+                            );
+                          })}
+                        </LabelGroup>
                       ) : null}
                     </Td>
                     <Td
