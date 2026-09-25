@@ -55,7 +55,8 @@ export const useFetchRecommendations = (purls: string[]) => {
 };
 
 /** Probe whether the recommendation feature is configured on the server.
- * Returns false when the endpoint responds with 503 FEATURE_UNCONFIGURED. */
+ * Returns false only when the endpoint responds with 503 and the structured
+ * error code is FEATURE_UNCONFIGURED; transient 503s are treated as enabled. */
 export const useIsRecommendationEnabled = (): boolean => {
   const { error, isLoading } = useQuery({
     queryKey: ["recommendation-feature-probe"],
@@ -64,7 +65,12 @@ export const useIsRecommendationEnabled = (): boolean => {
     staleTime: Infinity,
   });
   if (isLoading) return true;
-  return (error as AxiosError | null)?.response?.status !== 503;
+  const axiosErr = error as AxiosError | null;
+  if (axiosErr?.response?.status !== 503) return true;
+  return (
+    (axiosErr.response.data as { code?: string } | null)?.code !==
+    "FEATURE_UNCONFIGURED"
+  );
 };
 
 export const RemediationReportQueryKey = "remediation-report";
