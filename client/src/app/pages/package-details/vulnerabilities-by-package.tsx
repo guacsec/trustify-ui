@@ -148,7 +148,12 @@ export const VulnerabilitiesByPackage: React.FC<
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const rowRecs = recommendationsMap.get(pkg?.purl ?? "") ?? [];
+            const allRecs = recommendationsMap.get(pkg?.purl ?? "") ?? [];
+            const rowRecs = allRecs.filter((rec) =>
+              rec.vulnerabilities.some(
+                (v) => v.id === item.vulnerability.identifier,
+              ),
+            );
             const isRemediationApplied = rowRecs.some((rec) =>
               purlBaseEquals(rec.package, pkg?.purl ?? ""),
             );
