@@ -16,7 +16,7 @@ const mockVulnerability = {
 
 const mockRecommendationsMap = new Map<
   string,
-  { package: string; vulnerabilities: [] }[]
+  { package: string; vulnerabilities: { id: string; remediations: [] }[] }[]
 >();
 
 vi.mock("@app/queries/packages", () => ({
@@ -65,11 +65,11 @@ describe("VulnerabilitiesByPackage remediation column", () => {
 
   /** Verifies that a vulnerability row renders the recommended version Label when a recommendation exists for the package PURL. */
   it("renders recommended version Label when recommendations exist for the package", () => {
-    // Given a recommendation for the affected package PURL
+    // Given a recommendation for the affected package PURL that fixes the mock CVE
     mockRecommendationsMap.set(mockPackagePurl, [
       {
         package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
-        vulnerabilities: [],
+        vulnerabilities: [{ id: "CVE-2021-44228", remediations: [] }],
       },
     ]);
 
@@ -82,9 +82,12 @@ describe("VulnerabilitiesByPackage remediation column", () => {
 
   /** Verifies that a vulnerability row renders a blue Applied badge when the recommended PURL matches the package's current PURL. */
   it("renders Applied badge when recommendation matches the current package PURL", () => {
-    // Given a recommendation whose PURL base-equals the package's current PURL
+    // Given a recommendation whose PURL base-equals the package's current PURL and fixes the mock CVE
     mockRecommendationsMap.set(mockPackagePurl, [
-      { package: mockPackagePurl, vulnerabilities: [] },
+      {
+        package: mockPackagePurl,
+        vulnerabilities: [{ id: "CVE-2021-44228", remediations: [] }],
+      },
     ]);
 
     // When rendering the vulnerabilities tab
