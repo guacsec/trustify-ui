@@ -12,7 +12,14 @@ const mockVulnerability = {
     published: "2021-12-10T00:00:00Z",
   },
   vulnerabilityStatus: "affected" as const,
-  relatedSboms: [],
+  relatedSboms: [] as {
+    advisory: {
+      status: {
+        vulnerability: { identifier: string };
+        fixed_versions: string[];
+      }[];
+    };
+  }[],
 };
 
 const mockRecommendationsMap = new Map<
