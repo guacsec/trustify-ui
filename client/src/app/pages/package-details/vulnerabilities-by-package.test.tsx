@@ -97,6 +97,23 @@ describe("VulnerabilitiesByPackage remediation column", () => {
     expect(screen.getByText("Applied")).toBeInTheDocument();
   });
 
+  /** Verifies that a recommendation with no CVE scope (empty vulnerabilities array) shows on all rows. */
+  it("renders recommended version Label when recommendation has no CVE scope", () => {
+    // Given a recommendation with an empty vulnerabilities array (general upgrade, not CVE-specific)
+    mockRecommendationsMap.set(mockPackagePurl, [
+      {
+        package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
+        vulnerabilities: [],
+      },
+    ]);
+
+    // When rendering the vulnerabilities tab
+    renderComponent();
+
+    // Then the recommended version is still shown (not filtered out)
+    expect(screen.getByText("2.17.2")).toBeInTheDocument();
+  });
+
   /** Verifies that a vulnerability row renders no remediation content when no recommendations exist. */
   it("renders no remediation content when no recommendations exist", () => {
     renderComponent();
