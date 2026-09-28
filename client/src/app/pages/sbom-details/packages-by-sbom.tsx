@@ -4,6 +4,7 @@ import { generatePath, Link } from "react-router-dom";
 import {
   List,
   ListItem,
+  Skeleton,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -252,7 +253,12 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                     >
                       {item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
-                          {(pkg) => {
+                          {(pkg, isFetching) => {
+                            if (isFetching) {
+                              return (
+                                <Skeleton screenreaderText="Loading remediations" />
+                              );
+                            }
                             const cveIdsWithFix = new Set<string>();
                             for (const rec of rowRecommendations) {
                               for (const vuln of rec.vulnerabilities) {
@@ -268,7 +274,8 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 }
                               }
                             }
-                            return `${cveIdsWithFix.size} Remediations`;
+                            const count = cveIdsWithFix.size;
+                            return `${count} ${count === 1 ? "Remediation" : "Remediations"}`;
                           }}
                         </WithPackage>
                       ) : (

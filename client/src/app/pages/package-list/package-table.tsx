@@ -9,6 +9,7 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
+import { Skeleton } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
@@ -159,7 +160,11 @@ export const PackageTable: React.FC = () => {
                             width={15}
                             {...getTdProps({ columnKey: "remediation" })}
                           >
-                            {`${remediationCount} Remediations`}
+                            {packageIsFetching ? (
+                              <Skeleton screenreaderText="Loading remediations" />
+                            ) : (
+                              `${remediationCount} ${remediationCount === 1 ? "Remediation" : "Remediations"}`
+                            )}
                           </Td>
                           <Td
                             width={10}

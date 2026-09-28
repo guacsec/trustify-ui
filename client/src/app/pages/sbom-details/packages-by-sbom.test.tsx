@@ -111,7 +111,7 @@ describe("PackagesBySbom", () => {
     renderComponent();
 
     // Then the count of CVEs with remediations is shown
-    expect(screen.getByText("1 Remediations")).toBeInTheDocument();
+    expect(screen.getByText("1 Remediation")).toBeInTheDocument();
   });
 
   /** Verifies that a package with no recommendations renders "0 Remediations". */
