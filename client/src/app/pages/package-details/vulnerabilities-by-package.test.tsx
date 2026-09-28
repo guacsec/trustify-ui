@@ -12,12 +12,15 @@ const mockVulnerability = {
     published: "2021-12-10T00:00:00Z",
   },
   vulnerabilityStatus: "affected" as const,
+  relatedSboms: [],
 };
 
 const mockRecommendationsMap = new Map<
   string,
   { package: string; vulnerabilities: { id: string; remediations: [] }[] }[]
 >();
+
+let mockVulnerabilityList = [mockVulnerability];
 
 vi.mock("@app/queries/packages", () => ({
   useFetchPackageById: () => ({
@@ -29,7 +32,7 @@ vi.mock("@app/queries/packages", () => ({
 
 vi.mock("@app/hooks/domain-controls/useVulnerabilitiesOfPackage", () => ({
   useVulnerabilitiesOfPackageId: () => ({
-    data: { vulnerabilities: [mockVulnerability] },
+    data: { vulnerabilities: mockVulnerabilityList },
     isFetching: false,
     fetchError: null,
   }),
@@ -55,6 +58,7 @@ describe("VulnerabilitiesByPackage remediation column", () => {
 
   beforeEach(() => {
     mockRecommendationsMap.clear();
+    mockVulnerabilityList = [mockVulnerability];
   });
 
   /** Verifies the "Remediations" column header renders in the package detail vulnerabilities tab. */
@@ -111,6 +115,34 @@ describe("VulnerabilitiesByPackage remediation column", () => {
     renderComponent();
 
     // Then the recommended version is still shown (not filtered out)
+    expect(screen.getByText("2.17.2")).toBeInTheDocument();
+  });
+
+  /** Verifies that fixed_versions from related advisories appear as version-upgrade Labels when no vendor recommendation exists. */
+  it("renders fixed version Label from advisory when no vendor recommendation exists", () => {
+    // Given a vulnerability row with a related advisory that has fixed_versions for the CVE
+    mockVulnerabilityList = [
+      {
+        ...mockVulnerability,
+        relatedSboms: [
+          {
+            advisory: {
+              status: [
+                {
+                  vulnerability: { identifier: "CVE-2021-44228" },
+                  fixed_versions: ["2.17.2"],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ];
+
+    // When rendering the vulnerabilities tab
+    renderComponent();
+
+    // Then the fixed version is shown (advisory-sourced upgrade, not filtered out)
     expect(screen.getByText("2.17.2")).toBeInTheDocument();
   });
 
