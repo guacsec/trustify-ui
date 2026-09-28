@@ -70,7 +70,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
       version: "Version",
       vulnerabilities: "Vulnerabilities",
       licenses: "Licenses",
-      remediation: "Remediation",
+      remediation: "Remediations",
       purls: "PURLs",
       cpes: "CPEs",
     },

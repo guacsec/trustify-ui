@@ -167,7 +167,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       cvss: "CVSS",
       exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
-      remediation: "Remediation",
+      remediation: "Remediations",
       published: "Published",
       updated: "Updated",
     },

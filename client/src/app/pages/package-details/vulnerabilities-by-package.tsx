@@ -80,7 +80,7 @@ export const VulnerabilitiesByPackage: React.FC<
       description: "Description",
       severity: "CVSS",
       published: "Date published",
-      remediation: "Remediation",
+      remediation: "Remediations",
     },
     hasActionsColumn: false,
     isSortEnabled: true,

@@ -62,10 +62,10 @@ describe("PackageTable remediation column", () => {
     mockRecommendationsMap.clear();
   });
 
-  /** Verifies the "Remediation" column header is rendered in the global packages table. */
+  /** Verifies the "Remediations" column header is rendered in the global packages table. */
   it("renders the Remediation column header", () => {
     renderComponent();
-    expect(screen.getByText("Remediation")).toBeInTheDocument();
+    expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
   /** Verifies that a package row with a recommendation renders the recommended version as a Label. */

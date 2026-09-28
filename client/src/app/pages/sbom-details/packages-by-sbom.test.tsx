@@ -90,10 +90,10 @@ describe("PackagesBySbom", () => {
     mockRecommendationsMap.clear();
   });
 
-  /** Verifies the "Remediation" column header is rendered. */
+  /** Verifies the "Remediations" column header is rendered. */
   it("renders the Remediation column header", () => {
     renderComponent();
-    expect(screen.getByText("Remediation")).toBeInTheDocument();
+    expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
   /** Verifies that a package with a recommendation renders the recommended version as a green Label. */

@@ -119,10 +119,10 @@ describe("VulnerabilitiesBySbom remediation column", () => {
     mockRecommendationsMap.clear();
   });
 
-  /** Verifies the "Remediation" column header renders in the vulnerabilities table. */
+  /** Verifies the "Remediations" column header renders in the vulnerabilities table. */
   it("renders the Remediation column header", () => {
     renderComponent();
-    expect(screen.getByText("Remediation")).toBeInTheDocument();
+    expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
   /** Verifies that a vulnerability row with recommendations renders the recommended version Label. */

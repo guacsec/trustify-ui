@@ -57,10 +57,10 @@ describe("VulnerabilitiesByPackage remediation column", () => {
     mockRecommendationsMap.clear();
   });
 
-  /** Verifies the "Remediation" column header renders in the package detail vulnerabilities tab. */
+  /** Verifies the "Remediations" column header renders in the package detail vulnerabilities tab. */
   it("renders the Remediation column header", () => {
     renderComponent();
-    expect(screen.getByText("Remediation")).toBeInTheDocument();
+    expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
   /** Verifies that a vulnerability row renders the recommended version Label when a recommendation exists for the package PURL. */
