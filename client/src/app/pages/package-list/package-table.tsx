@@ -9,7 +9,8 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
-import { Skeleton } from "@patternfly/react-core";
+import { Skeleton, Tooltip } from "@patternfly/react-core";
+import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
@@ -63,7 +64,12 @@ export const PackageTable: React.FC = () => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
-              <Th {...getThProps({ columnKey: "remediation" })} />
+              <Th {...getThProps({ columnKey: "remediation" })}>
+                Remediations{" "}
+                <Tooltip content="Number of remediations available for this package. Open the package and use the Vulnerabilities tab to see remediations per CVE.">
+                  <OutlinedQuestionCircleIcon />
+                </Tooltip>
+              </Th>
               <Th {...getThProps({ columnKey: "path" })} />
               <Th {...getThProps({ columnKey: "qualifiers" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />

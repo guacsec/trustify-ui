@@ -8,6 +8,7 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 import {
@@ -35,6 +36,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
+import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 import { useFetchRecommendations } from "@app/queries/recommendations";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
@@ -172,7 +174,12 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
-              <Th {...getThProps({ columnKey: "remediation" })} />
+              <Th {...getThProps({ columnKey: "remediation" })}>
+                Remediations{" "}
+                <Tooltip content="Number of remediations available for this package. Open the package and use the Vulnerabilities tab to see remediations per CVE.">
+                  <OutlinedQuestionCircleIcon />
+                </Tooltip>
+              </Th>
               <Th {...getThProps({ columnKey: "purls" })} />
               <Th {...getThProps({ columnKey: "cpes" })} />
             </TableHeaderContentWithControls>
