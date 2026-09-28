@@ -10,7 +10,6 @@ import {
   Tr,
 } from "@patternfly/react-table";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
-import { Label, LabelGroup, Tooltip } from "@patternfly/react-core";
 
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SimplePagination } from "@app/components/SimplePagination";
@@ -20,7 +19,7 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 import { Paths } from "@app/Routes";
-import { decodePurl, decomposePurl, purlBaseEquals } from "@app/utils/utils";
+import { decodePurl } from "@app/utils/utils";
 import { useFetchRecommendations } from "@app/queries/recommendations";
 import { PackageSearchContext } from "./package-context";
 import { PackageVulnerabilities } from "./components/PackageVulnerabilities";
@@ -78,33 +77,24 @@ export const PackageTable: React.FC = () => {
         >
           {currentPageItems.map((item, rowIndex) => {
             const rowRecs = recommendationsMap.get(item.purl) ?? [];
-            const isRemediationApplied = rowRecs.some((rec) =>
-              purlBaseEquals(rec.package, item.purl),
-            );
 
             return (
               <WithPackage key={item.uuid} packageId={item.uuid}>
                 {(pkg, packageIsFetching, packageFetchError) => {
-                  const vendorVersionSet = new Set(
-                    rowRecs.map(
-                      (rec) =>
-                        decomposePurl(rec.package)?.version ?? rec.package,
-                    ),
-                  );
-                  const fixedVersions: string[] = [];
+                  const cveIdsWithFix = new Set<string>();
+                  for (const rec of rowRecs) {
+                    for (const vuln of rec.vulnerabilities) {
+                      cveIdsWithFix.add(vuln.id);
+                    }
+                  }
                   for (const advisory of pkg?.advisories ?? []) {
                     for (const pkgStatus of advisory.status ?? []) {
-                      for (const v of pkgStatus.fixed_versions ?? []) {
-                        if (!fixedVersions.includes(v)) fixedVersions.push(v);
+                      if (pkgStatus.fixed_versions.length > 0) {
+                        cveIdsWithFix.add(pkgStatus.vulnerability.identifier);
                       }
                     }
                   }
-                  const vendorVersions = rowRecs.map(
-                    (rec) => decomposePurl(rec.package)?.version ?? rec.package,
-                  );
-                  const nonVendorFixedVersions = fixedVersions.filter(
-                    (v) => !vendorVersionSet.has(v),
-                  );
+                  const remediationCount = cveIdsWithFix.size;
                   return (
                     <Tbody>
                       <Tr {...getTrProps({ item })}>
@@ -169,43 +159,7 @@ export const PackageTable: React.FC = () => {
                             width={15}
                             {...getTdProps({ columnKey: "remediation" })}
                           >
-                            {isRemediationApplied ? (
-                              <Label color="blue" isCompact>
-                                Applied
-                              </Label>
-                            ) : vendorVersions.length > 0 ||
-                              nonVendorFixedVersions.length > 0 ? (
-                              <LabelGroup>
-                                {vendorVersions.map((v) => (
-                                  <Tooltip
-                                    key={v}
-                                    content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
-                                  >
-                                    <Label
-                                      color="blue"
-                                      variant="outline"
-                                      isCompact
-                                    >
-                                      {v}
-                                    </Label>
-                                  </Tooltip>
-                                ))}
-                                {nonVendorFixedVersions.map((v) => (
-                                  <Tooltip
-                                    key={v}
-                                    content="Version upgrade — move to this newer release to get the fix."
-                                  >
-                                    <Label
-                                      color="green"
-                                      variant="outline"
-                                      isCompact
-                                    >
-                                      {v}
-                                    </Label>
-                                  </Tooltip>
-                                ))}
-                              </LabelGroup>
-                            ) : null}
+                            {`${remediationCount} Remediations`}
                           </Td>
                           <Td
                             width={10}

@@ -52,7 +52,7 @@ vi.mock("@app/queries/sboms", () => ({
 
 const mockRecommendationsMap = new Map<
   string,
-  { package: string; vulnerabilities: [] }[]
+  { package: string; vulnerabilities: { id: string; remediations: [] }[] }[]
 >();
 
 vi.mock("@app/queries/recommendations", () => ({
@@ -91,28 +91,34 @@ describe("PackagesBySbom", () => {
   });
 
   /** Verifies the "Remediations" column header is rendered. */
-  it("renders the Remediation column header", () => {
+  it("renders the Remediations column header", () => {
     renderComponent();
     expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
-  /** Verifies that a package with a recommendation renders the recommended version as a green Label. */
-  it("renders recommended version Label when recommendations exist", () => {
+  /** Verifies that a package with CVE-scoped recommendations shows the CVE count. */
+  it("renders remediation count when CVE-scoped recommendations exist", () => {
+    // Given a CVE-scoped recommendation for the package
     const purl = "pkg:maven/org.apache.log4j/log4j-core@2.14.1";
     mockRecommendationsMap.set(purl, [
       {
         package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
-        vulnerabilities: [],
+        vulnerabilities: [{ id: "CVE-2021-44228", remediations: [] }],
       },
     ]);
+
+    // When rendering the SBOM packages table
     renderComponent();
-    expect(screen.getByText("2.17.2")).toBeInTheDocument();
+
+    // Then the count of CVEs with remediations is shown
+    expect(screen.getByText("1 Remediations")).toBeInTheDocument();
   });
 
-  /** Verifies that a package with no recommendations and no fixed versions renders nothing in the remediation cell. */
-  it("renders no remediation content when no recommendations exist", () => {
+  /** Verifies that a package with no recommendations renders "0 Remediations". */
+  it("renders 0 Remediations when no recommendations exist", () => {
     renderComponent();
-    expect(screen.queryByText("Applied")).not.toBeInTheDocument();
-    expect(screen.queryByText("2.17.2")).not.toBeInTheDocument();
+    // packageWithPurl has no recommendations → 0 Remediations
+    // packageWithoutPurl has no purl → 0 Remediations (fallback)
+    expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
   });
 });
