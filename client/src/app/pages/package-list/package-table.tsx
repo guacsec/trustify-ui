@@ -84,151 +84,187 @@ export const PackageTable: React.FC = () => {
 
             return (
               <WithPackage key={item.uuid} packageId={item.uuid}>
-                {(pkg, packageIsFetching, packageFetchError) => (
-                  <Tbody>
-                    <Tr {...getTrProps({ item })}>
-                      <TableRowContentWithControls
-                        {...tableControls}
-                        item={item}
-                        rowIndex={rowIndex}
-                      >
-                        <Td
-                          width={15}
-                          modifier="breakWord"
-                          {...getTdProps({ columnKey: "name" })}
+                {(pkg, packageIsFetching, packageFetchError) => {
+                  const vendorVersionSet = new Set(
+                    rowRecs.map(
+                      (rec) =>
+                        decomposePurl(rec.package)?.version ?? rec.package,
+                    ),
+                  );
+                  const fixedVersions: string[] = [];
+                  for (const advisory of pkg?.advisories ?? []) {
+                    for (const pkgStatus of advisory.status ?? []) {
+                      for (const v of pkgStatus.fixed_versions ?? []) {
+                        if (!fixedVersions.includes(v)) fixedVersions.push(v);
+                      }
+                    }
+                  }
+                  const vendorVersions = rowRecs.map(
+                    (rec) => decomposePurl(rec.package)?.version ?? rec.package,
+                  );
+                  const nonVendorFixedVersions = fixedVersions.filter(
+                    (v) => !vendorVersionSet.has(v),
+                  );
+                  return (
+                    <Tbody>
+                      <Tr {...getTrProps({ item })}>
+                        <TableRowContentWithControls
+                          {...tableControls}
+                          item={item}
+                          rowIndex={rowIndex}
                         >
-                          <NavLink
-                            to={generatePath(Paths.packageDetails, {
-                              packageId: item.uuid,
+                          <Td
+                            width={15}
+                            modifier="breakWord"
+                            {...getTdProps({ columnKey: "name" })}
+                          >
+                            <NavLink
+                              to={generatePath(Paths.packageDetails, {
+                                packageId: item.uuid,
+                              })}
+                            >
+                              {item.decomposedPurl
+                                ? item.decomposedPurl?.name
+                                : decodePurl(item.purl)}
+                            </NavLink>
+                          </Td>
+                          <Td
+                            width={15}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "namespace" })}
+                          >
+                            {item.decomposedPurl?.namespace}
+                          </Td>
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "version" })}
+                          >
+                            {item.decomposedPurl?.version}
+                          </Td>
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "type" })}
+                          >
+                            {item.decomposedPurl?.type}
+                          </Td>
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({
+                              columnKey: "licenses",
+                              isCompoundExpandToggle: true,
+                              item,
+                              rowIndex,
                             })}
                           >
-                            {item.decomposedPurl
-                              ? item.decomposedPurl?.name
-                              : decodePurl(item.purl)}
-                          </NavLink>
-                        </Td>
-                        <Td
-                          width={15}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "namespace" })}
-                        >
-                          {item.decomposedPurl?.namespace}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "version" })}
-                        >
-                          {item.decomposedPurl?.version}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "type" })}
-                        >
-                          {item.decomposedPurl?.type}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({
-                            columnKey: "licenses",
-                            isCompoundExpandToggle: true,
-                            item,
-                            rowIndex,
-                          })}
-                        >
-                          <PackageLicenses
-                            pkg={pkg}
-                            isFetching={packageIsFetching}
-                            fetchError={packageFetchError}
-                          />
-                        </Td>
-                        <Td
-                          width={15}
-                          {...getTdProps({ columnKey: "remediation" })}
-                        >
-                          {isRemediationApplied ? (
-                            <Label color="blue" isCompact>
-                              Applied
-                            </Label>
-                          ) : rowRecs.length > 0 ? (
-                            <LabelGroup>
-                              {rowRecs.map((rec) => {
-                                const version =
-                                  decomposePurl(rec.package)?.version ??
-                                  rec.package;
-                                return (
+                            <PackageLicenses
+                              pkg={pkg}
+                              isFetching={packageIsFetching}
+                              fetchError={packageFetchError}
+                            />
+                          </Td>
+                          <Td
+                            width={15}
+                            {...getTdProps({ columnKey: "remediation" })}
+                          >
+                            {isRemediationApplied ? (
+                              <Label color="blue" isCompact>
+                                Applied
+                              </Label>
+                            ) : vendorVersions.length > 0 ||
+                              nonVendorFixedVersions.length > 0 ? (
+                              <LabelGroup>
+                                {vendorVersions.map((v) => (
                                   <Tooltip
-                                    key={rec.package}
-                                    content={rec.package}
+                                    key={v}
+                                    content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
                                   >
-                                    <Label color="green" isCompact>
-                                      {version}
+                                    <Label
+                                      color="blue"
+                                      variant="outline"
+                                      isCompact
+                                    >
+                                      {v}
                                     </Label>
                                   </Tooltip>
-                                );
-                              })}
-                            </LabelGroup>
-                          ) : null}
-                        </Td>
-                        <Td
-                          width={10}
-                          modifier="truncate"
-                          {...getTdProps({ columnKey: "path" })}
-                        >
-                          {item.decomposedPurl?.path}
-                        </Td>
-                        <Td
-                          width={20}
-                          {...getTdProps({ columnKey: "qualifiers" })}
-                        >
-                          {item.decomposedPurl?.qualifiers && (
-                            <PackageQualifiers
-                              value={item.decomposedPurl?.qualifiers}
-                            />
-                          )}
-                        </Td>
-                        <Td
-                          width={10}
-                          {...getTdProps({ columnKey: "vulnerabilities" })}
-                        >
-                          <PackageVulnerabilities
-                            pkg={pkg}
-                            isFetching={packageIsFetching}
-                            fetchError={packageFetchError}
-                          />
-                        </Td>
-                      </TableRowContentWithControls>
-                    </Tr>
-                    {isCellExpanded(item) ? (
-                      <Tr isExpanded>
-                        <Td
-                          {...getExpandedContentTdProps({
-                            item,
-                          })}
-                          className={spacing.pLg}
-                        >
-                          <ExpandableRowContent>
-                            <div className={spacing.ptLg}>
-                              {isCellExpanded(item, "licenses") ? (
-                                <List isPlain>
-                                  {pkg?.licenses?.map((license, idx) => (
-                                    <ListItem
-                                      key={`${license.license_name}-${idx}`}
+                                ))}
+                                {nonVendorFixedVersions.map((v) => (
+                                  <Tooltip
+                                    key={v}
+                                    content="Version upgrade — move to this newer release to get the fix."
+                                  >
+                                    <Label
+                                      color="green"
+                                      variant="outline"
+                                      isCompact
                                     >
-                                      {license.license_name}
-                                    </ListItem>
-                                  ))}
-                                </List>
-                              ) : null}
-                            </div>
-                          </ExpandableRowContent>
-                        </Td>
+                                      {v}
+                                    </Label>
+                                  </Tooltip>
+                                ))}
+                              </LabelGroup>
+                            ) : null}
+                          </Td>
+                          <Td
+                            width={10}
+                            modifier="truncate"
+                            {...getTdProps({ columnKey: "path" })}
+                          >
+                            {item.decomposedPurl?.path}
+                          </Td>
+                          <Td
+                            width={20}
+                            {...getTdProps({ columnKey: "qualifiers" })}
+                          >
+                            {item.decomposedPurl?.qualifiers && (
+                              <PackageQualifiers
+                                value={item.decomposedPurl?.qualifiers}
+                              />
+                            )}
+                          </Td>
+                          <Td
+                            width={10}
+                            {...getTdProps({ columnKey: "vulnerabilities" })}
+                          >
+                            <PackageVulnerabilities
+                              pkg={pkg}
+                              isFetching={packageIsFetching}
+                              fetchError={packageFetchError}
+                            />
+                          </Td>
+                        </TableRowContentWithControls>
                       </Tr>
-                    ) : null}
-                  </Tbody>
-                )}
+                      {isCellExpanded(item) ? (
+                        <Tr isExpanded>
+                          <Td
+                            {...getExpandedContentTdProps({
+                              item,
+                            })}
+                            className={spacing.pLg}
+                          >
+                            <ExpandableRowContent>
+                              <div className={spacing.ptLg}>
+                                {isCellExpanded(item, "licenses") ? (
+                                  <List isPlain>
+                                    {pkg?.licenses?.map((license, idx) => (
+                                      <ListItem
+                                        key={`${license.license_name}-${idx}`}
+                                      >
+                                        {license.license_name}
+                                      </ListItem>
+                                    ))}
+                                  </List>
+                                ) : null}
+                              </div>
+                            </ExpandableRowContent>
+                          </Td>
+                        </Tr>
+                      ) : null}
+                    </Tbody>
+                  );
+                }}
               </WithPackage>
             );
           })}
