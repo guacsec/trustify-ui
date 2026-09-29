@@ -116,16 +116,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     total: true,
   });
 
-  const purls = useMemo(
-    () =>
-      packages
-        .map((item) => item.purl[0]?.purl)
-        .filter((p): p is string => Boolean(p)),
-    [packages],
-  );
-
-  const { recommendationsMap } = useFetchRecommendations(purls);
-
   const tableControls = useTableControlProps({
     ...tableControlState,
     idProperty: "id",
@@ -150,6 +140,16 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
     },
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
+
+  const purls = useMemo(
+    () =>
+      currentPageItems
+        .map((item) => item.purl[0]?.purl)
+        .filter((p): p is string => Boolean(p)),
+    [currentPageItems],
+  );
+
+  const { recommendationsMap } = useFetchRecommendations(purls);
 
   return (
     <>
@@ -176,7 +176,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
               <Th {...getThProps({ columnKey: "licenses" })} />
               <Th {...getThProps({ columnKey: "remediation" })}>
                 Remediations{" "}
-                <Tooltip content="Number of remediations available for this package. Open the package and use the Vulnerabilities tab to see remediations per CVE.">
+                <Tooltip content="Number of CVEs with a fix available for this package. Open the package to see remediations per CVE in the Vulnerabilities tab.">
                   <OutlinedQuestionCircleIcon />
                 </Tooltip>
               </Th>
@@ -266,22 +266,44 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                 <Skeleton screenreaderText="Loading remediations" />
                               );
                             }
-                            const cveIdsWithFix = new Set<string>();
+                            const affectedStatuses = (
+                              pkg?.advisories ?? []
+                            ).flatMap((a) =>
+                              a.status.filter((s) => s.status === "affected"),
+                            );
+                            const affectedCveIds = pkg
+                              ? new Set(
+                                  affectedStatuses.map(
+                                    (s) => s.vulnerability.identifier,
+                                  ),
+                                )
+                              : null;
+                            const hasCveAgnosticBackport =
+                              rowRecommendations.some(
+                                (rec) => rec.vulnerabilities.length === 0,
+                              );
+                            const cveIdsWithRemediation = new Set<string>();
+                            if (hasCveAgnosticBackport && affectedCveIds) {
+                              for (const id of affectedCveIds)
+                                cveIdsWithRemediation.add(id);
+                            }
                             for (const rec of rowRecommendations) {
                               for (const vuln of rec.vulnerabilities) {
-                                cveIdsWithFix.add(vuln.id);
+                                if (
+                                  !affectedCveIds ||
+                                  affectedCveIds.has(vuln.id)
+                                )
+                                  cveIdsWithRemediation.add(vuln.id);
                               }
                             }
-                            for (const advisory of pkg?.advisories ?? []) {
-                              for (const pkgStatus of advisory.status ?? []) {
-                                if (pkgStatus.fixed_versions.length > 0) {
-                                  cveIdsWithFix.add(
-                                    pkgStatus.vulnerability.identifier,
-                                  );
-                                }
+                            for (const s of affectedStatuses) {
+                              if (s.fixed_versions.length > 0) {
+                                cveIdsWithRemediation.add(
+                                  s.vulnerability.identifier,
+                                );
                               }
                             }
-                            const count = cveIdsWithFix.size;
+                            const count = cveIdsWithRemediation.size;
                             return `${count} ${count === 1 ? "Remediation" : "Remediations"}`;
                           }}
                         </WithPackage>
