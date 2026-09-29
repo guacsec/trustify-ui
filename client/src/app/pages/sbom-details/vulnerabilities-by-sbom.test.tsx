@@ -94,9 +94,11 @@ vi.mock("@app/components/SbomVulnerabilitiesDonutChart", () => ({
 }));
 
 vi.mock("@app/components/WithPackage", () => ({
-  WithPackage: ({ children }: { children: (pkg: null) => React.ReactNode }) => (
-    <>{children(null)}</>
-  ),
+  WithPackage: ({
+    children,
+  }: {
+    children: (pkg: null, isFetching: boolean) => React.ReactNode;
+  }) => <>{children(null, false)}</>,
 }));
 
 vi.mock("@app/components/LoadingWrapper", () => ({
@@ -119,14 +121,14 @@ describe("VulnerabilitiesBySbom remediation column", () => {
     mockRecommendationsMap.clear();
   });
 
-  /** Verifies the "Remediation" column header renders in the vulnerabilities table. */
-  it("renders the Remediation column header", () => {
+  /** Verifies the "Remediations" column header renders in the vulnerabilities table. */
+  it("renders the Remediations column header", () => {
     renderComponent();
-    expect(screen.getByText("Remediation")).toBeInTheDocument();
+    expect(screen.getAllByText(/Remediations/).length).toBeGreaterThan(0);
   });
 
-  /** Verifies that a vulnerability row with recommendations renders the recommended version Label. */
-  it("renders recommended version Label when recommendations exist for an affected package", () => {
+  /** Verifies that a CVE row shows the count of packages with recommendations. */
+  it("renders count of packages with recommendations for a CVE row", () => {
     // Given a recommendation for the affected package PURL
     const affectedPurl = "pkg:maven/org.apache.log4j/log4j-core@2.14.1";
     mockRecommendationsMap.set(affectedPurl, [
@@ -139,14 +141,13 @@ describe("VulnerabilitiesBySbom remediation column", () => {
     // When rendering the vulnerabilities table
     renderComponent();
 
-    // Then the recommended version is shown as a Label
-    expect(screen.getByText("2.17.2")).toBeInTheDocument();
+    // Then the count shows 1 package with a remediation (singular)
+    expect(screen.getByText("1 Remediation")).toBeInTheDocument();
   });
 
-  /** Verifies that a vulnerability row with no recommendations renders no remediation content. */
-  it("renders no remediation content when no recommendations exist", () => {
+  /** Verifies that a CVE row with no recommendations renders "0 Remediations". */
+  it("renders 0 Remediations when no packages have recommendations", () => {
     renderComponent();
-    expect(screen.queryByText("Applied")).not.toBeInTheDocument();
-    expect(screen.queryByText("2.17.2")).not.toBeInTheDocument();
+    expect(screen.getByText("0 Remediations")).toBeInTheDocument();
   });
 });

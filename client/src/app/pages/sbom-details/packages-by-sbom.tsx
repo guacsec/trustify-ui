@@ -2,10 +2,9 @@ import type React from "react";
 import { generatePath, Link } from "react-router-dom";
 
 import {
-  Label,
-  LabelGroup,
   List,
   ListItem,
+  Skeleton,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -37,10 +36,11 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchPackagesBySbomId } from "@app/queries/packages";
+import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 import { useFetchRecommendations } from "@app/queries/recommendations";
 import { useFetchSbomsLicenseIds } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
-import { decodePurl, decomposePurl, purlBaseEquals } from "@app/utils/utils";
+import { decodePurl } from "@app/utils/utils";
 
 import { PackageVulnerabilities } from "../package-list/components/PackageVulnerabilities";
 import { WithPackage } from "@app/components/WithPackage";
@@ -70,7 +70,7 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
       version: "Version",
       vulnerabilities: "Vulnerabilities",
       licenses: "Licenses",
-      remediation: "Remediation",
+      remediation: "Remediations",
       purls: "PURLs",
       cpes: "CPEs",
     },
@@ -174,7 +174,12 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
               <Th {...getThProps({ columnKey: "version" })} />
               <Th {...getThProps({ columnKey: "vulnerabilities" })} />
               <Th {...getThProps({ columnKey: "licenses" })} />
-              <Th {...getThProps({ columnKey: "remediation" })} />
+              <Th {...getThProps({ columnKey: "remediation" })}>
+                Remediations{" "}
+                <Tooltip content="Number of remediations available for this package. Open the package and use the Vulnerabilities tab to see remediations per CVE.">
+                  <OutlinedQuestionCircleIcon />
+                </Tooltip>
+              </Th>
               <Th {...getThProps({ columnKey: "purls" })} />
               <Th {...getThProps({ columnKey: "cpes" })} />
             </TableHeaderContentWithControls>
@@ -190,14 +195,6 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
             const currentPurl = item.purl[0]?.purl;
             const rowRecommendations =
               recommendationsMap.get(currentPurl ?? "") ?? [];
-            const isRemediationApplied = rowRecommendations.some((rec) =>
-              purlBaseEquals(rec.package, currentPurl ?? ""),
-            );
-            const recommendedVersionSet = new Set(
-              rowRecommendations.map(
-                (rec) => decomposePurl(rec.package)?.version ?? rec.package,
-              ),
-            );
 
             return (
               <Tbody key={item.id} isExpanded={isCellExpanded(item)}>
@@ -261,96 +258,36 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                       width={15}
                       {...getTdProps({ columnKey: "remediation" })}
                     >
-                      {isRemediationApplied ? (
-                        <Label color="blue" isCompact>
-                          Applied
-                        </Label>
-                      ) : item.purl[0] ? (
+                      {item.purl[0] ? (
                         <WithPackage packageId={item.purl[0].uuid}>
-                          {(pkg) => {
-                            const fixedVersions: string[] = [];
+                          {(pkg, isFetching) => {
+                            if (isFetching) {
+                              return (
+                                <Skeleton screenreaderText="Loading remediations" />
+                              );
+                            }
+                            const cveIdsWithFix = new Set<string>();
+                            for (const rec of rowRecommendations) {
+                              for (const vuln of rec.vulnerabilities) {
+                                cveIdsWithFix.add(vuln.id);
+                              }
+                            }
                             for (const advisory of pkg?.advisories ?? []) {
                               for (const pkgStatus of advisory.status ?? []) {
-                                const versions = (
-                                  pkgStatus as unknown as {
-                                    fixed_versions?: string[];
-                                  }
-                                ).fixed_versions;
-                                if (versions) {
-                                  for (const v of versions) {
-                                    if (!fixedVersions.includes(v))
-                                      fixedVersions.push(v);
-                                  }
+                                if (pkgStatus.fixed_versions.length > 0) {
+                                  cveIdsWithFix.add(
+                                    pkgStatus.vulnerability.identifier,
+                                  );
                                 }
                               }
                             }
-                            const vendorVersions = rowRecommendations.map(
-                              (rec) =>
-                                decomposePurl(rec.package)?.version ??
-                                rec.package,
-                            );
-                            const nonVendorFixedVersions = fixedVersions.filter(
-                              (v) => !recommendedVersionSet.has(v),
-                            );
-                            if (
-                              vendorVersions.length === 0 &&
-                              nonVendorFixedVersions.length === 0
-                            ) {
-                              return null;
-                            }
-                            return (
-                              <LabelGroup>
-                                {vendorVersions.map((v) => (
-                                  <Tooltip
-                                    key={v}
-                                    content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
-                                  >
-                                    <Label
-                                      color="blue"
-                                      variant="outline"
-                                      isCompact
-                                    >
-                                      {v}
-                                    </Label>
-                                  </Tooltip>
-                                ))}
-                                {nonVendorFixedVersions.map((v) => (
-                                  <Tooltip
-                                    key={v}
-                                    content="Version upgrade — move to this newer release to get the fix."
-                                  >
-                                    <Label
-                                      color="green"
-                                      variant="outline"
-                                      isCompact
-                                    >
-                                      {v}
-                                    </Label>
-                                  </Tooltip>
-                                ))}
-                              </LabelGroup>
-                            );
+                            const count = cveIdsWithFix.size;
+                            return `${count} ${count === 1 ? "Remediation" : "Remediations"}`;
                           }}
                         </WithPackage>
-                      ) : rowRecommendations.length > 0 ? (
-                        <LabelGroup>
-                          {rowRecommendations.map((rec) => {
-                            const version =
-                              decomposePurl(rec.package)?.version ??
-                              rec.package;
-                            return (
-                              <Tooltip
-                                key={rec.package}
-                                content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
-                              >
-                                <Label color="blue" variant="outline" isCompact>
-                                  {version}
-                                </Label>
-                              </Tooltip>
-                            );
-                          })}
-                        </LabelGroup>
-                      ) : null}
+                      ) : (
+                        "0 Remediations"
+                      )}
                     </Td>
                     <Td
                       width={20}
