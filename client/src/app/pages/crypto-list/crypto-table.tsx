@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 
-import type { IconedStatusPreset } from "@app/components/IconedStatus";
-import { IconedStatus } from "@app/components/IconedStatus";
+import { PolicyLabel } from "@app/components/PolicyLabel";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -20,13 +19,6 @@ interface CryptoTableProps {
   assetType: string;
   onSelectAlgorithm: (item: CryptoAlgorithm) => void;
 }
-
-/** Maps a backend policy_status string to an IconedStatus preset name. */
-const policyPresetMap: Record<string, IconedStatusPreset> = {
-  compliant: "Compliant",
-  warning: "Warning",
-  non_compliant: "NonCompliant",
-};
 
 const algProps = (item: CryptoAlgorithm) =>
   ((item.properties as Record<string, unknown>)?.algorithmProperties as Record<
@@ -173,11 +165,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
                           rowIndex,
                         })}
                       >
-                        <IconedStatus
-                          preset={
-                            policyPresetMap[item.policy_status] ?? "Unknown"
-                          }
-                        />
+                        <PolicyLabel policyStatus={item.policy_status} />
                       </Td>
                       <Td
                         width={15}
