@@ -12,20 +12,12 @@ import {
   StackItem,
 } from "@patternfly/react-core";
 
-import type { IconedStatusPreset } from "@app/components/IconedStatus";
-import { IconedStatus } from "@app/components/IconedStatus";
-
+import { PolicyLabel } from "@app/components/PolicyLabel";
 import type { CryptoAlgorithm } from "../crypto-context";
 
 interface ICryptoAlgorithmDetailProps {
   algorithm: CryptoAlgorithm;
 }
-
-const policyPresetMap: Record<string, IconedStatusPreset> = {
-  compliant: "Compliant",
-  warning: "Warning",
-  non_compliant: "NonCompliant",
-};
 
 const policyReasonMap: Record<string, { label: string; description: string }> =
   {
@@ -234,9 +226,7 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
               <DescriptionListGroup>
                 <DescriptionListTerm>Overall</DescriptionListTerm>
                 <DescriptionListDescription>
-                  <IconedStatus
-                    preset={policyPresetMap[policyStatus] ?? "Unknown"}
-                  />
+                  <PolicyLabel policyStatus={policyStatus} />
                 </DescriptionListDescription>
               </DescriptionListGroup>
               {reason && (

@@ -16,9 +16,7 @@ import {
   ToolbarItem,
 } from "@patternfly/react-core";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
-
-import type { IconedStatusPreset } from "@app/components/IconedStatus";
-import { IconedStatus } from "@app/components/IconedStatus";
+import { PolicyLabel } from "@app/components/PolicyLabel";
 import { FilterToolbar, FilterType } from "@app/components/FilterToolbar";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
 import { PageDrawerContent } from "@app/components/PageDrawerContext";
@@ -37,12 +35,6 @@ import {
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
 import { CryptoAlgorithmDetail } from "@app/pages/crypto-list/components/CryptoAlgorithmDetail";
 import { useFetchCryptoBySbom } from "@app/queries/crypto";
-
-const policyPresetMap: Record<string, IconedStatusPreset> = {
-  compliant: "Compliant",
-  warning: "Warning",
-  non_compliant: "NonCompliant",
-};
 
 const algProps = (item: CryptoAlgorithm) =>
   ((item.properties as Record<string, unknown>)?.algorithmProperties as Record<
@@ -251,11 +243,7 @@ const AlgorithmsTable: React.FC<AssetTableProps> = ({
                         rowIndex,
                       })}
                     >
-                      <IconedStatus
-                        preset={
-                          policyPresetMap[item.policy_status] ?? "Unknown"
-                        }
-                      />
+                      <PolicyLabel policyStatus={item.policy_status} />
                     </Td>
                     <Td
                       width={15}
