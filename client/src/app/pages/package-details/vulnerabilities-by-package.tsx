@@ -80,7 +80,7 @@ export const VulnerabilitiesByPackage: React.FC<
       description: "Description",
       severity: "CVSS",
       published: "Date published",
-      remediation: "Remediation",
+      remediation: "Remediations",
     },
     hasActionsColumn: false,
     isSortEnabled: true,
@@ -148,9 +148,37 @@ export const VulnerabilitiesByPackage: React.FC<
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const rowRecs = recommendationsMap.get(pkg?.purl ?? "") ?? [];
+            const allRecs = recommendationsMap.get(pkg?.purl ?? "") ?? [];
+            const rowRecs = allRecs.filter(
+              (rec) =>
+                rec.vulnerabilities.length === 0 ||
+                rec.vulnerabilities.some(
+                  (v) => v.id === item.vulnerability.identifier,
+                ),
+            );
             const isRemediationApplied = rowRecs.some((rec) =>
               purlBaseEquals(rec.package, pkg?.purl ?? ""),
+            );
+            const vendorVersionSet = new Set(
+              rowRecs.map(
+                (rec) => decomposePurl(rec.package)?.version ?? rec.package,
+              ),
+            );
+            const fixedVersionsForCve = new Set<string>();
+            for (const { advisory } of item.relatedSboms ?? []) {
+              for (const pkgStatus of advisory.status ?? []) {
+                if (
+                  pkgStatus.vulnerability.identifier ===
+                  item.vulnerability.identifier
+                ) {
+                  for (const v of pkgStatus.fixed_versions ?? []) {
+                    fixedVersionsForCve.add(v);
+                  }
+                }
+              }
+            }
+            const nonVendorFixedVersions = [...fixedVersionsForCve].filter(
+              (v) => !vendorVersionSet.has(v),
             );
 
             return (
@@ -222,20 +250,34 @@ export const VulnerabilitiesByPackage: React.FC<
                         <Label color="blue" isCompact>
                           Applied
                         </Label>
-                      ) : rowRecs.length > 0 ? (
+                      ) : rowRecs.length > 0 ||
+                        nonVendorFixedVersions.length > 0 ? (
                         <LabelGroup>
                           {rowRecs.map((rec) => {
                             const version =
                               decomposePurl(rec.package)?.version ??
                               rec.package;
                             return (
-                              <Tooltip key={rec.package} content={rec.package}>
-                                <Label color="green" isCompact>
+                              <Tooltip
+                                key={rec.package}
+                                content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                              >
+                                <Label color="blue" variant="outline" isCompact>
                                   {version}
                                 </Label>
                               </Tooltip>
                             );
                           })}
+                          {nonVendorFixedVersions.map((v) => (
+                            <Tooltip
+                              key={v}
+                              content="Version upgrade — move to this newer release to get the fix."
+                            >
+                              <Label color="green" variant="outline" isCompact>
+                                {v}
+                              </Label>
+                            </Tooltip>
+                          ))}
                         </LabelGroup>
                       ) : null}
                     </Td>
