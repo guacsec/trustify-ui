@@ -141,23 +141,32 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     [rawAdvisories, includeResolved],
   );
 
+  // Build a map of CVE ID → Set of PURLs that have upstream fixed_versions
+  // from SBOM-level advisory data, so the count on the CVE row includes both
+  // vendor backports (from recommendationsMap) and upstream fixes.
+  const fixedPurlsByCve = React.useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const advisory of rawAdvisories) {
+      for (const status of advisory.status ?? []) {
+        if ((status.fixed_versions ?? []).length > 0) {
+          const cveId = status.identifier;
+          if (!map.has(cveId)) map.set(cveId, new Set());
+          const purlSet = map.get(cveId)!;
+          for (const pkg of status.packages ?? []) {
+            for (const p of pkg.purl ?? []) {
+              purlSet.add(p.purl);
+            }
+          }
+        }
+      }
+    }
+    return map;
+  }, [rawAdvisories]);
+
   const tableDataWithUiId = useWithUiId(
     affectedVulnerabilities,
     (d) => `${d.vulnerability.identifier}-${d.vulnerabilityStatus}`,
   );
-
-  const allPurls = React.useMemo(
-    () =>
-      affectedVulnerabilities.flatMap((vuln) =>
-        Array.from(vuln.purls.values())
-          .filter((p) => !p.isOrphan)
-          .map((p) => p.purlSummary.purl),
-      ),
-    [affectedVulnerabilities],
-  );
-
-  const { recommendationsMap, isFetching: isFetchingRecommendations } =
-    useFetchRecommendations(allPurls);
 
   const tableControls = useLocalTableControls({
     tableName: "vulnerability-table",
@@ -215,6 +224,19 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     },
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
+
+  const allPurls = React.useMemo(
+    () =>
+      currentPageItems.flatMap((vuln) =>
+        Array.from(vuln.purls.values())
+          .filter((p) => !p.isOrphan)
+          .map((p) => p.purlSummary.purl),
+      ),
+    [currentPageItems],
+  );
+
+  const { recommendationsMap, isFetching: isFetchingRecommendations } =
+    useFetchRecommendations(allPurls);
 
   return (
     <Stack hasGutter>
@@ -317,7 +339,7 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
                 <Th {...getThProps({ columnKey: "remediation" })}>
                   Remediations{" "}
-                  <Tooltip content="Count of remediations for packages affected by this vulnerability. Expand Affected dependencies to see remediations per package for this CVE.">
+                  <Tooltip content="Number of affected packages with a fix available for this CVE. Expand Affected dependencies to see remediations per package.">
                     <OutlinedQuestionCircleIcon />
                   </Tooltip>
                 </Th>
@@ -347,8 +369,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 .filter((p) => !p.isOrphan)
                 .map((p) => p.purlSummary.purl);
 
+              const fixedPurls =
+                fixedPurlsByCve.get(item.vulnerability.identifier) ??
+                new Set<string>();
               const remediationCount = rowPurls.filter(
-                (purl) => (recommendationsMap.get(purl) ?? []).length > 0,
+                (purl) =>
+                  (recommendationsMap.get(purl) ?? []).length > 0 ||
+                  fixedPurls.has(purl),
               ).length;
 
               const hasVexResolution =
