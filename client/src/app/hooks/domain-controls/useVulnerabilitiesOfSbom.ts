@@ -307,6 +307,7 @@ export const useVulnerabilitiesOfSbom = (sbomId: string) => {
 
   return {
     data: result,
+    advisories: advisories ?? [],
     isFetching: isFetchingAdvisories,
     fetchError: fetchErrorAdvisories,
   };
