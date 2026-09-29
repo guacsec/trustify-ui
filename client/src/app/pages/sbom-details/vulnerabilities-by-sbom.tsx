@@ -507,7 +507,6 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                   <Th>Path</Th>
                                   <Th>Qualifiers</Th>
                                   <Th>Remediations</Th>
-                                  {purlResolutions && <Th>VEX Status</Th>}
                                 </Tr>
                               </Thead>
                               <Tbody>
@@ -655,55 +654,6 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                               }}
                                             </WithPackage>
                                           </Td>
-                                          {purlResolutions && (
-                                            <Td>
-                                              {resolution ? (
-                                                <Flex
-                                                  spaceItems={{
-                                                    default: "spaceItemsSm",
-                                                  }}
-                                                  alignItems={{
-                                                    default: "alignItemsCenter",
-                                                  }}
-                                                  flexWrap={{
-                                                    default: "nowrap",
-                                                  }}
-                                                >
-                                                  <FlexItem>
-                                                    <Label
-                                                      color="green"
-                                                      isCompact
-                                                    >
-                                                      {resolution.status ===
-                                                      "not_affected"
-                                                        ? "Not affected"
-                                                        : resolution.status ===
-                                                            "known_not_affected"
-                                                          ? "Known not affected"
-                                                          : "Fixed"}
-                                                    </Label>
-                                                  </FlexItem>
-                                                  <FlexItem>
-                                                    <Link
-                                                      to={generatePath(
-                                                        Paths.advisoryDetails,
-                                                        {
-                                                          advisoryId:
-                                                            resolution.advisory
-                                                              .uuid,
-                                                        },
-                                                      )}
-                                                    >
-                                                      {
-                                                        resolution.advisory
-                                                          .identifier
-                                                      }
-                                                    </Link>
-                                                  </FlexItem>
-                                                </Flex>
-                                              ) : null}
-                                            </Td>
-                                          )}
                                         </Tr>
                                       );
                                     } else {
@@ -718,7 +668,6 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                           <Td />
                                           <Td />
                                           <Td />
-                                          {purlResolutions && <Td />}
                                         </Tr>
                                       );
                                     }
