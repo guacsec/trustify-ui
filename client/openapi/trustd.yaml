@@ -5,7 +5,7 @@ info:
   license:
     name: Apache License, Version 2.0
     identifier: Apache-2.0
-  version: 0.6.0-rc.1
+  version: 0.7.0-rc.1
 paths:
   /.well-known/trustify:
     get:
@@ -3163,6 +3163,16 @@ paths:
           type: array
           items:
             type: string
+      - name: crypto
+        in: query
+        description: |-
+          Filter by crypto algorithm name. Only SBOMs containing any of the provided algorithm
+          names will be returned. Can be specified multiple times.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: advisories
         in: query
         description: Include advisory severity summary per SBOM
@@ -5858,7 +5868,7 @@ components:
           - 'null'
           description: Identifier of the rule that produced the finding, when available.
         severity:
-          $ref: '#/components/schemas/Severity'
+          $ref: '#/components/schemas/ValidationSeverity'
           description: The severity of this finding.
     Format:
       type: string
@@ -8301,6 +8311,17 @@ components:
         validator:
           type: string
           description: The [`Validator::name`] that produced this report.
+    ValidationSeverity:
+      type: string
+      description: |-
+        Severity of a single validation finding.
+
+        Ordered from least to most severe, so `>=` comparisons express a threshold.
+      enum:
+      - info
+      - warning
+      - error
+      - fatal
     VersionRange:
       oneOf:
       - type: object
