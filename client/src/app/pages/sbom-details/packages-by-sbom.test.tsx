@@ -52,7 +52,14 @@ vi.mock("@app/queries/sboms", () => ({
 
 const mockRecommendationsMap = new Map<
   string,
-  { package: string; vulnerabilities: { id: string; remediations: [] }[] }[]
+  {
+    package: string;
+    vulnerabilities: {
+      id: string;
+      status?: string | null;
+      remediations: [];
+    }[];
+  }[]
 >();
 
 vi.mock("@app/queries/recommendations", () => ({
@@ -96,14 +103,16 @@ describe("PackagesBySbom", () => {
     expect(screen.getByText("Remediations")).toBeInTheDocument();
   });
 
-  /** Verifies that a package with CVE-scoped recommendations shows the CVE count. */
-  it("renders remediation count when CVE-scoped recommendations exist", () => {
-    // Given a CVE-scoped recommendation for the package
+  /** Verifies that a package with Fixed recommendation shows the CVE count. */
+  it("renders remediation count when recommendation has Fixed status", () => {
+    // Given a recommendation with Fixed status for the package
     const purl = "pkg:maven/org.apache.log4j/log4j-core@2.14.1";
     mockRecommendationsMap.set(purl, [
       {
         package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
-        vulnerabilities: [{ id: "CVE-2021-44228", remediations: [] }],
+        vulnerabilities: [
+          { id: "CVE-2021-44228", status: "Fixed", remediations: [] },
+        ],
       },
     ]);
 
@@ -114,11 +123,49 @@ describe("PackagesBySbom", () => {
     expect(screen.getByText("1 Remediation")).toBeInTheDocument();
   });
 
+  /** Verifies that a recommendation with Affected status is not counted. */
+  it("does not count recommendations with Affected status", () => {
+    // Given a recommendation with Affected status
+    const purl = "pkg:maven/org.apache.log4j/log4j-core@2.14.1";
+    mockRecommendationsMap.set(purl, [
+      {
+        package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
+        vulnerabilities: [
+          { id: "CVE-2021-44228", status: "Affected", remediations: [] },
+        ],
+      },
+    ]);
+
+    // When rendering the SBOM packages table
+    renderComponent();
+
+    // Then the count is 0 (Affected status does not count as remediation)
+    expect(screen.queryByText("1 Remediation")).not.toBeInTheDocument();
+    expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
+  });
+
+  /** Verifies that a recommendation with empty vulnerabilities array is not counted. */
+  it("does not count recommendations with empty vulnerabilities array", () => {
+    // Given a recommendation with empty vulnerabilities
+    const purl = "pkg:maven/org.apache.log4j/log4j-core@2.14.1";
+    mockRecommendationsMap.set(purl, [
+      {
+        package: "pkg:maven/org.apache.log4j/log4j-core@2.17.2",
+        vulnerabilities: [],
+      },
+    ]);
+
+    // When rendering the SBOM packages table
+    renderComponent();
+
+    // Then the count is 0 (no VEX proof for any CVE)
+    expect(screen.queryByText("1 Remediation")).not.toBeInTheDocument();
+    expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
+  });
+
   /** Verifies that a package with no recommendations renders "0 Remediations". */
   it("renders 0 Remediations when no recommendations exist", () => {
     renderComponent();
-    // packageWithPurl has no recommendations → 0 Remediations
-    // packageWithoutPurl has no purl → 0 Remediations (fallback)
     expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
   });
 });
