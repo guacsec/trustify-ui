@@ -140,6 +140,7 @@ describe("PackagesBySbom", () => {
     renderComponent();
 
     // Then the count is 0 (Affected status does not count as remediation)
+    expect(screen.queryByText("1 Remediation")).not.toBeInTheDocument();
     expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
   });
 
@@ -158,6 +159,7 @@ describe("PackagesBySbom", () => {
     renderComponent();
 
     // Then the count is 0 (no VEX proof for any CVE)
+    expect(screen.queryByText("1 Remediation")).not.toBeInTheDocument();
     expect(screen.getAllByText("0 Remediations").length).toBeGreaterThan(0);
   });
 
