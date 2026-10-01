@@ -67,7 +67,7 @@ import { useIsExploitIntelligenceEnabled } from "@app/queries/trustifyInfo";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
-import { decomposePurl, formatDate } from "@app/utils/utils";
+import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
 import { WithPackage } from "@app/components/WithPackage";
 
@@ -689,11 +689,28 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                                   (v) =>
                                                     !vendorVersionSet.has(v),
                                                 );
+                                                const isRemediationApplied =
+                                                  purlRecs.some((rec) =>
+                                                    purlBaseEquals(
+                                                      rec.package,
+                                                      purl.purlSummary.purl,
+                                                    ),
+                                                  );
                                                 if (
                                                   purlRecs.length === 0 &&
                                                   nonVendorVersions.length === 0
                                                 ) {
                                                   return null;
+                                                }
+                                                if (isRemediationApplied) {
+                                                  return (
+                                                    <Label
+                                                      color="blue"
+                                                      isCompact
+                                                    >
+                                                      Applied
+                                                    </Label>
+                                                  );
                                                 }
                                                 return (
                                                   <LabelGroup>
