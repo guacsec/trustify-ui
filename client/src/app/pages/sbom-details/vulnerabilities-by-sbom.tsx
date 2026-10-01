@@ -349,8 +349,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 new Set<string>();
               const remediationCount = rowPurls.filter(
                 (purl) =>
-                  (recommendationsMap.get(purl) ?? []).length > 0 ||
-                  fixedPurls.has(purl),
+                  (recommendationsMap.get(purl) ?? []).some((rec) =>
+                    rec.vulnerabilities.some(
+                      (v) =>
+                        v.id === item.vulnerability.identifier &&
+                        (v.status === "Fixed" || v.status === "NotAffected"),
+                    ),
+                  ) || fixedPurls.has(purl),
               ).length;
 
               return (
@@ -586,16 +591,16 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                                   recommendationsMap.get(
                                                     purl.purlSummary.purl,
                                                   ) ?? []
-                                                ).filter(
-                                                  (rec) =>
-                                                    rec.vulnerabilities
-                                                      .length === 0 ||
-                                                    rec.vulnerabilities.some(
-                                                      (v) =>
-                                                        v.id ===
+                                                ).filter((rec) =>
+                                                  rec.vulnerabilities.some(
+                                                    (v) =>
+                                                      v.id ===
                                                         item.vulnerability
-                                                          .identifier,
-                                                    ),
+                                                          .identifier &&
+                                                      (v.status === "Fixed" ||
+                                                        v.status ===
+                                                          "NotAffected"),
+                                                  ),
                                                 );
                                                 const vendorVersionSet =
                                                   new Set(
