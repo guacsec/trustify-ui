@@ -72,6 +72,7 @@ interface PackageRow {
   packageName: string;
   version: string;
   recommendedVersion: string;
+  isApplied: boolean;
   foundInNames: string[];
   vulnerabilities: string[];
 }
@@ -80,20 +81,16 @@ const toPackageRows = (
   packages: RecommendReportPackage[],
   sbomNameById: Map<string, string>,
 ): PackageRow[] =>
-  packages
-    // Skip entries where the vendor has no better alternative (same purl = no actionable upgrade).
-    .filter((pkg) => pkg.purl !== pkg.recommended_purl)
-    .map((pkg) => ({
-      purl: pkg.purl,
-      recommendedPurl: pkg.recommended_purl,
-      packageName: extractName(pkg.purl),
-      version: extractVersion(pkg.purl),
-      recommendedVersion: extractVersion(pkg.recommended_purl),
-      foundInNames: (pkg.found_in ?? []).map(
-        (id) => sbomNameById.get(id) ?? id,
-      ),
-      vulnerabilities: pkg.vulnerabilities ?? [],
-    }));
+  packages.map((pkg) => ({
+    purl: pkg.purl,
+    recommendedPurl: pkg.recommended_purl,
+    packageName: extractName(pkg.purl),
+    version: extractVersion(pkg.purl),
+    recommendedVersion: extractVersion(pkg.recommended_purl),
+    isApplied: pkg.purl === pkg.recommended_purl,
+    foundInNames: (pkg.found_in ?? []).map((id) => sbomNameById.get(id) ?? id),
+    vulnerabilities: pkg.vulnerabilities ?? [],
+  }));
 
 /** Remediation report page — renders an impact summary and per-package remediations for selected SBOMs. */
 export const RemediationReport: React.FC = () => {
@@ -498,11 +495,21 @@ export const RemediationReport: React.FC = () => {
                                 columnKey: "recommendedVersion",
                               })}
                             >
-                              <Tooltip content={item.recommendedPurl}>
-                                <Label color="blue" variant="outline" isCompact>
-                                  {item.recommendedVersion}
+                              {item.isApplied ? (
+                                <Label color="blue" isCompact>
+                                  Applied
                                 </Label>
-                              </Tooltip>
+                              ) : (
+                                <Tooltip content={item.recommendedPurl}>
+                                  <Label
+                                    color="blue"
+                                    variant="outline"
+                                    isCompact
+                                  >
+                                    {item.recommendedVersion}
+                                  </Label>
+                                </Tooltip>
+                              )}
                             </Td>
                             <Td
                               {...getTdProps({ columnKey: "vulnerabilities" })}
