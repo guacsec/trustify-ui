@@ -22,6 +22,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
       algorithmProperties: { primitive: "pke", cryptoFunctions: ["keygen"] },
     },
     policy_status: "compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
   {
     node_id: "alg-2",
@@ -35,6 +37,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
       },
     },
     policy_status: "non_compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
 ];
 
@@ -48,6 +52,8 @@ const mockKeys: CryptoAlgorithm[] = [
       relatedCryptoMaterialProperties: { type: "private-key" },
     },
     policy_status: "compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
 ];
 

@@ -3169,6 +3169,16 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: crypto
+        in: query
+        description: |-
+          Filter by crypto algorithm name. Only SBOMs containing any of the provided algorithm
+          names will be returned. Can be specified multiple times.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       responses:
         '200':
           description: Matching SBOMs

@@ -50,13 +50,12 @@ const getUsage = (item: CryptoAlgorithm): string =>
 const getOccurrences = (item: CryptoAlgorithm): number =>
   (algProps(item).occurrences as number) ?? 1;
 
-/** Extracts the packages count from crypto properties. */
+/** Extracts the packages count from the top-level API field. */
 const getPackagesCount = (item: CryptoAlgorithm): number =>
-  (algProps(item).packages as number) ?? 0;
+  item.packages_count ?? 0;
 
-/** Extracts the SBOMs count from crypto properties. */
-const getSbomsCount = (item: CryptoAlgorithm): number =>
-  (algProps(item).sboms as number) ?? 0;
+/** Extracts the SBOMs count from the top-level API field. */
+const getSbomsCount = (item: CryptoAlgorithm): number => item.sboms_count ?? 0;
 
 /** Master algorithm/key table component with tab-aware column rendering. */
 export const CryptoTable: React.FC<CryptoTableProps> = ({
