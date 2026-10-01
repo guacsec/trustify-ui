@@ -144,7 +144,8 @@ describe("RemediationReport", () => {
     expect(screen.getByText("commons-text")).toBeInTheDocument();
   });
 
-  it("hides packages where recommended_purl equals purl (no actionable upgrade)", () => {
+  /** Verifies that packages where purl equals recommended_purl render with an "Applied" badge instead of being hidden. */
+  it("renders Applied badge for packages where recommended_purl equals purl", () => {
     // Given a report where one package has the same purl and recommended_purl
     mockedUseFetchRemediationReport.mockReturnValue(
       makeHookResult({
@@ -165,10 +166,50 @@ describe("RemediationReport", () => {
     );
     renderReport();
 
-    // Then the no-upgrade package does not appear in the packages table
-    expect(screen.queryByText("unchanged")).not.toBeInTheDocument();
+    // Then the applied package appears in the table with an "Applied" badge
+    expect(screen.getByText("unchanged")).toBeInTheDocument();
+    expect(screen.getByText("Applied")).toBeInTheDocument();
     // And the packages with real upgrades still appear
     expect(screen.getByText("log4j-core")).toBeInTheDocument();
+  });
+
+  /** Verifies that packages with a different recommended version render the version Label (not Applied). */
+  it("renders version Label for packages with a different recommended version", () => {
+    // Given the default report where packages have different purl and recommended_purl
+    renderReport();
+
+    // Then the recommended versions are shown as Labels (not Applied)
+    expect(screen.getByText("2.17.1")).toBeInTheDocument();
+    expect(screen.getByText("1.10")).toBeInTheDocument();
+    expect(screen.queryByText("Applied")).not.toBeInTheDocument();
+  });
+
+  /** Verifies that all packages from the API response appear in the table (no hidden rows). */
+  it("renders all packages including applied ones in the table", () => {
+    // Given a report with 3 packages: 2 upgrades + 1 applied
+    mockedUseFetchRemediationReport.mockReturnValue(
+      makeHookResult({
+        report: {
+          ...sampleReport,
+          packages: [
+            ...sampleReport.packages,
+            {
+              purl: "pkg:maven/org.example/applied-pkg@3.0.0",
+              recommended_purl: "pkg:maven/org.example/applied-pkg@3.0.0",
+              vulnerabilities: ["CVE-2099-0002"],
+              found_in: ["sbom-id-1"],
+              advisory_id: null,
+            },
+          ],
+        },
+      }),
+    );
+    renderReport();
+
+    // Then all 3 packages are visible in the table
+    expect(screen.getByText("log4j-core")).toBeInTheDocument();
+    expect(screen.getByText("commons-text")).toBeInTheDocument();
+    expect(screen.getByText("applied-pkg")).toBeInTheDocument();
   });
 
   it("shows a limit-exceeded error when the server returns 413", () => {
