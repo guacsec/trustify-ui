@@ -15,6 +15,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
       algorithmProperties: { primitive: "block-cipher" },
     },
     policy_status: "compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
   {
     node_id: "alg-2",
@@ -25,6 +27,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
       algorithmProperties: { primitive: "pke", parameterSetIdentifier: "2048" },
     },
     policy_status: "warning",
+    packages_count: 0,
+    sboms_count: 0,
   },
   {
     node_id: "alg-3",
@@ -35,6 +39,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
       algorithmProperties: { primitive: "hash" },
     },
     policy_status: "non_compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
 ];
 
@@ -48,6 +54,8 @@ const mockKeys: CryptoAlgorithm[] = [
       relatedCryptoMaterialProperties: { type: "private-key" },
     },
     policy_status: "compliant",
+    packages_count: 0,
+    sboms_count: 0,
   },
 ];
 
