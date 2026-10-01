@@ -278,20 +278,14 @@ export const PackagesBySbom: React.FC<PackagesProps> = ({ sbomId }) => {
                                   ),
                                 )
                               : null;
-                            const hasCveAgnosticBackport =
-                              rowRecommendations.some(
-                                (rec) => rec.vulnerabilities.length === 0,
-                              );
                             const cveIdsWithRemediation = new Set<string>();
-                            if (hasCveAgnosticBackport && affectedCveIds) {
-                              for (const id of affectedCveIds)
-                                cveIdsWithRemediation.add(id);
-                            }
                             for (const rec of rowRecommendations) {
                               for (const vuln of rec.vulnerabilities) {
                                 if (
-                                  !affectedCveIds ||
-                                  affectedCveIds.has(vuln.id)
+                                  (vuln.status === "Fixed" ||
+                                    vuln.status === "NotAffected") &&
+                                  (!affectedCveIds ||
+                                    affectedCveIds.has(vuln.id))
                                 )
                                   cveIdsWithRemediation.add(vuln.id);
                               }
