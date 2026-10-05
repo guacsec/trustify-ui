@@ -99,7 +99,7 @@ type FormValues = {
   onlyPatterns: { value: string }[];
 };
 
-export const ALL_IMPORTERS = ["sbom", "csaf", "osv", "cve"] as const;
+const ALL_IMPORTERS = ["sbom", "csaf", "osv", "cve"] as const;
 type ImporterType = (typeof ALL_IMPORTERS)[number];
 
 export interface IImporterFormProps {
@@ -131,7 +131,7 @@ export const ImporterForm: React.FC<IImporterFormProps> = ({
   )[0] as ImporterType;
 
   const importerConfiguration = importer?.configuration
-    ? // biome-ignore lint/suspicious/noExplicitAny: allowed
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
       ((importer?.configuration as any)[importerType] as SbomImporter)
     : undefined;
 

@@ -8,9 +8,8 @@ import type { HubPaginatedResult, HubRequestParams } from "./models";
 
 const API = "/api";
 
-export const ORGANIZATIONS = `${API}/v2/organization`;
-export const ADVISORIES = `${API}/v2/advisory`;
-export const SBOMS = `${API}/v2/sbom`;
+export const ADVISORIES = `${API}/v3/advisory`;
+export const SBOMS = `${API}/v3/sbom`;
 
 export interface PaginatedResponse<T> {
   items: T[];
@@ -70,7 +69,7 @@ export const uploadSbomForAnalysis = (
   config?: AxiosRequestConfig,
 ) => {
   const file = formData.get(FORM_DATA_FILE_KEY) as File;
-  return axios.post<ExtractResult>("/api/v2/ui/extract-sbom-purls", file, {
+  return axios.post<ExtractResult>("/api/v3/ui/extract-sbom-purls", file, {
     ...config,
     headers: { "Content-Type": getContentTypeFromFile(file) },
   });

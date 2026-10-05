@@ -283,7 +283,7 @@ export const SbomScan: React.FC = () => {
             icon={<DownloadIcon />}
             onClick={async () => {
               await handleDownloadCSV();
-              blocker.state === "blocked" && blocker.proceed();
+              if (blocker.state === "blocked") blocker.proceed();
             }}
           >
             Download and leave
@@ -291,7 +291,7 @@ export const SbomScan: React.FC = () => {
           <Button
             variant="secondary"
             onClick={async () => {
-              blocker.state === "blocked" && blocker.proceed();
+              if (blocker.state === "blocked") blocker.proceed();
             }}
           >
             Leave without downloading
@@ -300,7 +300,7 @@ export const SbomScan: React.FC = () => {
             key="cancel"
             variant="link"
             onClick={() => {
-              blocker.state === "blocked" && blocker.reset();
+              if (blocker.state === "blocked") blocker.reset();
             }}
           >
             Cancel

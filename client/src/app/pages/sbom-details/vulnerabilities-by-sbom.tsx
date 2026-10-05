@@ -4,21 +4,34 @@ import { generatePath, Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
+  Alert,
+  AlertActionCloseButton,
+  Button,
   Card,
   CardBody,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Flex,
+  FlexItem,
   Grid,
   GridItem,
+  Label,
+  LabelGroup,
+  Popover,
+  Skeleton,
   Stack,
   StackItem,
+  Switch,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
+  Tooltip,
 } from "@patternfly/react-core";
+import { OutlinedQuestionCircleIcon } from "@patternfly/react-icons";
 import {
+  ActionsColumn,
   ExpandableRowContent,
   Table,
   TableText,
@@ -29,17 +42,8 @@ import {
   Tr,
 } from "@patternfly/react-table";
 
-import {
-  type VulnerabilityStatus,
-  extendedSeverityFromSeverity,
-} from "@app/api/models";
-import type {
-  PurlSummary,
-  SbomAdvisory,
-  SbomPackage,
-  SbomStatus,
-} from "@app/client";
 import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { PackageQualifiers } from "@app/components/PackageQualifiers";
 import { SbomVulnerabilitiesDonutChart } from "@app/components/SbomVulnerabilitiesDonutChart";
 import { SeverityShieldAndText } from "@app/components/SeverityShieldAndText";
@@ -51,25 +55,24 @@ import {
 } from "@app/components/TableControls";
 import { TdWithFocusStatus } from "@app/components/TdWithFocusStatus";
 import { VulnerabilityDescription } from "@app/components/VulnerabilityDescription";
-import { useVulnerabilitiesOfSbom } from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
+import {
+  buildVexByPurl,
+  useVulnerabilitiesOfSbom,
+} from "@app/hooks/domain-controls/useVulnerabilitiesOfSbom";
 import { useLocalTableControls } from "@app/hooks/table-controls";
+import { useExploitIntelligenceOfSbom } from "@app/hooks/domain-controls/useExploitIntelligenceOfSbom";
+import { useSubmitExploitAnalysisMutation } from "@app/queries/exploit-intelligence";
+import { useFetchRecommendations } from "@app/queries/recommendations";
+import { useIsExploitIntelligenceEnabled } from "@app/queries/trustifyInfo";
 import { useFetchSBOMById } from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { useWithUiId } from "@app/utils/query-utils";
-import { decomposePurl, formatDate } from "@app/utils/utils";
+import { decomposePurl, formatDate, purlBaseEquals } from "@app/utils/utils";
 
-interface TableData {
-  vulnerability: SbomStatus;
-  vulnerabilityStatus: VulnerabilityStatus;
-  relatedPackages: {
-    advisory: SbomAdvisory;
-    packages: SbomPackage[];
-  }[];
-  summary: {
-    totalPackages: number;
-    allPackages: SbomPackage[];
-  };
-}
+import { WithPackage } from "@app/components/WithPackage";
+
+import { ExploitIntelligenceAnalysisCell } from "./components/exploit-intelligence-analysis-cell";
+import { VulnerabilityScoreBreakdown } from "./components/vulnerability-score-breakdown";
 
 interface VulnerabilitiesBySbomProps {
   sbomId: string;
@@ -78,6 +81,8 @@ interface VulnerabilitiesBySbomProps {
 export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   sbomId,
 }) => {
+  const [includeResolved, setIncludeResolved] = React.useState(false);
+
   const {
     sbom,
     isFetching: isFetchingSbom,
@@ -85,9 +90,45 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
   } = useFetchSBOMById(sbomId);
   const {
     data: { vulnerabilities, summary: vulnerabilitiesSummary },
+    advisories: rawAdvisories,
     isFetching: isFetchingVulnerabilities,
     fetchError: fetchErrorVulnerabilities,
-  } = useVulnerabilitiesOfSbom(sbomId);
+  } = useVulnerabilitiesOfSbom(sbomId, includeResolved);
+
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
+  const isEiEnabled = useIsExploitIntelligenceEnabled();
+
+  const [showErrorBanner, setShowErrorBanner] = React.useState(false);
+
+  const { stateMap: eiStates, trackJob } = useExploitIntelligenceOfSbom(
+    isEiEnabled ? sbomId : undefined,
+    {
+      onJobFailed: () => {
+        setShowErrorBanner(true);
+      },
+    },
+  );
+
+  const submitAnalysis = useSubmitExploitAnalysisMutation();
+
+  const handleRequestAnalysis = React.useCallback(
+    (vulnerabilityId: string) => {
+      submitAnalysis.mutate(
+        { sbom_id: sbomId, vulnerability_id: vulnerabilityId },
+        {
+          onSuccess: (data) => {
+            if (data.data?.job_id) {
+              trackJob(data.data.job_id);
+            }
+          },
+          onError: () => {
+            setShowErrorBanner(true);
+          },
+        },
+      );
+    },
+    [sbomId, submitAnalysis, trackJob],
+  );
 
   const affectedVulnerabilities = React.useMemo(() => {
     return vulnerabilities.filter(
@@ -95,31 +136,35 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     );
   }, [vulnerabilities]);
 
-  const tableData = React.useMemo(() => {
-    return affectedVulnerabilities.map((item) => {
-      const allPackages = item.relatedPackages
-        .flatMap((i) => i.packages)
-        .reduce((prev, current) => {
-          const existingElement = prev.find((item) => item.id === current.id);
-          if (!existingElement) {
-            prev.push(current);
-          }
-          return prev;
-        }, [] as SbomPackage[]);
-      const result: TableData = {
-        ...item,
-        summary: {
-          totalPackages: allPackages.length,
-          allPackages,
-        },
-      };
+  const vexByPurl = React.useMemo(
+    () => (includeResolved ? buildVexByPurl(rawAdvisories) : new Map()),
+    [rawAdvisories, includeResolved],
+  );
 
-      return result;
-    });
-  }, [affectedVulnerabilities]);
+  // Build a map of CVE ID → Set of PURLs that have upstream fixed_versions
+  // from SBOM-level advisory data, so the count on the CVE row includes both
+  // vendor backports (from recommendationsMap) and upstream fixes.
+  const fixedPurlsByCve = React.useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const advisory of rawAdvisories) {
+      for (const status of advisory.status ?? []) {
+        if ((status.fixed_versions ?? []).length > 0) {
+          const cveId = status.identifier;
+          if (!map.has(cveId)) map.set(cveId, new Set());
+          const purlSet = map.get(cveId)!;
+          for (const pkg of status.packages ?? []) {
+            for (const p of pkg.purl ?? []) {
+              purlSet.add(p.purl);
+            }
+          }
+        }
+      }
+    }
+    return map;
+  }, [rawAdvisories]);
 
   const tableDataWithUiId = useWithUiId(
-    tableData,
+    affectedVulnerabilities,
     (d) => `${d.vulnerability.identifier}-${d.vulnerabilityStatus}`,
   );
 
@@ -132,11 +177,13 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
       id: "Id",
       description: "Description",
       cvss: "CVSS",
+      exploitAnalysis: "Exploit Intelligence",
       affectedDependencies: "Affected dependencies",
+      remediation: "Remediations",
       published: "Published",
       updated: "Updated",
     },
-    hasActionsColumn: false,
+    hasActionsColumn: isEiEnabled,
     isSortEnabled: true,
     sortableColumns: [
       "id",
@@ -147,8 +194,8 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     ],
     getSortValues: (item) => ({
       id: item.vulnerability.identifier,
-      cvss: item.vulnerability.average_score,
-      affectedDependencies: item.summary.totalPackages,
+      cvss: item.opinionatedAdvisory.score?.value ?? 0,
+      affectedDependencies: item.purls.size,
       published: item.vulnerability?.published
         ? dayjs(item.vulnerability.published).valueOf()
         : 0,
@@ -177,6 +224,19 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
     },
     expansionDerivedState: { isCellExpanded },
   } = tableControls;
+
+  const allPurls = React.useMemo(
+    () =>
+      currentPageItems.flatMap((vuln) =>
+        Array.from(vuln.purls.values())
+          .filter((p) => !p.isOrphan)
+          .map((p) => p.purlSummary.purl),
+      ),
+    [currentPageItems],
+  );
+
+  const { recommendationsMap, isFetching: isFetchingRecommendations } =
+    useFetchRecommendations(allPurls);
 
   return (
     <Stack hasGutter>
@@ -225,8 +285,37 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
         </Card>
       </StackItem>
       <StackItem>
+        {showErrorBanner && (
+          <Alert
+            isInline
+            variant="danger"
+            title="Analysis failed"
+            style={{ marginBlockEnd: "var(--pf-t--global--spacer--md)" }}
+            actionClose={
+              <AlertActionCloseButton
+                onClose={() => setShowErrorBanner(false)}
+              />
+            }
+            timeout={8000}
+            onTimeout={() => setShowErrorBanner(false)}
+          >
+            The analysis could not be completed due to an unsupported SBOM
+            format or a system error. Verify that your SBOM is in a supported
+            format. If the issue persists, contact your administrator.
+          </Alert>
+        )}
         <Toolbar {...toolbarProps}>
           <ToolbarContent>
+            <ToolbarItem>
+              <Tooltip content="When enabled, shows VEX resolution data alongside affected vulnerabilities to help identify suppressed findings">
+                <Switch
+                  id="include-resolved-toggle"
+                  label="Show VEX resolutions"
+                  isChecked={includeResolved}
+                  onChange={(_event, checked) => setIncludeResolved(checked)}
+                />
+              </Tooltip>
+            </ToolbarItem>
             <ToolbarItem {...paginationToolbarItemProps}>
               <SimplePagination
                 idPrefix="vulnerability-table"
@@ -244,7 +333,16 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                 <Th {...getThProps({ columnKey: "id" })} />
                 <Th {...getThProps({ columnKey: "description" })} />
                 <Th {...getThProps({ columnKey: "cvss" })} />
+                {isEiEnabled && (
+                  <Th {...getThProps({ columnKey: "exploitAnalysis" })} />
+                )}
                 <Th {...getThProps({ columnKey: "affectedDependencies" })} />
+                <Th {...getThProps({ columnKey: "remediation" })}>
+                  Remediations{" "}
+                  <Tooltip content="Number of affected packages with a fix available for this CVE. Expand Affected dependencies to see remediations per package.">
+                    <OutlinedQuestionCircleIcon />
+                  </Tooltip>
+                </Th>
                 <Th {...getThProps({ columnKey: "published" })} />
                 <Th {...getThProps({ columnKey: "updated" })} />
               </TableHeaderContentWithControls>
@@ -257,6 +355,40 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
             numRenderedColumns={numRenderedColumns}
           >
             {currentPageItems?.map((item, rowIndex) => {
+              const eiState = eiStates[item.vulnerability.identifier];
+              const isReanalysisDisabled =
+                !eiState ||
+                eiState.kind === "not_run" ||
+                (eiState.kind === "finding" &&
+                  eiState.finding.variant === "in_progress");
+              const purlResolutions = vexByPurl.get(
+                item.vulnerability.identifier,
+              );
+
+              const rowPurls = Array.from(item.purls.values())
+                .filter((p) => !p.isOrphan)
+                .map((p) => p.purlSummary.purl);
+
+              const fixedPurls =
+                fixedPurlsByCve.get(item.vulnerability.identifier) ??
+                new Set<string>();
+              const remediationCount = rowPurls.filter(
+                (purl) =>
+                  (recommendationsMap.get(purl) ?? []).some((rec) =>
+                    rec.vulnerabilities.some(
+                      (v) =>
+                        v.id === item.vulnerability.identifier &&
+                        (v.status === "Fixed" || v.status === "NotAffected"),
+                    ),
+                  ) || fixedPurls.has(purl),
+              ).length;
+
+              const hasVexResolution =
+                purlResolutions &&
+                Array.from(item.purls.values()).some(
+                  (p) => !p.isOrphan && purlResolutions.has(p.purlSummary.purl),
+                );
+
               return (
                 <Tbody
                   key={item._ui_unique_id}
@@ -269,22 +401,39 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       rowIndex={rowIndex}
                     >
                       <Td
-                        width={15}
+                        width={10}
                         modifier="breakWord"
                         {...getTdProps({ columnKey: "id" })}
                       >
-                        <Link
-                          to={generatePath(Paths.vulnerabilityDetails, {
-                            vulnerabilityId: item.vulnerability.identifier,
-                          })}
+                        <Flex
+                          spaceItems={{ default: "spaceItemsSm" }}
+                          alignItems={{ default: "alignItemsCenter" }}
+                          flexWrap={{ default: "nowrap" }}
                         >
-                          {item.vulnerability.identifier}
-                        </Link>
+                          <FlexItem>
+                            <Link
+                              to={generatePath(Paths.vulnerabilityDetails, {
+                                vulnerabilityId: item.vulnerability.identifier,
+                              })}
+                            >
+                              {item.vulnerability.identifier}
+                            </Link>
+                          </FlexItem>
+                          {hasVexResolution && (
+                            <FlexItem>
+                              <Tooltip content="VEX data indicates some affected dependencies may be resolved. Expand the row to see per-package status.">
+                                <Label color="green" isCompact>
+                                  VEX
+                                </Label>
+                              </Tooltip>
+                            </FlexItem>
+                          )}
+                        </Flex>
                       </Td>
                       <TdWithFocusStatus>
                         {(isFocused, setIsFocused) => (
                           <Td
-                            width={35}
+                            width={20}
                             modifier="truncate"
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
@@ -304,18 +453,67 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           </Td>
                         )}
                       </TdWithFocusStatus>
-                      <Td width={10} {...getTdProps({ columnKey: "cvss" })}>
-                        <SeverityShieldAndText
-                          value={extendedSeverityFromSeverity(
-                            item.vulnerability.average_severity,
-                          )}
-                          score={item.vulnerability.average_score}
-                          showLabel
-                          showScore
-                        />
+                      <Td width={15} {...getTdProps({ columnKey: "cvss" })}>
+                        <Flex>
+                          <FlexItem>
+                            <SeverityShieldAndText
+                              value={item.opinionatedAdvisory.extendedSeverity}
+                              score={
+                                item.opinionatedAdvisory.score?.value ?? null
+                              }
+                              showLabel
+                              showScore
+                            />
+                          </FlexItem>
+                          <FlexItem>
+                            <Popover
+                              hasAutoWidth
+                              aria-label="CVSS Score Breakdown"
+                              headerContent={<div>CVSS Score Breakdown</div>}
+                              bodyContent={
+                                <VulnerabilityScoreBreakdown
+                                  opinionatedAdvisory={{
+                                    advisory: item.opinionatedAdvisory.advisory,
+                                    score: item.opinionatedAdvisory.score,
+                                    extendedSeverity:
+                                      item.opinionatedAdvisory.extendedSeverity,
+                                  }}
+                                  advisories={Array.from(
+                                    item.advisories.values(),
+                                  )}
+                                />
+                              }
+                            >
+                              <Button
+                                variant="link"
+                                disabled
+                                size="sm"
+                              >{`${item.advisories.size} Sources`}</Button>
+                            </Popover>
+                          </FlexItem>
+                        </Flex>
                       </Td>
+                      {isEiEnabled && (
+                        <Td
+                          width={15}
+                          {...getTdProps({
+                            columnKey: "exploitAnalysis",
+                          })}
+                        >
+                          <ExploitIntelligenceAnalysisCell
+                            vulnerabilityIdentifier={
+                              item.vulnerability.identifier
+                            }
+                            state={eiState ?? { kind: "not_run" }}
+                            onRequestAnalysis={handleRequestAnalysis}
+                            isDisabled={
+                              areMutationsDisabled || submitAnalysis.isPending
+                            }
+                          />
+                        </Td>
+                      )}
                       <Td
-                        width={15}
+                        width={10}
                         modifier="truncate"
                         {...getTdProps({
                           columnKey: "affectedDependencies",
@@ -324,7 +522,17 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                           rowIndex,
                         })}
                       >
-                        {item.summary.totalPackages}
+                        {item.purls.size}
+                      </Td>
+                      <Td
+                        width={15}
+                        {...getTdProps({ columnKey: "remediation" })}
+                      >
+                        {isFetchingRecommendations ? (
+                          <Skeleton screenreaderText="Loading remediations" />
+                        ) : (
+                          `${remediationCount} ${remediationCount === 1 ? "Remediation" : "Remediations"}`
+                        )}
                       </Td>
                       <Td
                         width={10}
@@ -340,6 +548,25 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                       >
                         {formatDate(item.vulnerability?.modified)}
                       </Td>
+                      {isEiEnabled && (
+                        <Td isActionCell>
+                          <ActionsColumn
+                            items={[
+                              {
+                                title: "Request new analysis",
+                                onClick: () =>
+                                  handleRequestAnalysis(
+                                    item.vulnerability.identifier,
+                                  ),
+                                isDisabled:
+                                  areMutationsDisabled ||
+                                  submitAnalysis.isPending ||
+                                  isReanalysisDisabled,
+                              },
+                            ]}
+                          />
+                        </Td>
+                      )}
                     </TableRowContentWithControls>
                   </Tr>
                   {isCellExpanded(item) ? (
@@ -360,38 +587,18 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                   <Th>Version</Th>
                                   <Th>Path</Th>
                                   <Th>Qualifiers</Th>
+                                  <Th>Remediations</Th>
+                                  {purlResolutions && <Th>VEX Status</Th>}
                                 </Tr>
                               </Thead>
                               <Tbody>
-                                {item.summary.allPackages
-                                  .flatMap((item) => {
-                                    // Some packages do not have purl neither ID. So we render only the parent name meanwhile
-                                    type EnrichedPurlSummary = {
-                                      parentName: string;
-                                      purlSummary?: PurlSummary;
-                                    };
-
-                                    const hasNoPurlsButOnlyName =
-                                      item.name && item.purl.length === 0;
-
-                                    if (hasNoPurlsButOnlyName) {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                      };
-                                      return [result];
-                                    }
-
-                                    return item.purl.map((i) => {
-                                      const result: EnrichedPurlSummary = {
-                                        parentName: item.name,
-                                        purlSummary: i,
-                                      };
-                                      return result;
-                                    });
-                                  })
-                                  .map((purl, index) => {
-                                    if (purl.purlSummary) {
+                                {Array.from(item.purls.values()).map(
+                                  (purl, index) => {
+                                    if (!purl.isOrphan) {
                                       const decomposedPurl = decomposePurl(
+                                        purl.purlSummary.purl,
+                                      );
+                                      const resolution = purlResolutions?.get(
                                         purl.purlSummary.purl,
                                       );
                                       return (
@@ -422,23 +629,202 @@ export const VulnerabilitiesBySbom: React.FC<VulnerabilitiesBySbomProps> = ({
                                               />
                                             )}
                                           </Td>
+                                          <Td>
+                                            <WithPackage
+                                              packageId={purl.purlSummary.uuid}
+                                            >
+                                              {(pkg, isFetching) => {
+                                                if (isFetching) {
+                                                  return (
+                                                    <Skeleton screenreaderText="Loading remediations" />
+                                                  );
+                                                }
+                                                const purlRecs = (
+                                                  recommendationsMap.get(
+                                                    purl.purlSummary.purl,
+                                                  ) ?? []
+                                                ).filter((rec) =>
+                                                  rec.vulnerabilities.some(
+                                                    (v) =>
+                                                      v.id ===
+                                                        item.vulnerability
+                                                          .identifier &&
+                                                      (v.status === "Fixed" ||
+                                                        v.status ===
+                                                          "NotAffected"),
+                                                  ),
+                                                );
+                                                const vendorVersionSet =
+                                                  new Set(
+                                                    purlRecs.map(
+                                                      (rec) =>
+                                                        decomposePurl(
+                                                          rec.package,
+                                                        )?.version ??
+                                                        rec.package,
+                                                    ),
+                                                  );
+                                                const fixedVersions =
+                                                  new Set<string>();
+                                                for (const advisory of pkg?.advisories ??
+                                                  []) {
+                                                  for (const pkgStatus of advisory.status ??
+                                                    []) {
+                                                    if (
+                                                      pkgStatus.vulnerability
+                                                        .identifier ===
+                                                      item.vulnerability
+                                                        .identifier
+                                                    ) {
+                                                      for (const v of pkgStatus.fixed_versions ??
+                                                        []) {
+                                                        fixedVersions.add(v);
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                                const nonVendorVersions = [
+                                                  ...fixedVersions,
+                                                ].filter(
+                                                  (v) =>
+                                                    !vendorVersionSet.has(v),
+                                                );
+                                                const isRemediationApplied =
+                                                  purlRecs.some((rec) =>
+                                                    purlBaseEquals(
+                                                      rec.package,
+                                                      purl.purlSummary.purl,
+                                                    ),
+                                                  );
+                                                if (
+                                                  purlRecs.length === 0 &&
+                                                  nonVendorVersions.length === 0
+                                                ) {
+                                                  return null;
+                                                }
+                                                if (isRemediationApplied) {
+                                                  return (
+                                                    <Label
+                                                      color="blue"
+                                                      isCompact
+                                                    >
+                                                      Applied
+                                                    </Label>
+                                                  );
+                                                }
+                                                return (
+                                                  <LabelGroup>
+                                                    {purlRecs.map((rec) => {
+                                                      const version =
+                                                        decomposePurl(
+                                                          rec.package,
+                                                        )?.version ??
+                                                        rec.package;
+                                                      return (
+                                                        <Tooltip
+                                                          key={rec.package}
+                                                          content="Vendor backport — security fix applied in the same version stream (no major upgrade required)."
+                                                        >
+                                                          <Label
+                                                            color="blue"
+                                                            variant="outline"
+                                                            isCompact
+                                                          >
+                                                            {version}
+                                                          </Label>
+                                                        </Tooltip>
+                                                      );
+                                                    })}
+                                                    {nonVendorVersions.map(
+                                                      (v) => (
+                                                        <Tooltip
+                                                          key={v}
+                                                          content="Version upgrade — move to this newer release to get the fix."
+                                                        >
+                                                          <Label
+                                                            color="green"
+                                                            variant="outline"
+                                                            isCompact
+                                                          >
+                                                            {v}
+                                                          </Label>
+                                                        </Tooltip>
+                                                      ),
+                                                    )}
+                                                  </LabelGroup>
+                                                );
+                                              }}
+                                            </WithPackage>
+                                          </Td>
+                                          {purlResolutions && (
+                                            <Td>
+                                              {resolution ? (
+                                                <Flex
+                                                  spaceItems={{
+                                                    default: "spaceItemsSm",
+                                                  }}
+                                                  alignItems={{
+                                                    default: "alignItemsCenter",
+                                                  }}
+                                                  flexWrap={{
+                                                    default: "nowrap",
+                                                  }}
+                                                >
+                                                  <FlexItem>
+                                                    <Label
+                                                      color="green"
+                                                      isCompact
+                                                    >
+                                                      {resolution.status ===
+                                                      "not_affected"
+                                                        ? "Not affected"
+                                                        : resolution.status ===
+                                                            "known_not_affected"
+                                                          ? "Known not affected"
+                                                          : "Fixed"}
+                                                    </Label>
+                                                  </FlexItem>
+                                                  <FlexItem>
+                                                    <Link
+                                                      to={generatePath(
+                                                        Paths.advisoryDetails,
+                                                        {
+                                                          advisoryId:
+                                                            resolution.advisory
+                                                              .uuid,
+                                                        },
+                                                      )}
+                                                    >
+                                                      {
+                                                        resolution.advisory
+                                                          .identifier
+                                                      }
+                                                    </Link>
+                                                  </FlexItem>
+                                                </Flex>
+                                              ) : null}
+                                            </Td>
+                                          )}
+                                        </Tr>
+                                      );
+                                    } else {
+                                      return (
+                                        <Tr
+                                          key={`${purl.parentName}-${index}-name`}
+                                        >
+                                          <Td />
+                                          <Td />
+                                          <Td>{purl.parentName}</Td>
+                                          <Td />
+                                          <Td />
+                                          <Td />
+                                          <Td />
+                                          {purlResolutions && <Td />}
                                         </Tr>
                                       );
                                     }
-
-                                    return (
-                                      <Tr
-                                        key={`${purl.parentName}-${index}-name`}
-                                      >
-                                        <Td />
-                                        <Td />
-                                        <Td>{purl.parentName}</Td>
-                                        <Td />
-                                        <Td />
-                                        <Td />
-                                      </Tr>
-                                    );
-                                  })}
+                                  },
+                                )}
                               </Tbody>
                             </Table>
                           ) : null}

@@ -21,6 +21,7 @@ import { useFetchAdvisories } from "@app/queries/advisories";
 import { useFetchPackages } from "@app/queries/packages";
 import { useFetchSBOMs } from "@app/queries/sboms";
 import { useFetchVulnerabilities } from "@app/queries/vulnerabilities";
+import { decodePurl } from "@app/utils/utils";
 
 export interface IEntity {
   id: string;
@@ -61,6 +62,19 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
       { field: FILTER_TEXT_CATEGORY_KEY, operator: "~", value: filterText },
     ],
     page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
+  };
+
+  const sbomParams: HubRequestParams = {
+    filters: [{ field: "name", operator: "~", value: filterText }],
+    page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
+  };
+
+  const packageParams: HubRequestParams = {
+    filters: [{ field: "name", operator: "~", value: filterText }],
+    page: { pageNumber: 1, itemsPerPage: 5 },
+    total: false,
   };
 
   const {
@@ -71,12 +85,12 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
   const {
     isFetching: isFetchingPackages,
     result: { data: packages },
-  } = useFetchPackages({ ...params }, disableSearch);
+  } = useFetchPackages({ ...packageParams }, disableSearch);
 
   const {
     isFetching: isFetchingSBOMs,
     result: { data: sboms },
-  } = useFetchSBOMs({ ...params }, [], disableSearch);
+  } = useFetchSBOMs(null, { ...sbomParams }, [], disableSearch);
 
   const {
     isFetching: isFetchingVulnerabilities,
@@ -94,7 +108,7 @@ function useAllEntities(filterText: string, disableSearch: boolean) {
 
   const transformedPackages: IEntity[] = packages.map((item) => ({
     id: `package-${item.uuid}`,
-    title: item.purl,
+    title: decodePurl(item.purl),
     navLink: `/packages/${item.uuid}`,
     type: "Package",
     typeColor: "teal",
@@ -166,14 +180,29 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
     React.useContext(SbomSearchContext);
 
   // Search value
+  // Stable string primitive — the filterState object is recreated every render
+  // (no useMemo in the useUrlParams → useFilterState → context chain), but the
+  // extracted string only changes when the URL filter param actually changes.
+  const appliedSearchValue =
+    sbomTableControls.filterState.filterValues["name"]?.[0] ?? "";
+
   const [searchValue, setSearchValue] = React.useState("");
   const [isSearchValueDirty, setIsSearchValueDirty] = React.useState(false);
+  const submittedSearchValueRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    const searchValueFromTableControls =
-      sbomTableControls.filterState.filterValues[FILTER_TEXT_CATEGORY_KEY]?.[0];
-    setSearchValue(searchValueFromTableControls ?? "");
-  }, [sbomTableControls.filterState]);
+    if (isSearchValueDirty) return;
+
+    if (submittedSearchValueRef.current !== null) {
+      if (appliedSearchValue === submittedSearchValueRef.current) {
+        submittedSearchValueRef.current = null;
+        setSearchValue(appliedSearchValue);
+      }
+      return;
+    }
+
+    setSearchValue(appliedSearchValue);
+  }, [appliedSearchValue, isSearchValueDirty]);
 
   // Debounce Search value
   const [debouncedSearchValue, setDebouncedSearchValue] = useDebounceValue(
@@ -185,10 +214,13 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
     setDebouncedSearchValue(searchValue);
   }, [setDebouncedSearchValue, searchValue]);
 
+  const disableAutocomplete =
+    !isSearchValueDirty || debouncedSearchValue.trim() === "";
+
   // Fetch all entities
   const { isFetching, list: entityList } = useAllEntities(
     debouncedSearchValue,
-    !isSearchValueDirty,
+    disableAutocomplete,
   );
 
   const [isAutocompleteOpen, setIsAutocompleteOpen] =
@@ -217,9 +249,16 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
 
   const onClearSearchValue = () => {
     setSearchValue("");
+    setIsSearchValueDirty(false);
+    setIsAutocompleteOpen(false);
+    submittedSearchValueRef.current = "";
+    onChangeSearch("");
   };
 
   const onSubmitInput = () => {
+    setIsSearchValueDirty(false);
+    setIsAutocompleteOpen(false);
+    submittedSearchValueRef.current = searchValue;
     onChangeSearch(searchValue);
   };
 
@@ -239,7 +278,7 @@ export const SearchMenu: React.FC<ISearchMenu> = ({ onChangeSearch }) => {
           const firstElement = autocompleteRef.current?.querySelector(
             "li > button:not(:disabled)",
           );
-          firstElement && (firstElement as HTMLElement)?.focus();
+          if (firstElement) (firstElement as HTMLElement)?.focus();
           event.preventDefault(); // by default, the up and down arrow keys scroll the window
           // the tab, enter, and space keys will close the menu, and the tab key will move browser
           // focus forward one element (by default)

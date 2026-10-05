@@ -1,0 +1,4 @@
+# Reference config: https://github.com/ambient-code/agentready/blob/main/.agentready-config.example.yaml
+excluded_attributes:
+# This is a monorepo
+  - standard_layout

@@ -71,11 +71,26 @@ When(
   },
 );
 
-Then(
-  "The Page should have a spinner with {string} message and {string} option while processing the SBOM",
-  async ({ page }, header: string, cancelLabel: string) => {
+When(
+  "User Cancels the vulnerability report generation by clicking {string} with {string} message",
+  async ({ page }, cancelLabel: string, header: string) => {
     const scanPage = await SbomScanPage.build(page);
-    await scanPage.expectProcessingSpinner(header, cancelLabel);
+
+    // Block all API requests to keep the page in processing state long enough to click cancel
+    await page.route("**/api/**", async (route) => {
+      // Delay the response for 10 seconds - hopefully more than enough time to click cancel
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await route.continue();
+    });
+
+    try {
+      // Verify spinner and click cancel while requests are blocked
+      await scanPage.expectProcessingSpinner(header, cancelLabel);
+      await scanPage.clickCancelProcessing(cancelLabel);
+    } finally {
+      // Always clean up the route to prevent it from leaking into other tests
+      await page.unroute("**/api/**");
+    }
   },
 );
 
@@ -102,7 +117,7 @@ Then(
 
 Then(
   "Tooltip on the {string} column should display {string}",
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   async ({ page }, column: any, tooltipMessage: string) => {
     const table = await Table.build(
       page,
@@ -158,11 +173,6 @@ Then(
 
 When("User Clicks on {string} button", async ({ page }, buttonName: string) => {
   await page.getByRole("button", { name: buttonName }).click();
-});
-
-When("User Clicks on {string} link", async ({ page }, cancelLabel: string) => {
-  const scanPage = await SbomScanPage.build(page);
-  await scanPage.clickCancelProcessing(cancelLabel);
 });
 
 Then(
@@ -239,11 +249,12 @@ Then(
 When(
   "User Applies {string} filter with {string} on the Vulnerability Report",
   async ({ page }, filter: string, value: string) => {
+    const toolbarTable = new ToolbarTable(page, "Vulnerability table");
+    await toolbarTable.waitForTableContent();
+
     // Click the filter dropdown and select the filter type
     await page.getByLabel("filtered-by").click();
     await page.getByRole("menuitem", { name: filter }).click();
-
-    const toolbarTable = new ToolbarTable(page, "Vulnerability table");
 
     // For multi-select filters (Severity, Importer), select the value
     // For text filters (Vulnerability ID), this step only selects the filter type

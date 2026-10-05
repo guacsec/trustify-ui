@@ -16,7 +16,6 @@ import {
   FlexItem,
   Label,
   MenuToggle,
-  type MenuToggleElement,
   PageSection,
   Split,
   SplitItem,
@@ -24,6 +23,7 @@ import {
   TabContent,
   Tabs,
   TabTitleText,
+  type MenuToggleElement,
 } from "@patternfly/react-core";
 
 import {
@@ -32,9 +32,9 @@ import {
   advisoryDeletedSuccessMessage,
 } from "@app/Constants";
 import { PathParam, Paths, useRouteParams } from "@app/Routes";
-import type { AdvisorySummary } from "@app/client";
+import { AdvisoryHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
-import { LoadingWrapper } from "@app/components/LoadingWrapper";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
 import { NotificationsContext } from "@app/components/NotificationsContext";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
 import { useTabControls } from "@app/hooks/tab-controls";
@@ -42,10 +42,10 @@ import {
   useDeleteAdvisoryMutation,
   useFetchAdvisoryById,
 } from "@app/queries/advisories";
+import { LoadingWrapper } from "@app/components/LoadingWrapper";
 
 import { Overview } from "./overview";
 import { VulnerabilitiesByAdvisory } from "./vulnerabilities-by-advisory";
-import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const AdvisoryDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export const AdvisoryDetails: React.FC = () => {
   // Delete action
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
-  const onDeleteAdvisorySuccess = (advisory: AdvisorySummary) => {
+  const onDeleteAdvisorySuccess = (advisory: AdvisoryHead) => {
     setIsDeleteDialogOpen(false);
     pushNotification({
       title: advisoryDeletedSuccessMessage(advisory),
@@ -96,8 +96,8 @@ export const AdvisoryDetails: React.FC = () => {
     tabKeys: ["info", "vulnerabilities"],
   });
 
-  const infoTabRef = React.createRef<HTMLElement>();
-  const vulnerabilitiesTabRef = React.createRef<HTMLElement>();
+  const infoTabRef = React.useRef<HTMLElement>(null);
+  const vulnerabilitiesTabRef = React.useRef<HTMLElement>(null);
 
   return (
     <>
@@ -231,7 +231,7 @@ export const AdvisoryDetails: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => {
           if (advisory) {
-            deleteAdvisory(advisory.uuid);
+            deleteAdvisory(advisory);
           }
         }}
       />

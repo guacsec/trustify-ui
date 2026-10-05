@@ -1,6 +1,6 @@
 import { expect, test } from "../fixtures";
 
-const recommendationsEndpoint = "/api/v2/purl/recommend";
+const recommendationsEndpoint = "/api/v3/purl/recommend";
 
 test("Recommendations - Empty PURL list", async ({ axios }) => {
   const res = await axios.post(recommendationsEndpoint, { purls: [] });
@@ -173,7 +173,7 @@ test.describe("Recommendation API - Invalid PURL Format", () => {
   for (const badPurl of invalidPurls) {
     test(`rejects invalid PURL: "${badPurl}"`, async ({ axios }) => {
       const resOrError = await axios
-        .post("/api/v2/purl/recommend", { purls: [badPurl] })
+        .post("/api/v3/purl/recommend", { purls: [badPurl] })
         .catch((err) => err.response);
 
       expect(resOrError.status).toBe(400);

@@ -19,10 +19,10 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "clean:all": "rimraf ./dist ./node_modules",
-    "check": "biome check --error-on-warnings .",
-    "check:write": "biome check --write .",
-    "format": "biome format .",
-    "format:fix": "biome format --write .",
+    "lint": "eslint --max-warnings 0 . && tsc --noEmit",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --check --ignore-path ../.prettierignore './src/**/*.{ts,tsx,js,json}'",
+    "format:fix": "prettier --write --ignore-path ../.prettierignore './src/**/*.{ts,tsx,js,json}'",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production rollup -c",
     "start:dev": "cross-env NODE_ENV=development rollup -c --watch"

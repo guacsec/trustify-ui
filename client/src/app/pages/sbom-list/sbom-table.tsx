@@ -16,10 +16,11 @@ import {
 } from "@patternfly/react-table";
 
 import { joinKeyValueAsString } from "@app/api/model-utils";
-import type { SbomSummary } from "@app/client";
+import type { SbomHead } from "@app/client";
 import { ConfirmDialog } from "@app/components/ConfirmDialog";
 import { LabelsAsList } from "@app/components/LabelsAsList";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -32,7 +33,10 @@ import {
   sbomDeletedSuccessMessage,
 } from "@app/Constants";
 import { useDownload } from "@app/hooks/domain-controls/useDownload";
-import { useDeleteSbomMutation } from "@app/queries/sboms";
+import {
+  useDeleteSbomMutation,
+  useRemoveSBOMFromGroupMutation,
+} from "@app/queries/sboms";
 import { Paths } from "@app/Routes";
 import { formatDate } from "@app/utils/utils";
 
@@ -42,11 +46,12 @@ import { SbomSearchContext } from "./sbom-context";
 
 export const SbomTable: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   const {
+    sbomGroupId,
     isFetching,
     fetchError,
-    totalItemCount,
     tableControls,
     bulkSelection: {
       isEnabled: showBulkSelector,
@@ -55,7 +60,7 @@ export const SbomTable: React.FC = () => {
   } = React.useContext(SbomSearchContext);
 
   const [editLabelsModalState, setEditLabelsModalState] =
-    React.useState<SbomSummary | null>(null);
+    React.useState<SbomHead | null>(null);
   const isEditLabelsModalOpen = editLabelsModalState !== null;
   const rowLabelsToUpdate = editLabelsModalState;
 
@@ -74,7 +79,6 @@ export const SbomTable: React.FC = () => {
   } = tableControls;
 
   const {
-    selectedItems: _selectedItems,
     propHelpers: { getSelectCheckboxTdProps },
   } = bulkSelectionControls;
 
@@ -86,11 +90,9 @@ export const SbomTable: React.FC = () => {
 
   // Delete action
 
-  const [sbomToDelete, setSbomToDelete] = React.useState<SbomSummary | null>(
-    null,
-  );
+  const [sbomToDelete, setSbomToDelete] = React.useState<SbomHead | null>(null);
 
-  const onDeleteSbomSuccess = (sbom: SbomSummary) => {
+  const onDeleteSbomSuccess = (sbom: SbomHead) => {
     setSbomToDelete(null);
     pushNotification({
       title: sbomDeletedSuccessMessage(sbom),
@@ -107,6 +109,35 @@ export const SbomTable: React.FC = () => {
 
   const { mutate: deleteSbom, isPending: isDeletingSbom } =
     useDeleteSbomMutation(onDeleteSbomSuccess, onDeleteAdvisoryError);
+
+  // Remove from group action
+
+  const [sbomToRemoveFromGroup, setSbomToRemoveFromGroup] =
+    React.useState<SbomHead | null>(null);
+
+  const onRemoveFromGroupSuccess = (payload: {
+    groupId: string;
+    sbom: SbomHead;
+  }) => {
+    setSbomToRemoveFromGroup(null);
+    pushNotification({
+      title: `SBOM "${payload.sbom.name}" removed from group`,
+      variant: "success",
+    });
+  };
+
+  const onRemoveFromGroupError = (error: AxiosError) => {
+    pushNotification({
+      title: `Failed to remove SBOM from group: ${error.message}`,
+      variant: "danger",
+    });
+  };
+
+  const { mutate: removeSbomFromGroup, isPending: isRemovingFromGroup } =
+    useRemoveSBOMFromGroupMutation(
+      onRemoveFromGroupSuccess,
+      onRemoveFromGroupError,
+    );
 
   return (
     <>
@@ -127,7 +158,7 @@ export const SbomTable: React.FC = () => {
         <ConditionalTableBody
           isLoading={isFetching}
           isError={!!fetchError}
-          isNoData={totalItemCount === 0}
+          isNoData={currentPageItems.length === 0}
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => {
@@ -218,7 +249,7 @@ export const SbomTable: React.FC = () => {
                       width={20}
                       {...getTdProps({ columnKey: "vulnerabilities" })}
                     >
-                      <SBOMVulnerabilities sbomId={item.id} />
+                      <SBOMVulnerabilities advisories={item.advisories} />
                     </Td>
                     <Td isActionCell>
                       <ActionsColumn
@@ -228,6 +259,7 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setEditLabelsModalState(item);
                             },
+                            isDisabled: areMutationsDisabled,
                           },
                           {
                             isSeparator: true,
@@ -252,7 +284,19 @@ export const SbomTable: React.FC = () => {
                             onClick: () => {
                               setSbomToDelete(item);
                             },
+                            isDisabled: areMutationsDisabled,
                           },
+                          ...(sbomGroupId
+                            ? [
+                                {
+                                  title: "Delete SBOM from group",
+                                  onClick: () => {
+                                    setSbomToRemoveFromGroup(item);
+                                  },
+                                  isDisabled: areMutationsDisabled,
+                                },
+                              ]
+                            : []),
                         ]}
                       />
                     </Td>
@@ -297,7 +341,28 @@ export const SbomTable: React.FC = () => {
         onClose={() => setSbomToDelete(null)}
         onConfirm={() => {
           if (sbomToDelete) {
-            deleteSbom(sbomToDelete.id);
+            deleteSbom(sbomToDelete);
+          }
+        }}
+      />
+
+      <ConfirmDialog
+        title="Delete SBOM from group"
+        message={`Are you sure you want to remove "${sbomToRemoveFromGroup?.name}" from this group? The SBOM itself will not be deleted.`}
+        inProgress={isRemovingFromGroup}
+        titleIconVariant="warning"
+        isOpen={!!sbomToRemoveFromGroup}
+        confirmBtnVariant={ButtonVariant.danger}
+        confirmBtnLabel="Remove"
+        cancelBtnLabel="Cancel"
+        onCancel={() => setSbomToRemoveFromGroup(null)}
+        onClose={() => setSbomToRemoveFromGroup(null)}
+        onConfirm={() => {
+          if (sbomToRemoveFromGroup && sbomGroupId) {
+            removeSbomFromGroup({
+              groupId: sbomGroupId,
+              sbom: sbomToRemoveFromGroup,
+            });
           }
         }}
       />

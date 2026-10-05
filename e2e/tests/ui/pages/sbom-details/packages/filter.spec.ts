@@ -21,7 +21,7 @@ test.describe("Filter validations", { tag: "@tier1" }, () => {
     await expect(table).toHaveColumnWithValue("Name", "commons-compress");
 
     // Labels filter
-    await toolbar.applyFilter({ License: ["Apache-2.0", "NOASSERTION"] });
+    await toolbar.applyFilter({ License: ["APACHE-2.0", "NOASSERTION"] });
     await expect(table).toHaveColumnWithValue("Name", "commons-compress");
   });
 });

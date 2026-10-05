@@ -30,7 +30,7 @@ export const useSelectionState = <T>({
   initialSelected = [],
   isEqual = (a, b) => a === b,
 }: ISelectionStateArgs<T>): ISelectionState<T> => {
-  const [selectedSet, setSelectedSet] = React.useState<T[]>(
+  const [selectedSet, setSelectedSet] = React.useState<T[]>(() =>
     doSelect(isEqual, items, initialSelected),
   );
 

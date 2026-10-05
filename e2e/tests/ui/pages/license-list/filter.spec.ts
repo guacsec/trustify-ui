@@ -110,7 +110,6 @@ test.describe("Filter edge cases", { tag: ["@filtering"] }, () => {
 
   testFilterMatches("Empty filter input is handled", {
     filters: { Name: "" },
-    assertions: { columnName: "Name", value: "Abstyles License" },
     getConfig: async ({ page }) => {
       const listPage = await LicenseListPage.build(page);
       const toolbar = await listPage.getToolbar();

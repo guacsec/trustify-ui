@@ -43,7 +43,7 @@ test.describe("Columns validations", { tag: "@tier1" }, () => {
       table._table
         .locator(`td[data-label="Licenses"]`)
         .nth(1)
-        .locator("ul > li", { hasText: "Apache-2.0" }),
+        .locator("ul > li", { hasText: "APACHE-2.0" }),
     ).toBeVisible();
     await expect(
       table._table

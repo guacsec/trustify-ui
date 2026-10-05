@@ -36,6 +36,7 @@ import {
   type ConfirmDialogProps,
 } from "@app/components/ConfirmDialog";
 import { NotificationsContext } from "@app/components/NotificationsContext";
+import { ReadOnlyContext } from "@app/components/ReadOnlyContext";
 import {
   useFetchImporterReports,
   useFetchImporters,
@@ -52,7 +53,6 @@ import {
   forceRunImporter,
 } from "@app/client";
 import { FilterToolbar, FilterType } from "@app/components/FilterToolbar";
-import { IconedStatus } from "@app/components/IconedStatus";
 import { SimplePagination } from "@app/components/SimplePagination";
 import {
   ConditionalTableBody,
@@ -61,16 +61,20 @@ import {
 } from "@app/components/TableControls";
 import { useLocalTableControls } from "@app/hooks/table-controls";
 
+import CheckCircleIcon from "@patternfly/react-icons/dist/esm/icons/check-circle-icon";
+import ExclamationCircleIcon from "@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon";
+import InProgressIcon from "@patternfly/react-icons/dist/esm/icons/in-progress-icon";
+import PendingIcon from "@patternfly/react-icons/dist/esm/icons/pending-icon";
+
 import { ANSICOLOR } from "@app/Constants";
 import { ImporterProgress } from "./components/importer-progress";
-import { ImporterStatusIcon } from "./components/importer-status-icon";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 type ImporterStatus = "disabled" | "scheduled" | "running";
 
 const getImporterStatus = (importer: Importer): ImporterStatus => {
   const importerType = Object.keys(importer.configuration ?? {})[0];
-  // biome-ignore lint/suspicious/noExplicitAny: allowed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
   const configValues = (importer.configuration as any)[
     importerType
   ] as SbomImporter;
@@ -83,6 +87,7 @@ const getImporterStatus = (importer: Importer): ImporterStatus => {
 
 export const ImporterList: React.FC = () => {
   const { pushNotification } = React.useContext(NotificationsContext);
+  const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
 
   // Actions that each row can trigger
   type RowAction = "enable" | "disable" | "run";
@@ -113,7 +118,7 @@ export const ImporterList: React.FC = () => {
 
   const execEnableDisableImporter = (row: Importer, enable: boolean) => {
     const importerType = Object.keys(row.configuration ?? {})[0];
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     const currentConfigValues = (row.configuration as any)[
       importerType
     ] as SbomImporter;
@@ -285,7 +290,7 @@ export const ImporterList: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <Toolbar {...toolbarProps}>
+          <Toolbar {...toolbarProps} aria-label="importer-toolbar">
             <ToolbarContent>
               <FilterToolbar showFiltersSideBySide {...filterToolbarProps} />
               <ToolbarItem {...paginationToolbarItemProps}>
@@ -319,7 +324,7 @@ export const ImporterList: React.FC = () => {
             >
               {currentPageItems?.map((item, rowIndex) => {
                 const importerType = Object.keys(item.configuration ?? {})[0];
-                // biome-ignore lint/suspicious/noExplicitAny: allowed
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
                 const configValues = (item.configuration as any)[
                   importerType
                 ] as SbomImporter;
@@ -378,8 +383,16 @@ export const ImporterList: React.FC = () => {
                             <Label color="orange">Disabled</Label>
                           ) : importerStatus === "running" && item.progress ? (
                             <ImporterProgress value={item.progress} />
+                          ) : importerStatus === "running" ? (
+                            <Label color="blue" icon={<InProgressIcon />}>
+                              Running
+                            </Label>
+                          ) : item.state === "waiting" ? (
+                            <Label color="blue" icon={<PendingIcon />}>
+                              Scheduled
+                            </Label>
                           ) : (
-                            <ImporterStatusIcon state={item.state} />
+                            <Label>Not started</Label>
                           )}
                         </Td>
                         <Td isActionCell>
@@ -392,6 +405,7 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("enable", item);
                                       },
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]
                                 : [
@@ -400,13 +414,16 @@ export const ImporterList: React.FC = () => {
                                       onClick: () => {
                                         prepareActionOnRow("run", item);
                                       },
-                                      isDisabled: importerStatus === "running",
+                                      isDisabled:
+                                        importerStatus === "running" ||
+                                        areMutationsDisabled,
                                     },
                                     {
                                       title: "Disable",
                                       onClick: () => {
                                         prepareActionOnRow("disable", item);
                                       },
+                                      isDisabled: areMutationsDisabled,
                                     },
                                   ]),
                             ]}
@@ -659,24 +676,15 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems?.map((item, rowIndex) => {
-            const LogButton = ({ children }: { children: React.ReactNode }) => {
-              if (item.messages) {
-                return (
-                  <Button
-                    isInline
-                    variant="link"
-                    onClick={() => {
-                      const newLogData = messagesToLogData(item.messages ?? {});
-                      setLogData(newLogData);
-                      toggleLogModal();
-                    }}
-                  >
-                    {children}
-                  </Button>
-                );
-              }
-              return children;
-            };
+            const statusIcon = item.error ? (
+              <Label color="red" icon={<ExclamationCircleIcon />}>
+                {item.error}
+              </Label>
+            ) : (
+              <Label color="green" icon={<CheckCircleIcon />}>
+                Finished successfully
+              </Label>
+            );
 
             return (
               <Tbody key={item.id}>
@@ -713,18 +721,22 @@ export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
                       {...getTdProps({ columnKey: "status" })}
                     >
                       {item.isRunning ? (
-                        <ImporterStatusIcon state="running" />
+                        <Label color="blue" icon={<InProgressIcon />}>
+                          Running
+                        </Label>
+                      ) : item.messages ? (
+                        <Button
+                          isInline
+                          variant="link"
+                          onClick={() => {
+                            setLogData(messagesToLogData(item.messages ?? {}));
+                            toggleLogModal();
+                          }}
+                        >
+                          {statusIcon}
+                        </Button>
                       ) : (
-                        <LogButton>
-                          {item.error ? (
-                            <IconedStatus preset="Failed" label={item.error} />
-                          ) : (
-                            <IconedStatus
-                              preset="Completed"
-                              label="Finished successfully"
-                            />
-                          )}
-                        </LogButton>
+                        statusIcon
                       )}
                     </Td>
                     <Td

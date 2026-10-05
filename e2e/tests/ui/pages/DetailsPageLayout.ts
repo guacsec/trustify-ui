@@ -24,7 +24,9 @@ export class DetailsPageLayout {
   }
 
   async verifyPageHeader(header: string) {
-    await expect(this._page.getByRole("heading")).toContainText(header);
+    await expect(this._page.getByRole("heading", { level: 1 })).toContainText(
+      header,
+    );
   }
 
   async verifyTabIsSelected(tabName: string) {
@@ -39,5 +41,15 @@ export class DetailsPageLayout {
 
   async verifyTabIsNotVisible(tabName: string) {
     await expect(this._page.getByRole("tab", { name: tabName })).toHaveCount(0);
+  }
+
+  async verifyBreadcrumbContains(text: string) {
+    const breadcrumb = this._page.locator("nav[aria-label='Breadcrumb']");
+    await expect(breadcrumb.getByText(text)).toBeVisible();
+  }
+
+  async clickBreadcrumbLink(text: string) {
+    const breadcrumb = this._page.locator("nav[aria-label='Breadcrumb']");
+    await breadcrumb.getByRole("link", { name: text }).click();
   }
 }

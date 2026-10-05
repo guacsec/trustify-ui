@@ -29,8 +29,7 @@ Feature: Scan SBOM - To Generate Vulnerability Report for SBOM
     Scenario: Cancel Generate vulnerability report
         Given User Navigated to Generate Vulnerability Report screen
         When User Selects SBOM "<fileName>" from "<filePath>" on the file explorer dialog window
-        Then The Page should have a spinner with "<header>" message and "<cancelLabel>" option while processing the SBOM
-        When User Clicks on "<cancelLabel>" link
+        When User Cancels the vulnerability report generation by clicking "<cancelLabel>" with "<header>" message
         Then Application navigates to Generate Vulnerability Report screen
 
         Examples:

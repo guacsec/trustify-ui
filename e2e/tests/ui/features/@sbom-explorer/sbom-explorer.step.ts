@@ -16,6 +16,7 @@ import { SbomsTab as PackageSbomsTab } from "../../pages/package-details/sboms/S
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { SbomListPage } from "../../pages/sbom-list/SbomListPage";
 import { SbomDetailsPage } from "../../pages/sbom-details/SbomDetailsPage";
+import { PackagesTab } from "../../pages/sbom-details/packages/PackagesTab";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -51,8 +52,9 @@ Then(
 );
 
 Then("Search by FilterText {string}", async ({ page }, filterText: string) => {
-  const toolbarTable = new ToolbarTable(page, PACKAGE_TABLE_NAME);
-  await toolbarTable.filterByText(filterText);
+  const detailsPage = await PackagesTab.fromCurrentPage(page);
+  const toolbar = await detailsPage.getToolbar();
+  await toolbar.applyFilter({ "Filter text": filterText });
 });
 
 Then(
@@ -167,9 +169,9 @@ When(
     const labelsToAdd =
       labelList === "RANDOM_LABELS" ? detailsPage.generateLabels() : labelList;
     await detailsPage.addLabels(labelsToAdd);
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     (page as any).testContext = {
-      // biome-ignore lint/suspicious/noExplicitAny: allowed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
       ...(page as any).testContext,
       generatedLabels: labelsToAdd,
     };
@@ -185,7 +187,7 @@ Then(
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
-        ? // biome-ignore lint/suspicious/noExplicitAny: allowed
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
           (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName, infoSection);
@@ -196,9 +198,7 @@ When(
   "User select Delete button from the Permanently delete SBOM model window",
   async ({ page }) => {
     const dialog = await DeletionConfirmDialog.build(page, "Confirm dialog");
-    await expect(dialog).toHaveDialogTitle(
-      "Warning alert:Permanently delete SBOM?",
-    );
+    await expect(dialog).toHaveDialogTitle("Permanently delete SBOM?");
     await dialog.clickConfirm();
   },
 );

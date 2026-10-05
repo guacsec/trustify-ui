@@ -124,8 +124,8 @@ export const SelectFilterControl = <TItem, TFilterCategoryKey extends string>({
             const isSelected = filterValue?.includes(value);
             return (
               <SelectOption
-                {...optionProps}
                 key={value}
+                {...optionProps}
                 value={value}
                 isSelected={isSelected}
               >

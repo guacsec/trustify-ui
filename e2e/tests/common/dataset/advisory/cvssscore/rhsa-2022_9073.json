@@ -1,0 +1,2169 @@
+{
+  "document": {
+    "aggregate_severity": {
+      "namespace": "https://access.redhat.com/security/updates/classification/",
+      "text": "Moderate"
+    },
+    "category": "csaf_security_advisory",
+    "csaf_version": "2.0",
+    "distribution": {
+      "text": "Copyright © Red Hat, Inc. All rights reserved.",
+      "tlp": {
+        "label": "WHITE",
+        "url": "https://www.first.org/tlp/"
+      }
+    },
+    "lang": "en",
+    "notes": [
+      {
+        "category": "summary",
+        "text": "An update for the nodejs:16 module is now available for Red Hat Enterprise Linux 8.\n\nRed Hat Product Security has rated this update as having a security impact of Moderate. A Common Vulnerability Scoring System (CVSS) base score, which gives a detailed severity rating, is available for each vulnerability from the CVE link(s) in the References section.",
+        "title": "Topic"
+      },
+      {
+        "category": "general",
+        "text": "Node.js is a software development platform for building fast and scalable network applications in the JavaScript programming language. \n\nThe following packages were updated to later upstream versions: nodejs (16.18.1), nodejs-nodemon (2.0.20).\n\nSecurity Fix(es):\n\n* nodejs: Improper handling of URI Subject Alternative Names (CVE-2021-44531)\n\n* nodejs: Certificate Verification Bypass via String Injection (CVE-2021-44532)\n\n* nodejs: Incorrect handling of certificate subject and issuer fields (CVE-2021-44533)\n\n* minimist: prototype pollution (CVE-2021-44906)\n\n* nodejs-minimatch: ReDoS via the braceExpand function (CVE-2022-3517)\n\n* nodejs: DNS rebinding in inspect via invalid octal IP address (CVE-2022-43548)\n\n* nodejs: Prototype pollution via console.table properties (CVE-2022-21824)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nBug Fix(es):\n\n* nodejs:16/nodejs: Packaged version of undici does not fit with declared version. [rhel-8] (BZ#2151625)",
+        "title": "Details"
+      },
+      {
+        "category": "legal_disclaimer",
+        "text": "This content is licensed under the Creative Commons Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/). If you distribute this content, or a modified version of it, you must provide attribution to Red Hat Inc. and provide a link to the original.",
+        "title": "Terms of Use"
+      }
+    ],
+    "publisher": {
+      "category": "vendor",
+      "contact_details": "https://access.redhat.com/security/team/contact/",
+      "issuing_authority": "Red Hat Product Security is responsible for vulnerability handling across all Red Hat products and services.",
+      "name": "Red Hat Product Security",
+      "namespace": "https://www.redhat.com"
+    },
+    "references": [
+      {
+        "category": "self",
+        "summary": "https://access.redhat.com/errata/RHSA-2022:9073",
+        "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+      },
+      {
+        "category": "external",
+        "summary": "https://access.redhat.com/security/updates/classification/#moderate",
+        "url": "https://access.redhat.com/security/updates/classification/#moderate"
+      },
+      {
+        "category": "external",
+        "summary": "2040839",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040839"
+      },
+      {
+        "category": "external",
+        "summary": "2040846",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040846"
+      },
+      {
+        "category": "external",
+        "summary": "2040856",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040856"
+      },
+      {
+        "category": "external",
+        "summary": "2040862",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040862"
+      },
+      {
+        "category": "external",
+        "summary": "2066009",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2066009"
+      },
+      {
+        "category": "external",
+        "summary": "2134609",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2134609"
+      },
+      {
+        "category": "external",
+        "summary": "2140911",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2140911"
+      },
+      {
+        "category": "external",
+        "summary": "2142806",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2142806"
+      },
+      {
+        "category": "self",
+        "summary": "Canonical URL",
+        "url": "https://security.access.redhat.com/data/csaf/v2/advisories/2022/rhsa-2022_9073.json"
+      }
+    ],
+    "title": "Red Hat Security Advisory: nodejs:16 security, bug fix, and enhancement update",
+    "tracking": {
+      "current_release_date": "2026-04-30T13:28:46+00:00",
+      "generator": {
+        "date": "2026-04-30T13:28:46+00:00",
+        "engine": {
+          "name": "Red Hat SDEngine",
+          "version": "4.7.7"
+        }
+      },
+      "id": "RHSA-2022:9073",
+      "initial_release_date": "2022-12-15T16:20:58+00:00",
+      "revision_history": [
+        {
+          "date": "2022-12-15T16:20:58+00:00",
+          "number": "1",
+          "summary": "Initial version"
+        },
+        {
+          "date": "2022-12-15T16:20:58+00:00",
+          "number": "2",
+          "summary": "Last updated version"
+        },
+        {
+          "date": "2026-04-30T13:28:46+00:00",
+          "number": "3",
+          "summary": "Last generated version"
+        }
+      ],
+      "status": "final",
+      "version": "3"
+    }
+  },
+  "product_tree": {
+    "branches": [
+      {
+        "branches": [
+          {
+            "branches": [
+              {
+                "category": "product_name",
+                "name": "Red Hat Enterprise Linux AppStream (v. 8)",
+                "product": {
+                  "name": "Red Hat Enterprise Linux AppStream (v. 8)",
+                  "product_id": "AppStream-8.7.0.Z.MAIN",
+                  "product_identification_helper": {
+                    "cpe": "cpe:/a:redhat:enterprise_linux:8::appstream"
+                  }
+                }
+              }
+            ],
+            "category": "product_family",
+            "name": "Red Hat Enterprise Linux"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debuginfo@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debugsource@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-devel@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-full-i18n@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                "product": {
+                  "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16)",
+                  "product_id": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/npm@8.19.2-1.16.18.1.3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=aarch64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "aarch64"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+                "product": {
+                  "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src (nodejs:16)",
+                  "product_id": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=src&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+                "product": {
+                  "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src (nodejs:16)",
+                  "product_id": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-nodemon@2.0.20-2.module%2Bel8.7.0%2B17412%2Bbb0e4a6b?arch=src&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+                "product": {
+                  "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src (nodejs:16)",
+                  "product_id": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-packaging@25-1.module%2Bel8.5.0%2B10992%2Bfac5fe06?arch=src&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "src"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+                "product": {
+                  "name": "nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch (nodejs:16)",
+                  "product_id": "nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-docs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=noarch&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+                "product": {
+                  "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch (nodejs:16)",
+                  "product_id": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-nodemon@2.0.20-2.module%2Bel8.7.0%2B17412%2Bbb0e4a6b?arch=noarch&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+                "product": {
+                  "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch (nodejs:16)",
+                  "product_id": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-packaging@25-1.module%2Bel8.5.0%2B10992%2Bfac5fe06?arch=noarch&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "noarch"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debuginfo@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debugsource@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-devel@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-full-i18n@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                "product": {
+                  "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16)",
+                  "product_id": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/npm@8.19.2-1.16.18.1.3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=ppc64le&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "ppc64le"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debuginfo@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debugsource@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-devel@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-full-i18n@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                "product": {
+                  "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16)",
+                  "product_id": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/npm@8.19.2-1.16.18.1.3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=s390x&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "s390x"
+          },
+          {
+            "branches": [
+              {
+                "category": "product_version",
+                "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debuginfo@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-debugsource@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-devel@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/nodejs-full-i18n@16.18.1-3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              },
+              {
+                "category": "product_version",
+                "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                "product": {
+                  "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16)",
+                  "product_id": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+                  "product_identification_helper": {
+                    "purl": "pkg:rpm/redhat/npm@8.19.2-1.16.18.1.3.module%2Bel8.7.0%2B17465%2B1a1abd74?arch=x86_64&epoch=1&rpmmod=nodejs:16:8070020221207164159:bd1311ed"
+                  }
+                }
+              }
+            ],
+            "category": "architecture",
+            "name": "x86_64"
+          }
+        ],
+        "category": "vendor",
+        "name": "Red Hat"
+      }
+    ],
+    "relationships": [
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16"
+        },
+        "product_reference": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16"
+        },
+        "product_reference": "nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16"
+        },
+        "product_reference": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16"
+        },
+        "product_reference": "nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16"
+        },
+        "product_reference": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16"
+        },
+        "product_reference": "nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16"
+        },
+        "product_reference": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16"
+        },
+        "product_reference": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16"
+        },
+        "product_reference": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      },
+      {
+        "category": "default_component_of",
+        "full_product_name": {
+          "name": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64 (nodejs:16) as a component of Red Hat Enterprise Linux AppStream (v. 8)",
+          "product_id": "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        },
+        "product_reference": "npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+        "relates_to_product_reference": "AppStream-8.7.0.Z.MAIN"
+      }
+    ]
+  },
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2021-44531",
+      "cwe": {
+        "id": "CWE-295",
+        "name": "Improper Certificate Validation"
+      },
+      "discovery_date": "2022-01-11T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2040839"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "A flaw was found in node.js where it accepted a certificate's Subject Alternative Names (SAN) entry, as opposed to what is specified by the HTTPS protocol. This flaw allows an active person-in-the-middle to forge a certificate and impersonate a trusted host.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs: Improper handling of URI Subject Alternative Names",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "Red Hat Quay from version 3.4 consumes nodejs from RHEL, so security tracking is provided by the container health index on the customer portal [1]. Additionally there is no impact from this issue on Quay 3.3 and 3.2 because nodejs is only used at build time and is no longer shipped, starting with Quay 3.5 [2].\n[1] https://catalog.redhat.com/software/containers/quay/quay-rhel8/600e03aadd19c7786c43ae49?container-tabs=security\n[2] https://issues.redhat.com/browse/PROJQUAY-1409\nTherefore Quay component is marked as \"Will not fix\" with impact LOW.",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2021-44531"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2040839",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040839"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2021-44531",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2021-44531"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2021-44531",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44531"
+        },
+        {
+          "category": "external",
+          "summary": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/",
+          "url": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/"
+        }
+      ],
+      "release_date": "2022-01-10T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "HIGH",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "NONE",
+            "baseScore": 7.4,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "HIGH",
+            "integrityImpact": "HIGH",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "nodejs: Improper handling of URI Subject Alternative Names"
+    },
+    {
+      "cve": "CVE-2021-44532",
+      "cwe": {
+        "id": "CWE-295",
+        "name": "Improper Certificate Validation"
+      },
+      "discovery_date": "2022-01-11T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2040846"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "It was found that node.js did not safely read the x509 certificate generalName format properly, resulting in data injection. A certificate could use a specially crafted extension in order to be successfully validated, permitting an attacker to impersonate a trusted host.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs: Certificate Verification Bypass via String Injection",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "Red Hat Quay from version 3.4 consumes nodejs from RHEL, so security tracking is provided by the container health index on the customer portal [1]. Additionally there is no impact from this issue on Quay 3.3 and 3.2 because nodejs is only used at build time and is no longer shipped, starting with Quay 3.5 [2].\n[1] https://catalog.redhat.com/software/containers/quay/quay-rhel8/600e03aadd19c7786c43ae49?container-tabs=security\n[2] https://issues.redhat.com/browse/PROJQUAY-1409\nTherefore Quay component is marked as \"Will not fix\" with impact LOW.",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2021-44532"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2040846",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040846"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2021-44532",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2021-44532"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2021-44532",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44532"
+        }
+      ],
+      "release_date": "2022-01-10T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "HIGH",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "NONE",
+            "baseScore": 7.4,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "HIGH",
+            "integrityImpact": "HIGH",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "nodejs: Certificate Verification Bypass via String Injection"
+    },
+    {
+      "cve": "CVE-2021-44533",
+      "cwe": {
+        "id": "CWE-295",
+        "name": "Improper Certificate Validation"
+      },
+      "discovery_date": "2022-01-11T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2040856"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "A flaw was found in node.js, where it did not properly handle multi-value Relative Distinguished Names. This flaw allows a specially crafted x509 certificate to produce a false multi-value Relative Distinguished Name and to inject arbitrary data in node.js libraries.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs: Incorrect handling of certificate subject and issuer fields",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "Red Hat Quay from version 3.4 consumes nodejs from RHEL, so security tracking is provided by the container health index on the customer portal [1]. Additionally, there is no impact from this issue on Quay 3.3 and 3.2 because nodejs is only used at build time and is no longer shipped, starting with Quay 3.5 [2].\n[1] https://catalog.redhat.com/software/containers/quay/quay-rhel8/600e03aadd19c7786c43ae49?container-tabs=security\n[2] https://issues.redhat.com/browse/PROJQUAY-1409\nTherefore, the Quay component is marked as \"Will not fix\" with impact LOW.",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2021-44533"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2040856",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040856"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2021-44533",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2021-44533"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2021-44533",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44533"
+        },
+        {
+          "category": "external",
+          "summary": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/",
+          "url": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/"
+        }
+      ],
+      "release_date": "2022-01-10T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "HIGH",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "NONE",
+            "baseScore": 7.4,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "HIGH",
+            "integrityImpact": "HIGH",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "nodejs: Incorrect handling of certificate subject and issuer fields"
+    },
+    {
+      "cve": "CVE-2021-44906",
+      "cwe": {
+        "id": "CWE-1321",
+        "name": "Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')"
+      },
+      "discovery_date": "2022-03-19T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2066009"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "An Uncontrolled Resource Consumption flaw was found in minimist. The original fix for CVE-2020-7598 was incomplete as it was still possible to bypass in some cases. This flaw (CVE-2021-44906) allows an attacker to trick the library into adding or modifying the properties of Object.prototype, using a constructor or __proto__ payload, resulting in prototype pollution and loss of confidentiality, availability, and integrity.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "minimist: prototype pollution",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "As minimist is an argument parsing module for nodejs, exploitation of this vulnerability requires an attacker to influence which arguments are passed to nodejs when running a script. Red Hat products and services are designed in such a way that gaining this ability is not trivial. Additionally, the impact is limited by only enabling the pollution of functions, and not all generic objects.\n\nWithin Red Hat Satellite 6 this flaw has been rated as having a security impact of Low. It is not currently planned to be addressed there, as the minimist library is only included in the -doc subpackage and is part of test fixtures that are not in the execution path used by the rabl gem.",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2021-44906"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2066009",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2066009"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2021-44906",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2021-44906"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2021-44906",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44906"
+        },
+        {
+          "category": "external",
+          "summary": "https://github.com/advisories/GHSA-xvch-5gv4-984h",
+          "url": "https://github.com/advisories/GHSA-xvch-5gv4-984h"
+        }
+      ],
+      "release_date": "2022-03-10T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "HIGH",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "NONE",
+            "baseScore": 3.1,
+            "baseSeverity": "LOW",
+            "confidentialityImpact": "NONE",
+            "integrityImpact": "LOW",
+            "privilegesRequired": "LOW",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "minimist: prototype pollution"
+    },
+    {
+      "cve": "CVE-2022-3517",
+      "cwe": {
+        "id": "CWE-1333",
+        "name": "Inefficient Regular Expression Complexity"
+      },
+      "discovery_date": "2022-06-01T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2134609"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "A vulnerability was found in the nodejs-minimatch package. This flaw allows a Regular Expression Denial of Service (ReDoS) when calling the braceExpand function with specific arguments, resulting in a Denial of Service.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs-minimatch: ReDoS via the braceExpand function",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2022-3517"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2134609",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2134609"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2022-3517",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2022-3517"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2022-3517",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-3517"
+        }
+      ],
+      "release_date": "2022-02-06T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "LOW",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "HIGH",
+            "baseScore": 7.5,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "NONE",
+            "integrityImpact": "NONE",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "nodejs-minimatch: ReDoS via the braceExpand function"
+    },
+    {
+      "cve": "CVE-2022-21824",
+      "cwe": {
+        "id": "CWE-915",
+        "name": "Improperly Controlled Modification of Dynamically-Determined Object Attributes"
+      },
+      "discovery_date": "2022-01-11T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2040862"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "Due to the formatting logic of the \"console.table()\" function it was not safe to allow user controlled input to be passed to the \"properties\" parameter while simultaneously passing a plain object with at least one property as the first parameter, which could be \"__proto__\". The prototype pollution has very limited control, in that it only allows an empty string to be assigned to numerical keys of the object prototype.Node.js >= 12.22.9, >= 14.18.3, >= 16.13.2, and >= 17.3.1 use a null protoype for the object these properties are being assigned to.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs: Prototype pollution via console.table properties",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "Red Hat Quay from version 3.4 consumes nodejs from RHEL, so security tracking is provided by the container health index on the customer portal [1]. Additionally there is no impact from this issue on Quay 3.3 and 3.2 because nodejs is only used at build time and is no longer shipped, starting with Quay 3.5 [2].\n[1] https://catalog.redhat.com/software/containers/quay/quay-rhel8/600e03aadd19c7786c43ae49?container-tabs=security\n[2] https://issues.redhat.com/browse/PROJQUAY-1409\nTherefore Quay component is marked as \"Will not fix\".",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2022-21824"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2040862",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2040862"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2022-21824",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2022-21824"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2022-21824",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-21824"
+        },
+        {
+          "category": "external",
+          "summary": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/",
+          "url": "https://nodejs.org/en/blog/vulnerability/jan-2022-security-releases/"
+        }
+      ],
+      "release_date": "2022-01-10T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "LOW",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "HIGH",
+            "baseScore": 8.2,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "NONE",
+            "integrityImpact": "LOW",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Low"
+        }
+      ],
+      "title": "nodejs: Prototype pollution via console.table properties"
+    },
+    {
+      "cve": "CVE-2022-43548",
+      "cwe": {
+        "id": "CWE-350",
+        "name": "Reliance on Reverse DNS Resolution for a Security-Critical Action"
+      },
+      "discovery_date": "2022-11-08T00:00:00+00:00",
+      "ids": [
+        {
+          "system_name": "Red Hat Bugzilla ID",
+          "text": "2140911"
+        }
+      ],
+      "notes": [
+        {
+          "category": "description",
+          "text": "A flaw was found in NodeJS. The issue occurs in the Node.js rebinding protector for --inspect that still allows invalid IP addresses, specifically, the octal format. This flaw allows an attacker to perform DNS rebinding and execute arbitrary code.",
+          "title": "Vulnerability description"
+        },
+        {
+          "category": "summary",
+          "text": "nodejs: DNS rebinding in inspect via invalid octal IP address",
+          "title": "Vulnerability summary"
+        },
+        {
+          "category": "other",
+          "text": "Redhat has marked this vulnerability as moderate for two primary reasons.\n1. The vulnerable inspect functionality might not be enabled, exposed, or reachable in many deployments.\n\n2.The code path might require very specific configurations or conditions (e.g. DNS rebinding, certain host/IP setups) that are rare in default environments.",
+          "title": "Statement"
+        },
+        {
+          "category": "general",
+          "text": "The CVSS score(s) listed for this vulnerability do not reflect the associated product's status, and are included for informational purposes to better understand the severity of this vulnerability.",
+          "title": "CVSS score applicability"
+        }
+      ],
+      "product_status": {
+        "fixed": [
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+          "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+        ]
+      },
+      "references": [
+        {
+          "category": "self",
+          "summary": "Canonical URL",
+          "url": "https://access.redhat.com/security/cve/CVE-2022-43548"
+        },
+        {
+          "category": "external",
+          "summary": "RHBZ#2140911",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2140911"
+        },
+        {
+          "category": "external",
+          "summary": "https://www.cve.org/CVERecord?id=CVE-2022-43548",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2022-43548"
+        },
+        {
+          "category": "external",
+          "summary": "https://nvd.nist.gov/vuln/detail/CVE-2022-43548",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-43548"
+        },
+        {
+          "category": "external",
+          "summary": "https://nodejs.org/en/blog/vulnerability/november-2022-security-releases/#dns-rebinding-in-inspect-via-invalid-octal-ip-address-medium-cve-2022-43548",
+          "url": "https://nodejs.org/en/blog/vulnerability/november-2022-security-releases/#dns-rebinding-in-inspect-via-invalid-octal-ip-address-medium-cve-2022-43548"
+        }
+      ],
+      "release_date": "2022-11-04T00:00:00+00:00",
+      "remediations": [
+        {
+          "category": "vendor_fix",
+          "date": "2022-12-15T16:20:58+00:00",
+          "details": "For details on how to apply this update, which includes the changes described in this advisory, refer to:\n\nhttps://access.redhat.com/articles/11258",
+          "product_ids": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ],
+          "restart_required": {
+            "category": "none"
+          },
+          "url": "https://access.redhat.com/errata/RHSA-2022:9073"
+        }
+      ],
+      "scores": [
+        {
+          "cvss_v3": {
+            "attackComplexity": "LOW",
+            "attackVector": "NETWORK",
+            "availabilityImpact": "NONE",
+            "baseScore": 7.5,
+            "baseSeverity": "HIGH",
+            "confidentialityImpact": "NONE",
+            "integrityImpact": "HIGH",
+            "privilegesRequired": "NONE",
+            "scope": "UNCHANGED",
+            "userInteraction": "NONE",
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+            "version": "3.1"
+          },
+          "products": [
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debuginfo-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-debugsource-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-devel-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-docs-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-full-i18n-1:16.18.1-3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-nodemon-0:2.0.20-2.module+el8.7.0+17412+bb0e4a6b.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.noarch::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:nodejs-packaging-0:25-1.module+el8.5.0+10992+fac5fe06.src::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.aarch64::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.ppc64le::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.s390x::nodejs:16",
+            "AppStream-8.7.0.Z.MAIN:npm-1:8.19.2-1.16.18.1.3.module+el8.7.0+17465+1a1abd74.x86_64::nodejs:16"
+          ]
+        }
+      ],
+      "threats": [
+        {
+          "category": "impact",
+          "details": "Moderate"
+        }
+      ],
+      "title": "nodejs: DNS rebinding in inspect via invalid octal IP address"
+    }
+  ]
+}

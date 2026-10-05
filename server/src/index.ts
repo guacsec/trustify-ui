@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,10 +12,10 @@ import {
   brandingStrings,
   encodeEnv,
 } from "@trustify-ui/common";
-import { proxyMap } from "./proxies";
+import { proxyMap } from "./proxies.js";
 
 const debugMode = process.env.DEBUG === "1";
-debugMode && console.log("CONSOLE_ENV", TRUSTIFICATION_ENV);
+if (debugMode) console.log("CONSOLE_ENV", TRUSTIFICATION_ENV);
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const pathToClientDist = path.join(__dirname, "../../client/dist");
@@ -67,7 +65,7 @@ const server = app.listen(port, (error) => {
 // Handle shutdown signals Ctrl-C (SIGINT) and default podman/docker stop (SIGTERM)
 const httpTerminator = createHttpTerminator({ server });
 
-const shutdown = async (signal) => {
+const shutdown = async (signal: string) => {
   if (!server) {
     console.log(`${signal}, no server running.`);
     return;

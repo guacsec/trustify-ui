@@ -74,6 +74,7 @@ interface HubRequestParamsQuery {
   offset?: number;
   q?: string;
   sort?: string;
+  total?: boolean;
 }
 
 /**
@@ -108,7 +109,7 @@ export const requestParamsQuery = (
       .join("&");
   }
 
-  return { limit, offset, q, sort };
+  return { limit, offset, q, sort, total: p.total };
 };
 
 export const labelRequestParamsQuery = (labels: Label[] = []) => {

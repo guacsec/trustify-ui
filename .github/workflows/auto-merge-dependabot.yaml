@@ -1,0 +1,63 @@
+name: Auto-merge dependabot PRs
+
+on:
+  pull_request_target:
+    types: [ opened, synchronize ]
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Auto-merge Dependabot PRs for patch and minor updates
+  auto-merge-dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v5
+        with:
+          application_id: ${{ vars.TRUSTIFICATION_BOT_ID }}
+          application_private_key: ${{ secrets.TRUSTIFICATION_BOT_KEY }}
+      
+      - name: Comment on major update (requires manual review)
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --body "$(cat <<EOF
+          **Major version update** — Dependabot \`${{ steps.metadata.outputs.update-type }}\` requires manual review before merging.
+          EOF
+          )"
+
+      - name: Approve PR (patch and minor only)
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr review "$PR_NUMBER" --repo "${{ github.repository }}" --approve \
+            --body "$(cat <<EOF
+          🤖 **Auto-approved**
+
+          Dependabot \`${{ steps.metadata.outputs.update-type }}\` — no manual review required.
+          EOF
+          )"
+
+      - name: Enable auto-merge (patch and minor only)
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr merge "$PR_NUMBER" --repo "${{ github.repository }}" --auto

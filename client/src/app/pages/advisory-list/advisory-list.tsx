@@ -2,7 +2,7 @@ import type React from "react";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
-import { AdvisorySearchProvider } from "./advisory-context";
+import { AdvisorySearchProvider } from "./advisory-provider";
 import { AdvisoryTable } from "./advisory-table";
 import { AdvisoryToolbar } from "./advisory-toolbar";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";

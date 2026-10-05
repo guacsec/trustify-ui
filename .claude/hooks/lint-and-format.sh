@@ -19,12 +19,6 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 # Navigate to project root
 cd "$CLAUDE_PROJECT_DIR" || exit 0
 
-# Run Biome on the specific modified file (handles filtering via biome.json)
-echo "🎨 Formatting and linting: $FILE_PATH" >&2
-if ! npx biome check --write "$FILE_PATH" 2>&1; then
-  echo "⚠️  Biome found issues in $FILE_PATH" >&2
-fi
-
 # Determine workspace based on file path
 WORKSPACE=""
 if [[ "$FILE_PATH" == */client/* ]]; then
@@ -36,6 +30,25 @@ elif [[ "$FILE_PATH" == */common/* ]]; then
 elif [[ "$FILE_PATH" == */server/* ]]; then
   WORKSPACE="server"
 fi
+
+# Run eslint and prettier on supported file types
+case "$FILE_PATH" in
+  *.ts|*.tsx)
+    echo "🎨 Linting and formatting: $FILE_PATH" >&2
+    if ! npx eslint --fix "$FILE_PATH" 2>&1; then
+      echo "⚠️  ESLint found issues in $FILE_PATH" >&2
+    fi
+    if ! npx prettier --write --ignore-path "$CLAUDE_PROJECT_DIR/.prettierignore" "$FILE_PATH" 2>&1; then
+      echo "⚠️  Prettier found issues in $FILE_PATH" >&2
+    fi
+    ;;
+  *.js|*.json)
+    echo "🎨 Formatting: $FILE_PATH" >&2
+    if ! npx prettier --write --ignore-path "$CLAUDE_PROJECT_DIR/.prettierignore" "$FILE_PATH" 2>&1; then
+      echo "⚠️  Prettier found issues in $FILE_PATH" >&2
+    fi
+    ;;
+esac
 
 # Run TypeScript type checking on the specific workspace
 if [[ -n "$WORKSPACE" && -f "$WORKSPACE/tsconfig.json" ]]; then

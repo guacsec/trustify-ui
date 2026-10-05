@@ -1,0 +1,71 @@
+import type { AxiosInstance } from "axios";
+import fs from "node:fs";
+import { logger } from "../../common/constants";
+
+export async function uploadFiles(
+  axios: AxiosInstance,
+  type: "sbom" | "advisory",
+  files: string[],
+): Promise<string[]> {
+  const uploads = files.map((file) => {
+    const fileStream = fs.createReadStream(file);
+    const contentType = file.endsWith(".bz2")
+      ? "application/json+bzip2"
+      : "application/json";
+    return axios.post(`/api/v3/${type}`, fileStream, {
+      headers: { "Content-Type": contentType },
+    });
+  });
+
+  const responses = await Promise.all(uploads);
+  const ids = responses.map((response) => response.data.id);
+
+  return ids;
+}
+
+export async function deleteSboms(axios: AxiosInstance, sbomIds: string[]) {
+  logger.info("Teardown: starting to delete SBOMs.");
+
+  const deletes = sbomIds.map((id) => {
+    logger.info(`Teardown: deleting SBOM with ID ${id}`);
+    return axios.delete(`/api/v3/sbom/${id}`).catch((error) => {
+      if (error.response?.status === 404) {
+        logger.warn(`Teardown: SBOM ${id} not found during cleanup.`);
+      } else {
+        throw error;
+      }
+    });
+  });
+
+  await Promise.all(deletes);
+}
+
+export function getFullSbomPaths(sbomDir: string, sbomPaths: string[]) {
+  const fullSbomPaths: string[] = [];
+  sbomPaths.forEach((sbomPath) => {
+    fullSbomPaths.push(`${sbomDir}/${sbomPath}`);
+  });
+  return fullSbomPaths;
+}
+
+export function formatTimeElapsed(endTime: number, startTime: number) {
+  const elapsedTimeMs = endTime - startTime;
+  const totalSeconds = Math.floor(elapsedTimeMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return formattedTime;
+}
+
+/** Decode percent-encoded qualifier values in analysis component purls. */
+export function decodeAnalysisItemPurls<
+  T extends { purl: string[]; ancestors?: T[]; descendants?: T[] },
+>(item: T): T {
+  return {
+    ...item,
+    purl: item.purl.map(decodeURIComponent),
+    ancestors: item.ancestors?.map(decodeAnalysisItemPurls),
+    descendants: item.descendants?.map(decodeAnalysisItemPurls),
+  };
+}

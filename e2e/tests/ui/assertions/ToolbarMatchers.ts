@@ -19,14 +19,13 @@ export interface ToolbarMatchers<
     filters: Partial<FilterValueType<TFilter>>,
   ): Promise<MatcherResult>;
   toHaveNoLabels(): Promise<MatcherResult>;
+  toHaveBulkSelectedCount(count: string): Promise<MatcherResult>;
 }
 
 type ToolbarMatcherDefinitions = {
-  readonly [K in keyof ToolbarMatchers<
-    Record<string, TFilterValue>,
-    string,
-    string[]
-  >]: <
+  readonly [
+    K in keyof ToolbarMatchers<Record<string, TFilterValue>, string, string[]>
+  ]: <
     TFilter extends Record<string, TFilterValue>,
     TFilterName extends Extract<keyof TFilter, string>,
     TKebabActions extends readonly string[],
@@ -112,6 +111,31 @@ export const toolbarAssertions = baseExpect.extend<ToolbarMatcherDefinitions>({
       return {
         pass: true,
         message: () => "Toolbar has no labels",
+      };
+    } catch (error) {
+      return {
+        pass: false,
+        message: () => (error instanceof Error ? error.message : String(error)),
+      };
+    }
+  },
+  toHaveBulkSelectedCount: async <
+    TFilter extends Record<string, TFilterValue>,
+    TFilterName extends Extract<keyof TFilter, string>,
+    TKebabActions extends readonly string[],
+  >(
+    toolbar: Toolbar<TFilter, TFilterName, TKebabActions>,
+    count: string,
+  ): Promise<MatcherResult> => {
+    try {
+      const bulkCheckbox = toolbar._toolbar
+        .page()
+        .locator("#bulk-selected-items-checkbox");
+      await baseExpect(bulkCheckbox).toContainText(count);
+
+      return {
+        pass: true,
+        message: () => `Bulk selected count is ${count}`,
       };
     } catch (error) {
       return {

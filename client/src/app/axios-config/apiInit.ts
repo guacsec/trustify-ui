@@ -1,10 +1,17 @@
 import axios from "axios";
 import { User, UserManager } from "oidc-client-ts";
 
-import { OIDC_CLIENT_ID, OIDC_SERVER_URL, oidcClientSettings } from "@app/oidc";
+import {
+  OIDC_CLIENT_ID,
+  OIDC_SERVER_URL,
+  oidcClientSettings,
+  oidcSignoutArgs,
+} from "@app/oidc";
 
 import { createClient } from "@app/client/client";
 import { isAuthRequired } from "@app/Constants";
+import { queryClient } from "@app/queries/config";
+import { TrustifyInfoQueryKey } from "@app/queries/trustifyInfo";
 
 export const client = createClient({
   // set default base url for requests
@@ -23,7 +30,20 @@ function getUser() {
   return User.fromStorageString(oidcStorage);
 }
 
+/** Detects 503 "ReadOnly" responses and invalidates the trustify info cache. */
+export const readOnlyRejectionHandler = (error: unknown) => {
+  const resp = (
+    error as { response?: { status?: number; data?: { error?: string } } }
+  ).response;
+  if (resp?.status === 503 && resp?.data?.error === "ReadOnly") {
+    queryClient.invalidateQueries({ queryKey: [TrustifyInfoQueryKey] });
+  }
+  return Promise.reject(error);
+};
+
 export const initInterceptors = () => {
+  axios.interceptors.response.use(undefined, readOnlyRejectionHandler);
+
   if (!isAuthRequired) {
     return;
   }
@@ -71,7 +91,7 @@ export const initInterceptors = () => {
             });
           }
         } catch (_refreshError) {
-          await userManager.signoutRedirect();
+          await userManager.signoutRedirect(oidcSignoutArgs);
         }
       }
 

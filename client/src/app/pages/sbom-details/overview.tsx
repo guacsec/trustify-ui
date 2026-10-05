@@ -3,7 +3,6 @@ import React from "react";
 import prettyBytes from "pretty-bytes";
 
 import {
-  Button,
   ButtonVariant,
   Card,
   CardBody,
@@ -24,7 +23,8 @@ import PenIcon from "@patternfly/react-icons/dist/esm/icons/pen-icon";
 
 import type { SbomSummary } from "@app/client";
 import { LabelsAsList } from "@app/components/LabelsAsList";
-import { formatDate } from "@app/utils/utils";
+import { ReadOnlyButton } from "@app/components/ReadOnlyButton";
+import { decodePurl, formatDate } from "@app/utils/utils";
 
 import { SBOMEditLabelsForm } from "../sbom-list/components/SBOMEditLabelsForm";
 
@@ -116,7 +116,7 @@ export const Overview: React.FC<InfoProps> = ({ sbom }) => {
                 <DescriptionListGroup>
                   <DescriptionListTerm>
                     Labels {""}
-                    <Button
+                    <ReadOnlyButton
                       variant={ButtonVariant.link}
                       size="sm"
                       icon={<PenIcon />}
@@ -124,7 +124,7 @@ export const Overview: React.FC<InfoProps> = ({ sbom }) => {
                       onClick={() => setShowEditLabels(true)}
                     >
                       Edit
-                    </Button>
+                    </ReadOnlyButton>
                   </DescriptionListTerm>
                   <DescriptionListDescription>
                     <Card isCompact>
@@ -169,7 +169,7 @@ export const Overview: React.FC<InfoProps> = ({ sbom }) => {
                       {sbom.described_by
                         .flatMap((e) => e.purl)
                         .map((e) => (
-                          <ListItem key={e.uuid}>{e.purl}</ListItem>
+                          <ListItem key={e.uuid}>{decodePurl(e.purl)}</ListItem>
                         ))}
                     </List>
                   </DescriptionListDescription>

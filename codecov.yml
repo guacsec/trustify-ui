@@ -6,3 +6,9 @@ coverage:
     patch:
       default:
         informational: true
+
+flags:
+  unit:
+    carryforward: true
+  e2e:
+    carryforward: true

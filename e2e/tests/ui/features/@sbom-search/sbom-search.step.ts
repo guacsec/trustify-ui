@@ -51,9 +51,9 @@ When(
     await labelsModal.clickSave();
 
     // Store generated labels for verification
-    // biome-ignore lint/suspicious/noExplicitAny: allowed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
     (page as any).testContext = {
-      // biome-ignore lint/suspicious/noExplicitAny: allowed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
       ...(page as any).testContext,
       generatedLabels: labelsToAdd,
     };
@@ -68,7 +68,7 @@ Then(
     // Use stored generated labels if placeholder was used
     const labelsToVerify =
       labelList === "RANDOM_LABELS"
-        ? // biome-ignore lint/suspicious/noExplicitAny: allowed
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
           (page as any).testContext?.generatedLabels || labelList
         : labelList;
     await detailsPage.verifyLabels(labelsToVerify, sbomName);

@@ -1,6 +1,6 @@
 import type React from "react";
 import { useReducer, useState } from "react";
-import { useAuth } from "react-oidc-context";
+import { type AuthContextProps, useAuth } from "react-oidc-context";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -31,22 +31,39 @@ import {
 
 import EllipsisVIcon from "@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon";
 import HelpIcon from "@patternfly/react-icons/dist/esm/icons/help-icon";
-import BarsIcon from "@patternfly/react-icons/dist/js/icons/bars-icon";
-import ExternalLinkAltIcon from "@patternfly/react-icons/dist/js/icons/external-link-alt-icon";
+import BarsIcon from "@patternfly/react-icons/dist/esm/icons/bars-icon";
+import ExternalLinkAltIcon from "@patternfly/react-icons/dist/esm/icons/external-link-alt-icon";
+
+import { ThemeSelector } from "@app/components/Theme";
 
 import { isAuthRequired } from "@app/Constants";
-import useBranding from "@app/hooks/useBranding";
+import getBranding from "@app/hooks/useBranding";
+import { oidcSignoutArgs } from "@app/oidc";
 
 import imgAvatar from "../images/avatar.svg";
 import { AboutApp } from "./about";
 
 export const HeaderApp: React.FC = () => {
+  return isAuthRequired ? <HeaderWithAuth /> : <HeaderWithoutAuth />;
+};
+
+const HeaderWithAuth: React.FC = () => {
+  const auth = useAuth();
+  return <HeaderAppInner auth={auth} />;
+};
+
+const HeaderWithoutAuth: React.FC = () => {
+  return <HeaderAppInner auth={null} />;
+};
+
+interface IHeaderAppInnerProps {
+  auth: AuthContextProps | null;
+}
+
+const HeaderAppInner: React.FC<IHeaderAppInnerProps> = ({ auth }) => {
   const {
     masthead: { leftBrand, leftTitle, rightBrand, supportUrl },
-  } = useBranding();
-
-  // biome-ignore lint/correctness/useHookAtTopLevel: allowed
-  const auth = (isAuthRequired && useAuth()) || undefined;
+  } = getBranding();
 
   const navigate = useNavigate();
 
@@ -68,7 +85,7 @@ export const HeaderApp: React.FC = () => {
 
   const logout = () => {
     auth
-      ?.signoutRedirect()
+      ?.signoutRedirect(oidcSignoutArgs)
       .then(() => {})
       .catch((err) => {
         console.error("Logout failed:", err);
@@ -181,6 +198,9 @@ export const HeaderApp: React.FC = () => {
                     </DropdownList>
                   </Dropdown>
                 </ToolbarItem>
+                <ToolbarItem>
+                  <ThemeSelector />
+                </ToolbarItem>
               </ToolbarGroup>
 
               {/* toolbar items to show at mobile sizes */}
@@ -190,6 +210,9 @@ export const HeaderApp: React.FC = () => {
                 gap={{ default: "gapNone", md: "gapMd" }}
                 visibility={{ lg: "hidden" }}
               >
+                <ToolbarItem>
+                  <ThemeSelector />
+                </ToolbarItem>
                 <ToolbarItem>
                   <Dropdown
                     isOpen={isKebabDropdownOpen}

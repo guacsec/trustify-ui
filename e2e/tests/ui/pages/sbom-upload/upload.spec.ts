@@ -5,11 +5,15 @@ import { login } from "../../helpers/Auth";
 import {
   testInvalidFileExtensions,
   testRemoveFiles,
+  testUploadApiErrorMessage,
   testUploadFilesParallel,
   testUploadFilesSequentially,
 } from "../common/upload-test-helpers";
 import { SBOMUploadPage } from "./SBOMUploadPage";
 
+// The dataset SBOMs below are ingested by `global.setup` before the UI tests
+// run, so re-uploading them from the UI is reported by the server as a
+// duplicate and rendered with the `warning` status.
 const TEST_FILES = {
   QUARKUS_BOM: path.join(
     __dirname,
@@ -35,7 +39,7 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
     files: [
       {
         path: TEST_FILES.QUARKUS_BOM,
-        status: "success",
+        status: "warning",
       },
     ],
     getConfig: async ({ page }) => {
@@ -63,11 +67,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
     files: [
       {
         path: TEST_FILES.QUARKUS_BOM,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.UBI9_MINIMAL,
-        status: "success",
+        status: "warning",
       },
     ],
     getConfig: async ({ page }) => {
@@ -81,11 +85,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
     files: [
       {
         path: TEST_FILES.QUARKUS_BOM,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.UBI9_MINIMAL,
-        status: "success",
+        status: "warning",
       },
     ],
     getConfig: async ({ page }) => {
@@ -99,11 +103,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
     files: [
       {
         path: TEST_FILES.QUARKUS_BOM,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.UBI9_MINIMAL,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.INVALID_JSON,
@@ -121,11 +125,11 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
     files: [
       {
         path: TEST_FILES.QUARKUS_BOM,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.UBI9_MINIMAL,
-        status: "success",
+        status: "warning",
       },
       {
         path: TEST_FILES.INVALID_JSON,
@@ -147,4 +151,48 @@ test.describe("File Upload", { tag: ["@upload"] }, () => {
       return { fileUploader };
     },
   });
+
+  testUploadApiErrorMessage("displays API error message for SBOM", {
+    filePath: TEST_FILES.INVALID_JSON,
+    apiRoutePattern: "**/api/v3/sbom",
+    errorResponseBody: {
+      error: "InvalidFormat",
+      message: "expected CycloneDX or SPDX document",
+    },
+    expectedErrorMessage: "InvalidFormat: expected CycloneDX or SPDX document",
+    getConfig: async ({ page }) => {
+      const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
+      const fileUploader = await uploadPage.getFileUploader();
+      return { fileUploader };
+    },
+  });
+
+  testUploadApiErrorMessage(
+    "displays validation finding messages for ValidationRejected SBOM",
+    {
+      filePath: TEST_FILES.INVALID_JSON,
+      apiRoutePattern: "**/api/v3/sbom",
+      httpStatus: 422,
+      errorResponseBody: {
+        error: "ValidationRejected",
+        message: "document rejected by validation",
+        validation: [
+          {
+            validator: "scheck",
+            findings: [
+              { severity: "fatal", message: "missing field 'SPDXID'" },
+            ],
+            outcome: "failed",
+          },
+        ],
+      },
+      expectedErrorMessage:
+        "ValidationRejected: document rejected by validation\nmissing field 'SPDXID'",
+      getConfig: async ({ page }) => {
+        const uploadPage = await SBOMUploadPage.buildFromBrowserPath(page);
+        const fileUploader = await uploadPage.getFileUploader();
+        return { fileUploader };
+      },
+    },
+  );
 });

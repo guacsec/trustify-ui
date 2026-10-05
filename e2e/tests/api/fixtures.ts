@@ -162,6 +162,7 @@ export const test = base.extend<ApiClientFixture>({
       await initAxiosInstance(axiosInstance, TRUSTIFY_API_URL);
     }
 
+    // eslint-disable-next-line @eslint-react/rules-of-hooks -- Playwright fixture use(), not React
     await use(axiosInstance);
   },
 });
