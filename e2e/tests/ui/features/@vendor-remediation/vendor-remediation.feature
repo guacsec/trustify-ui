@@ -66,3 +66,23 @@ Feature: Vendor (LW/RHLW) Remediation Recommendations
             | spring-webmvc | 6.0.8             | CVE-2024-38816=6.1.13;CVE-2024-38819=6.1.14;CVE-2025-41242=6.2.10                                                                                                  |
             | spring-webmvc | 5.3.18.rhlw-00010 | CVE-2023-20860=Applied;CVE-2024-38816=Applied;CVE-2024-38819=6.1.14;CVE-2025-41242=6.2.10 |
             | spring-webmvc | 5.3.18            | CVE-2023-20860=5.3.18.rhlw-00010,5.3.26,6.0.7;CVE-2024-38816=5.3.18.rhlw-00010,6.1.13;CVE-2024-38819=6.1.14;CVE-2025-41242=6.2.10                                   |
+
+    Scenario Outline: Remediation report impact summary and package recommendations
+        Given An ingested SBOM "<sbomName>" is available
+        When User navigates to remediation report for SBOM "<sbomName>"
+        Then The report shows "<sbomsWithRemediations>" SBOM with remediations out of "1" total
+        Then The report shows "<addressablePackages>" addressable packages
+        Then The report shows "<coverage>" percent coverage
+        Then The packages table has "<tableRows>" rows
+        Then The packages table shows package "<packageName>" version "<currentVersion>" recommended "<recommendedVersion>" addressing "<cves>" found in "<foundIn>"
+
+        Examples:
+            | sbomName                            | sbomsWithRemediations | addressablePackages | coverage | tableRows | packageName   | currentVersion    | recommendedVersion    | cves                             | foundIn                             |
+            | springmvc-cve-2023-20860-scenario2  | 1                     | 1                   | 100      | 1         | spring-webmvc | 5.3.18            | 5.3.18.rhlw-00010     | CVE-2023-20860,CVE-2024-38816    | springmvc-cve-2023-20860-scenario2 |
+            | springmvc-cve-2023-20860-scenario1  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario3  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario4  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario5  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario5a | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario6  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
+            | springmvc-cve-2023-20860-scenario7  | 0                     | 0                   | 0        | 0         |               |                   |                       |                                  |                                     |
