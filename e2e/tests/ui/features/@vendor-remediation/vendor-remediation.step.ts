@@ -11,6 +11,7 @@ import { PackageListPage } from "../../pages/package-list/PackageListPage";
 import { VulnerabilitiesTab as PackageVulnerabilitiesTab } from "../../pages/package-details/vulnerabilities/VulnerabilitiesTab";
 import { VulnerabilityDetailsPage } from "../../pages/vulnerability-details/VulnerabilityDetailsPage";
 import { SbomsTab } from "../../pages/vulnerability-details/sboms/SbomsTab";
+import { RemediationReportPage } from "../../pages/remediation-report/RemediationReportPage";
 
 export const { Given, When, Then } = createBdd(test);
 
@@ -214,5 +215,100 @@ Then(
         ).toBeVisible();
       }
     }
+  },
+);
+
+When(
+  "User navigates to remediation report for SBOM {string}",
+  async ({ page }, sbomName: string) => {
+    await RemediationReportPage.build(page, [sbomName]);
+  },
+);
+
+Then(
+  "The report shows {string} SBOM with remediations out of {string} total",
+  async ({ page }, sbomsWithRemediations: string, total: string) => {
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    const summary = await reportPage.getImpactSummary();
+    await expect(summary.sbomsWith).toBe(parseInt(sbomsWithRemediations, 10));
+    await expect(summary.total).toBe(parseInt(total, 10));
+  },
+);
+
+Then(
+  "The report shows {string} addressable packages",
+  async ({ page }, addressablePackages: string) => {
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    const summary = await reportPage.getImpactSummary();
+    await expect(summary.addressablePackages).toBe(
+      parseInt(addressablePackages, 10),
+    );
+  },
+);
+
+Then(
+  "The report shows {string} percent coverage",
+  async ({ page }, coverage: string) => {
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    const summary = await reportPage.getImpactSummary();
+    await expect(summary.coverage).toBe(parseInt(coverage, 10));
+  },
+);
+
+Then(
+  "The packages table has {string} rows",
+  async ({ page }, rowCount: string) => {
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    const expectedCount = parseInt(rowCount, 10);
+
+    if (expectedCount === 0) {
+      const isEmpty = await reportPage.hasEmptyState();
+      await expect(isEmpty).toBe(true);
+    } else {
+      const table = await reportPage.getPackagesTable();
+      await expect(table).toHaveNumberOfRows({ equal: expectedCount });
+    }
+  },
+);
+
+Then(
+  "The packages table shows package {string} version {string} recommended {string} addressing {string} found in {string}",
+  async (
+    { page },
+    packageName: string,
+    currentVersion: string,
+    recommendedVersion: string,
+    cves: string,
+    foundIn: string,
+  ) => {
+    if (!packageName) return;
+
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    const table = await reportPage.getPackagesTable();
+
+    const row = await table.getRowsByCellValue(
+      {
+        Package: packageName,
+        Version: currentVersion,
+      },
+      true,
+    );
+    await expect(row.first()).toBeVisible();
+
+    const recommendedCell = row
+      .first()
+      .locator('td[data-label="Recommended version"]');
+    await expect(recommendedCell).toContainText(recommendedVersion);
+
+    const cveList = cves.split(",").map((c) => c.trim());
+    for (const cve of cveList) {
+      const vulnCell = row
+        .first()
+        .locator('td[data-label="Vulnerabilities addressed"]');
+      await expect(vulnCell).toContainText(cve);
+    }
+
+    const foundInCell = row.first().locator('td[data-label="Found in"]');
+    await expect(foundInCell).toContainText(foundIn);
   },
 );
