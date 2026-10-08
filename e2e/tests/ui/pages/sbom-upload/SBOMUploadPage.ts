@@ -13,6 +13,10 @@ export class SBOMUploadPage {
     return new SBOMUploadPage(page);
   }
 
+  static fromCurrentPage(page: Page) {
+    return new SBOMUploadPage(page);
+  }
+
   async getFileUploader() {
     return await FileUpload.build(this._page, "sbom-uploader");
   }
