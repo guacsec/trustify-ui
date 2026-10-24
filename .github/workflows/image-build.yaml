@@ -22,7 +22,7 @@ jobs:
     with:
       registry: "ghcr.io"
       image_name: "${{ github.repository_owner }}/trustify-ui"
-      containerfile: "./Dockerfile"
+      containerfile: "./Dockerfile.dev"
       architectures: '[ "amd64", "arm64" ]'
       extra-args: "--ulimit nofile=4096:4096"
     secrets:
