@@ -27,8 +27,8 @@ elif [[ "$FILE_PATH" == */e2e/* ]]; then
   WORKSPACE="e2e"
 elif [[ "$FILE_PATH" == */common/* ]]; then
   WORKSPACE="common"
-elif [[ "$FILE_PATH" == */server/* ]]; then
-  WORKSPACE="server"
+elif [[ "$FILE_PATH" == */dev-server/* ]]; then
+  WORKSPACE="dev-server"
 fi
 
 # Run eslint and prettier on supported file types
