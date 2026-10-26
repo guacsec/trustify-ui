@@ -157,7 +157,7 @@ export const useUpload = <T, E>({
 }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState<T, E>());
 
-  const handleUpload = (acceptedFiles: File[]) => {
+  const handleUpload = (acceptedFiles: File[]): Promise<void> => {
     const queue: PromiseConfig<T, E>[] = [];
 
     for (let index = 0; index < acceptedFiles.length; index++) {
@@ -223,18 +223,20 @@ export const useUpload = <T, E>({
     }
 
     if (parallel) {
-      for (const item of queue) {
-        uploadFn(item.formData, item.config)
-          .then(item.thenFn)
-          .catch(item.catchFn);
-      }
+      return Promise.all(
+        queue.map((item) =>
+          uploadFn(item.formData, item.config)
+            .then(item.thenFn)
+            .catch(item.catchFn),
+        ),
+      ).then(() => undefined);
     } else {
-      queue.reduce(async (prev, next) => {
+      return queue.reduce(async (prev, next) => {
         await prev;
         return uploadFn(next.formData, next.config)
           .then(next.thenFn)
           .catch(next.catchFn);
-      }, Promise.resolve());
+      }, Promise.resolve<void>(undefined));
     }
   };
 
