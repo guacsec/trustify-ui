@@ -15,7 +15,7 @@ interface PromiseConfig<T, E> {
   formData: FormData;
   config: AxiosRequestConfig;
 
-  thenFn: (response: AxiosResponse<T>) => void;
+  thenFn: (response: AxiosResponse<T>) => Promise<void>;
   catchFn: (error: AxiosError<E>) => void;
 }
 
@@ -156,6 +156,7 @@ export const useUpload = <T, E>({
   onError?: (error: AxiosError<E>, file: File) => void;
 }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState<T, E>());
+  const removedFilesRef = React.useRef(new Set<File>());
 
   const handleUpload = (acceptedFiles: File[]): Promise<void> => {
     const queue: PromiseConfig<T, E>[] = [];
@@ -174,6 +175,7 @@ export const useUpload = <T, E>({
           "X-Requested-With": "XMLHttpRequest",
         },
         onUploadProgress: (progressEvent) => {
+          if (removedFilesRef.current.has(file)) return;
           const total = progressEvent.total ?? 1;
           const progress = (progressEvent.loaded / total) * 100;
           dispatch({
@@ -184,6 +186,7 @@ export const useUpload = <T, E>({
         cancelToken: cancelFn.token,
       };
 
+      removedFilesRef.current.delete(file);
       dispatch({
         type: "queueUpload",
         payload: {
@@ -192,16 +195,24 @@ export const useUpload = <T, E>({
         },
       });
 
-      const thenFn = (response: AxiosResponse<T>) => {
-        dispatch({
-          type: "finishUploadSuccessfully",
-          payload: { file, response },
-        });
-
-        if (onSuccess) onSuccess(response, file);
+      const thenFn = async (response: AxiosResponse<T>) => {
+        if (!removedFilesRef.current.has(file)) {
+          dispatch({
+            type: "finishUploadSuccessfully",
+            payload: { file, response },
+          });
+        }
+        if (onSuccess) {
+          try {
+            await onSuccess(response, file);
+          } catch {
+            // callback failure must not reclassify a successful upload
+          }
+        }
       };
 
       const catchFn = (error: AxiosError<E>) => {
+        if (removedFilesRef.current.has(file)) return;
         dispatch({
           type: "finishUploadWithError",
           payload: { file, error },
@@ -245,6 +256,8 @@ export const useUpload = <T, E>({
   };
 
   const handleRemoveUpload = (file: File) => {
+    removedFilesRef.current.add(file);
+    state.uploads.get(file)?.cancelFn?.cancel(CANCEL_MESSAGE);
     dispatch({
       type: "removeUpload",
       payload: { file },
