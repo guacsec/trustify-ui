@@ -78,7 +78,11 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
   // determine the icon that should be shown for the overall status list
   React.useEffect(() => {
     const currentUploads = Array.from(uploads.values());
-    if (currentUploads.some((e) => e.status === "inProgress")) {
+    if (
+      currentUploads.some(
+        (e) => e.status === "queued" || e.status === "inProgress",
+      )
+    ) {
       setStatusIcon("inProgress");
     } else if (currentUploads.every((e) => e.status === "complete")) {
       setStatusIcon("success");
