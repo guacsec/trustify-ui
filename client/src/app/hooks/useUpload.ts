@@ -156,10 +156,11 @@ export const useUpload = <T, E>({
   onError?: (error: AxiosError<E>, file: File) => void;
 }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState<T, E>());
-  const removedFilesRef = React.useRef(new Set<File>());
+  const uploadTokensRef = React.useRef(new Map<File, symbol>());
 
   const handleUpload = (acceptedFiles: File[]): Promise<void> => {
     const queue: PromiseConfig<T, E>[] = [];
+    const successCallbacks: Array<Promise<void>> = [];
 
     for (let index = 0; index < acceptedFiles.length; index++) {
       const file = acceptedFiles[index]!;
@@ -169,13 +170,15 @@ export const useUpload = <T, E>({
       formData.set(FORM_DATA_FILE_KEY, file);
 
       const cancelFn = axios.CancelToken.source();
+      const token = Symbol();
+      uploadTokensRef.current.set(file, token);
 
       const config: AxiosRequestConfig = {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
         },
         onUploadProgress: (progressEvent) => {
-          if (removedFilesRef.current.has(file)) return;
+          if (uploadTokensRef.current.get(file) !== token) return;
           const total = progressEvent.total ?? 1;
           const progress = (progressEvent.loaded / total) * 100;
           dispatch({
@@ -186,7 +189,6 @@ export const useUpload = <T, E>({
         cancelToken: cancelFn.token,
       };
 
-      removedFilesRef.current.delete(file);
       dispatch({
         type: "queueUpload",
         payload: {
@@ -196,23 +198,24 @@ export const useUpload = <T, E>({
       });
 
       const thenFn = async (response: AxiosResponse<T>) => {
-        if (!removedFilesRef.current.has(file)) {
-          dispatch({
-            type: "finishUploadSuccessfully",
-            payload: { file, response },
-          });
-        }
+        if (uploadTokensRef.current.get(file) !== token) return;
+        dispatch({
+          type: "finishUploadSuccessfully",
+          payload: { file, response },
+        });
         if (onSuccess) {
-          try {
-            await onSuccess(response, file);
-          } catch {
-            // callback failure must not reclassify a successful upload
-          }
+          successCallbacks.push(
+            Promise.resolve()
+              .then(() => onSuccess(response, file))
+              .catch(() => {
+                // callback failure must not reclassify a successful upload
+              }),
+          );
         }
       };
 
       const catchFn = (error: AxiosError<E>) => {
-        if (removedFilesRef.current.has(file)) return;
+        if (uploadTokensRef.current.get(file) !== token) return;
         dispatch({
           type: "finishUploadWithError",
           payload: { file, error },
@@ -233,22 +236,24 @@ export const useUpload = <T, E>({
       queue.push(promiseConfig);
     }
 
-    if (parallel) {
-      return Promise.all(
-        queue.map((item) =>
-          uploadFn(item.formData, item.config)
-            .then(item.thenFn)
-            .catch(item.catchFn),
-        ),
-      ).then(() => undefined);
-    } else {
-      return queue.reduce(async (prev, next) => {
-        await prev;
-        return uploadFn(next.formData, next.config)
-          .then(next.thenFn)
-          .catch(next.catchFn);
-      }, Promise.resolve<void>(undefined));
-    }
+    const uploadChain = parallel
+      ? Promise.all(
+          queue.map((item) =>
+            uploadFn(item.formData, item.config)
+              .then(item.thenFn)
+              .catch(item.catchFn),
+          ),
+        ).then(() => undefined)
+      : queue.reduce(async (prev, next) => {
+          await prev;
+          return uploadFn(next.formData, next.config)
+            .then(next.thenFn)
+            .catch(next.catchFn);
+        }, Promise.resolve<void>(undefined));
+
+    return uploadChain
+      .then(() => Promise.all(successCallbacks))
+      .then(() => undefined);
   };
 
   const handleCancelUpload = (file: File) => {
@@ -256,7 +261,7 @@ export const useUpload = <T, E>({
   };
 
   const handleRemoveUpload = (file: File) => {
-    removedFilesRef.current.add(file);
+    uploadTokensRef.current.delete(file);
     state.uploads.get(file)?.cancelFn?.cancel(CANCEL_MESSAGE);
     dispatch({
       type: "removeUpload",
