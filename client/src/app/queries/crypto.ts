@@ -1,12 +1,11 @@
 import axios from "axios";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 import type { HubRequestParams } from "@app/api/models";
 import { uploadRemediationMapping } from "@app/api/rest";
 import { requestParamsQuery } from "@app/hooks/table-controls";
-import { useUpload } from "@app/hooks/useUpload";
 
 import type {
   CryptoAlgorithm,
@@ -113,12 +112,11 @@ export const useFetchCryptoPolicySummary = (disableQuery = false) => {
   };
 };
 
-/** Upload hook for importing remediation mappings from a CSV or JSON file. */
+/** Mutation hook for importing a single remediation mapping file. */
 export const useUploadRemediationMapping = () => {
   const queryClient = useQueryClient();
-  return useUpload<{ count: number }, { message: string }>({
-    parallel: false,
-    uploadFn: (formData, config) => uploadRemediationMapping(formData, config),
+  return useMutation({
+    mutationFn: (file: File) => uploadRemediationMapping(file),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [CryptoAlgorithmsQueryKey] }),

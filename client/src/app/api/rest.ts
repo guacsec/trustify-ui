@@ -47,17 +47,12 @@ export const uploadSbomForAnalysis = (
   });
 };
 
-export const uploadRemediationMapping = (
-  formData: FormData,
-  config?: AxiosRequestConfig,
-) => {
-  const file = formData.get(FORM_DATA_FILE_KEY) as File;
+export const uploadRemediationMapping = (file: File) => {
   const contentType = file.name.toLowerCase().endsWith(".csv")
     ? "text/csv"
     : "application/json";
   return file.arrayBuffer().then((bytes) =>
     axios.post<{ count: number }>(REMEDIATION_IMPORT, bytes, {
-      ...config,
       timeout: 30_000,
       headers: { "Content-Type": contentType },
     }),
