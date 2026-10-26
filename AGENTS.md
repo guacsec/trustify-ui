@@ -31,7 +31,7 @@ Four npm workspaces (`@app` alias maps to `client/src/app/`):
 │       ├── api/              # custom REST calls (uploads, downloads)
 │       ├── client/           # auto-generated API client (DO NOT EDIT)
 │       └── axios-config/     # Axios instance and interceptors
-├── server/                   # Express.js production server (proxying, env injection)
+├── dev-server/               # Express.js production server (proxying, env injection)
 └── e2e/                      # Playwright end-to-end tests
     └── tests/
         ├── ui/features/      # BDD .feature files (Gherkin)
@@ -75,7 +75,7 @@ npm run build
 - **Language**: [TypeScript](https://www.typescriptlang.org/docs/)
 - **UI framework**: [React](https://react.dev/learn)
 - **Component library**: [PatternFly](https://www.patternfly.org/) (`@patternfly/react-core`, `@patternfly/react-table`)
-- **Build**: [Vite](https://vite.dev/guide/) (client), [Rollup](https://rollupjs.org/) (common, server)
+- **Build**: [Vite](https://vite.dev/guide/) (client), [Rollup](https://rollupjs.org/) (common, dev-server)
 - **Routing**: [react-router-dom](https://reactrouter.com/) with lazy-loaded routes
 - **Data fetching**: [TanStack React Query](https://tanstack.com/query/latest)
 - **HTTP client**: [Axios](https://axios-http.com/)
@@ -113,7 +113,7 @@ npm run build
 
 Builds `common` once, then concurrently watches `common` (rollup rebuild on change) and runs the Vite dev server on port 3000 with HMR.
 
-The **`server/` workspace is not started** in dev mode — Vite handles both static serving and API proxying directly:
+The **`dev-server/` workspace is not started** in dev mode — Vite handles both static serving and API proxying directly:
 
 | Path | Proxied to | Default |
 |------|-----------|---------|
@@ -125,9 +125,9 @@ Environment variables are injected into `index.html` via `ViteEjsPlugin` at star
 
 ### `npm run start` (production mode)
 
-Builds `common` and `client`, then starts the Express server from `server/` on port 8080.
+Builds `common` and `client`, then starts the Express server from `dev-server/` on port 8080.
 
-The Express server (`server/src/index.ts`):
+The Express server (`dev-server/src/index.ts`):
 - Serves `client/dist/` as static files
 - Renders `index.html.ejs` per-request via EJS, injecting runtime env vars
 
