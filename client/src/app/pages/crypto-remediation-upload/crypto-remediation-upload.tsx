@@ -30,6 +30,9 @@ export const CryptoRemediationUpload: React.FC = () => {
   const { areMutationsDisabled } = React.useContext(ReadOnlyContext);
   const { uploads, handleUpload, handleRemoveUpload } =
     useUploadRemediationMapping();
+  const isUploading = Array.from(uploads.values()).some(
+    (u) => u.status === "inProgress",
+  );
 
   return (
     <>
@@ -67,6 +70,7 @@ export const CryptoRemediationUpload: React.FC = () => {
           </PageSection>
           <PageSection>
             <UploadFiles
+              disabled={isUploading}
               fileUploadProps={{
                 "aria-label": "remediation-mapping-uploader",
               }}

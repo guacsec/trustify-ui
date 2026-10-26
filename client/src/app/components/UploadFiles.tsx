@@ -48,6 +48,8 @@ export interface IUploadFilesProps {
   dropzoneAccept?: Record<string, string[]>;
   /** Info text shown below the drag-and-drop area. */
   infoText?: string;
+  /** When true, the drop zone rejects new files. */
+  disabled?: boolean;
 }
 
 export const UploadFiles: React.FC<IUploadFilesProps> = ({
@@ -60,6 +62,7 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
   fileUploadProps,
   dropzoneAccept,
   infoText,
+  disabled,
 }) => {
   const [showStatus, setShowStatus] = React.useState(false);
   const [statusIcon, setStatusIcon] = React.useState<
@@ -128,6 +131,7 @@ export const UploadFiles: React.FC<IUploadFilesProps> = ({
         accept: dropzoneAccept ?? { "application/xml": [".json", ".bz2"] },
         onDropRejected: handleDropRejected,
         useFsAccessApi: false, // Required to make playwright work
+        disabled,
       }}
       {...fileUploadProps}
     >

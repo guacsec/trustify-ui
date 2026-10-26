@@ -7,6 +7,7 @@ const API = "/api";
 
 const ADVISORIES = `${API}/v3/advisory`;
 const SBOMS = `${API}/v3/sbom`;
+const REMEDIATION_IMPORT = `${API}/v3/crypto/remediation/import`;
 
 const getContentTypeFromFile = (file: File) => {
   let contentType = "application/json";
@@ -44,6 +45,23 @@ export const uploadSbomForAnalysis = (
     ...config,
     headers: { "Content-Type": getContentTypeFromFile(file) },
   });
+};
+
+export const uploadRemediationMapping = (
+  formData: FormData,
+  config?: AxiosRequestConfig,
+) => {
+  const file = formData.get(FORM_DATA_FILE_KEY) as File;
+  const contentType = file.name.toLowerCase().endsWith(".csv")
+    ? "text/csv"
+    : "application/json";
+  return file.arrayBuffer().then((bytes) =>
+    axios.post<{ count: number }>(REMEDIATION_IMPORT, bytes, {
+      ...config,
+      timeout: 30_000,
+      headers: { "Content-Type": contentType },
+    }),
+  );
 };
 
 // Using our own definition of the endpoint rather than the `hey-api` auto generated
