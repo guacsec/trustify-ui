@@ -23,11 +23,10 @@
     "build": "npm run build --ws --if-present",
     "prepare": "npm run generate && husky",
     "start:dev:common": "npm run start:dev -w common",
-    "start:dev:server": "npm run start:dev -w server",
     "start:dev:client": "npm run start:dev -w client",
     "start:dev": "npm run build -w common && concurrently -n common,client -c 'white.bold.inverse,green.bold.inverse,blue.bold.inverse' 'npm:start:dev:common' 'npm:start:dev:client'",
-    "start": "npm run build -w common -w client && npm run start -w server",
-    "test": "npm run test -w common -w client -w server --if-present --",
+    "start": "npm run build -w common -w client && npm run start -w dev-server",
+    "test": "npm run test -w common -w client -w dev-server --if-present --",
     "e2e:codegen": "npm run codegen -w e2e --if-present --",
     "e2e:test": "npm run test -w e2e --if-present --",
     "e2e:test:api": "npm run test:api -w e2e --if-present --",
@@ -38,7 +37,7 @@
   "workspaces": [
     "common",
     "client",
-    "server",
+    "dev-server",
     "e2e"
   ],
   "dependencies": {

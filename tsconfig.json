@@ -7,6 +7,6 @@
     { "path": "./client" },
     { "path": "./common" },
     { "path": "./e2e" },
-    { "path": "./server" }
+    { "path": "./dev-server" }
   ]
 }

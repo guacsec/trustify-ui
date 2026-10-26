@@ -24,7 +24,7 @@ jobs:
 
       - name: save trustify-ui image
         run: |
-          docker build . -t ghcr.io/guacsec/trustify-ui:pr-test -f Dockerfile
+          docker build . -t ghcr.io/guacsec/trustify-ui:pr-test -f Dockerfile.dev
           docker save -o /tmp/trustify-ui.tar ghcr.io/guacsec/trustify-ui:pr-test
 
       - name: Upload trustify-ui image as artifact
