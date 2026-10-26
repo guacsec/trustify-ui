@@ -6,7 +6,7 @@ on:
       - "main"
       - "release/*"
     paths:
-      - "Dockerfile.server"
+      - "Dockerfile.prod"
 
   schedule:
     - cron: "35 5 * * *"
@@ -41,5 +41,5 @@ jobs:
 
       - name: Test build server image
         run: |
-          docker build . -t trustd:pr-test -f Dockerfile.server \
+          docker build . -t trustd:pr-test -f Dockerfile.prod \
             --build-arg server_branch=${{ needs.discover-envs.outputs.server_branch }}
