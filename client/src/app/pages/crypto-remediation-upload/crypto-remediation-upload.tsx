@@ -31,7 +31,7 @@ export const CryptoRemediationUpload: React.FC = () => {
   const { uploads, handleUpload, handleRemoveUpload } =
     useUploadRemediationMapping();
   const isUploading = Array.from(uploads.values()).some(
-    (u) => u.status === "inProgress",
+    (u) => u.status === "queued" || u.status === "inProgress",
   );
 
   return (
