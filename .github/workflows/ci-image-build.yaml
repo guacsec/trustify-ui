@@ -20,7 +20,7 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
-            Dockerfile
+            Dockerfile.dev
             **/package.json
             package-lock.json
 
@@ -98,5 +98,5 @@ jobs:
           extra-args: "--no-cache --rm --ulimit nofile=4096:4096"
           archs: ${{ matrix.architecture }}
           labels: ""
-          containerfiles: "./Dockerfile"
+          containerfiles: "./Dockerfile.dev"
           context: "."

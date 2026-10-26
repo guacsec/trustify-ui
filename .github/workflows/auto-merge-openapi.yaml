@@ -69,7 +69,7 @@ jobs:
 
       - name: Build and save trustify-ui image
         run: |
-          docker build . -t ghcr.io/guacsec/trustify-ui:pr-test -f Dockerfile
+          docker build . -t ghcr.io/guacsec/trustify-ui:pr-test -f Dockerfile.dev
           docker save -o /tmp/trustify-ui.tar ghcr.io/guacsec/trustify-ui:pr-test
 
       - name: Upload trustify-ui image as artifact
@@ -79,7 +79,7 @@ jobs:
           path: /tmp/trustify-ui.tar
           retention-days: 1
 
-  # Build server image from Dockerfile.server and upload as artifact
+  # Build server image from Dockerfile.prod and upload as artifact
   build-server:
     needs: discover-envs
     runs-on: ubuntu-latest
@@ -88,7 +88,7 @@ jobs:
 
       - name: Build and save trustd server image
         run: |
-          docker build . -t ghcr.io/guacsec/trustd:pr-test -f Dockerfile.server \
+          docker build . -t ghcr.io/guacsec/trustd:pr-test -f Dockerfile.prod \
             --build-arg server_branch=${{ needs.discover-envs.outputs.server_branch }}
           docker save -o /tmp/trustd.tar ghcr.io/guacsec/trustd:pr-test
 

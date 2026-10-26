@@ -40,4 +40,4 @@ if [[ -z "${NODE_EXTRA_CA_CERTS}" ]]; then
     fi
 fi
 
-exec node --enable-source-maps server/dist/index.js
+exec node --enable-source-maps dev-server/dist/index.js
