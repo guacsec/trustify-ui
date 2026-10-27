@@ -37,14 +37,10 @@ import { CryptoAlgorithmDetail } from "@app/pages/crypto-list/components/CryptoA
 import { useFetchCryptoBySbom } from "@app/queries/crypto";
 
 const algProps = (item: CryptoAlgorithm) =>
-  ((item.properties as Record<string, unknown>)?.algorithmProperties as Record<
-    string,
-    unknown
-  >) ?? {};
+  (item.properties as Record<string, unknown>) ?? {};
 
 const rcmProps = (item: CryptoAlgorithm) =>
-  ((item.properties as Record<string, unknown>)
-    ?.relatedCryptoMaterialProperties as Record<string, unknown>) ?? {};
+  (item.properties as Record<string, unknown>) ?? {};
 
 const getPrimitive = (item: CryptoAlgorithm): string =>
   (algProps(item).primitive as string) ?? "--";
@@ -55,8 +51,10 @@ const getKeyType = (item: CryptoAlgorithm): string =>
 const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
 
-const getUsage = (item: CryptoAlgorithm): string =>
-  (algProps(item).detectionContext as string) ?? "--";
+const getUsage = (item: CryptoAlgorithm): string => {
+  const fns = algProps(item).cryptoFunctions as string[] | undefined;
+  return fns?.length ? fns.join(", ") : "--";
+};
 
 const getOccurrences = (item: CryptoAlgorithm): number =>
   (algProps(item).occurrences as number) ?? 1;
