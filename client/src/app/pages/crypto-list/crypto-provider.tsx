@@ -47,6 +47,7 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
       packages: "Packages",
       sboms: "SBOMs",
       type: "Type",
+      size: "Size",
     },
     isPaginationEnabled: true,
     isSortEnabled: true,
