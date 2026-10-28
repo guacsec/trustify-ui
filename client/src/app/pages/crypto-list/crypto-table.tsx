@@ -21,14 +21,10 @@ interface CryptoTableProps {
 }
 
 const algProps = (item: CryptoAlgorithm) =>
-  ((item.properties as Record<string, unknown>)?.algorithmProperties as Record<
-    string,
-    unknown
-  >) ?? {};
+  (item.properties as Record<string, unknown>) ?? {};
 
 const rcmProps = (item: CryptoAlgorithm) =>
-  ((item.properties as Record<string, unknown>)
-    ?.relatedCryptoMaterialProperties as Record<string, unknown>) ?? {};
+  (item.properties as Record<string, unknown>) ?? {};
 
 /** Extracts the primitive value from algorithm properties. */
 const getPrimitive = (item: CryptoAlgorithm): string =>
@@ -42,9 +38,17 @@ const getKeyType = (item: CryptoAlgorithm): string =>
 const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
 
-/** Extracts the usage context from crypto properties. */
-const getUsage = (item: CryptoAlgorithm): string =>
-  (algProps(item).detectionContext as string) ?? "--";
+/** Extracts the usage from cryptoFunctions in algorithm properties. */
+const getUsage = (item: CryptoAlgorithm): string => {
+  const fns = algProps(item).cryptoFunctions as string[] | undefined;
+  return fns?.length ? fns.join(", ") : "--";
+};
+
+/** Extracts the key size in bits from related crypto material properties. */
+const getKeySize = (item: CryptoAlgorithm): string => {
+  const size = rcmProps(item).size as number | undefined;
+  return size != null ? `${size} bits` : "--";
+};
 
 /** Extracts the occurrence count from crypto properties. */
 const getOccurrences = (item: CryptoAlgorithm): number =>
@@ -100,7 +104,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
                 <>
                   <Th {...getThProps({ columnKey: "type" })} />
                   <Th {...getThProps({ columnKey: "occurrences" })} />
-                  <Th {...getThProps({ columnKey: "usage" })} />
+                  <Th {...getThProps({ columnKey: "size" })} />
                   <Th {...getThProps({ columnKey: "sboms" })} />
                 </>
               )}
@@ -241,12 +245,12 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
                       <Td
                         width={15}
                         {...getTdProps({
-                          columnKey: "usage",
+                          columnKey: "size",
                           item,
                           rowIndex,
                         })}
                       >
-                        {getUsage(item)}
+                        {getKeySize(item)}
                       </Td>
                       <Td
                         width={15}

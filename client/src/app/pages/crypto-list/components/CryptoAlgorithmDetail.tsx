@@ -39,9 +39,8 @@ export const CryptoAlgorithmDetail: React.FC<ICryptoAlgorithmDetailProps> = ({
   algorithm,
 }) => {
   const props = algorithm.properties as Record<string, unknown>;
-  const ap = (props?.algorithmProperties as Record<string, unknown>) ?? {};
-  const rcm =
-    (props?.relatedCryptoMaterialProperties as Record<string, unknown>) ?? {};
+  const ap = (props as Record<string, unknown>) ?? {};
+  const rcm = (props as Record<string, unknown>) ?? {};
 
   const primitive = (ap.primitive as string) ?? undefined;
   const type = (rcm.type as string) ?? undefined;
