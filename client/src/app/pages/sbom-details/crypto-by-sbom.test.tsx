@@ -11,9 +11,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     name: "AES-256-GCM",
     asset_type: "algorithm",
     oid: null,
-    properties: {
-      algorithmProperties: { primitive: "block-cipher" },
-    },
+    properties: { primitive: "block-cipher" },
     policy_status: "compliant",
     packages_count: 0,
     sboms_count: 0,
@@ -23,9 +21,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     name: "RSA-2048",
     asset_type: "algorithm",
     oid: null,
-    properties: {
-      algorithmProperties: { primitive: "pke", parameterSetIdentifier: "2048" },
-    },
+    properties: { primitive: "pke", parameterSetIdentifier: "2048" },
     policy_status: "warning",
     packages_count: 0,
     sboms_count: 0,
@@ -35,9 +31,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     name: "SHA-256",
     asset_type: "algorithm",
     oid: null,
-    properties: {
-      algorithmProperties: { primitive: "hash" },
-    },
+    properties: { primitive: "hash" },
     policy_status: "non_compliant",
     packages_count: 0,
     sboms_count: 0,
@@ -50,9 +44,7 @@ const mockKeys: CryptoAlgorithm[] = [
     name: "private-key-rsa",
     asset_type: "related-crypto-material",
     oid: null,
-    properties: {
-      relatedCryptoMaterialProperties: { type: "private-key" },
-    },
+    properties: { type: "private-key" },
     policy_status: "compliant",
     packages_count: 0,
     sboms_count: 0,

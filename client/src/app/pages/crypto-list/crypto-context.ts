@@ -16,7 +16,8 @@ export interface ICryptoSearchContext {
     | "usage"
     | "packages"
     | "sboms"
-    | "type",
+    | "type"
+    | "size",
     "name",
     "" | "policy_status",
     string
