@@ -34,7 +34,7 @@ export const TablePersistenceKeyPrefixes = {
   sboms_by_package: "sbk",
   packages: "pk",
   licenses: "li",
-  cryptoAlgorithms: "ca",
+  cryptography: "cr",
   cryptoKeys: "ck",
   models: "mo",
 };

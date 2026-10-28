@@ -36,7 +36,7 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
   const tableControlState = useTableControlState({
     tableName: isAlgorithms ? "crypto" : "crypto-keys",
     persistenceKeyPrefix: isAlgorithms
-      ? TablePersistenceKeyPrefixes.cryptoAlgorithms
+      ? TablePersistenceKeyPrefixes.cryptography
       : TablePersistenceKeyPrefixes.cryptoKeys,
     persistTo: "urlParams",
     columnNames: {
