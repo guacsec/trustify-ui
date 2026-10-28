@@ -41,7 +41,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
 const mockKeys: CryptoAlgorithm[] = [
   {
     node_id: "key-1",
-    name: "private-key",
+    name: "my-rsa-key",
     asset_type: "related-crypto-material",
     oid: null,
     properties: { type: "private-key" },
@@ -172,7 +172,8 @@ describe("CryptoList", () => {
 
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Type")).toBeInTheDocument();
-    expect(screen.getAllByText("private-key").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("my-rsa-key")).toBeInTheDocument();
+    expect(screen.getByText("private-key")).toBeInTheDocument();
   });
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */

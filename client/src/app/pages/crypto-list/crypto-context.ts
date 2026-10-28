@@ -34,6 +34,7 @@ export interface CryptoAlgorithm {
   name: string;
   asset_type: string;
   oid: string | null;
+  primitive?: string | null;
   properties: Record<string, unknown>;
   policy_status: string;
   packages_count: number;
