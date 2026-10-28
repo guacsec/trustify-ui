@@ -60,7 +60,7 @@ export default defineConfig({
           {
             name: "copy-index",
             closeBundle: () => {
-              const distDir = path.resolve(__dirname, "dist");
+              const distDir = path.resolve(import.meta.dirname, "dist");
               const src = path.join(distDir, "index.html");
               const dest = path.join(distDir, "index.html.ejs");
 
@@ -79,7 +79,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@app": path.resolve(__dirname, "./src/app"),
+      "@app": path.resolve(import.meta.dirname, "./src/app"),
     },
   },
   build: {
