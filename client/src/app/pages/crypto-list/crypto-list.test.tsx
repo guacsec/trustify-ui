@@ -18,9 +18,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     name: "AES-256-GCM",
     asset_type: "algorithm",
     oid: null,
-    properties: {
-      algorithmProperties: { primitive: "pke", cryptoFunctions: ["keygen"] },
-    },
+    properties: { primitive: "pke", cryptoFunctions: ["keygen"] },
     policy_status: "compliant",
     packages_count: 0,
     sboms_count: 0,
@@ -31,10 +29,8 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     asset_type: "algorithm",
     oid: null,
     properties: {
-      algorithmProperties: {
-        primitive: "signature",
-        parameterSetIdentifier: "2048",
-      },
+      primitive: "signature",
+      parameterSetIdentifier: "2048",
     },
     policy_status: "non_compliant",
     packages_count: 0,
@@ -48,9 +44,7 @@ const mockKeys: CryptoAlgorithm[] = [
     name: "private-key",
     asset_type: "related-crypto-material",
     oid: null,
-    properties: {
-      relatedCryptoMaterialProperties: { type: "private-key" },
-    },
+    properties: { type: "private-key" },
     policy_status: "compliant",
     packages_count: 0,
     sboms_count: 0,
