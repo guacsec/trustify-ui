@@ -52,8 +52,13 @@ const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
 
 const getUsage = (item: CryptoAlgorithm): string => {
-  const fns = algProps(item).cryptoFunctions as string[] | undefined;
-  return fns?.length ? fns.join(", ") : "--";
+  const props = algProps(item);
+  const fns = props.cryptoFunctions as string[] | undefined;
+  if (fns?.length) return fns.join(", ");
+  const size = props.size as number | undefined;
+  if (size != null) return `${size} bits`;
+  const ctx = props.detectionContext as string | undefined;
+  return ctx ?? "--";
 };
 
 const getOccurrences = (item: CryptoAlgorithm): number =>
