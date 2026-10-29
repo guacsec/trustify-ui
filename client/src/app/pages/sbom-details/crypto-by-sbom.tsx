@@ -43,7 +43,7 @@ const rcmProps = (item: CryptoAlgorithm) =>
   (item.properties as Record<string, unknown>) ?? {};
 
 const getPrimitive = (item: CryptoAlgorithm): string =>
-  (algProps(item).primitive as string) ?? "--";
+  (algProps(item).primitive as string) ?? item.primitive ?? "--";
 
 const getKeyType = (item: CryptoAlgorithm): string =>
   (rcmProps(item).type as string) ?? item.asset_type ?? "--";
@@ -55,8 +55,6 @@ const getUsage = (item: CryptoAlgorithm): string => {
   const props = algProps(item);
   const fns = props.cryptoFunctions as string[] | undefined;
   if (fns?.length) return fns.join(", ");
-  const size = props.size as number | undefined;
-  if (size != null) return `${size} bits`;
   const ctx = props.detectionContext as string | undefined;
   return ctx ?? "--";
 };

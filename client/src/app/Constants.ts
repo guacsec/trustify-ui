@@ -35,6 +35,7 @@ export const TablePersistenceKeyPrefixes = {
   packages: "pk",
   licenses: "li",
   cryptography: "cr",
+  cryptoKeys: "ck",
   models: "mo",
 };
 
