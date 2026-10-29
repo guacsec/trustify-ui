@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import { expect } from "../../assertions";
 
@@ -74,10 +74,53 @@ export class RemediationReportPage {
     );
   }
 
-  async hasEmptyState(): Promise<boolean> {
-    const emptyText = this._page.locator(
-      'p[class*="rr-report__empty"]:has-text("None of the selected SBOMs have remediations available")',
+  /**
+   * Returns the visible row in the packages table for the given package/version.
+   * The page object owns the selectors; callers assert on the returned locators.
+   */
+  async getPackageRow(packageName: string, version: string): Promise<Locator> {
+    const table = await this.getPackagesTable();
+    const rows = await table.getRowsByCellValue(
+      { Package: packageName, Version: version },
+      true,
     );
-    return await emptyText.isVisible();
+    const row = rows.first();
+    await expect(row).toBeVisible();
+    return row;
+  }
+
+  /**
+   * Returns the label chip texts rendered in the given column of a packages-table
+   * row. Returns a locator (not a snapshot) so callers can poll for async rendering.
+   */
+  getCellLabelTexts(row: Locator, columnLabel: string): Locator {
+    return row
+      .locator(`td[data-label="${columnLabel}"]`)
+      .locator(".pf-v6-c-label__text");
+  }
+
+  async expectNoAddressablePackages() {
+    await expect(
+      this._page.getByText(
+        "None of the selected SBOMs have remediations available.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      this._page.locator('table[aria-label="SBOMs with remediations"]'),
+    ).toHaveCount(0);
+    // PatternFly renders the package table as role=grid because its columns
+    // are sortable, so scope by the stable aria-label instead of role=table.
+    const table = this._page.locator(
+      'table[aria-label="Packages with remediations"]',
+    );
+    await expect(
+      table.getByRole("heading", { name: "No data available", exact: true }),
+    ).toBeVisible();
+    await expect(table.locator('td[data-label="Package"]')).toHaveCount(0);
+    // The report renders a "remediations available" alert unconditionally, so
+    // this must be matched by class/text rather than role: a custom-variant
+    // PatternFly alert has no role="alert".
+    expect(await this.hasVendorRemediationsAlert()).toBe(false);
   }
 }

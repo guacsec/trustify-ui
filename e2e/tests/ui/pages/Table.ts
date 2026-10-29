@@ -163,7 +163,9 @@ export class Table<
       if (exact) {
         rowLocator = rowLocator.filter({
           has: this._page.locator(`td[data-label="${columnName}"]`, {
-            hasText: new RegExp(`^${value}$`),
+            hasText: new RegExp(
+              `^${(value ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+            ),
           }),
         });
       } else {

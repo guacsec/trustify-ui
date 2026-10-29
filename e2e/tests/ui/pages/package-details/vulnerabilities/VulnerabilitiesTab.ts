@@ -68,6 +68,11 @@ export class VulnerabilitiesTab {
       .locator(".pf-v6-c-label");
   }
 
+  async getRemediationLabelTexts(vulnerabilityId: string): Promise<Locator> {
+    const labels = await this.getRemediationLabels(vulnerabilityId);
+    return labels.locator(".pf-v6-c-label__text");
+  }
+
   async getPagination(top: boolean = true) {
     return await Pagination.build(
       this._page,

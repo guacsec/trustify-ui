@@ -1,0 +1,42 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:a0000000-0000-4000-8000-000000000012",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-24T00:00:00Z",
+    "tools": [
+      {
+        "vendor": "trustify-qe",
+        "name": "lw-validation",
+        "version": "1.0"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "root-app",
+      "name": "orgjson-20220320-base",
+      "version": "1.0.0",
+      "purl": "pkg:maven/com.example/orgjson-20220320-base@1.0.0",
+      "description": "org.json:json at base 20220320: same-stream /recommend (blue)."
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "json-20220320",
+      "name": "json",
+      "group": "org.json",
+      "version": "20220320",
+      "purl": "pkg:maven/org.json/json@20220320"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "root-app",
+      "dependsOn": [
+        "json-20220320"
+      ]
+    }
+  ]
+}

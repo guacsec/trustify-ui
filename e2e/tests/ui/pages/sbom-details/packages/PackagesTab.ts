@@ -51,6 +51,15 @@ export class PackagesTab {
     );
   }
 
+  async getRemediationCountCell(packageName: string, version: string) {
+    const table = await this.getTable();
+    const rows = await table.getRowsByCellValue(
+      { Name: packageName, Version: version },
+      true,
+    );
+    return rows.locator('td[data-label="Remediations"]');
+  }
+
   async getPagination(top: boolean = true) {
     return await Pagination.build(
       this._page,

@@ -109,6 +109,13 @@ Then(
       await expect(
         remediationChipLabels.getByText(chip, { exact: true }),
       ).toBeVisible();
+      const label = remediationChipLabels.filter({ hasText: chip });
+      await expect(label).toHaveClass(
+        chip.includes("rhlw") || chip === "Applied"
+          ? /pf-m-blue/
+          : /pf-m-green/,
+      );
+      if (chip !== "Applied") await expect(label).toHaveClass(/pf-m-outline/);
     }
   },
 );
@@ -225,6 +232,16 @@ When(
   },
 );
 
+When(
+  "User navigates to remediation report for SBOMs {string}",
+  async ({ page }, sbomNames: string) => {
+    await RemediationReportPage.build(
+      page,
+      sbomNames.split(",").map((name) => name.trim()),
+    );
+  },
+);
+
 Then(
   "The report shows {string} SBOM with remediations out of {string} total",
   async ({ page }, sbomsWithRemediations: string, total: string) => {
@@ -262,8 +279,7 @@ Then(
     const expectedCount = parseInt(rowCount, 10);
 
     if (expectedCount === 0) {
-      const isEmpty = await reportPage.hasEmptyState();
-      await expect(isEmpty).toBe(true);
+      await reportPage.expectNoAddressablePackages();
     } else {
       const table = await reportPage.getPackagesTable();
       await expect(table).toHaveNumberOfRows({ equal: expectedCount });
@@ -284,31 +300,34 @@ Then(
     if (!packageName) return;
 
     const reportPage = await RemediationReportPage.fromCurrentPage(page);
-    const table = await reportPage.getPackagesTable();
+    const row = await reportPage.getPackageRow(packageName, currentVersion);
 
-    const row = await table.getRowsByCellValue(
-      {
-        Package: packageName,
-        Version: currentVersion,
-      },
-      true,
-    );
-    await expect(row.first()).toBeVisible();
-
-    const recommendedCell = row
-      .first()
-      .locator('td[data-label="Recommended version"]');
-    await expect(recommendedCell).toContainText(recommendedVersion);
+    await expect(
+      reportPage.getCellLabelTexts(row, "Recommended version"),
+    ).toHaveText([recommendedVersion]);
 
     const cveList = cves.split(",").map((c) => c.trim());
-    for (const cve of cveList) {
-      const vulnCell = row
-        .first()
-        .locator('td[data-label="Vulnerabilities addressed"]');
-      await expect(vulnCell).toContainText(cve);
-    }
+    await expect
+      .poll(async () =>
+        (
+          await reportPage
+            .getCellLabelTexts(row, "Vulnerabilities addressed")
+            .allTextContents()
+        ).sort(),
+      )
+      .toEqual(cveList.sort());
 
-    const foundInCell = row.first().locator('td[data-label="Found in"]');
-    await expect(foundInCell).toContainText(foundIn);
+    await expect
+      .poll(async () =>
+        (
+          await reportPage.getCellLabelTexts(row, "Found in").allTextContents()
+        ).sort(),
+      )
+      .toEqual(
+        foundIn
+          .split(",")
+          .map((name) => name.trim())
+          .sort(),
+      );
   },
 );

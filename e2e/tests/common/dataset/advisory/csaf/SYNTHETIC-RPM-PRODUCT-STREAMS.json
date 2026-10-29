@@ -1,0 +1,197 @@
+{
+  "document": {
+    "aggregate_severity": {
+      "namespace": "https://access.redhat.com/security/updates/classification/",
+      "text": "Important"
+    },
+    "category": "csaf_vex",
+    "csaf_version": "2.0",
+    "distribution": {
+      "text": "Synthetic test data - not a real advisory",
+      "tlp": {
+        "label": "WHITE",
+        "url": "https://www.first.org/tlp/"
+      }
+    },
+    "lang": "en",
+    "notes": [
+      {
+        "category": "description",
+        "text": "Synthetic fixture for TC-6610: fixes must stay within their RPM product stream.",
+        "title": "Advisory Description"
+      }
+    ],
+    "publisher": {
+      "category": "vendor",
+      "contact_details": "https://access.redhat.com/security/team/contact/",
+      "issuing_authority": "Red Hat Product Security is responsible for vulnerability handling across all Red Hat products and services.",
+      "name": "Red Hat Product Security",
+      "namespace": "https://www.redhat.com"
+    },
+    "references": [
+      {
+        "category": "self",
+        "summary": "Canonical URL",
+        "url": "https://example.com/synthetic-rpm-product-streams.json"
+      }
+    ],
+    "title": "Synthetic RPM product-stream remediation regression",
+    "tracking": {
+      "current_release_date": "2024-01-01T00:00:00+00:00",
+      "generator": {
+        "date": "2024-01-01T00:00:00+00:00",
+        "engine": {
+          "name": "Synthetic Test Data Generator",
+          "version": "1.0"
+        }
+      },
+      "id": "SYNTHETIC-RPM-PRODUCT-STREAMS",
+      "initial_release_date": "2024-01-01T00:00:00+00:00",
+      "revision_history": [
+        {
+          "date": "2024-01-01T00:00:00+00:00",
+          "number": "1",
+          "summary": "Initial version"
+        }
+      ],
+      "status": "final",
+      "version": "1"
+    }
+  },
+  "product_tree": {
+    "branches": [
+      {
+        "category": "vendor",
+        "name": "Red Hat",
+        "branches": [
+          {
+            "category": "product_name",
+            "name": "Red Hat Enterprise Linux 8",
+            "product": {
+              "product_id": "Red Hat Enterprise Linux 8",
+              "name": "Red Hat Enterprise Linux 8",
+              "product_identification_helper": {
+                "cpe": "cpe:/o:redhat:enterprise_linux:8"
+              }
+            }
+          },
+          {
+            "category": "product_version",
+            "name": "remediation-stream-test-1.0-1.el8",
+            "product": {
+              "product_id": "remediation-stream-test-1.0-1.el8",
+              "name": "remediation-stream-test-1.0-1.el8",
+              "product_identification_helper": {
+                "purl": "pkg:rpm/redhat/remediation-stream-test@1.0-1.el8?arch=x86_64"
+              }
+            }
+          },
+          {
+            "category": "product_version",
+            "name": "remediation-stream-test-1.0-2.el8",
+            "product": {
+              "product_id": "remediation-stream-test-1.0-2.el8",
+              "name": "remediation-stream-test-1.0-2.el8",
+              "product_identification_helper": {
+                "purl": "pkg:rpm/redhat/remediation-stream-test@1.0-2.el8?arch=x86_64"
+              }
+            }
+          },
+          {
+            "category": "product_name",
+            "name": "Red Hat Enterprise Linux 9",
+            "product": {
+              "product_id": "Red Hat Enterprise Linux 9",
+              "name": "Red Hat Enterprise Linux 9",
+              "product_identification_helper": {
+                "cpe": "cpe:/o:redhat:enterprise_linux:9"
+              }
+            }
+          },
+          {
+            "category": "product_version",
+            "name": "remediation-stream-test-1.0-1.el9",
+            "product": {
+              "product_id": "remediation-stream-test-1.0-1.el9",
+              "name": "remediation-stream-test-1.0-1.el9",
+              "product_identification_helper": {
+                "purl": "pkg:rpm/redhat/remediation-stream-test@1.0-1.el9?arch=x86_64"
+              }
+            }
+          },
+          {
+            "category": "product_version",
+            "name": "remediation-stream-test-1.0-9.el9",
+            "product": {
+              "product_id": "remediation-stream-test-1.0-9.el9",
+              "name": "remediation-stream-test-1.0-9.el9",
+              "product_identification_helper": {
+                "purl": "pkg:rpm/redhat/remediation-stream-test@1.0-9.el9?arch=x86_64"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "category": "default_component_of",
+        "product_reference": "remediation-stream-test-1.0-1.el8",
+        "relates_to_product_reference": "Red Hat Enterprise Linux 8",
+        "full_product_name": {
+          "name": "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-1.el8",
+          "product_id": "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-1.el8"
+        }
+      },
+      {
+        "category": "default_component_of",
+        "product_reference": "remediation-stream-test-1.0-2.el8",
+        "relates_to_product_reference": "Red Hat Enterprise Linux 8",
+        "full_product_name": {
+          "name": "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-2.el8",
+          "product_id": "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-2.el8"
+        }
+      },
+      {
+        "category": "default_component_of",
+        "product_reference": "remediation-stream-test-1.0-1.el9",
+        "relates_to_product_reference": "Red Hat Enterprise Linux 9",
+        "full_product_name": {
+          "name": "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-1.el9",
+          "product_id": "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-1.el9"
+        }
+      },
+      {
+        "category": "default_component_of",
+        "product_reference": "remediation-stream-test-1.0-9.el9",
+        "relates_to_product_reference": "Red Hat Enterprise Linux 9",
+        "full_product_name": {
+          "name": "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-9.el9",
+          "product_id": "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-9.el9"
+        }
+      }
+    ]
+  },
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2026-99910",
+      "title": "Synthetic RPM stream vulnerability",
+      "notes": [
+        {
+          "category": "description",
+          "text": "Test-only vulnerability in two RPM product streams."
+        }
+      ],
+      "product_status": {
+        "known_affected": [
+          "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-1.el8",
+          "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-1.el9"
+        ],
+        "fixed": [
+          "Red Hat Enterprise Linux 8:remediation-stream-test-1.0-2.el8",
+          "Red Hat Enterprise Linux 9:remediation-stream-test-1.0-9.el9"
+        ]
+      }
+    }
+  ]
+}
