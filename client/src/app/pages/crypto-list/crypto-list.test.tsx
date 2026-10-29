@@ -1,6 +1,6 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm, CryptoPolicySummary } from "./crypto-context";
@@ -41,7 +41,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
 const mockKeys: CryptoAlgorithm[] = [
   {
     node_id: "key-1",
-    name: "private-key",
+    name: "my-rsa-key",
     asset_type: "related-crypto-material",
     oid: null,
     properties: { type: "private-key" },
@@ -172,7 +172,11 @@ describe("CryptoList", () => {
 
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Type")).toBeInTheDocument();
-    expect(screen.getAllByText("private-key").length).toBeGreaterThanOrEqual(1);
+
+    const keyRow = screen.getByText("my-rsa-key").closest("tr")!;
+    const row = within(keyRow);
+    expect(row.getByText("my-rsa-key")).toBeInTheDocument();
+    expect(row.getByText("private-key")).toBeInTheDocument();
   });
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
