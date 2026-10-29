@@ -26,9 +26,8 @@ const algProps = (item: CryptoAlgorithm) =>
 const rcmProps = (item: CryptoAlgorithm) =>
   (item.properties as Record<string, unknown>) ?? {};
 
-/** Extracts the primitive value from algorithm properties. */
 const getPrimitive = (item: CryptoAlgorithm): string =>
-  (algProps(item).primitive as string) ?? "--";
+  (algProps(item).primitive as string) ?? item.primitive ?? "--";
 
 /** Extracts the type value from related crypto material properties. */
 const getKeyType = (item: CryptoAlgorithm): string =>
@@ -38,10 +37,12 @@ const getKeyType = (item: CryptoAlgorithm): string =>
 const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
 
-/** Extracts the usage from cryptoFunctions in algorithm properties. */
 const getUsage = (item: CryptoAlgorithm): string => {
-  const fns = algProps(item).cryptoFunctions as string[] | undefined;
-  return fns?.length ? fns.join(", ") : "--";
+  const props = algProps(item);
+  const fns = props.cryptoFunctions as string[] | undefined;
+  if (fns?.length) return fns.join(", ");
+  const ctx = props.detectionContext as string | undefined;
+  return ctx ?? "--";
 };
 
 /** Extracts the key size in bits from related crypto material properties. */
