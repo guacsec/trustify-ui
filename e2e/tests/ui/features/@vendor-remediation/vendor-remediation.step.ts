@@ -15,6 +15,22 @@ import { RemediationReportPage } from "../../pages/remediation-report/Remediatio
 
 export const { Given, When, Then } = createBdd(test);
 
+// A vendor-rebuild chip (".rhlw-" suffix) renders blue only when it comes from the
+// recommend endpoint. For the single-backport-base spring packages used by this
+// feature, that happens only when the installed version equals the advisory's
+// backport base version ("5.3.18" -> "5.3.18.rhlw-00010") — at any other installed
+// version the .rhlw- entry comes from the advisory fixed_versions and renders
+// green, exactly like an upstream upgrade. NOTE: this rule does NOT generalize to
+// packages with multiple backport bases (see the json-path cases in the API suite,
+// where 2.7.0 recommends both 2.7.0.rhlw and 2.8.0.rhlw); such a fixture would need
+// a different rule here. "Applied" (installed version already IS the vendor
+// rebuild) is a filled blue chip.
+const isVendorRecommendation = (
+  chip: string,
+  packageVersion: string,
+): boolean =>
+  chip.includes(".rhlw-") && chip.split(".rhlw-")[0] === packageVersion;
+
 // Navigation steps mirror the @sbom-explorer definitions. playwright-bdd scopes
 // step definitions per feature (@*) directory, so these must be declared here to
 // be resolvable by this feature (same reason @vulnerability-explorer redeclares
@@ -84,12 +100,13 @@ Then(
 );
 
 Then(
-  "Expanding vulnerability {string} shows remediations {string} for package {string}",
+  "Expanding vulnerability {string} shows remediations {string} for package {string} version {string}",
   async (
     { page },
     vulnerabilityId: string,
     remediationChips: string,
     packageName: string,
+    packageVersion: string,
   ) => {
     const vulnerabilitiesTab = await VulnerabilitiesTab.fromCurrentPage(page);
     const remediationChipLabels =
@@ -111,7 +128,7 @@ Then(
       ).toBeVisible();
       const label = remediationChipLabels.filter({ hasText: chip });
       await expect(label).toHaveClass(
-        chip.includes("rhlw") || chip === "Applied"
+        chip === "Applied" || isVendorRecommendation(chip, packageVersion)
           ? /pf-m-blue/
           : /pf-m-green/,
       );
@@ -194,8 +211,8 @@ Then(
 );
 
 Then(
-  "The package Vulnerabilities tab shows per-CVE remediations {string}",
-  async ({ page }, perCveRemediations: string) => {
+  "The package Vulnerabilities tab shows per-CVE remediations {string} for version {string}",
+  async ({ page }, perCveRemediations: string, packageVersion: string) => {
     const vulnerabilitiesTab =
       await PackageVulnerabilitiesTab.fromCurrentPage(page);
 
@@ -203,6 +220,9 @@ Then(
     // affected CVE and its exact remediation set as "CVE=chip1,chip2;CVE2=chipA".
     // Asserting the exact chip set per CVE row guarantees the vendor backport /
     // "Applied" state shows ONLY on the CVEs it fixes and never leaks onto the rest.
+    // Chip colors follow the same rule as the SBOM view: blue only for "Applied" or
+    // a vendor rebuild recommended at the installed version (see
+    // isVendorRecommendation), green for every other fixed version.
     const entries = perCveRemediations
       .split(";")
       .map((entry) => entry.trim())
@@ -220,6 +240,13 @@ Then(
         await expect(
           remediationLabels.getByText(chip, { exact: true }),
         ).toBeVisible();
+        const label = remediationLabels.filter({ hasText: chip });
+        await expect(label).toHaveClass(
+          chip === "Applied" || isVendorRecommendation(chip, packageVersion)
+            ? /pf-m-blue/
+            : /pf-m-green/,
+        );
+        if (chip !== "Applied") await expect(label).toHaveClass(/pf-m-outline/);
       }
     }
   },
@@ -329,5 +356,17 @@ Then(
           .map((name) => name.trim())
           .sort(),
       );
+  },
+);
+
+Then(
+  "The Vendor Remediation Alert is {string}",
+  async ({ page }, alertStatus: string) => {
+    const reportPage = await RemediationReportPage.fromCurrentPage(page);
+    let alertCont = false;
+    if (alertStatus == "Visible") {
+      alertCont = true;
+    }
+    expect(await reportPage.hasVendorRemediationsAlert()).toBe(alertCont);
   },
 );

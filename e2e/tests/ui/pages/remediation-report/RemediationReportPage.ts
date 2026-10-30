@@ -14,7 +14,11 @@ export class RemediationReportPage {
 
   static async build(page: Page, sbomNames: string[]) {
     const sbomListPage = await SbomListPage.build(page);
+    const sbomToolBar = await sbomListPage.getToolbar();
+    const sbomListPagination = await sbomListPage.getPagination();
+    await sbomListPagination.selectItemsPerPage(100);
     await sbomListPage.selectSbomsByName(sbomNames);
+    await sbomToolBar.clearAllFilters();
     await sbomListPage.clickRemediationReport();
     return new RemediationReportPage(page);
   }
@@ -118,9 +122,5 @@ export class RemediationReportPage {
       table.getByRole("heading", { name: "No data available", exact: true }),
     ).toBeVisible();
     await expect(table.locator('td[data-label="Package"]')).toHaveCount(0);
-    // The report renders a "remediations available" alert unconditionally, so
-    // this must be matched by class/text rather than role: a custom-variant
-    // PatternFly alert has no role="alert".
-    expect(await this.hasVendorRemediationsAlert()).toBe(false);
   }
 }

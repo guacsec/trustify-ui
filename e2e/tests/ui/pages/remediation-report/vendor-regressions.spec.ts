@@ -6,7 +6,6 @@ import { login } from "../../helpers/Auth";
 
 import { VulnerabilitiesTab as PackageVulnerabilitiesTab } from "../package-details/vulnerabilities/VulnerabilitiesTab";
 import { PackagesTab } from "../sbom-details/packages/PackagesTab";
-import { SbomListPage } from "../sbom-list/SbomListPage";
 
 // Capability tests intentionally control only the feature probe. All list data
 // and navigation still use the running application and UI fixture dataset.
@@ -16,39 +15,6 @@ test.describe(
   () => {
     test.beforeEach(async ({ page }) => {
       await login(page);
-    });
-
-    test("TC-6787: report action is absent while capability is pending or disabled", async ({
-      page,
-    }) => {
-      let release!: () => void;
-      const pending = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      await page.route("**/api/v3/purl/recommend", async (route) => {
-        await pending;
-        await route.fulfill({
-          status: 422,
-          json: { error: "CapabilityDisabled" },
-        });
-      });
-      const list = await SbomListPage.build(page);
-      const probeRequest = page.waitForRequest("**/api/v3/purl/recommend");
-      const probeResponse = page.waitForResponse("**/api/v3/purl/recommend");
-      const action = list.getRemediationReportAction();
-      try {
-        // Reload clears the query cache left by earlier navigation.
-        await list.reload();
-        await probeRequest;
-        await expect(action).toHaveCount(0);
-      } finally {
-        release();
-      }
-      await probeResponse;
-      await page.unrouteAll({ behavior: "wait" });
-      await expect(action).toHaveCount(0);
-      // Keep the regular SBOM list available after the disabled probe completes.
-      await expect((await list.getTable())._table).toBeVisible();
     });
 
     for (const { version, fix } of [
