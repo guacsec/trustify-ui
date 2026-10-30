@@ -1,6 +1,6 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within, act } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
@@ -44,7 +44,17 @@ const mockKeys: CryptoAlgorithm[] = [
     name: "private-key-rsa",
     asset_type: "related-crypto-material",
     oid: null,
-    properties: { type: "private-key" },
+    properties: { type: "private-key", size: 2048 },
+    policy_status: "compliant",
+    packages_count: 0,
+    sboms_count: 0,
+  },
+  {
+    node_id: "key-2",
+    name: "public-key-ec",
+    asset_type: "related-crypto-material",
+    oid: null,
+    properties: { type: "public-key" },
     policy_status: "compliant",
     packages_count: 0,
     sboms_count: 0,
@@ -118,7 +128,7 @@ describe("CryptoBySbom", () => {
     renderComponent();
 
     expect(screen.getByText("Algorithms (3)")).toBeInTheDocument();
-    expect(screen.getByText("Keys (1)")).toBeInTheDocument();
+    expect(screen.getByText("Keys (2)")).toBeInTheDocument();
   });
 
   it("renders all 7 algorithm table columns", () => {
@@ -163,5 +173,21 @@ describe("CryptoBySbom", () => {
     expect(
       screen.getByText("No algorithms found for this SBOM."),
     ).toBeInTheDocument();
+  });
+
+  it("renders Size column in keys table with correct values", async () => {
+    renderComponent();
+
+    const keysTab = screen.getByText("Keys (2)");
+    await act(() => keysTab.click());
+
+    expect(screen.getByText("Size")).toBeInTheDocument();
+    expect(screen.getByText("2048 bits")).toBeInTheDocument();
+
+    const noSizeRow = screen.getByText("public-key-ec").closest("tr")!;
+    const sizeCell = within(noSizeRow)
+      .getAllByRole("cell")
+      .find((cell) => cell.getAttribute("data-label") === "Size")!;
+    expect(sizeCell).toHaveTextContent("--");
   });
 });
