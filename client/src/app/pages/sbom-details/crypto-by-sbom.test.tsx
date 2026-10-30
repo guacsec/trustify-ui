@@ -1,6 +1,6 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, within, act } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
@@ -185,6 +185,9 @@ describe("CryptoBySbom", () => {
     expect(screen.getByText("2048 bits")).toBeInTheDocument();
 
     const noSizeRow = screen.getByText("public-key-ec").closest("tr")!;
-    expect(noSizeRow).toHaveTextContent("--");
+    const sizeCell = within(noSizeRow)
+      .getAllByRole("cell")
+      .find((cell) => cell.getAttribute("data-label") === "Size")!;
+    expect(sizeCell).toHaveTextContent("--");
   });
 });
