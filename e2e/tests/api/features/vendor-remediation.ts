@@ -107,8 +107,6 @@ test.describe(
         {
           [expression]: {
             "CVE-2023-20861": "Fixed",
-            "CVE-2024-38808": "Fixed",
-            "CVE-2023-20863": "Fixed",
           },
           [webMVC]: {
             "CVE-2023-20860": "Fixed",
@@ -134,8 +132,6 @@ test.describe(
         {
           [purl]: {
             "CVE-2023-20861": "Fixed",
-            "CVE-2024-38808": "Fixed",
-            "CVE-2023-20863": "Fixed",
           },
         },
       );
