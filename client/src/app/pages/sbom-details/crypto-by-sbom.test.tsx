@@ -182,12 +182,15 @@ describe("CryptoBySbom", () => {
     await act(() => keysTab.click());
 
     expect(screen.getByText("Size")).toBeInTheDocument();
-    expect(screen.getByText("2048 bits")).toBeInTheDocument();
 
-    const noSizeRow = screen.getByText("public-key-ec").closest("tr")!;
-    const sizeCell = within(noSizeRow)
-      .getAllByRole("cell")
-      .find((cell) => cell.getAttribute("data-label") === "Size")!;
-    expect(sizeCell).toHaveTextContent("--");
+    const findSizeCell = (rowLabel: string) => {
+      const row = screen.getByText(rowLabel).closest("tr")!;
+      return within(row)
+        .getAllByRole("cell")
+        .find((cell) => cell.getAttribute("data-label") === "Size")!;
+    };
+
+    expect(findSizeCell("private-key-rsa")).toHaveTextContent("2048 bits");
+    expect(findSizeCell("public-key-ec")).toHaveTextContent("--");
   });
 });
