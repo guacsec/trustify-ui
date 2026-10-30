@@ -59,6 +59,11 @@ const getUsage = (item: CryptoAlgorithm): string => {
   return ctx ?? "--";
 };
 
+const getKeySize = (item: CryptoAlgorithm): string => {
+  const size = rcmProps(item).size as number | undefined;
+  return size != null ? `${size} bits` : "--";
+};
+
 const getOccurrences = (item: CryptoAlgorithm): number =>
   (algProps(item).occurrences as number) ?? 1;
 
@@ -310,6 +315,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
       name: "Name",
       type: "Type",
       occurrences: "Occurrences",
+      size: "Size",
       usage: "Usage",
     },
     isPaginationEnabled: true,
@@ -349,7 +355,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
     currentPageItems: keys,
     totalItemCount,
     isLoading: isFetching,
-    forceNumRenderedColumns: 4,
+    forceNumRenderedColumns: 5,
   });
 
   const {
@@ -389,6 +395,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
               <Th {...getThProps({ columnKey: "name" })} />
               <Th {...getThProps({ columnKey: "type" })} />
               <Th {...getThProps({ columnKey: "occurrences" })} />
+              <Th {...getThProps({ columnKey: "size" })} />
               <Th {...getThProps({ columnKey: "usage" })} />
             </TableHeaderContentWithControls>
           </Tr>
@@ -411,7 +418,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
                   rowIndex={rowIndex}
                 >
                   <Td
-                    width={25}
+                    width={20}
                     modifier="breakWord"
                     {...getTdProps({ columnKey: "name", item, rowIndex })}
                   >
@@ -424,13 +431,13 @@ const KeysTable: React.FC<AssetTableProps> = ({
                     </Button>
                   </Td>
                   <Td
-                    width={25}
+                    width={20}
                     {...getTdProps({ columnKey: "type", item, rowIndex })}
                   >
                     {getKeyType(item)}
                   </Td>
                   <Td
-                    width={25}
+                    width={15}
                     {...getTdProps({
                       columnKey: "occurrences",
                       item,
@@ -440,7 +447,13 @@ const KeysTable: React.FC<AssetTableProps> = ({
                     {getOccurrences(item)}
                   </Td>
                   <Td
-                    width={25}
+                    width={15}
+                    {...getTdProps({ columnKey: "size", item, rowIndex })}
+                  >
+                    {getKeySize(item)}
+                  </Td>
+                  <Td
+                    width={20}
                     {...getTdProps({ columnKey: "usage", item, rowIndex })}
                   >
                     {getUsage(item)}
