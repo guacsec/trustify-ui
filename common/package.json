@@ -19,10 +19,10 @@
   "devDependencies": {
     "ejs": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-typescript": "^12.3.0",
-    "@rollup/plugin-virtual": "^3.0.2",
+    "@rollup/plugin-typescript": "^12.3.1",
+    "@rollup/plugin-virtual": "^3.0.3",
     "cross-env": "^10.0.0",
-    "rollup": "^4.63.5"
+    "rollup": "^4.66.0"
   },
   "scripts": {
     "clean": "rimraf ./dist",
