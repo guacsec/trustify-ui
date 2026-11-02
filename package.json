@@ -55,7 +55,9 @@
     "playwright": "1.60.0",
     "playwright-core": "1.60.0",
     "js-yaml": ">=5.0.0",
-    "braces": ">=3.0.3"
+    "braces": ">=3.0.3",
+    "minimatch": ">=11.0.1",
+    "glob": ">=14.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
