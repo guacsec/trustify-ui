@@ -469,7 +469,7 @@ Then(
   "Application should remain on the Generate Vulnerability Report screen",
   async ({ page }) => {
     await expect(page).toHaveURL(/\/sboms\/scan$/);
-    // After canceling the modal, we're still viewing the vulnerability report (not the generate screen)
+    await expect(page.getByRole("dialog")).toBeHidden();
     const scanPage = await SbomScanPage.build(page);
     await expect(scanPage.heading).toHaveText("Vulnerability report");
   },
