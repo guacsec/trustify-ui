@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 
 import { AuthProvider, useAuth } from "react-oidc-context";
 
-import ENV from "@app/env";
+import { ENV } from "@app/env";
 import { oidcClientSettings } from "@app/oidc";
 import { AppRoutes } from "@app/Routes";
 

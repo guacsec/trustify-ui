@@ -1,5 +1,4 @@
-import type { Locator, Page } from "playwright-core";
-import { expect } from "playwright/test";
+import { type Locator, type Page, expect } from "@playwright/test";
 
 export class LabelsModal {
   private _dialog: Locator;

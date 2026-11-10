@@ -1,6 +1,6 @@
 import type { AxiosError } from "axios";
 import type { AdvisoryHead, AdvisorySummary, SbomHead } from "./client";
-import ENV from "./env";
+import { ENV } from "./env";
 
 export const FILTER_TEXT_CATEGORY_KEY = "";
 export const FILTER_NULL_VALUE = "\0";
