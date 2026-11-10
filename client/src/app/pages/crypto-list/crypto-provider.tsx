@@ -82,8 +82,11 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
           {
             categoryKey: FILTER_TEXT_CATEGORY_KEY,
             title: "Filter",
-            placeholderText: "Search",
+            placeholderText: "Search by key name",
             type: FilterType.search,
+            // Scope the search to the name field; an unqualified query would
+            // full-text match every string-like field (e.g. key metadata).
+            serverFilterField: "name",
           },
         ],
     isExpansionEnabled: false,
