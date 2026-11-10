@@ -54,7 +54,13 @@
     "react-dom": "$react-dom",
     "@playwright/test": "1.60.0",
     "playwright": "1.60.0",
-    "playwright-core": "1.60.0"
+    "playwright-core": "1.60.0",
+    "@hey-api/json-schema-ref-parser": {
+      "js-yaml": "4.3.2"
+    },
+    "cosmiconfig": {
+      "js-yaml": "4.3.2"
+    }
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
@@ -69,7 +75,7 @@
     "@rollup/plugin-virtual": "^3.0.3",
     "@tanstack/eslint-plugin-query": "^5.100.10",
     "@types/node": "^25.0.3",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.12",
     "concurrently": "^10.0.4",
     "copyfiles": "^2.4.1",
     "cross-env": "^10.0.0",
