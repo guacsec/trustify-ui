@@ -1,5 +1,5 @@
 import React from "react";
-import { MemoryRouter } from "react-router-dom";
+import { BrowserRouter, MemoryRouter } from "react-router-dom";
 import { render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -51,6 +51,8 @@ const mockKeys: CryptoAlgorithm[] = [
   },
 ];
 
+const fetchCryptoAlgorithmsSpy = vi.hoisted(() => vi.fn());
+
 vi.mock("@app/queries/crypto", () => ({
   useFetchCryptoPolicySummary: () => ({
     result: mockSummary,
@@ -59,22 +61,26 @@ vi.mock("@app/queries/crypto", () => ({
     refetch: vi.fn(),
   }),
   useFetchCryptoAlgorithms: (
-    _params: unknown,
+    params: unknown,
     _disable: boolean,
     assetType?: string,
-  ) => ({
-    result: {
-      data: assetType === "related-crypto-material" ? mockKeys : mockAlgorithms,
-      total:
-        assetType === "related-crypto-material"
-          ? mockKeys.length
-          : mockAlgorithms.length,
-      params: {},
-    },
-    isFetching: false,
-    fetchError: null,
-    refetch: vi.fn(),
-  }),
+  ) => {
+    fetchCryptoAlgorithmsSpy(params, assetType);
+    return {
+      result: {
+        data:
+          assetType === "related-crypto-material" ? mockKeys : mockAlgorithms,
+        total:
+          assetType === "related-crypto-material"
+            ? mockKeys.length
+            : mockAlgorithms.length,
+        params: {},
+      },
+      isFetching: false,
+      fetchError: null,
+      refetch: vi.fn(),
+    };
+  },
 }));
 
 vi.mock("@app/components/DocumentMetadata", () => ({
@@ -177,6 +183,43 @@ describe("CryptoList", () => {
     const row = within(keyRow);
     expect(row.getByText("my-rsa-key")).toBeInTheDocument();
     expect(row.getByText("private-key")).toBeInTheDocument();
+  });
+
+  /** Verifies that both the Algorithms and Keys tabs expose a search filter. */
+  it("renders a name filter on the Keys tab", () => {
+    renderComponent();
+
+    expect(
+      screen.getByPlaceholderText("Search by algorithm name"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search by key name"),
+    ).toBeInTheDocument();
+  });
+
+  /** Verifies that the Keys search is scoped to the name field instead of a full-text search. */
+  it("scopes the Keys search to the name field", () => {
+    fetchCryptoAlgorithmsSpy.mockClear();
+    const filters = encodeURIComponent(JSON.stringify({ "": ["rsa"] }));
+    // URL params are written through document.location, so a real browser router is needed
+    window.history.replaceState({}, "", `/?ck:filters=${filters}`);
+    render(
+      <BrowserRouter>
+        <CryptoList />
+      </BrowserRouter>,
+    );
+
+    const keysCalls = (
+      fetchCryptoAlgorithmsSpy.mock.calls as [
+        { filters?: unknown[] },
+        string | undefined,
+      ][]
+    ).filter(([, assetType]) => assetType === "related-crypto-material");
+    const keysCall = keysCalls[keysCalls.length - 1];
+    window.history.replaceState({}, "", "/");
+    expect(keysCall?.[0].filters).toEqual([
+      { field: "name", operator: "~", value: "rsa" },
+    ]);
   });
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
