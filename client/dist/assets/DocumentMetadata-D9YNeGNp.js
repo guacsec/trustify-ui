@@ -1,0 +1,1 @@
+import{t as e}from"./useBranding-B4q08dlr.js";import{t}from"./react-Cd7cGt34.js";var n=t(),r=({title:t})=>{let r=e().application.title,i=t?`${t} | ${r}`:r;return(0,n.jsx)(`title`,{children:i})};export{r as t};
