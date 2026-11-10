@@ -20,7 +20,7 @@ export type {
   RecommendReportSbom,
 };
 
-export const RecommendationsQueryKey = "recommendations";
+const RecommendationsQueryKey = "recommendations";
 
 /** Batch-fetch vendor recommendations for the given PURLs via POST /api/v2/purl/recommend. */
 export const useFetchRecommendations = (purls: string[]) => {
@@ -73,7 +73,7 @@ export const useIsRecommendationEnabled = (): boolean => {
   );
 };
 
-export const RemediationReportQueryKey = "remediation-report";
+const RemediationReportQueryKey = "remediation-report";
 
 /** Fetch an aggregated vendor remediation report for the given SBOM IDs via POST /api/v3/purl/recommend/report. */
 export const useFetchRemediationReport = (sbomIds: string[]) => {

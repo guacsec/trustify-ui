@@ -10,7 +10,7 @@ import {
   extractGroupControllerProps,
 } from "./HookFormPFGroupController";
 
-export type HookFormPFSelectProps<
+type HookFormPFSelectProps<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
 > = FormSelectProps &

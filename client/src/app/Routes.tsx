@@ -79,10 +79,7 @@ export const Paths = {
   sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
 } as const;
 
-export const getPathFromParams = (
-  params: Params<string>,
-  pathParam: PathParam,
-) => {
+const getPathFromParams = (params: Params<string>, pathParam: PathParam) => {
   const value = params[pathParam];
   if (value === undefined) {
     throw new Error(

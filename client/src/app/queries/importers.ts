@@ -13,7 +13,7 @@ import {
   updateImporter,
 } from "@app/client";
 
-export const ImportersQueryKey = "importers";
+const ImportersQueryKey = "importers";
 
 export const useFetchImporters = (refetchDisabled = false) => {
   const { isLoading, error, refetch, data } = useQuery({

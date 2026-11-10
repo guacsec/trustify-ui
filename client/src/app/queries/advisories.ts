@@ -33,7 +33,7 @@ export interface IAdvisoriesQueryParams {
   sort_by?: string;
 }
 
-export const AdvisoriesQueryKey = "advisories";
+const AdvisoriesQueryKey = "advisories";
 
 export const useFetchAdvisoryLabels = (filterText: string) => {
   const { data, isLoading, error, refetch } = useQuery({

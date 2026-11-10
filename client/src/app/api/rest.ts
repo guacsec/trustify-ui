@@ -8,10 +8,10 @@ import type { HubPaginatedResult, HubRequestParams } from "./models";
 
 const API = "/api";
 
-export const ADVISORIES = `${API}/v3/advisory`;
-export const SBOMS = `${API}/v3/sbom`;
+const ADVISORIES = `${API}/v3/advisory`;
+const SBOMS = `${API}/v3/sbom`;
 
-export interface PaginatedResponse<T> {
+interface PaginatedResponse<T> {
   items: T[];
   total: number;
 }

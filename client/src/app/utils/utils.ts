@@ -49,7 +49,7 @@ export const formatDateTime = (value?: string | null) => {
   return value ? dayjs(value).format(RENDER_DATETIME_FORMAT) : null;
 };
 
-export const duplicateFieldCheck = <T>(
+const duplicateFieldCheck = <T>(
   fieldKey: keyof T,
   itemList: T[],
   currentItem: T | null,
