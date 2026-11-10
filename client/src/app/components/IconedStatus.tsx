@@ -9,7 +9,7 @@ import PendingIcon from "@patternfly/react-icons/dist/esm/icons/pending-icon";
 import TimesCircleIcon from "@patternfly/react-icons/dist/esm/icons/times-circle-icon";
 import UnknownIcon from "@patternfly/react-icons/dist/esm/icons/unknown-icon";
 
-export type IconedStatusPreset =
+type IconedStatusPreset =
   | "Canceled"
   | "Completed"
   | "Error"
@@ -20,7 +20,7 @@ export type IconedStatusPreset =
   | "Scheduled"
   | "Unknown";
 
-export type IconedStatusStatusType =
+type IconedStatusStatusType =
   | "custom"
   | "info"
   | "success"

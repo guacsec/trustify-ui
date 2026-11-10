@@ -3,7 +3,7 @@ import type React from "react";
 import { AboutModal, Content, ContentVariants } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 
-import ENV from "@app/env";
+import { ENV } from "@app/env";
 import getBranding from "@app/hooks/useBranding";
 
 interface IButtonAboutAppProps {

@@ -189,7 +189,7 @@ generated output at `client/src/app/client/` must never be edited manually.
 |---|---|---|---|
 | Generated | `client/types.gen.ts`, `sdk.gen.ts` | `PaginatedResultsAdvisorySummary`, `ListAdvisoriesData` | Auto-generated — never edit |
 | Manual (request) | `api/models.ts` | `HubRequestParams`, `HubFilter` | Hand-maintained |
-| Manual (response) | `api/models.ts`, `api/rest.ts` | `HubPaginatedResult<T>`, `PaginatedResponse<T>` | Hand-maintained |
+| Manual (response) | `api/models.ts` | `HubPaginatedResult<T>` | Hand-maintained |
 
 Query hooks in `queries/` bridge the two layers: they call generated SDK
 functions and normalize responses into the `HubPaginatedResult<T>` shape.
@@ -203,7 +203,7 @@ to reconcile generated types, query hooks, manual types, and constants.
 
 ### Legacy REST helpers
 
-- `getHubPaginatedResult` in `api/rest.ts` and `serializeRequestParamsForHub` in `hooks/table-controls/getHubRequestParams.ts` are the legacy serialization path (URLSearchParams). They do **not** serialize the `total` query parameter.
+- `serializeRequestParamsForHub` in `hooks/table-controls/getHubRequestParams.ts` is the legacy serialization path (URLSearchParams). It does **not** serialize the `total` query parameter.
 - Only used for upload/download flows — all paginated list queries use `requestParamsQuery` (plain object, includes `total`).
 - New paginated endpoints must use the `requestParamsQuery` path.
 

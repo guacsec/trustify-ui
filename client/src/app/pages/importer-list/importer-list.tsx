@@ -539,7 +539,7 @@ interface ImporterExpandedAreaProps {
   importer: Importer;
 }
 
-export const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
+const ImporterExpandedArea: React.FC<ImporterExpandedAreaProps> = ({
   importer,
 }) => {
   const [logData, setLogData] = React.useState<string[]>([]);

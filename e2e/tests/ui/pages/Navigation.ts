@@ -1,4 +1,4 @@
-import type { Page } from "playwright-core";
+import type { Page } from "@playwright/test";
 
 /**
  * Used to navigate to different pages
