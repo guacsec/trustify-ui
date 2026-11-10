@@ -26,13 +26,6 @@ import {
 } from "@app/hooks/table-controls";
 import { useUpload } from "@app/hooks/useUpload";
 
-export interface IAdvisoriesQueryParams {
-  filterText?: string;
-  offset?: number;
-  limit?: number;
-  sort_by?: string;
-}
-
 const AdvisoriesQueryKey = "advisories";
 
 export const useFetchAdvisoryLabels = (filterText: string) => {

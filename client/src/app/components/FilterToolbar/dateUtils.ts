@@ -1,20 +1,5 @@
 import dayjs from "dayjs";
 
-/**
- *
- * @param interval ISO time interval with date part only (no time, no time zone) interpreted as closed range (both start and and included)
- * @param date  ISO date time
- * @returns true if the provided date is in the time interval
- */
-export const isInClosedRange = (interval: string, date: string): boolean => {
-  const [start, end] = parseInterval(interval);
-  if (!isValidInterval([start, end])) {
-    return false;
-  }
-  const target = dayjs(date);
-  return start.isSameOrBefore(target) && target.isSameOrBefore(end, "day");
-};
-
 export const isValidAmericanShortDate = (val: string) =>
   dayjs(val, "MM/DD/YYYY", true).isValid();
 

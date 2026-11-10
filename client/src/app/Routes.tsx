@@ -54,7 +54,6 @@ export enum PathParam {
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
-  LICENSE_NAME = "licenseName",
   SBOM_GROUP_ID = "sbomGroupId",
 }
 
