@@ -156,7 +156,7 @@ export const CryptoList: React.FC = () => {
             title={<TabTitleText>Keys ({keysTotal})</TabTitleText>}
           >
             <CryptoSearchProvider assetType="related-crypto-material">
-              <CryptoToolbar />
+              <CryptoToolbar showFilters />
               <CryptoTable
                 assetType="related-crypto-material"
                 onSelectAlgorithm={setSelectedAlgorithm}

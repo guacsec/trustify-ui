@@ -179,6 +179,18 @@ describe("CryptoList", () => {
     expect(row.getByText("private-key")).toBeInTheDocument();
   });
 
+  /** Verifies that both the Algorithms and Keys tabs expose a search filter. */
+  it("renders a name filter on the Keys tab", () => {
+    renderComponent();
+
+    expect(
+      screen.getByPlaceholderText("Search by algorithm name"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search by key name"),
+    ).toBeInTheDocument();
+  });
+
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
   it("renders pagination controls", () => {
     renderComponent();

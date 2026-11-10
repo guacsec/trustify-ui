@@ -82,7 +82,7 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
           {
             categoryKey: FILTER_TEXT_CATEGORY_KEY,
             title: "Filter",
-            placeholderText: "Search",
+            placeholderText: "Search by key name",
             type: FilterType.search,
           },
         ],
