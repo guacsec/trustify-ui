@@ -27,7 +27,7 @@ import {
 import { requestParamsQuery } from "@app/hooks/table-controls/getHubRequestParams";
 import { SBOMsQueryKey } from "./sboms";
 
-const SBOMGroupsQueryKey = "sbom-groups";
+export const SBOMGroupsQueryKey = "sbom-groups";
 
 export const SBOMGroupByIdQueryOptions = (id: string) => {
   return queryOptions({

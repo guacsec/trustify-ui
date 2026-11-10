@@ -7,7 +7,7 @@ import { client } from "../axios-config/apiInit";
 import { getPurl, listPackages, listPurl } from "../client";
 import { requestParamsQuery } from "../hooks/table-controls";
 
-const PackagesQueryKey = "packages";
+export const PackagesQueryKey = "packages";
 
 export const useFetchPackages = (
   params: HubRequestParams = {},

@@ -26,7 +26,7 @@ import {
 } from "@app/hooks/table-controls";
 import { useUpload } from "@app/hooks/useUpload";
 
-const AdvisoriesQueryKey = "advisories";
+export const AdvisoriesQueryKey = "advisories";
 
 export const useFetchAdvisoryLabels = (filterText: string) => {
   const { data, isLoading, error, refetch } = useQuery({

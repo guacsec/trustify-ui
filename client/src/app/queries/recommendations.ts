@@ -13,7 +13,7 @@ import type {
 export { type RecommendEntry };
 export type { RecommendReportPackage, RecommendReportResponse };
 
-const RecommendationsQueryKey = "recommendations";
+export const RecommendationsQueryKey = "recommendations";
 
 /** Batch-fetch vendor recommendations for the given PURLs via POST /api/v2/purl/recommend. */
 export const useFetchRecommendations = (purls: string[]) => {
@@ -66,7 +66,7 @@ export const useIsRecommendationEnabled = (): boolean => {
   );
 };
 
-const RemediationReportQueryKey = "remediation-report";
+export const RemediationReportQueryKey = "remediation-report";
 
 /** Fetch an aggregated vendor remediation report for the given SBOM IDs via POST /api/v3/purl/recommend/report. */
 export const useFetchRemediationReport = (sbomIds: string[]) => {
