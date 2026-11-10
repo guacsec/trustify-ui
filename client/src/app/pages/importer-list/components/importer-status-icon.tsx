@@ -7,7 +7,7 @@ export interface ImporterStatusIconProps {
   state: State;
 }
 
-export type AnalysisState =
+type AnalysisState =
   | "Canceled"
   | "Scheduled"
   | "Completed"

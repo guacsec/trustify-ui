@@ -28,7 +28,7 @@ export const resolveAssetPath = (
  * @param download The Playwright Download object
  * @returns The suggested filename
  */
-export const verifyDownload = async (download: Download): Promise<string> => {
+const verifyDownload = async (download: Download): Promise<string> => {
   try {
     return download.suggestedFilename();
   } catch (error) {

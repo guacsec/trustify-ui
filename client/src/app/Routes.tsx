@@ -54,7 +54,6 @@ export enum PathParam {
   VULNERABILITY_ID = "vulnerabilityId",
   SBOM_ID = "sbomId",
   PACKAGE_ID = "packageId",
-  LICENSE_NAME = "licenseName",
   SBOM_GROUP_ID = "sbomGroupId",
 }
 
@@ -79,10 +78,7 @@ export const Paths = {
   sbomGroupDetails: `/sbom-groups/:${PathParam.SBOM_GROUP_ID}`,
 } as const;
 
-export const getPathFromParams = (
-  params: Params<string>,
-  pathParam: PathParam,
-) => {
+const getPathFromParams = (params: Params<string>, pathParam: PathParam) => {
   const value = params[pathParam];
   if (value === undefined) {
     throw new Error(

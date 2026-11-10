@@ -3,9 +3,6 @@ import type { Severity } from "@app/client";
 
 export type WithUiId<T> = T & { _ui_unique_id: string };
 
-/** Mark an object as "New" therefore does not have an `id` field. */
-export type New<T extends { id: number }> = Omit<T, "id">;
-
 export interface HubFilter {
   field: string;
   operator?: "=" | "!=" | "~" | ">" | ">=" | "<" | "<=";

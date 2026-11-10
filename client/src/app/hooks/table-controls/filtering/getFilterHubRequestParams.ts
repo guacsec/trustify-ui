@@ -201,7 +201,7 @@ export const getFilterHubRequestParams = <
  * - Given a string or number, returns it as a string with quotes (`"`) around it.
  * - Adds an escape character before any existing quote (`"`) characters in the string.
  */
-export const wrapAndEscape = (value: string | number): string =>
+const wrapAndEscape = (value: string | number): string =>
   `${String(value)
     .replace("=", "\\=")
     .replace("~", "\\~")

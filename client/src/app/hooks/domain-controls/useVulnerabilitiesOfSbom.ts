@@ -18,10 +18,7 @@ import type {
   SbomStatus,
   ScoredVector,
 } from "@app/client";
-import {
-  useFetchSbomsAdvisory,
-  useFetchSbomsAdvisoryBatch,
-} from "@app/queries/sboms";
+import { useFetchSbomsAdvisory } from "@app/queries/sboms";
 
 const areVulnerabilityOfSbomEqual = (
   a: VulnerabilityOfSbom,
@@ -310,22 +307,5 @@ export const useVulnerabilitiesOfSbom = (sbomId: string) => {
     advisories: advisories ?? [],
     isFetching: isFetchingAdvisories,
     fetchError: fetchErrorAdvisories,
-  };
-};
-
-export const useVulnerabilitiesOfSboms = (sbomIds: string[]) => {
-  const { advisories, isFetching, fetchError } =
-    useFetchSbomsAdvisoryBatch(sbomIds);
-
-  const result = React.useMemo(() => {
-    return (advisories ?? []).map((item) => {
-      return advisoryToModels(item || []);
-    });
-  }, [advisories]);
-
-  return {
-    data: result,
-    isFetching: isFetching,
-    fetchError: fetchError,
   };
 };

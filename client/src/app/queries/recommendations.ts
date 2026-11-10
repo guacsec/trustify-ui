@@ -6,19 +6,12 @@ import { client } from "../axios-config/apiInit";
 import { recommend, recommendReport } from "../client";
 import type {
   RecommendEntry,
-  RecommendReportImpactSummary,
   RecommendReportPackage,
   RecommendReportResponse,
-  RecommendReportSbom,
 } from "../client";
 
 export { type RecommendEntry };
-export type {
-  RecommendReportImpactSummary,
-  RecommendReportPackage,
-  RecommendReportResponse,
-  RecommendReportSbom,
-};
+export type { RecommendReportPackage, RecommendReportResponse };
 
 export const RecommendationsQueryKey = "recommendations";
 
