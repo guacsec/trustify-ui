@@ -19,7 +19,7 @@ export interface ICryptoSearchContext {
     | "type"
     | "size",
     "name",
-    "" | "policy_status",
+    "",
     string
   >;
 
