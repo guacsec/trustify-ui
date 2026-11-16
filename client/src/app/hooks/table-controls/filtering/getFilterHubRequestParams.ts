@@ -102,9 +102,10 @@ export const getFilterHubRequestParams = <
         (category) => category.categoryKey === categoryKey,
       );
       const filterValue = filterValues[categoryKey];
-      // Skip (rather than stop at) unknown categories or empty values, e.g. a stale
-      // filter restored from a persisted URL, so later valid filters are still sent.
-      if (!filterCategory || !filterValue) continue;
+      // Skip (rather than stop at) unknown categories or empty values (null or an
+      // empty array), e.g. a stale filter restored from a persisted URL, so later
+      // valid filters are still sent and no malformed filter is built.
+      if (!filterCategory || !filterValue?.length) continue;
       const serverFilterField = filterCategory.serverFilterField || categoryKey;
       const serverFilterValue =
         filterCategory.getServerFilterValue?.(filterValue) || filterValue;
@@ -195,7 +196,9 @@ export const getFilterHubRequestParams = <
       filters.push(filter);
     }
   }
-  return { filters };
+  // Omit `filters` entirely when nothing is left to send; an empty array would
+  // otherwise be serialized by requestParamsQuery as an empty `q` expression.
+  return filters.length > 0 ? { filters } : {};
 };
 
 /**

@@ -1,5 +1,8 @@
 import { FilterType } from "@app/components/FilterToolbar";
 
+import type { HubRequestParams } from "@app/api/models";
+import { requestParamsQuery } from "../getHubRequestParams";
+
 import { getFilterHubRequestParams } from "./getFilterHubRequestParams";
 
 const filterCategories = [
@@ -46,6 +49,74 @@ describe("getFilterHubRequestParams", () => {
     expect(result.filters).toEqual([
       { field: "name", operator: "~", value: "rsa" },
     ]);
+  });
+
+  /** Verifies that a known select category restored with an empty array does not build a malformed filter. */
+  it("skips known select categories with an empty value array", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { status: [], name: ["rsa"] },
+        setFilterValues: () => {},
+      },
+      filterCategories,
+    });
+
+    expect(result.filters).toEqual([
+      { field: "name", operator: "~", value: "rsa" },
+    ]);
+  });
+
+  /** Verifies that a known multiselect category restored with an empty array does not build a malformed filter. */
+  it("skips known multiselect categories with an empty value array", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { tags: [], name: ["rsa"] },
+        setFilterValues: () => {},
+      },
+      filterCategories: [
+        ...filterCategories,
+        {
+          categoryKey: "tags",
+          title: "Tags",
+          type: FilterType.multiselect,
+          selectOptions: [{ value: "a", label: "A" }],
+        },
+      ],
+    });
+
+    expect(result.filters).toEqual([
+      { field: "name", operator: "~", value: "rsa" },
+    ]);
+  });
+
+  /** Verifies that no `filters` property is returned when every restored value is empty or unknown, so no empty `q` is serialized. */
+  it("omits filters when all values are empty or unknown", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { stale: ["x"], status: [], name: null },
+        setFilterValues: () => {},
+      },
+      filterCategories,
+    });
+
+    expect(result).toEqual({});
+    expect("filters" in result).toBe(false);
+    expect(requestParamsQuery(result as HubRequestParams).q).toBeUndefined();
+  });
+
+  /** Verifies that implicit filters are still returned when all user filters are empty. */
+  it("keeps implicit filters when all user filters are empty", () => {
+    const implicit = { field: "sbom_id", operator: "=" as const, value: "1" };
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { status: [] },
+        setFilterValues: () => {},
+      },
+      filterCategories,
+      implicitFilters: [implicit],
+    });
+
+    expect(result.filters).toEqual([implicit]);
   });
 
   /** Verifies that an empty filter value does not prevent later valid filters from being sent. */
