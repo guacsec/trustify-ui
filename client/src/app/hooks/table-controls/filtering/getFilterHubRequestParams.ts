@@ -196,7 +196,9 @@ export const getFilterHubRequestParams = <
       filters.push(filter);
     }
   }
-  return { filters };
+  // Omit `filters` entirely when nothing is left to send; an empty array would
+  // otherwise be serialized by requestParamsQuery as an empty `q` expression.
+  return filters.length > 0 ? { filters } : {};
 };
 
 /**
