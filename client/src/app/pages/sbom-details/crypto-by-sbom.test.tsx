@@ -159,6 +159,15 @@ describe("CryptoBySbom", () => {
     expect(screen.getByText("Parameter set 2048")).toBeInTheDocument();
   });
 
+  it("only offers the name search filter on the algorithms table", () => {
+    renderComponent();
+
+    expect(
+      screen.getByPlaceholderText("Search by algorithm name"),
+    ).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("Policy status")).toBeNull();
+  });
+
   it("renders pagination controls", () => {
     renderComponent();
 

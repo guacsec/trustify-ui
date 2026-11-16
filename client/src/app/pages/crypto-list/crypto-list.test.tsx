@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, MemoryRouter } from "react-router-dom";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm, CryptoPolicySummary } from "./crypto-context";
@@ -220,6 +220,44 @@ describe("CryptoList", () => {
     expect(keysCall?.[0].filters).toEqual([
       { field: "name", operator: "~", value: "rsa" },
     ]);
+  });
+
+  /** Verifies that the Algorithms tab only offers the name search (policy filtering is not supported by the backend). */
+  it("does not offer a policy filter on the Algorithms tab", () => {
+    renderComponent();
+
+    expect(screen.queryByPlaceholderText("Policy status")).toBeNull();
+
+    // Open the filter category dropdown of the Algorithms toolbar (first on the page)
+    fireEvent.click(screen.getAllByLabelText("filtered-by")[0]!);
+    expect(
+      screen.getByText("Filter", { selector: "li *" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Policy" })).toBeNull();
+  });
+
+  /** Verifies that a stale policy_status filter in the URL is never sent to the backend. */
+  it("ignores a stale policy_status filter from the URL", () => {
+    fetchCryptoAlgorithmsSpy.mockClear();
+    const filters = encodeURIComponent(
+      JSON.stringify({ policy_status: ["non_compliant"] }),
+    );
+    // URL params are written through document.location, so a real browser router is needed
+    window.history.replaceState({}, "", `/?cr:filters=${filters}`);
+    render(
+      <BrowserRouter>
+        <CryptoList />
+      </BrowserRouter>,
+    );
+    window.history.replaceState({}, "", "/");
+
+    const sentFilters = (
+      fetchCryptoAlgorithmsSpy.mock.calls as [
+        { filters?: { field: string }[] },
+        string | undefined,
+      ][]
+    ).flatMap(([params]) => params.filters ?? []);
+    expect(sentFilters.some((f) => f.field === "policy_status")).toBe(false);
   });
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
