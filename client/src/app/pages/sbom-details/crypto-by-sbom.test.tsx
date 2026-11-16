@@ -1,6 +1,6 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen, within, act } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
@@ -157,6 +157,20 @@ describe("CryptoBySbom", () => {
     renderComponent();
 
     expect(screen.getByText("Parameter set 2048")).toBeInTheDocument();
+  });
+
+  it("only offers the name search filter on the algorithms table", () => {
+    renderComponent();
+
+    // Open the filter category dropdown of the Algorithms toolbar (first on the page)
+    fireEvent.click(screen.getAllByLabelText("filtered-by")[0]!);
+
+    // The name search must be the one and only filter category offered
+    const categories = screen.getAllByRole("menuitem");
+    expect(categories.map((c) => c.textContent)).toEqual(["Search"]);
+    expect(
+      screen.getByPlaceholderText("Search by algorithm name"),
+    ).toBeInTheDocument();
   });
 
   it("renders pagination controls", () => {
