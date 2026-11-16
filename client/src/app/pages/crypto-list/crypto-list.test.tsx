@@ -226,21 +226,20 @@ describe("CryptoList", () => {
   it("does not offer a policy filter on the Algorithms tab", () => {
     renderComponent();
 
-    expect(screen.queryByPlaceholderText("Policy status")).toBeNull();
-
     // Open the filter category dropdown of the Algorithms toolbar (first on the page)
     fireEvent.click(screen.getAllByLabelText("filtered-by")[0]!);
-    expect(
-      screen.getByText("Filter", { selector: "li *" }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("menuitem", { name: "Policy" })).toBeNull();
+
+    // The name search must be the one and only filter category offered
+    const categories = screen.getAllByRole("menuitem");
+    expect(categories.map((c) => c.textContent)).toEqual(["Filter"]);
   });
 
-  /** Verifies that a stale policy_status filter in the URL is never sent to the backend. */
+  /** Verifies that a stale policy_status filter in the URL is never sent and does not drop the valid name search. */
   it("ignores a stale policy_status filter from the URL", () => {
     fetchCryptoAlgorithmsSpy.mockClear();
+    // The stale filter is deliberately listed before the valid name search
     const filters = encodeURIComponent(
-      JSON.stringify({ policy_status: ["non_compliant"] }),
+      JSON.stringify({ policy_status: ["non_compliant"], "": ["rsa"] }),
     );
     // URL params are written through document.location, so a real browser router is needed
     window.history.replaceState({}, "", `/?cr:filters=${filters}`);
@@ -251,13 +250,18 @@ describe("CryptoList", () => {
     );
     window.history.replaceState({}, "", "/");
 
-    const sentFilters = (
+    const algorithmCalls = (
       fetchCryptoAlgorithmsSpy.mock.calls as [
         { filters?: { field: string }[] },
         string | undefined,
       ][]
-    ).flatMap(([params]) => params.filters ?? []);
-    expect(sentFilters.some((f) => f.field === "policy_status")).toBe(false);
+    ).filter(([, assetType]) => assetType === "algorithm");
+    // The Algorithms table must have issued its data request, otherwise the checks below are vacuous
+    expect(algorithmCalls.length).toBeGreaterThan(0);
+    const lastCall = algorithmCalls[algorithmCalls.length - 1];
+    expect(lastCall?.[0].filters).toEqual([
+      { field: "", operator: "~", value: "rsa" },
+    ]);
   });
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
