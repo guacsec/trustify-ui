@@ -102,7 +102,9 @@ export const getFilterHubRequestParams = <
         (category) => category.categoryKey === categoryKey,
       );
       const filterValue = filterValues[categoryKey];
-      if (!filterCategory || !filterValue) break;
+      // Skip (rather than stop at) unknown categories or empty values, e.g. a stale
+      // filter restored from a persisted URL, so later valid filters are still sent.
+      if (!filterCategory || !filterValue) continue;
       const serverFilterField = filterCategory.serverFilterField || categoryKey;
       const serverFilterValue =
         filterCategory.getServerFilterValue?.(filterValue) || filterValue;
