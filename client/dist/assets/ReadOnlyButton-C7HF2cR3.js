@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-XKyaHtl9.js";import{i as t,t as n}from"./react-t7yL8cdK.js";import{Tt as r}from"./useBranding-DGUBumTn.js";import{a as i}from"./index-9ykezwpY.js";var a=e(t(),1),o=n(),s=e=>{let{areMutationsDisabled:t}=a.useContext(i);return(0,o.jsx)(r,{...e,isDisabled:t})};export{s as t};
