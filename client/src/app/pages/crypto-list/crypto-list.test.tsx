@@ -226,8 +226,19 @@ describe("CryptoList", () => {
   it("does not offer a policy filter on the Algorithms tab", () => {
     renderComponent();
 
-    // Open the filter category dropdown of the Algorithms toolbar (first on the page)
-    fireEvent.click(screen.getAllByLabelText("filtered-by")[0]!);
+    // The Algorithms toolbar is the first on the page
+    const toolbar = screen.getAllByLabelText("crypto-toolbar")[0]!;
+
+    // No policy control may be rendered in the toolbar, e.g. outside the category dropdown
+    expect(within(toolbar).queryByText(/policy/i)).toBeNull();
+    expect(within(toolbar).queryByPlaceholderText(/policy/i)).toBeNull();
+    expect(within(toolbar).queryByLabelText(/policy/i)).toBeNull();
+    // Nor may any extra filter control (e.g. a select) sit next to the name search
+    expect(within(toolbar).queryByLabelText("Select")).toBeNull();
+    expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
+
+    // Open the filter category dropdown
+    fireEvent.click(within(toolbar).getByLabelText("filtered-by"));
 
     // The name search must be the one and only filter category offered
     const categories = screen.getAllByRole("menuitem");
