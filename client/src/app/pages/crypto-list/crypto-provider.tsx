@@ -19,13 +19,6 @@ interface ICryptoProvider {
   assetType: string;
 }
 
-/** Maps a backend policy_status value to a display label for the filter dropdown. */
-const policyStatusOptions = [
-  { value: "compliant", label: "Compliant" },
-  { value: "warning", label: "Warning" },
-  { value: "non_compliant", label: "Non-compliant" },
-];
-
 /** Context provider that manages table state and data fetching for the cryptography algorithm list. */
 export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
   children,
@@ -66,16 +59,6 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
             title: "Filter",
             placeholderText: "Search by algorithm name",
             type: FilterType.search,
-          },
-          {
-            categoryKey: "policy_status",
-            title: "Policy",
-            placeholderText: "Policy status",
-            type: FilterType.select,
-            selectOptions: policyStatusOptions.map((opt) => ({
-              value: opt.value,
-              label: opt.label,
-            })),
           },
         ]
       : [

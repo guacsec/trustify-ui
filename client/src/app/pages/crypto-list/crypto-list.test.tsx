@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, MemoryRouter } from "react-router-dom";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
 import type { CryptoAlgorithm, CryptoPolicySummary } from "./crypto-context";
@@ -219,6 +219,48 @@ describe("CryptoList", () => {
     window.history.replaceState({}, "", "/");
     expect(keysCall?.[0].filters).toEqual([
       { field: "name", operator: "~", value: "rsa" },
+    ]);
+  });
+
+  /** Verifies that the Algorithms tab only offers the name search (policy filtering is not supported by the backend). */
+  it("does not offer a policy filter on the Algorithms tab", () => {
+    renderComponent();
+
+    // Open the filter category dropdown of the Algorithms toolbar (first on the page)
+    fireEvent.click(screen.getAllByLabelText("filtered-by")[0]!);
+
+    // The name search must be the one and only filter category offered
+    const categories = screen.getAllByRole("menuitem");
+    expect(categories.map((c) => c.textContent)).toEqual(["Filter"]);
+  });
+
+  /** Verifies that a stale policy_status filter in the URL is never sent and does not drop the valid name search. */
+  it("ignores a stale policy_status filter from the URL", () => {
+    fetchCryptoAlgorithmsSpy.mockClear();
+    // The stale filter is deliberately listed before the valid name search
+    const filters = encodeURIComponent(
+      JSON.stringify({ policy_status: ["non_compliant"], "": ["rsa"] }),
+    );
+    // URL params are written through document.location, so a real browser router is needed
+    window.history.replaceState({}, "", `/?cr:filters=${filters}`);
+    render(
+      <BrowserRouter>
+        <CryptoList />
+      </BrowserRouter>,
+    );
+    window.history.replaceState({}, "", "/");
+
+    const algorithmCalls = (
+      fetchCryptoAlgorithmsSpy.mock.calls as [
+        { filters?: { field: string }[] },
+        string | undefined,
+      ][]
+    ).filter(([, assetType]) => assetType === "algorithm");
+    // The Algorithms table must have issued its data request, otherwise the checks below are vacuous
+    expect(algorithmCalls.length).toBeGreaterThan(0);
+    const lastCall = algorithmCalls[algorithmCalls.length - 1];
+    expect(lastCall?.[0].filters).toEqual([
+      { field: "", operator: "~", value: "rsa" },
     ]);
   });
 
