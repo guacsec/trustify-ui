@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type {
   FilterCategory,
@@ -7,8 +7,11 @@ import type {
 import { usePersistentState } from "@app/hooks/usePersistentState";
 import type { DiscriminatedArgs } from "@app/utils/type-utils";
 import { type IFeaturePersistenceArgs, isPersistenceProvider } from "../types";
-import { serializeFilterUrlParams } from "./helpers";
-import { deserializeFilterUrlParams } from "./helpers";
+import {
+  deserializeFilterUrlParams,
+  sanitizeFilterValues,
+  serializeFilterUrlParams,
+} from "./helpers";
 
 /**
  * The "source of truth" state for the filter feature.
@@ -120,5 +123,11 @@ export const useFilterState = <
             }
           : { persistTo: "state", defaultValue: initialFilterValues }),
   });
-  return { filterValues, setFilterValues };
+  // Persisted values (URL params, storage) may be stale or malformed, e.g. a hand-edited or bookmarked URL.
+  // Sanitize them here, at the single source of truth, so server (hub) and local filtering never see them.
+  const sanitizedFilterValues = useMemo(
+    () => sanitizeFilterValues<TFilterCategoryKey>(filterValues),
+    [filterValues],
+  );
+  return { filterValues: sanitizedFilterValues, setFilterValues };
 };
