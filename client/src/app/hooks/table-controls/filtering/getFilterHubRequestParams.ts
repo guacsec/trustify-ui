@@ -101,10 +101,13 @@ export const getFilterHubRequestParams = <
       const filterCategory = filterCategories?.find(
         (category) => category.categoryKey === categoryKey,
       );
-      const filterValue = filterValues[categoryKey];
-      // Skip (rather than stop at) unknown categories or empty values (null or an
-      // empty array), e.g. a stale filter restored from a persisted URL, so later
-      // valid filters are still sent and no malformed filter is built.
+      // Ignore blank selections (e.g. an empty string restored from a persisted URL)
+      // so they are not serialized as an empty query term.
+      const filterValue = filterValues[categoryKey]?.filter((v) => v !== "");
+      // Skip (rather than stop at) unknown categories or empty values (null, an
+      // empty array or only blank entries), e.g. a stale filter restored from a
+      // persisted URL, so later valid filters are still sent and no malformed
+      // filter is built.
       if (!filterCategory || !filterValue?.length) continue;
       const serverFilterField = filterCategory.serverFilterField || categoryKey;
       const serverFilterValue =

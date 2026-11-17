@@ -1,8 +1,7 @@
+import type { HubRequestParams } from "@app/api/models";
 import { FilterType } from "@app/components/FilterToolbar";
 
-import type { HubRequestParams } from "@app/api/models";
 import { requestParamsQuery } from "../getHubRequestParams";
-
 import { getFilterHubRequestParams } from "./getFilterHubRequestParams";
 
 const filterCategories = [
@@ -117,6 +116,65 @@ describe("getFilterHubRequestParams", () => {
     });
 
     expect(result.filters).toEqual([implicit]);
+  });
+
+  /** Verifies that blank (empty string) selections are skipped and never serialized as an empty query term. */
+  it("skips select and multiselect categories restored with blank values", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { status: [""], tags: ["", ""], name: ["rsa"] },
+        setFilterValues: () => {},
+      },
+      filterCategories: [
+        ...filterCategories,
+        {
+          categoryKey: "tags",
+          title: "Tags",
+          type: FilterType.multiselect,
+          selectOptions: [{ value: "a", label: "A" }],
+        },
+      ],
+    });
+
+    expect(result.filters).toEqual([
+      { field: "name", operator: "~", value: "rsa" },
+    ]);
+  });
+
+  /** Verifies that blank entries are dropped from a multiselect while real selections are kept. */
+  it("drops blank entries from a multiselect but keeps real ones", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { tags: ["", "a"] },
+        setFilterValues: () => {},
+      },
+      filterCategories: [
+        {
+          categoryKey: "tags",
+          title: "Tags",
+          type: FilterType.multiselect,
+          selectOptions: [{ value: "a", label: "A" }],
+        },
+      ],
+    });
+
+    expect(result.filters).toEqual([
+      { field: "tags", operator: "=", value: { list: ["a"], operator: "OR" } },
+    ]);
+  });
+
+  /** Verifies that only blank selections leave no filters and no empty `q`. */
+  it("omits filters and q when the only selection is blank", () => {
+    const result = getFilterHubRequestParams({
+      filterState: {
+        filterValues: { status: [""] },
+        setFilterValues: () => {},
+      },
+      filterCategories,
+    });
+
+    expect(result).toEqual({});
+    expect(requestParamsQuery(result as HubRequestParams).q).toBeUndefined();
   });
 
   /** Verifies that an empty filter value does not prevent later valid filters from being sent. */
