@@ -38,9 +38,26 @@ export class PackagesTab {
     return await Table.build(
       this._page,
       "Package table",
-      ["Name", "Version", "Vulnerabilities", "Licenses", "PURLs", "CPEs"],
+      [
+        "Name",
+        "Version",
+        "Vulnerabilities",
+        "Licenses",
+        "Remediations",
+        "PURLs",
+        "CPEs",
+      ],
       [],
     );
+  }
+
+  async getRemediationCountCell(packageName: string, version: string) {
+    const table = await this.getTable();
+    const rows = await table.getRowsByCellValue(
+      { Name: packageName, Version: version },
+      true,
+    );
+    return rows.locator('td[data-label="Remediations"]');
   }
 
   async getPagination(top: boolean = true) {
