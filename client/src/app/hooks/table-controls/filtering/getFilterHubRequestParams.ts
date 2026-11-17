@@ -101,9 +101,15 @@ export const getFilterHubRequestParams = <
       const filterCategory = filterCategories?.find(
         (category) => category.categoryKey === categoryKey,
       );
-      // Ignore blank selections (e.g. an empty string restored from a persisted URL)
-      // so they are not serialized as an empty query term.
-      const filterValue = filterValues[categoryKey]?.filter((v) => v !== "");
+      // Defensive: ignore non-array values and blank selections (e.g. restored from a
+      // persisted URL) so they are not serialized as an empty query term. The filter
+      // state is already sanitized by useFilterState; this guards direct callers.
+      const rawFilterValue: unknown = filterValues[categoryKey];
+      const filterValue = Array.isArray(rawFilterValue)
+        ? rawFilterValue.filter(
+            (v): v is string => typeof v === "string" && v !== "",
+          )
+        : undefined;
       // Skip (rather than stop at) unknown categories or empty values (null, an
       // empty array or only blank entries), e.g. a stale filter restored from a
       // persisted URL, so later valid filters are still sent and no malformed

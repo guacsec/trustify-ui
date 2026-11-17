@@ -177,6 +177,24 @@ describe("getFilterHubRequestParams", () => {
     expect(requestParamsQuery(result as HubRequestParams).q).toBeUndefined();
   });
 
+  /** Verifies that non-array values (malformed persisted state) are skipped instead of throwing. */
+  it("skips non-array values without throwing", () => {
+    const filterValues = {
+      status: "a",
+      stale: 5,
+      name: ["rsa"],
+    } as unknown as Record<string, string[]>;
+
+    const result = getFilterHubRequestParams({
+      filterState: { filterValues, setFilterValues: () => {} },
+      filterCategories,
+    });
+
+    expect(result.filters).toEqual([
+      { field: "name", operator: "~", value: "rsa" },
+    ]);
+  });
+
   /** Verifies that an empty filter value does not prevent later valid filters from being sent. */
   it("skips empty values without dropping later filters", () => {
     const result = getFilterHubRequestParams({
