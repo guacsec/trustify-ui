@@ -44,22 +44,31 @@ export const getLocalFilterDerivedState = <
   filterState: { filterValues },
 }: ILocalFilterDerivedStateArgs<TItem, TFilterCategoryKey>) => {
   const filteredItems = items.filter((item) =>
-    Object.entries<FilterValue>(filterValues).every(([filterKey, values]) => {
-      if (!values || values.length === 0) return true;
-      const filterCategory = filterCategories.find(
-        (category) => category.categoryKey === filterKey,
-      );
-      const defaultMatcher = (filterValue: string, item: TItem) =>
-        legacyMatcher(
-          filterValue,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
-          filterCategory?.getItemValue?.(item) ?? (item as any)[filterKey],
+    Object.entries<FilterValue>(filterValues).every(
+      ([filterKey, rawValues]) => {
+        // Defensive: ignore non-array and blank values so a stale restored selection never hides rows.
+        // The filter state is already sanitized by useFilterState; this guards direct callers.
+        const values = Array.isArray(rawValues)
+          ? rawValues.filter((v) => typeof v === "string" && v !== "")
+          : undefined;
+        if (!values || values.length === 0) return true;
+        const filterCategory = filterCategories.find(
+          (category) => category.categoryKey === filterKey,
         );
-      const matcher = filterCategory?.matcher ?? defaultMatcher;
-      const logicOperator =
-        getFilterLogicOperator(filterCategory) === "AND" ? "every" : "some";
-      return values[logicOperator]((filterValue) => matcher(filterValue, item));
-    }),
+        const defaultMatcher = (filterValue: string, item: TItem) =>
+          legacyMatcher(
+            filterValue,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allowed
+            filterCategory?.getItemValue?.(item) ?? (item as any)[filterKey],
+          );
+        const matcher = filterCategory?.matcher ?? defaultMatcher;
+        const logicOperator =
+          getFilterLogicOperator(filterCategory) === "AND" ? "every" : "some";
+        return values[logicOperator]((filterValue) =>
+          matcher(filterValue, item),
+        );
+      },
+    ),
   );
 
   return { filteredItems };
