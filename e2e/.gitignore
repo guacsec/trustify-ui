@@ -8,4 +8,5 @@ node_modules/
 
 .idea/
 .features-gen/
+.features-gen-ei/
 /.nyc_output/

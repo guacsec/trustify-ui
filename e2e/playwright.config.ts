@@ -2,9 +2,19 @@ import { defineConfig, devices } from "@playwright/test";
 import { defineBddConfig } from "playwright-bdd";
 
 const bddTestDir = defineBddConfig({
-  features: ["tests/**/features/@*/*.feature"],
+  features: ["tests/**/features/@!(ei)/*.feature"],
   steps: [
     "tests/**/features/**/*.step.ts",
+    "tests/**/steps/**/*.ts",
+    "tests/ui/fixtures.ts",
+  ],
+});
+
+const eiBddTestDir = defineBddConfig({
+  outputDir: ".features-gen-ei",
+  features: ["tests/**/features/@ei/*.feature"],
+  steps: [
+    "tests/**/features/@ei/*.step.ts",
     "tests/**/steps/**/*.ts",
     "tests/ui/fixtures.ts",
   ],
@@ -87,6 +97,19 @@ export default defineConfig({
       testMatch: /.*\.ts/,
       dependencies: ["setup-api-data"],
     },
+    ...(process.env.EI === "true"
+      ? [
+          {
+            name: "ei",
+            testDir: eiBddTestDir,
+            use: {
+              ...devices["Desktop Chrome"],
+              ...DESKTOP_CONFIG,
+            },
+            dependencies: ["setup-api-data"],
+          },
+        ]
+      : []),
     {
       name: "setup-api-data",
       testDir: "./tests/api/dependencies",
