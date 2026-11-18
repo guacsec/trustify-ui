@@ -1,13 +1,18 @@
 import type React from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
 import { PackageSearchProvider } from "./package-provider";
 import { PackageTable } from "./package-table";
 import { PackageToolbar } from "./package-toolbar";
+import { CryptoFilterLabels } from "@app/components/CryptoFilterLabels";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const PackageList: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const cryptoAlgorithms = searchParams.getAll("crypto");
+
   return (
     <>
       <DocumentMetadata title="Packages" />
@@ -18,7 +23,8 @@ export const PackageList: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
-          <PackageSearchProvider>
+          <CryptoFilterLabels cryptoAlgorithms={cryptoAlgorithms} />
+          <PackageSearchProvider cryptoAlgorithms={cryptoAlgorithms}>
             <PackageToolbar showFilters />
             <PackageTable />
           </PackageSearchProvider>
