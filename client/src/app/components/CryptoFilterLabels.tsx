@@ -1,5 +1,5 @@
 import type React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Label, LabelGroup } from "@patternfly/react-core";
 
@@ -17,22 +17,24 @@ interface CryptoFilterLabelsProps {
 export const CryptoFilterLabels: React.FC<CryptoFilterLabelsProps> = ({
   cryptoAlgorithms,
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   if (cryptoAlgorithms.length === 0) {
     return null;
   }
 
   const remove = (name?: string) => {
+    // Build the new query string from the live URL, not from a render snapshot, so that
+    // concurrent updates of other params (e.g. table filters) are retained.
+    const next = new URLSearchParams(document.location.search);
     const remaining = name
-      ? searchParams.getAll(CRYPTO_PARAM).filter((value) => value !== name)
+      ? next.getAll(CRYPTO_PARAM).filter((value) => value !== name)
       : [];
-    const next = new URLSearchParams(searchParams);
     next.delete(CRYPTO_PARAM);
     for (const value of remaining) {
       next.append(CRYPTO_PARAM, value);
     }
-    setSearchParams(next, { replace: true });
+    navigate({ search: next.toString() }, { replace: true });
   };
 
   return (

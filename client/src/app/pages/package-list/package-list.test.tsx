@@ -75,4 +75,29 @@ describe("PackageList crypto filter", () => {
 
     expect(screen.queryByTestId("crypto-filter-labels")).toBeNull();
   });
+
+  it("keeps all the repeated crypto values when the table updates the URL", () => {
+    renderAt("/packages?crypto=AES&crypto=RSA");
+
+    expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
+    expect(screen.getByText("AES")).toBeInTheDocument();
+    expect(screen.getByText("RSA")).toBeInTheDocument();
+  });
+
+  it("removes only the closed crypto value and keeps other URL params", () => {
+    renderAt("/packages?crypto=AES&crypto=RSA");
+
+    // A URL update made after the last render, e.g. by the table filters
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${window.location.search}&other=kept`,
+    );
+    fireEvent.click(screen.getByLabelText("Remove crypto filter AES"));
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll("crypto")).toEqual(["RSA"]);
+    expect(params.get("other")).toBe("kept");
+    expect(lastCryptoArg()).toEqual(["RSA"]);
+  });
 });

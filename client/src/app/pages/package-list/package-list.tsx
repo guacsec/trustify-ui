@@ -3,11 +3,12 @@ import { useSearchParams } from "react-router-dom";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
+import { CryptoFilterLabels } from "@app/components/CryptoFilterLabels";
+import { DocumentMetadata } from "@app/components/DocumentMetadata";
+
 import { PackageSearchProvider } from "./package-provider";
 import { PackageTable } from "./package-table";
 import { PackageToolbar } from "./package-toolbar";
-import { CryptoFilterLabels } from "@app/components/CryptoFilterLabels";
-import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 export const PackageList: React.FC = () => {
   const [searchParams] = useSearchParams();
