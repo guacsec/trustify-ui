@@ -125,24 +125,21 @@ export const trimAndStringifyUrlParams = <TPrefixedURLParamKey extends string>({
   existingSearchParams?: URLSearchParams;
   newPrefixedSerializedParams: TSerializedParams<TPrefixedURLParamKey>;
 }) => {
-  const existingPrefixedSerializedParams =
-    Object.fromEntries(existingSearchParams);
+  // Start from a copy of the existing params so that unrelated params which are repeated
+  // (e.g. `?crypto=AES&crypto=RSA`) keep all of their values.
+  const newParams = new URLSearchParams(existingSearchParams);
   for (const key of objectKeys(newPrefixedSerializedParams)) {
+    const value = newPrefixedSerializedParams[key];
     // Returning undefined for a property from serialize should result in it being omitted from the partial update.
-    if (newPrefixedSerializedParams[key] === undefined) {
-      delete newPrefixedSerializedParams[key];
-    }
+    if (value === undefined) continue;
     // Returning null for a property from serialize should result in it being removed from the URL.
-    if (newPrefixedSerializedParams[key] === null) {
-      delete newPrefixedSerializedParams[key];
-      delete existingPrefixedSerializedParams[key];
+    if (value === null) {
+      newParams.delete(key);
+    } else {
+      // Replaces all the existing values of this param.
+      newParams.set(key, value);
     }
   }
-
-  const newParams = new URLSearchParams({
-    ...existingPrefixedSerializedParams,
-    ...newPrefixedSerializedParams,
-  });
   newParams.sort();
   return newParams.toString();
 };
