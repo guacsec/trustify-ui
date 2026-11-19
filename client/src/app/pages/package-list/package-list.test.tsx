@@ -82,6 +82,22 @@ describe("PackageList crypto filter", () => {
     expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
     expect(screen.getByText("AES")).toBeInTheDocument();
     expect(screen.getByText("RSA")).toBeInTheDocument();
+
+    // Apply a table filter, which makes the table persist its state in the URL
+    const input = screen.getByLabelText("Filter text filter");
+    fireEvent.change(input, { target: { value: "log4j" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll("crypto")).toEqual(["AES", "RSA"]);
+    expect(
+      [...params.entries()].some(
+        ([key, value]) => key !== "crypto" && value.includes("log4j"),
+      ),
+    ).toBe(true);
+    expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
+    expect(screen.getByText("AES")).toBeInTheDocument();
+    expect(screen.getByText("RSA")).toBeInTheDocument();
   });
 
   it("removes only the closed crypto value and keeps other URL params", () => {
@@ -99,5 +115,36 @@ describe("PackageList crypto filter", () => {
     expect(params.getAll("crypto")).toEqual(["RSA"]);
     expect(params.get("other")).toBe("kept");
     expect(lastCryptoArg()).toEqual(["RSA"]);
+  });
+
+  it("removes only the empty crypto value and keeps the other ones", () => {
+    renderAt("/packages?crypto=&crypto=AES");
+
+    expect(lastCryptoArg()).toEqual(["", "AES"]);
+
+    fireEvent.click(screen.getByLabelText("Remove crypto filter"));
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll("crypto")).toEqual(["AES"]);
+    expect(lastCryptoArg()).toEqual(["AES"]);
+  });
+
+  it("removes only the closed occurrence of a repeated crypto value", () => {
+    renderAt("/packages?crypto=AES&crypto=AES&crypto=RSA");
+
+    expect(screen.getAllByLabelText("Remove crypto filter AES")).toHaveLength(
+      2,
+    );
+
+    fireEvent.click(
+      screen.getAllByLabelText("Remove crypto filter AES")[0] as HTMLElement,
+    );
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll("crypto")).toEqual(["AES", "RSA"]);
+    expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
+    expect(screen.getAllByLabelText("Remove crypto filter AES")).toHaveLength(
+      1,
+    );
   });
 });
