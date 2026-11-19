@@ -128,4 +128,23 @@ describe("PackageList crypto filter", () => {
     expect(params.getAll("crypto")).toEqual(["AES"]);
     expect(lastCryptoArg()).toEqual(["AES"]);
   });
+
+  it("removes only the closed occurrence of a repeated crypto value", () => {
+    renderAt("/packages?crypto=AES&crypto=AES&crypto=RSA");
+
+    expect(screen.getAllByLabelText("Remove crypto filter AES")).toHaveLength(
+      2,
+    );
+
+    fireEvent.click(
+      screen.getAllByLabelText("Remove crypto filter AES")[0] as HTMLElement,
+    );
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.getAll("crypto")).toEqual(["AES", "RSA"]);
+    expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
+    expect(screen.getAllByLabelText("Remove crypto filter AES")).toHaveLength(
+      1,
+    );
+  });
 });

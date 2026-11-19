@@ -23,15 +23,16 @@ export const CryptoFilterLabels: React.FC<CryptoFilterLabelsProps> = ({
     return null;
   }
 
-  // `name === undefined` clears every crypto value; any string, including an empty one
-  // coming from `?crypto=`, only removes the matching value.
-  const remove = (name?: string) => {
+  // `index === undefined` clears every crypto value; otherwise only the value at that position
+  // is removed, so that closing one label does not drop identical repeated values, nor
+  // empty ones coming from `?crypto=`.
+  const remove = (index?: number) => {
     // Build the new query string from the live URL, not from a render snapshot, so that
     // concurrent updates of other params (e.g. table filters) are retained.
     const next = new URLSearchParams(document.location.search);
     const remaining =
-      name !== undefined
-        ? next.getAll(CRYPTO_PARAM).filter((value) => value !== name)
+      index !== undefined
+        ? next.getAll(CRYPTO_PARAM).filter((_, i) => i !== index)
         : [];
     next.delete(CRYPTO_PARAM);
     for (const value of remaining) {
@@ -48,11 +49,11 @@ export const CryptoFilterLabels: React.FC<CryptoFilterLabelsProps> = ({
         onClick={() => remove()}
         data-testid="crypto-filter-labels"
       >
-        {cryptoAlgorithms.map((name) => (
+        {cryptoAlgorithms.map((name, index) => (
           <Label
-            key={name}
+            key={`${name}-${index}`}
             variant="outline"
-            onClose={() => remove(name)}
+            onClose={() => remove(index)}
             closeBtnAriaLabel={`Remove crypto filter ${name}`}
           >
             {name}
