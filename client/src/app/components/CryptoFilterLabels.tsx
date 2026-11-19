@@ -23,13 +23,16 @@ export const CryptoFilterLabels: React.FC<CryptoFilterLabelsProps> = ({
     return null;
   }
 
+  // `name === undefined` clears every crypto value; any string, including an empty one
+  // coming from `?crypto=`, only removes the matching value.
   const remove = (name?: string) => {
     // Build the new query string from the live URL, not from a render snapshot, so that
     // concurrent updates of other params (e.g. table filters) are retained.
     const next = new URLSearchParams(document.location.search);
-    const remaining = name
-      ? next.getAll(CRYPTO_PARAM).filter((value) => value !== name)
-      : [];
+    const remaining =
+      name !== undefined
+        ? next.getAll(CRYPTO_PARAM).filter((value) => value !== name)
+        : [];
     next.delete(CRYPTO_PARAM);
     for (const value of remaining) {
       next.append(CRYPTO_PARAM, value);
