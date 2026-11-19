@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { Content, PageSection } from "@patternfly/react-core";
 
+import { CryptoFilterLabels } from "@app/components/CryptoFilterLabels";
 import { DocumentMetadata } from "@app/components/DocumentMetadata";
 
 import { SbomSearchProvider } from "./sbom-provider";
@@ -23,6 +24,7 @@ export const SbomList: React.FC = () => {
       </PageSection>
       <PageSection hasBodyWrapper={false}>
         <div>
+          <CryptoFilterLabels cryptoAlgorithms={cryptoAlgorithms} />
           <SbomSearchProvider
             isBulkSelectionEnabled
             cryptoAlgorithms={cryptoAlgorithms}

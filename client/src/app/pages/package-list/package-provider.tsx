@@ -20,11 +20,13 @@ import { type PackageTableData, PackageSearchContext } from "./package-context";
 
 interface IPackageProvider {
   children: React.ReactNode;
+  /** Restricts the packages to those generating one of these crypto assets. */
+  cryptoAlgorithms?: string[];
 }
 
 export const PackageSearchProvider: React.FunctionComponent<
   IPackageProvider
-> = ({ children }) => {
+> = ({ children, cryptoAlgorithms }) => {
   const [inputValueLicense, setInputValueLicense] = React.useState("");
   const [debouncedInputValueLicense] = useDebounceValue(inputValueLicense, 400);
   const {
@@ -114,17 +116,21 @@ export const PackageSearchProvider: React.FunctionComponent<
     result: { data: packages, total: totalItemCount },
     isFetching,
     fetchError,
-  } = useFetchPackages({
-    ...getHubRequestParams({
-      ...tableControlState,
-      hubSortFieldKeys: {
-        name: "name",
-        namespace: "namespace",
-        version: "version",
-      },
-    }),
-    total: true,
-  });
+  } = useFetchPackages(
+    {
+      ...getHubRequestParams({
+        ...tableControlState,
+        hubSortFieldKeys: {
+          name: "name",
+          namespace: "namespace",
+          version: "version",
+        },
+      }),
+      total: true,
+    },
+    false,
+    cryptoAlgorithms,
+  );
 
   const enrichedPackages = React.useMemo(() => {
     return packages.map((item) => {
