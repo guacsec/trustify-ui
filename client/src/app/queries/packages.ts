@@ -12,13 +12,17 @@ const PackagesQueryKey = "packages";
 export const useFetchPackages = (
   params: HubRequestParams = {},
   disableQuery = false,
+  cryptoAlgorithms?: string[],
 ) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [PackagesQueryKey, params],
+    queryKey: [PackagesQueryKey, params, cryptoAlgorithms],
     queryFn: () =>
       listPurl({
         client: client,
-        query: { ...requestParamsQuery(params) },
+        query: {
+          ...requestParamsQuery(params),
+          ...(cryptoAlgorithms?.length ? { crypto: cryptoAlgorithms } : {}),
+        },
       }),
     enabled: !disableQuery,
   });
