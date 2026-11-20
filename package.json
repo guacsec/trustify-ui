@@ -54,7 +54,10 @@
     "react-dom": "$react-dom",
     "@playwright/test": "1.60.0",
     "playwright": "1.60.0",
-    "playwright-core": "1.60.0"
+    "playwright-core": "1.60.0",
+    "@hey-api/json-schema-ref-parser": {
+      "js-yaml": "^4.3.2"
+    }
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
