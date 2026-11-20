@@ -1,0 +1,1 @@
+import{_t as e}from"./StateError-Ctx9WF5S.js";import{t}from"./react-Cd7cGt34.js";var n=t(),r=({value:t})=>(0,n.jsx)(n.Fragment,{children:Object.entries(t).map(([t,r])=>(0,n.jsx)(e,{isCompact:!0,children:`${t}=${r}`},`${t}=${r}`))});export{r as t};
