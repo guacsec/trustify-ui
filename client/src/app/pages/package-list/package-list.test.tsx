@@ -28,6 +28,8 @@ vi.mock("@app/queries/recommendations", () => ({
   }),
 }));
 
+import { TablePersistenceKeyPrefixes } from "@app/Constants";
+
 import { PackageList } from "./package-list";
 
 describe("PackageList crypto filter", () => {
@@ -90,11 +92,11 @@ describe("PackageList crypto filter", () => {
 
     const params = new URLSearchParams(window.location.search);
     expect(params.getAll("crypto")).toEqual(["AES", "RSA"]);
-    expect(
-      [...params.entries()].some(
-        ([key, value]) => key !== "crypto" && value.includes("log4j"),
-      ),
-    ).toBe(true);
+    // The filter is persisted by the table under its own, prefixed, URL parameter
+    const filtersKey = `${TablePersistenceKeyPrefixes.packages}:filters`;
+    expect(JSON.parse(params.get(filtersKey) ?? "null")).toEqual({
+      name: ["log4j"],
+    });
     expect(lastCryptoArg()).toEqual(["AES", "RSA"]);
     expect(screen.getByText("AES")).toBeInTheDocument();
     expect(screen.getByText("RSA")).toBeInTheDocument();
