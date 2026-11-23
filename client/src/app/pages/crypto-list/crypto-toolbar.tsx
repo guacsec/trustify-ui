@@ -16,11 +16,13 @@ import { CryptoSearchContext } from "./crypto-context";
 
 interface CryptoToolbarProps {
   showFilters?: boolean;
+  showFiltersSideBySide?: boolean;
 }
 
-/** Toolbar with filters and pagination for the cryptography algorithm list. */
+/** Toolbar with filters and pagination for the cryptography algorithm and key lists. */
 export const CryptoToolbar: React.FC<CryptoToolbarProps> = ({
   showFilters,
+  showFiltersSideBySide,
 }) => {
   const { tableControls } = React.useContext(CryptoSearchContext);
   const navigate = useNavigate();
@@ -37,7 +39,12 @@ export const CryptoToolbar: React.FC<CryptoToolbarProps> = ({
   return (
     <Toolbar {...toolbarProps} aria-label="crypto-toolbar">
       <ToolbarContent>
-        {showFilters && <FilterToolbar {...filterToolbarProps} />}
+        {showFilters && (
+          <FilterToolbar
+            {...filterToolbarProps}
+            showFiltersSideBySide={showFiltersSideBySide}
+          />
+        )}
         <ToolbarItem>
           <Button
             variant="secondary"
