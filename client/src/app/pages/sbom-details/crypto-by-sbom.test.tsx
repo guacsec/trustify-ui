@@ -62,6 +62,8 @@ const mockKeys: CryptoAlgorithm[] = [
   },
 ];
 
+let mockAlgorithmResponse = mockAlgorithms;
+let mockKeyResponse = mockKeys;
 let returnEmpty = false;
 const fetchCryptoBySbomSpy = vi.hoisted(() => vi.fn());
 
@@ -81,7 +83,9 @@ vi.mock("@app/queries/crypto", () => ({
       };
     }
     const data =
-      assetType === "related-crypto-material" ? mockKeys : mockAlgorithms;
+      assetType === "related-crypto-material"
+        ? mockKeyResponse
+        : mockAlgorithmResponse;
     return {
       result: { data, total: data.length, params: {} },
       isFetching: false,
@@ -134,6 +138,8 @@ describe("CryptoBySbom", () => {
   };
 
   beforeEach(() => {
+    mockAlgorithmResponse = mockAlgorithms;
+    mockKeyResponse = mockKeys;
     returnEmpty = false;
   });
 
@@ -188,6 +194,72 @@ describe("CryptoBySbom", () => {
     expect(screen.getByText("Compliant")).toBeInTheDocument();
     expect(screen.getByText("Non-compliant")).toBeInTheDocument();
   });
+
+  it.each([
+    {
+      description: "nested primitive and joined cryptoFunctions",
+      algorithm: {
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+        },
+      },
+    },
+    {
+      description: "canonical fields instead of conflicting fallbacks",
+      algorithm: {
+        primitive: "unsupported-primitive",
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+          detectionContext: "unsupported-usage",
+        },
+      },
+    },
+  ])("displays $description in the Algorithms table", ({ algorithm }) => {
+    mockAlgorithmResponse = [{ ...mockAlgorithms[0]!, ...algorithm }];
+    renderComponent();
+
+    const row = screen.getByText("AES-256-GCM").closest("tr")!;
+    expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+      /^signature$/,
+    );
+    expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+      /^sign, verify$/,
+    );
+    expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+    expect(within(row).queryByText("unsupported-usage")).toBeNull();
+  });
+
+  it.each([
+    { description: "absent", properties: {} },
+    { description: "empty", properties: { cryptoFunctions: [] } },
+  ])(
+    "displays placeholders instead of unsupported fallbacks when cryptoFunctions is $description",
+    ({ properties }) => {
+      mockAlgorithmResponse = [
+        {
+          ...mockAlgorithms[0]!,
+          primitive: "unsupported-primitive",
+          properties: {
+            ...properties,
+            detectionContext: "unsupported-usage",
+          },
+        },
+      ];
+      renderComponent();
+
+      const row = screen.getByText("AES-256-GCM").closest("tr")!;
+      expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+      expect(within(row).queryByText("unsupported-usage")).toBeNull();
+    },
+  );
 
   it("renders parameter set subtitle when present", () => {
     renderComponent();
@@ -358,6 +430,31 @@ describe("CryptoBySbom", () => {
       screen.getByText("No algorithms found for this SBOM."),
     ).toBeInTheDocument();
   });
+
+  it.each([
+    { description: "absent", properties: {} },
+    { description: "empty", properties: { cryptoFunctions: [] } },
+  ])(
+    "preserves the Keys Usage detectionContext fallback when cryptoFunctions is $description",
+    ({ properties }) => {
+      mockKeyResponse = [
+        {
+          ...mockKeys[0]!,
+          properties: {
+            ...properties,
+            detectionContext: "TLS key exchange",
+          },
+        },
+      ];
+      renderComponent();
+      fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
+
+      const row = screen.getByText("private-key-rsa").closest("tr")!;
+      expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+        /^TLS key exchange$/,
+      );
+    },
+  );
 
   it("renders Size column in keys table with correct values", async () => {
     renderComponent();

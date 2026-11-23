@@ -53,6 +53,7 @@ const mockKeys: CryptoAlgorithm[] = [
   },
 ];
 
+let mockAlgorithmResponse = mockAlgorithms;
 const fetchCryptoAlgorithmsSpy = vi.hoisted(() => vi.fn());
 
 vi.mock("@app/queries/crypto", () => ({
@@ -71,11 +72,13 @@ vi.mock("@app/queries/crypto", () => ({
     return {
       result: {
         data:
-          assetType === "related-crypto-material" ? mockKeys : mockAlgorithms,
+          assetType === "related-crypto-material"
+            ? mockKeys
+            : mockAlgorithmResponse,
         total:
           assetType === "related-crypto-material"
             ? mockKeys.length
-            : mockAlgorithms.length,
+            : mockAlgorithmResponse.length,
         params: {},
       },
       isFetching: false,
@@ -99,6 +102,10 @@ import { CryptoList } from "./crypto-list";
 
 /** Verifies that the page renders the title, KPI cards, tabs, and table content. */
 describe("CryptoList", () => {
+  beforeEach(() => {
+    mockAlgorithmResponse = mockAlgorithms;
+  });
+
   afterEach(() => {
     window.history.replaceState({}, "", "/");
   });
@@ -213,6 +220,72 @@ describe("CryptoList", () => {
     expect(screen.getByText("Compliant")).toBeInTheDocument();
     expect(screen.getByText("Non-compliant")).toBeInTheDocument();
   });
+
+  it.each([
+    {
+      description: "nested primitive and joined cryptoFunctions",
+      algorithm: {
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+        },
+      },
+    },
+    {
+      description: "canonical fields instead of conflicting fallbacks",
+      algorithm: {
+        primitive: "unsupported-primitive",
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+          detectionContext: "unsupported-usage",
+        },
+      },
+    },
+  ])("displays $description in the Algorithms table", ({ algorithm }) => {
+    mockAlgorithmResponse = [{ ...mockAlgorithms[0]!, ...algorithm }];
+    renderComponent();
+
+    const row = screen.getByText("AES-256-GCM").closest("tr")!;
+    expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+      /^signature$/,
+    );
+    expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+      /^sign, verify$/,
+    );
+    expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+    expect(within(row).queryByText("unsupported-usage")).toBeNull();
+  });
+
+  it.each([
+    { description: "absent", properties: {} },
+    { description: "empty", properties: { cryptoFunctions: [] } },
+  ])(
+    "displays placeholders instead of unsupported fallbacks when cryptoFunctions is $description",
+    ({ properties }) => {
+      mockAlgorithmResponse = [
+        {
+          ...mockAlgorithms[0]!,
+          primitive: "unsupported-primitive",
+          properties: {
+            ...properties,
+            detectionContext: "unsupported-usage",
+          },
+        },
+      ];
+      renderComponent();
+
+      const row = screen.getByText("AES-256-GCM").closest("tr")!;
+      expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+      expect(within(row).queryByText("unsupported-usage")).toBeNull();
+    },
+  );
 
   /** Verifies that the Keys tab renders its 5 columns and key data. */
   it("renders Keys tab with correct columns and data", () => {

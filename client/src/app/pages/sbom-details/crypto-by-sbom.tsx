@@ -33,6 +33,10 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { algorithmColumnFilters } from "@app/pages/crypto-list/algorithm-filters";
+import {
+  getAlgorithmPrimitive,
+  getAlgorithmUsage,
+} from "@app/pages/crypto-list/algorithm-properties";
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
 import { CryptoAlgorithmDetail } from "@app/pages/crypto-list/components/CryptoAlgorithmDetail";
 import { useFetchCryptoBySbom } from "@app/queries/crypto";
@@ -43,16 +47,13 @@ const algProps = (item: CryptoAlgorithm) =>
 const rcmProps = (item: CryptoAlgorithm) =>
   (item.properties as Record<string, unknown>) ?? {};
 
-const getPrimitive = (item: CryptoAlgorithm): string =>
-  (algProps(item).primitive as string) ?? item.primitive ?? "--";
-
 const getKeyType = (item: CryptoAlgorithm): string =>
   (rcmProps(item).type as string) ?? item.asset_type ?? "--";
 
 const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
 
-const getUsage = (item: CryptoAlgorithm): string => {
+const getKeyUsage = (item: CryptoAlgorithm): string => {
   const props = algProps(item);
   const fns = props.cryptoFunctions as string[] | undefined;
   if (fns?.length) return fns.join(", ");
@@ -231,7 +232,7 @@ const AlgorithmsTable: React.FC<AssetTableProps> = ({
                         rowIndex,
                       })}
                     >
-                      {getPrimitive(item)}
+                      {getAlgorithmPrimitive(item) ?? "--"}
                     </Td>
                     <Td
                       width={10}
@@ -272,7 +273,7 @@ const AlgorithmsTable: React.FC<AssetTableProps> = ({
                         rowIndex,
                       })}
                     >
-                      {getUsage(item)}
+                      {getAlgorithmUsage(item) ?? "--"}
                     </Td>
                     <Td
                       width={10}
@@ -459,7 +460,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
                     width={20}
                     {...getTdProps({ columnKey: "usage", item, rowIndex })}
                   >
-                    {getUsage(item)}
+                    {getKeyUsage(item)}
                   </Td>
                 </TableRowContentWithControls>
               </Tr>
