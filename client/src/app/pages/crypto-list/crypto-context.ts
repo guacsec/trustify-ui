@@ -4,6 +4,8 @@ import type { AxiosError } from "axios";
 
 import type { ITableControls } from "@app/hooks/table-controls";
 
+import type { CryptoAlgorithmFilterKey } from "./algorithm-filters";
+
 /** Context interface for the cryptography algorithm search page. */
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
@@ -19,7 +21,7 @@ export interface ICryptoSearchContext {
     | "type"
     | "size",
     "name",
-    "",
+    CryptoAlgorithmFilterKey,
     string
   >;
 
