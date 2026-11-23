@@ -1,11 +1,6 @@
 name: Start trustify
 description: Start trustify using docker compose.
 inputs:
-  ui_image:
-    description: image uri for the ui (ie. ghcr.io/<namespace>/<image-name>:<tag>)
-    type: string
-    required: false
-    default: ""
   server_image:
     description: image uri for the server (ie. ghcr.io/<namespace>/<image-name>:<tag>)
     type: string
@@ -43,9 +38,6 @@ runs:
         if [ -n "${{ inputs.server_image }}" ]; then
           opts="${opts} TRUSTIFY_IMAGE=${{ inputs.server_image }}"
         fi
-        if [ -n "${{ inputs.ui_image }}" ]; then
-          opts="${opts} TRUSTIFY_UI_IMAGE=${{ inputs.ui_image }}"
-        fi
         if [ -n "${{ inputs.server_db_image }}" ]; then
           opts="${opts} POSTGRESQL_IMAGE=${{ inputs.server_db_image }}"
         fi
@@ -59,13 +51,23 @@ runs:
         eval "${opts} docker compose up -d"
 
     - name: Wait for services to be ready
+      working-directory: ${{ github.action_path }}/../../..
       shell: bash
       run: |
-        for port in "8080" "8081"; do
-          until curl -s http://localhost:$port | grep -qi "<html"; do
-            echo "Waiting for HTML page on port $port..."
-            sleep 2
-          done
+        url="http://localhost:8080/"
+        deadline=$((SECONDS + 180))
+        response=$(mktemp)
+        trap 'rm -f "$response"' EXIT
+
+        until curl --fail --silent --show-error --connect-timeout 2 --max-time 5 "$url" -o "$response" && grep -qi "<html" "$response"; do
+          if (( SECONDS >= deadline )); then
+            echo "::error::Trustify did not serve the embedded UI at $url within 180 seconds."
+            docker compose ps -a || true
+            docker compose logs --no-color --tail=100 || true
+            exit 1
+          fi
+          echo "Waiting for HTML page at $url..."
+          sleep 2
         done
 
     - id: set-output

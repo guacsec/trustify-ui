@@ -17,56 +17,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-upload-for-e2e-ci:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: save trustify-ui image
-        run: |
-          docker build . -t ghcr.io/guacsec/trustify-ui:pr-test -f Dockerfile.dev
-          docker save -o /tmp/trustify-ui.tar ghcr.io/guacsec/trustify-ui:pr-test
-
-      - name: Upload trustify-ui image as artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: trustify-ui
-          path: /tmp/trustify-ui.tar
-          retention-days: 1
-
   discover-envs-for-e2e-ci:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.set-outputs.outputs.image_tag }}
+      server_branch: ${{ steps.set-outputs.outputs.server_branch }}
     steps:
-      - name: Extract vars for Pull Request
-        shell: bash
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-        env:
-          base_ref: ${{ github.event.pull_request.base.ref || github.event.merge_group.base_ref }}
-        run: |
-          branch=$base_ref
-          branch=$(echo ${branch#refs/heads/})
-          image_tag="latest"
-          if [[ "$branch" != "main" ]]; then
-            image_tag="${branch#release/}"
-          fi
-          echo "image_tag=$image_tag" >> $GITHUB_ENV
-      - name: Extract vars for Push
-        shell: bash
-        if: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
-        run: |
-          branch=$(echo ${GITHUB_REF#refs/heads/})
-          image_tag="latest"
-          if [[ "$branch" != "main" ]]; then
-            image_tag="${branch#release/}"
-          fi
-          echo "image_tag=$image_tag" >> $GITHUB_ENV
-      - name: Set outputs
+      - name: Set Trustify branch
         id: set-outputs
+        env:
+          TARGET_REF: ${{ github.event.pull_request.base.ref || github.event.merge_group.base_ref || github.ref }}
         run: |
-          echo ${{ env.image_tag }}
-          echo "image_tag=${{ env.image_tag }}" >> "$GITHUB_OUTPUT"
+          branch="${TARGET_REF#refs/heads/}"
+          echo "server_branch=$branch" >> "$GITHUB_OUTPUT"
+
+  build-and-upload-for-e2e-ci:
+    runs-on: ubuntu-latest
+    needs: discover-envs-for-e2e-ci
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build Trustify with the embedded UI
+        run: |
+          docker build . -t ghcr.io/guacsec/trustd:pr-test -f Dockerfile.prod \
+            --build-arg server_branch=${{ needs.discover-envs-for-e2e-ci.outputs.server_branch }}
+          docker save -o /tmp/trustd.tar ghcr.io/guacsec/trustd:pr-test
+
+      - name: Upload Trustify image as artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: trustd
+          path: /tmp/trustd.tar
+          retention-days: 1
 
   run-e2e-ci:
     needs:
@@ -74,6 +55,5 @@ jobs:
       - discover-envs-for-e2e-ci
     uses: ./.github/workflows/ci-e2e-template.yaml
     with:
-      artifact: trustify-ui
-      ui_image: ghcr.io/guacsec/trustify-ui:pr-test
-      server_image: ghcr.io/guacsec/trustd:${{ needs.discover-envs-for-e2e-ci.outputs.image_tag }}
+      artifact: trustd
+      server_image: ghcr.io/guacsec/trustd:pr-test

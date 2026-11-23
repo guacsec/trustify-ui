@@ -74,19 +74,6 @@ services:
       trustify-migrate:
         condition: service_completed_successfully
 
-  trustify-ui:
-    image: ${TRUSTIFY_UI_IMAGE}
-    environment:
-      TRUSTIFY_API_URL: http://trustify:8080
-      AUTH_REQUIRED: false
-    ports:
-      - "8081:8080"
-    networks:
-      - trustify
-    depends_on:
-      trustify:
-        condition: service_started
-
   playwright:
     image: ${PLAYWRIGHT_IMAGE:?PLAYWRIGHT_IMAGE is required}:${PLAYWRIGHT_VERSION:?PLAYWRIGHT_VERSION is required}${UBUNTU_VERSION_ALIAS}
     ports:

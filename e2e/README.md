@@ -40,7 +40,7 @@ For UI tests:
 
 | Variable                 | Default Value         | Description                              |
 |--------------------------|-----------------------|------------------------------------------|
-| TRUSTIFY_UI_URL          | http://localhost:3000 | The UI URL                               |
+| TRUSTIFY_UI_URL          | http://localhost:8080 | The UI URL served by the embedded Trustify backend (use :3000 for Vite development) |
 | AUTH_REQUIRED            | true                  | Whether or not auth is enabled in the UI |
 | PLAYWRIGHT_AUTH_USER     | admin                 | User name to be used when authenticating |
 | PLAYWRIGHT_AUTH_PASSWORD | admin                 | Password to be used when authenticating  |

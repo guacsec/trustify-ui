@@ -16,7 +16,7 @@ Trustify UI is a React-based web application for software supply chain security 
 
 ## Repository Architecture
 
-Four npm workspaces (`@app` alias maps to `client/src/app/`):
+Three npm workspaces (`common`, `client`, and `e2e`; `@app` maps to `client/src/app/`):
 
 ```
 ├── common/                   # shared ESM module (branding, env config)
@@ -31,12 +31,12 @@ Four npm workspaces (`@app` alias maps to `client/src/app/`):
 │       ├── api/              # custom REST calls (uploads, downloads)
 │       ├── client/           # auto-generated API client (DO NOT EDIT)
 │       └── axios-config/     # Axios instance and interceptors
-├── dev-server/               # Express.js production server (proxying, env injection)
-└── e2e/                      # Playwright end-to-end tests
-    └── tests/
-        ├── ui/features/      # BDD .feature files (Gherkin)
-        ├── ui/pages/         # Page Object Model classes
-        └── api/              # API-level tests
+├── e2e/                      # Playwright end-to-end tests
+│   └── tests/
+│       ├── ui/features/      # BDD .feature files (Gherkin)
+│       ├── ui/pages/         # Page Object Model classes
+│       └── api/              # API-level tests
+└── crate/                    # Rust crate embedding the client bundle into trustd
 ```
 
 ## Key Commands
@@ -75,7 +75,7 @@ npm run build
 - **Language**: [TypeScript](https://www.typescriptlang.org/docs/)
 - **UI framework**: [React](https://react.dev/learn)
 - **Component library**: [PatternFly](https://www.patternfly.org/) (`@patternfly/react-core`, `@patternfly/react-table`)
-- **Build**: [Vite](https://vite.dev/guide/) (client), [Rollup](https://rollupjs.org/) (common, dev-server)
+- **Build**: [Vite](https://vite.dev/guide/) (client), [Rollup](https://rollupjs.org/) (common)
 - **Routing**: [react-router-dom](https://reactrouter.com/) with lazy-loaded routes
 - **Data fetching**: [TanStack React Query](https://tanstack.com/query/latest)
 - **HTTP client**: [Axios](https://axios-http.com/)
@@ -113,25 +113,7 @@ npm run build
 
 Builds `common` once, then concurrently watches `common` (rollup rebuild on change) and runs the Vite dev server on port 3000 with HMR.
 
-The **`dev-server/` workspace is not started** in dev mode — Vite handles both static serving and API proxying directly:
-
-| Path | Proxied to | Default |
-|------|-----------|---------|
-| `/api` | `TRUSTIFY_API_URL` | `http://localhost:8080` |
-| `/auth` | `OIDC_SERVER_URL` | `http://localhost:8090` |
-| `/.well-known/trustify` | `TRUSTIFY_API_URL` | `http://localhost:8080` |
-
-Environment variables are injected into `index.html` via `ViteEjsPlugin` at startup.
-
-### `npm run start` (production mode)
-
-Builds `common` and `client`, then starts the Express server from `dev-server/` on port 8080.
-
-The Express server (`dev-server/src/index.ts`):
-- Serves `client/dist/` as static files
-- Renders `index.html.ejs` per-request via EJS, injecting runtime env vars
-
-Use this mode only if you want to see how you app behaves with minified JS, CSS, etc. resources, just like when it will be deployed in production.
+Vite serves the UI on port 3000 with HMR and proxies API requests to the running Trustify backend (`TRUSTIFY_API_URL`, default `http://localhost:8080`) and authentication requests to the configured OIDC server. Production UI assets are embedded in the Trustify backend through the `crate/` Rust crate and served by Actix; this repository has no standalone Express UI server or UI container image.
 
 ## Testing
 
