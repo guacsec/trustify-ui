@@ -8,8 +8,7 @@ RUN \
   npm version && \
   npm config ls && \
   npm ci --verbose --ignore-scripts --no-audit && \
-  npm run build && \
-  npm run dist
+  npm run build
 
 ######################################################################
 # Prepare server
@@ -43,8 +42,9 @@ RUN rustup target add $(uname -m)-unknown-linux-gnu
 # Build source code
 COPY --from=ui-source /opt/app-root/src/ /code/trustify-ui/
 COPY --from=server-source /trustify/ /code/trustify/
+# Keep bundled PostgreSQL and the separate UI console disabled, but embed this UI.
 RUN cd /code/trustify/ && \
-    cargo build --no-default-features --release --target=$(uname -m)-unknown-linux-gnu && \
+    cargo build --package trustify-trustd --no-default-features --features trustify-ui --release --target=$(uname -m)-unknown-linux-gnu && \
     find /code/trustify/target/ -name "trustd" -exec cp -av {} /stage/usr/local/bin \;
 
 ######################################################################

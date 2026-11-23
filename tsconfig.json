@@ -6,7 +6,6 @@
   "references": [
     { "path": "./client" },
     { "path": "./common" },
-    { "path": "./e2e" },
-    { "path": "./dev-server" }
+    { "path": "./e2e" }
   ]
 }

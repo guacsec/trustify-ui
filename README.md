@@ -6,9 +6,9 @@ Trustify UI Component
 
 # Build and Test Status
 
-| branch | last merge CI | last merge image build | nightly CI | nightly server build |
-| :----- | :------------ | :--------------------- | :--------- | :------------------- |
-| main   | [![CI (repo level)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml?query=branch%3Amain+event%3Apush)           | [![Multiple Architecture Image Build](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/image-build.yaml?query=branch%3Amain+event%3Apush)                    | [![Nightly CI (repo level @main)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml?query=branch%3Amain+event%3Aschedule)       | [![CI (test server image build)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml?query=branch%3Amain+event%3Aschedule) |
+| branch | last merge CI | nightly CI | nightly backend build |
+| :----- | :------------ | :--------- | :-------------------- |
+| main   | [![CI (repo level)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml/badge.svg?branch=main&event=push)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-repo.yaml?query=branch%3Amain+event%3Apush) | [![Nightly CI (repo level @main)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/nightly-ci-repo.yaml?query=branch%3Amain+event%3Aschedule) | [![CI (test server image build)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml/badge.svg?branch=main&event=schedule)](https://github.com/guacsec/trustify-ui/actions/workflows/ci-server-image-build.yaml?query=branch%3Amain+event%3Aschedule) |
 
 | branch | last merge e2e CI | nightly e2e CI |
 | :----- | :---------------- | :------------- |
@@ -54,26 +54,27 @@ npm ci
 
 ### Init the dev server
 
+Start a Trustify backend (which serves the production UI through its embedded Actix server) and then run the Vite development server in this repository:
+
 ```shell
 npm run start:dev
 ```
 
-Open browser at <http://localhost:3000>
+Open <http://localhost:3000>. Vite provides HMR and proxies API requests to the backend at `TRUSTIFY_API_URL` (default `http://localhost:8080`). The production UI is built into Trustify through the `crate/` Rust crate; there is no separate Express UI server or standalone UI image.
 
 ## Environment variables
 
-| ENV VAR             | Description                   | Default value                           |
-| ------------------- | ----------------------------- | --------------------------------------- |
-| TRUSTIFY_API_URL    | Set Trustification API URL    | `http://localhost:8080`                 |
-| AUTH_REQUIRED       | Enable/Disable authentication | true                                    |
-| OIDC_CLIENT_ID      | Set Oidc Client               | frontend                                |
-| OIDC_SERVER_URL     | Set Oidc Server URL           | `http://localhost:8090/realms/trustify` |
-| OIDC_SCOPE          | Set Oidc Scope                | openid                                  |
+| ENV VAR          | Description                           | Default value                           |
+| ---------------- | ------------------------------------- | --------------------------------------- |
+| TRUSTIFY_API_URL | Backend URL used by the Vite API proxy | `http://localhost:8080`                |
+| AUTH_REQUIRED    | Enable/Disable authentication         | true                                    |
+| OIDC_CLIENT_ID   | Set OIDC client                       | frontend                                |
+| OIDC_SERVER_URL  | Set OIDC server URL                   | `http://localhost:8090/realms/trustify` |
+| OIDC_SCOPE       | Set OIDC scope                        | openid                                  |
 
-## Crate
+## Production serving
 
-> [!NOTE]
-> When using the crate it is expected to build the UI always in Prod mode
+The production client bundle is embedded into the Trustify backend using this repository's Rust crate and served by Trustify's Actix server alongside the API. Build the UI in production mode when building the crate; no standalone Node/Express server is part of the deployment.
 
 ## Contributing
 

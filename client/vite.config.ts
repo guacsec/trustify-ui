@@ -11,7 +11,7 @@ import istanbul from "vite-plugin-istanbul";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
 import {
-  SERVER_ENV_KEYS,
+  PRIVATE_ENV_KEYS,
   TRUSTIFICATION_ENV,
   brandingStrings,
   encodeEnv,
@@ -72,7 +72,7 @@ export default defineConfig({
         ]
       : [
           ViteEjsPlugin({
-            _env: encodeEnv(TRUSTIFICATION_ENV, SERVER_ENV_KEYS),
+            _env: encodeEnv(TRUSTIFICATION_ENV, PRIVATE_ENV_KEYS),
             branding: brandingStrings,
           }),
         ]),

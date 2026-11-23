@@ -4,7 +4,7 @@ Date: 2026-05-20
 
 ## Status
 
-Accepted
+Accepted; the standalone Express server decision is superseded by [ADR 0004](0004-embed-ui-in-trustify-backend.md).
 
 ## Context
 

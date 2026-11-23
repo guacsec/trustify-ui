@@ -10,11 +10,6 @@ on:
           and should contain the file <artifact>.tar inside.
         required: false
         type: string
-      ui_image:
-        description: image uri for the ui (ie. ghcr.io/<namespace>/<image-name>:<tag>)
-        type: string
-        required: false
-        default: ""
       server_image:
         description: image uri for the server (ie. ghcr.io/<namespace>/<image-name>:<tag>)
         type: string
@@ -46,11 +41,6 @@ on:
           and should contain the file <artifact>.tar inside.
         required: false
         type: string
-      ui_image:
-        description: image uri for the ui (ie. ghcr.io/<namespace>/<image-name>:<tag>)
-        type: string
-        required: false
-        default: ""
       server_image:
         description: image uri for the server (ie. ghcr.io/<namespace>/<image-name>:<tag>)
         type: string
@@ -88,16 +78,6 @@ jobs:
         if: ${{ inputs.artifact != '' }}
         run: |
           docker load --input /tmp/${{ inputs.artifact }}.tar
-      - name: Check ui image exists
-        if: ${{ inputs.ui_image != '' }}
-        run: |
-          if docker image inspect ${{ inputs.ui_image }} >/dev/null 2>&1; then
-              echo "Image exists locally"
-              docker image inspect ${{ inputs.ui_image }}
-          else
-              echo "Image does not exist locally"
-              docker manifest inspect ${{ inputs.ui_image }}
-          fi
       - name: Check server image exists
         if: ${{ inputs.server_image != '' }}
         run: |
@@ -146,7 +126,6 @@ jobs:
       - name: Start trustify
         uses: ./.github/actions/start-trustify
         with:
-          ui_image: ${{ inputs.ui_image }}
           server_image: ${{ inputs.server_image }}
           server_db_image: ${{ inputs.server_db_image }}
 
@@ -163,7 +142,7 @@ jobs:
 
           echo "script to run: ${script}"
 
-          PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ TRUSTIFY_UI_URL=http://localhost:8081 AUTH_REQUIRED=false npm run -w e2e $script
+          PW_TEST_CONNECT_WS_ENDPOINT=ws://localhost:5000/ TRUSTIFY_UI_URL=http://localhost:8080 AUTH_REQUIRED=false npm run -w e2e $script
 
       - name: Upload Playwright artifacts
         if: failure() # only upload if tests failed
