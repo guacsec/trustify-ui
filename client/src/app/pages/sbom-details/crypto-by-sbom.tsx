@@ -32,6 +32,7 @@ import {
   useTableControlProps,
   useTableControlState,
 } from "@app/hooks/table-controls";
+import { algorithmColumnFilters } from "@app/pages/crypto-list/algorithm-filters";
 import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
 import { CryptoAlgorithmDetail } from "@app/pages/crypto-list/components/CryptoAlgorithmDetail";
 import { useFetchCryptoBySbom } from "@app/queries/crypto";
@@ -111,6 +112,7 @@ const AlgorithmsTable: React.FC<AssetTableProps> = ({
         placeholderText: "Search by algorithm name",
         type: FilterType.search,
       },
+      ...algorithmColumnFilters,
     ],
   });
 
