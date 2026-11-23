@@ -1,11 +1,6 @@
 name: Start trustify
 description: Start trustify using docker compose.
 inputs:
-  ui_image:
-    description: image uri for the ui (ie. ghcr.io/<namespace>/<image-name>:<tag>)
-    type: string
-    required: false
-    default: ""
   server_image:
     description: image uri for the server (ie. ghcr.io/<namespace>/<image-name>:<tag>)
     type: string
@@ -43,9 +38,6 @@ runs:
         if [ -n "${{ inputs.server_image }}" ]; then
           opts="${opts} TRUSTIFY_IMAGE=${{ inputs.server_image }}"
         fi
-        if [ -n "${{ inputs.ui_image }}" ]; then
-          opts="${opts} TRUSTIFY_UI_IMAGE=${{ inputs.ui_image }}"
-        fi
         if [ -n "${{ inputs.server_db_image }}" ]; then
           opts="${opts} POSTGRESQL_IMAGE=${{ inputs.server_db_image }}"
         fi
@@ -61,7 +53,7 @@ runs:
     - name: Wait for services to be ready
       shell: bash
       run: |
-        for port in "8080" "8081"; do
+        for port in "8080"; do
           until curl -s http://localhost:$port | grep -qi "<html"; do
             echo "Waiting for HTML page on port $port..."
             sleep 2

@@ -4,7 +4,7 @@
 
 - TypeScript 6.0, React 19
 - UI component library: PatternFly 6 (`@patternfly/react-core`, `@patternfly/react-table`)
-- Build tool: Vite (client), Rollup (common, dev-server)
+- Build tool: Vite (client), Rollup (common)
 - Routing: react-router-dom v7 with lazy-loaded routes
 - Data fetching: TanStack React Query v5
 - API client: auto-generated from OpenAPI spec via `@hey-api/openapi-ts` with Axios
@@ -78,8 +78,8 @@ import {Overview} from "./overview";
 package.json            # workspace root
 common/                 # shared ESM module (branding, environment config)
 client/                 # React SPA
-dev-server/             # Express.js production server (proxying, env injection)
 e2e/                    # Playwright end-to-end tests
+crate/                  # Rust crate embedding the client bundle in trustd
 eslint.config.mjs       # ESLint config
 .prettierrc.mjs         # Prettier config
 ```

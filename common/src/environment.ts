@@ -29,10 +29,7 @@ export type TrustificationEnvType = {
   /** UI upload file size limit in megabytes (MB), suffixed with "m" */
   UI_INGRESS_PROXY_BODY_SIZE: string;
 
-  /** The listen port for the UI's server */
-  PORT?: string;
-
-  /** Target URL for the UI server's `/auth` proxy */
+  /** OIDC provider URL and Vite dev server auth proxy target */
   OIDC_SERVER_URL?: string;
 
   /** Whether or not `/auth` proxy will be enabled */
@@ -44,7 +41,7 @@ export type TrustificationEnvType = {
   /** Whether or not call to /loaduser endpoint on Auth flow */
   OIDC_LOAD_USER?: "true" | "false";
 
-  /** Target URL for the UI server's `/api` proxy */
+  /** Target URL for the Vite dev server's `/api` proxy */
   TRUSTIFY_API_URL?: string;
 
   /** Location of branding files (relative paths computed from the project source root) */
@@ -52,17 +49,15 @@ export type TrustificationEnvType = {
 };
 
 /**
- * Keys in `TrustificationEnv` that are only used on the server and therefore do not
- * need to be sent to the client.
+ * Build-time values that should not be exposed in the browser runtime config.
  */
-export const SERVER_ENV_KEYS = ["PORT", "TRUSTIFY_API_URL", "BRANDING"];
+export const PRIVATE_ENV_KEYS = ["TRUSTIFY_API_URL", "BRANDING"];
 
 /**
  * Create a `TrustificationEnv` from a partial `TrustificationEnv` with a set of default values.
  */
 export const buildTrustificationEnv = ({
   NODE_ENV = "production",
-  PORT,
   VERSION = "99.0.0",
   MOCK = "off",
 
@@ -79,7 +74,6 @@ export const buildTrustificationEnv = ({
   BRANDING,
 }: Partial<TrustificationEnvType> = {}): TrustificationEnvType => ({
   NODE_ENV,
-  PORT,
   VERSION,
   MOCK,
 
