@@ -1,7 +1,9 @@
 import React from "react";
 import { BrowserRouter, MemoryRouter } from "react-router-dom";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
+
+import type { HubRequestParams } from "@app/api/models";
 
 import type { CryptoAlgorithm, CryptoPolicySummary } from "./crypto-context";
 
@@ -51,6 +53,7 @@ const mockKeys: CryptoAlgorithm[] = [
   },
 ];
 
+let mockAlgorithmResponse = mockAlgorithms;
 const fetchCryptoAlgorithmsSpy = vi.hoisted(() => vi.fn());
 
 vi.mock("@app/queries/crypto", () => ({
@@ -69,11 +72,13 @@ vi.mock("@app/queries/crypto", () => ({
     return {
       result: {
         data:
-          assetType === "related-crypto-material" ? mockKeys : mockAlgorithms,
+          assetType === "related-crypto-material"
+            ? mockKeys
+            : mockAlgorithmResponse,
         total:
           assetType === "related-crypto-material"
             ? mockKeys.length
-            : mockAlgorithms.length,
+            : mockAlgorithmResponse.length,
         params: {},
       },
       isFetching: false,
@@ -97,6 +102,50 @@ import { CryptoList } from "./crypto-list";
 
 /** Verifies that the page renders the title, KPI cards, tabs, and table content. */
 describe("CryptoList", () => {
+  beforeEach(() => {
+    mockAlgorithmResponse = mockAlgorithms;
+  });
+
+  afterEach(() => {
+    window.history.replaceState({}, "", "/");
+  });
+
+  const renderBrowserComponent = () =>
+    render(
+      <BrowserRouter>
+        <CryptoList />
+      </BrowserRouter>,
+    );
+
+  const getLastAlgorithmCall = () => {
+    const calls = (
+      fetchCryptoAlgorithmsSpy.mock.calls as [
+        HubRequestParams,
+        string | undefined,
+      ][]
+    ).filter(([, assetType]) => assetType === "algorithm");
+    expect(calls.length).toBeGreaterThan(0);
+    return calls[calls.length - 1];
+  };
+
+  const submitAlgorithmFilter = async (
+    toolbar: HTMLElement,
+    category: string,
+    placeholder: string,
+    value: string,
+  ) => {
+    await act(async () => {
+      fireEvent.click(within(toolbar).getByLabelText("filtered-by"));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("menuitem", { name: category }));
+    });
+    const input = within(toolbar).getByPlaceholderText(placeholder);
+    expect(input).toBeVisible();
+    fireEvent.change(input, { target: { value } });
+    fireEvent.keyDown(input, { key: "Enter" });
+  };
+
   const renderComponent = () =>
     render(
       <MemoryRouter>
@@ -172,6 +221,72 @@ describe("CryptoList", () => {
     expect(screen.getByText("Non-compliant")).toBeInTheDocument();
   });
 
+  it.each([
+    {
+      description: "nested primitive and joined cryptoFunctions",
+      algorithm: {
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+        },
+      },
+    },
+    {
+      description: "canonical fields instead of conflicting fallbacks",
+      algorithm: {
+        primitive: "unsupported-primitive",
+        properties: {
+          primitive: "signature",
+          cryptoFunctions: ["sign", "verify"],
+          detectionContext: "unsupported-usage",
+        },
+      },
+    },
+  ])("displays $description in the Algorithms table", ({ algorithm }) => {
+    mockAlgorithmResponse = [{ ...mockAlgorithms[0]!, ...algorithm }];
+    renderComponent();
+
+    const row = screen.getByText("AES-256-GCM").closest("tr")!;
+    expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+      /^signature$/,
+    );
+    expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+      /^sign, verify$/,
+    );
+    expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+    expect(within(row).queryByText("unsupported-usage")).toBeNull();
+  });
+
+  it.each([
+    { description: "absent", properties: {} },
+    { description: "empty", properties: { cryptoFunctions: [] } },
+  ])(
+    "displays placeholders instead of unsupported fallbacks when cryptoFunctions is $description",
+    ({ properties }) => {
+      mockAlgorithmResponse = [
+        {
+          ...mockAlgorithms[0]!,
+          primitive: "unsupported-primitive",
+          properties: {
+            ...properties,
+            detectionContext: "unsupported-usage",
+          },
+        },
+      ];
+      renderComponent();
+
+      const row = screen.getByText("AES-256-GCM").closest("tr")!;
+      expect(row.querySelector('[data-label="Primitive"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(row.querySelector('[data-label="Usage"]')).toHaveTextContent(
+        /^--$/,
+      );
+      expect(within(row).queryByText("unsupported-primitive")).toBeNull();
+      expect(within(row).queryByText("unsupported-usage")).toBeNull();
+    },
+  );
+
   /** Verifies that the Keys tab renders its 5 columns and key data. */
   it("renders Keys tab with correct columns and data", () => {
     renderComponent();
@@ -185,16 +300,49 @@ describe("CryptoList", () => {
     expect(row.getByText("private-key")).toBeInTheDocument();
   });
 
-  /** Verifies that both the Algorithms and Keys tabs expose a search filter. */
-  it("renders a name filter on the Keys tab", () => {
+  it("renders a standalone name search on the Keys tab", () => {
     renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
 
+    const toolbar = screen.getAllByLabelText("crypto-toolbar")[1]!;
     expect(
-      screen.getByPlaceholderText("Search by algorithm name"),
-    ).toBeInTheDocument();
+      within(toolbar).getByPlaceholderText("Search by key name"),
+    ).toBeVisible();
+    expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
+    expect(within(toolbar).queryByLabelText("filtered-by")).toBeNull();
+    expect(within(toolbar).queryByRole("combobox")).toBeNull();
     expect(
-      screen.getByPlaceholderText("Search by key name"),
-    ).toBeInTheDocument();
+      within(toolbar).getByRole("button", {
+        name: "Import Remediation Mappings",
+      }),
+    ).toBeVisible();
+  });
+
+  it("submits and clears the standalone Keys name search", () => {
+    renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
+    const input = screen.getByPlaceholderText("Search by key name");
+
+    fetchCryptoAlgorithmsSpy.mockClear();
+    fireEvent.change(input, { target: { value: "rsa" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoAlgorithmsSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        filters: [{ field: "name", operator: "~", value: "rsa" }],
+        total: true,
+      }),
+      "related-crypto-material",
+    );
+
+    fetchCryptoAlgorithmsSpy.mockClear();
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoAlgorithmsSpy).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "related-crypto-material",
+    );
   });
 
   /** Verifies that the Keys search is scoped to the name field instead of a full-text search. */
@@ -222,56 +370,145 @@ describe("CryptoList", () => {
     ]);
   });
 
-  /** Verifies that the Algorithms tab only offers the name search (policy filtering is not supported by the backend). */
-  it("does not offer a policy filter on the Algorithms tab", () => {
+  it("offers only name, Primitive, and Usage algorithm filter categories", async () => {
     renderComponent();
-
-    // The Algorithms toolbar is the first on the page
     const toolbar = screen.getAllByLabelText("crypto-toolbar")[0]!;
 
-    // No policy control may be rendered in the toolbar, e.g. outside the category dropdown
-    expect(within(toolbar).queryByText(/policy/i)).toBeNull();
-    expect(within(toolbar).queryByPlaceholderText(/policy/i)).toBeNull();
-    expect(within(toolbar).queryByLabelText(/policy/i)).toBeNull();
-    // Nor may any extra filter control (e.g. a select) sit next to the name search
+    expect(within(toolbar).queryByText(/policy|recommendation/i)).toBeNull();
+    expect(
+      within(toolbar).queryByPlaceholderText(/policy|recommendation/i),
+    ).toBeNull();
+    expect(
+      within(toolbar).queryByLabelText(/policy|recommendation/i),
+    ).toBeNull();
     expect(within(toolbar).queryByLabelText("Select")).toBeNull();
     expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
+    expect(
+      within(toolbar).getByPlaceholderText("Search by algorithm name"),
+    ).toBeVisible();
 
-    // Open the filter category dropdown
-    fireEvent.click(within(toolbar).getByLabelText("filtered-by"));
-
-    // The name search must be the one and only filter category offered
-    const categories = screen.getAllByRole("menuitem");
-    expect(categories.map((c) => c.textContent)).toEqual(["Filter"]);
+    await act(async () => {
+      fireEvent.click(within(toolbar).getByLabelText("filtered-by"));
+    });
+    expect(screen.getAllByRole("menuitem").map((c) => c.textContent)).toEqual([
+      "Filter",
+      "Primitive",
+      "Usage",
+    ]);
   });
 
-  /** Verifies that a stale policy_status filter in the URL is never sent and does not drop the valid name search. */
-  it("ignores a stale policy_status filter from the URL", () => {
-    fetchCryptoAlgorithmsSpy.mockClear();
-    // The stale filter is deliberately listed before the valid name search
-    const filters = encodeURIComponent(
-      JSON.stringify({ policy_status: ["non_compliant"], "": ["rsa"] }),
-    );
-    // URL params are written through document.location, so a real browser router is needed
-    window.history.replaceState({}, "", `/?cr:filters=${filters}`);
-    render(
-      <BrowserRouter>
-        <CryptoList />
-      </BrowserRouter>,
-    );
-    window.history.replaceState({}, "", "/");
+  it.each([
+    ["Primitive", "Search by primitive", "pke", "properties:primitive"],
+    ["Usage", "Search by usage", "keygen", "properties:cryptoFunctions"],
+  ])(
+    "submits and clears the %s algorithm search",
+    async (category, placeholder, value, field) => {
+      renderBrowserComponent();
+      const toolbar = screen.getAllByLabelText("crypto-toolbar")[0]!;
 
-    const algorithmCalls = (
-      fetchCryptoAlgorithmsSpy.mock.calls as [
-        { filters?: { field: string }[] },
-        string | undefined,
-      ][]
-    ).filter(([, assetType]) => assetType === "algorithm");
-    // The Algorithms table must have issued its data request, otherwise the checks below are vacuous
-    expect(algorithmCalls.length).toBeGreaterThan(0);
-    const lastCall = algorithmCalls[algorithmCalls.length - 1];
-    expect(lastCall?.[0].filters).toEqual([
-      { field: "", operator: "~", value: "rsa" },
+      fetchCryptoAlgorithmsSpy.mockClear();
+      await submitAlgorithmFilter(toolbar, category, placeholder, value);
+      expect(getLastAlgorithmCall()).toEqual([
+        expect.objectContaining({
+          filters: [{ field, operator: "~", value }],
+          total: true,
+        }),
+        "algorithm",
+      ]);
+
+      fetchCryptoAlgorithmsSpy.mockClear();
+      const input = within(toolbar).getByPlaceholderText(placeholder);
+      fireEvent.change(input, { target: { value: "" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+      expect(getLastAlgorithmCall()).toEqual([
+        expect.not.objectContaining({ filters: expect.anything() }),
+        "algorithm",
+      ]);
+    },
+  );
+
+  it("combines name, primitive, and usage filters, persists them, and clears all", async () => {
+    renderBrowserComponent();
+    const toolbar = screen.getAllByLabelText("crypto-toolbar")[0]!;
+
+    await submitAlgorithmFilter(
+      toolbar,
+      "Filter",
+      "Search by algorithm name",
+      "rsa",
+    );
+    await submitAlgorithmFilter(
+      toolbar,
+      "Primitive",
+      "Search by primitive",
+      "pke",
+    );
+    fetchCryptoAlgorithmsSpy.mockClear();
+    await submitAlgorithmFilter(toolbar, "Usage", "Search by usage", "keygen");
+
+    expect(getLastAlgorithmCall()).toEqual([
+      expect.objectContaining({
+        filters: [
+          { field: "", operator: "~", value: "rsa" },
+          { field: "properties:primitive", operator: "~", value: "pke" },
+          {
+            field: "properties:cryptoFunctions",
+            operator: "~",
+            value: "keygen",
+          },
+        ],
+        total: true,
+      }),
+      "algorithm",
+    ]);
+    expect(
+      JSON.parse(
+        new URLSearchParams(window.location.search).get("cr:filters")!,
+      ),
+    ).toEqual({ "": ["rsa"], primitive: ["pke"], usage: ["keygen"] });
+
+    fetchCryptoAlgorithmsSpy.mockClear();
+    fireEvent.click(
+      within(toolbar).getByRole("button", { name: "Clear all filters" }),
+    );
+    expect(getLastAlgorithmCall()).toEqual([
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "algorithm",
+    ]);
+    expect(
+      new URLSearchParams(window.location.search).get("cr:filters"),
+    ).toBeNull();
+  });
+
+  it("restores primitive, usage, and name from the URL while ignoring removed filters", () => {
+    fetchCryptoAlgorithmsSpy.mockClear();
+    // Removed categories precede valid ones so they cannot stop restoration.
+    const filters = encodeURIComponent(
+      JSON.stringify({
+        policy_status: ["non_compliant"],
+        recommendation: ["replace"],
+        primitive: ["pke"],
+        usage: ["keygen"],
+        "": ["rsa"],
+      }),
+    );
+    window.history.replaceState({}, "", `/?cr:filters=${filters}`);
+    renderBrowserComponent();
+
+    expect(getLastAlgorithmCall()).toEqual([
+      expect.objectContaining({
+        filters: [
+          { field: "properties:primitive", operator: "~", value: "pke" },
+          {
+            field: "properties:cryptoFunctions",
+            operator: "~",
+            value: "keygen",
+          },
+          { field: "", operator: "~", value: "rsa" },
+        ],
+        total: true,
+      }),
+      "algorithm",
     ]);
   });
 
