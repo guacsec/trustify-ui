@@ -1,5 +1,5 @@
 import React from "react";
-import { MemoryRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -143,11 +143,16 @@ describe("CryptoBySbom", () => {
     returnEmpty = false;
   });
 
+  afterEach(() => {
+    window.history.replaceState({}, "", "/");
+  });
+
+  // URL-backed table controls read document.location when updating params.
   const renderComponent = () =>
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <CryptoBySbom sbomId="test-sbom-id" />
-      </MemoryRouter>,
+      </BrowserRouter>,
     );
 
   it("displays the PQC KPI card with correct values", () => {
@@ -298,31 +303,50 @@ describe("CryptoBySbom", () => {
     ["Primitive", "Search by primitive", "pke", "properties:primitive"],
     ["Usage", "Search by usage", "keygen", "properties:cryptoFunctions"],
   ])(
-    "submits and clears the %s algorithm search",
+    "persists, restores, and clears the %s algorithm search",
     async (category, placeholder, value, field) => {
-      renderComponent();
+      window.history.replaceState(
+        {},
+        "",
+        "/sboms/test-sbom-id?sd:activeTab=cryptography",
+      );
+      const { unmount } = renderComponent();
       const toolbar = screen.getByLabelText("Algorithms toolbar");
-
-      fetchCryptoBySbomSpy.mockClear();
-      await submitAlgorithmFilter(toolbar, category, placeholder, value);
-      expect(getLastAlgorithmCall()).toEqual([
+      const expectedCall = [
         "test-sbom-id",
         expect.objectContaining({
           filters: [{ field, operator: "~", value }],
           total: true,
         }),
         "algorithm",
-      ]);
+      ];
 
       fetchCryptoBySbomSpy.mockClear();
-      const input = within(toolbar).getByPlaceholderText(placeholder);
-      fireEvent.change(input, { target: { value: "" } });
-      fireEvent.keyDown(input, { key: "Enter" });
+      await submitAlgorithmFilter(toolbar, category, placeholder, value);
+      expect(getLastAlgorithmCall()).toEqual(expectedCall);
+      expect(
+        JSON.parse(new URLSearchParams(window.location.search).get("filters")!),
+      ).toEqual({ [category.toLowerCase()]: [value] });
+
+      // Remount at the same URL to simulate reloading or opening a shared link.
+      unmount();
+      fetchCryptoBySbomSpy.mockClear();
+      renderComponent();
+      expect(getLastAlgorithmCall()).toEqual(expectedCall);
+      const restoredToolbar = screen.getByLabelText("Algorithms toolbar");
+      expect(within(restoredToolbar).getByText(value)).toBeInTheDocument();
+
+      fetchCryptoBySbomSpy.mockClear();
+      await submitAlgorithmFilter(restoredToolbar, category, placeholder, "");
       expect(getLastAlgorithmCall()).toEqual([
         "test-sbom-id",
         expect.not.objectContaining({ filters: expect.anything() }),
         "algorithm",
       ]);
+      const searchParams = new URLSearchParams(window.location.search);
+      expect(searchParams.get("filters")).toBeNull();
+      expect(searchParams.get("sd:activeTab")).toBe("cryptography");
+      expect(window.location.pathname).toBe("/sboms/test-sbom-id");
     },
   );
 
