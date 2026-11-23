@@ -12,6 +12,7 @@ import {
 } from "@app/hooks/table-controls";
 import { useFetchCryptoAlgorithms } from "@app/queries/crypto";
 
+import { algorithmColumnFilters } from "./algorithm-filters";
 import { CryptoSearchContext } from "./crypto-context";
 
 interface ICryptoProvider {
@@ -60,6 +61,7 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
             placeholderText: "Search by algorithm name",
             type: FilterType.search,
           },
+          ...algorithmColumnFilters,
         ]
       : [
           {

@@ -12,6 +12,10 @@ import {
   TableRowContentWithControls,
 } from "@app/components/TableControls";
 
+import {
+  getAlgorithmPrimitive,
+  getAlgorithmUsage,
+} from "./algorithm-properties";
 import type { CryptoAlgorithm } from "./crypto-context";
 import { CryptoSearchContext } from "./crypto-context";
 
@@ -26,9 +30,6 @@ const algProps = (item: CryptoAlgorithm) =>
 const rcmProps = (item: CryptoAlgorithm) =>
   (item.properties as Record<string, unknown>) ?? {};
 
-const getPrimitive = (item: CryptoAlgorithm): string =>
-  (algProps(item).primitive as string) ?? item.primitive ?? "--";
-
 /** Extracts the type value from related crypto material properties. */
 const getKeyType = (item: CryptoAlgorithm): string =>
   (rcmProps(item).type as string) ?? item.asset_type ?? "--";
@@ -36,14 +37,6 @@ const getKeyType = (item: CryptoAlgorithm): string =>
 /** Extracts the recommendation from algorithm properties. */
 const getRecommendation = (item: CryptoAlgorithm): string =>
   item.recommendation ?? "--";
-
-const getUsage = (item: CryptoAlgorithm): string => {
-  const props = algProps(item);
-  const fns = props.cryptoFunctions as string[] | undefined;
-  if (fns?.length) return fns.join(", ");
-  const ctx = props.detectionContext as string | undefined;
-  return ctx ?? "--";
-};
 
 /** Extracts the key size in bits from related crypto material properties. */
 const getKeySize = (item: CryptoAlgorithm): string => {
@@ -149,7 +142,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
                           rowIndex,
                         })}
                       >
-                        {getPrimitive(item)}
+                        {getAlgorithmPrimitive(item) ?? "--"}
                       </Td>
                       <Td
                         width={10}
@@ -190,7 +183,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
                           rowIndex,
                         })}
                       >
-                        {getUsage(item)}
+                        {getAlgorithmUsage(item) ?? "--"}
                       </Td>
                       <Td
                         width={10}
