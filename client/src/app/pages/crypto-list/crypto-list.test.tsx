@@ -185,16 +185,49 @@ describe("CryptoList", () => {
     expect(row.getByText("private-key")).toBeInTheDocument();
   });
 
-  /** Verifies that both the Algorithms and Keys tabs expose a search filter. */
-  it("renders a name filter on the Keys tab", () => {
+  it("renders a standalone name search on the Keys tab", () => {
     renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
 
+    const toolbar = screen.getAllByLabelText("crypto-toolbar")[1]!;
     expect(
-      screen.getByPlaceholderText("Search by algorithm name"),
-    ).toBeInTheDocument();
+      within(toolbar).getByPlaceholderText("Search by key name"),
+    ).toBeVisible();
+    expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
+    expect(within(toolbar).queryByLabelText("filtered-by")).toBeNull();
+    expect(within(toolbar).queryByRole("combobox")).toBeNull();
     expect(
-      screen.getByPlaceholderText("Search by key name"),
-    ).toBeInTheDocument();
+      within(toolbar).getByRole("button", {
+        name: "Import Remediation Mappings",
+      }),
+    ).toBeVisible();
+  });
+
+  it("submits and clears the standalone Keys name search", () => {
+    renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
+    const input = screen.getByPlaceholderText("Search by key name");
+
+    fetchCryptoAlgorithmsSpy.mockClear();
+    fireEvent.change(input, { target: { value: "rsa" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoAlgorithmsSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        filters: [{ field: "name", operator: "~", value: "rsa" }],
+        total: true,
+      }),
+      "related-crypto-material",
+    );
+
+    fetchCryptoAlgorithmsSpy.mockClear();
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoAlgorithmsSpy).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "related-crypto-material",
+    );
   });
 
   /** Verifies that the Keys search is scoped to the name field instead of a full-text search. */

@@ -62,13 +62,15 @@ const mockKeys: CryptoAlgorithm[] = [
 ];
 
 let returnEmpty = false;
+const fetchCryptoBySbomSpy = vi.hoisted(() => vi.fn());
 
 vi.mock("@app/queries/crypto", () => ({
   useFetchCryptoBySbom: (
-    _sbomId: string,
-    _params: unknown,
+    sbomId: string,
+    params: unknown,
     assetType?: string,
   ) => {
+    fetchCryptoBySbomSpy(sbomId, params, assetType);
     if (returnEmpty) {
       return {
         result: { data: [], total: 0, params: {} },
@@ -181,6 +183,48 @@ describe("CryptoBySbom", () => {
     expect(
       screen.getByPlaceholderText("Search by algorithm name"),
     ).toBeInTheDocument();
+  });
+
+  it("renders a standalone name search on the Keys tab", () => {
+    renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (2)" }));
+
+    const toolbar = screen.getByLabelText("Keys toolbar");
+    expect(
+      within(toolbar).getByPlaceholderText("Search by key name"),
+    ).toBeVisible();
+    expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
+    expect(within(toolbar).queryByLabelText("filtered-by")).toBeNull();
+    expect(within(toolbar).queryByRole("combobox")).toBeNull();
+  });
+
+  it("submits and clears the standalone Keys name search", () => {
+    renderComponent();
+    fireEvent.click(screen.getByRole("tab", { name: "Keys (2)" }));
+    const input = screen.getByPlaceholderText("Search by key name");
+
+    fetchCryptoBySbomSpy.mockClear();
+    fireEvent.change(input, { target: { value: "rsa" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoBySbomSpy).toHaveBeenLastCalledWith(
+      "test-sbom-id",
+      expect.objectContaining({
+        filters: [{ field: "name", operator: "~", value: "rsa" }],
+        total: true,
+      }),
+      "related-crypto-material",
+    );
+
+    fetchCryptoBySbomSpy.mockClear();
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(fetchCryptoBySbomSpy).toHaveBeenLastCalledWith(
+      "test-sbom-id",
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "related-crypto-material",
+    );
   });
 
   it("renders pagination controls", () => {

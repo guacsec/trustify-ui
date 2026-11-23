@@ -327,8 +327,9 @@ const KeysTable: React.FC<AssetTableProps> = ({
       {
         categoryKey: FILTER_TEXT_CATEGORY_KEY,
         title: "Search",
-        placeholderText: "Search",
+        placeholderText: "Search by key name",
         type: FilterType.search,
+        serverFilterField: "name",
       },
     ],
   });
@@ -377,7 +378,7 @@ const KeysTable: React.FC<AssetTableProps> = ({
     <>
       <Toolbar {...toolbarProps} aria-label="Keys toolbar">
         <ToolbarContent>
-          <FilterToolbar {...filterToolbarProps} />
+          <FilterToolbar {...filterToolbarProps} showFiltersSideBySide />
           <ToolbarItem {...paginationToolbarItemProps}>
             <SimplePagination
               idPrefix="sbom-crypto-keys"
