@@ -2,6 +2,7 @@ import React from "react";
 
 import type { AxiosError } from "axios";
 
+import type { WithUiId } from "@app/api/models";
 import type { ITableControls } from "@app/hooks/table-controls";
 
 import type { CryptoAlgorithmFilterKey } from "./algorithm-filters";
@@ -9,7 +10,7 @@ import type { CryptoAlgorithmFilterKey } from "./algorithm-filters";
 /** Context interface for the cryptography algorithm search page. */
 export interface ICryptoSearchContext {
   tableControls: ITableControls<
-    CryptoAlgorithm,
+    WithUiId<CryptoAlgorithm>,
     | "name"
     | "primitive"
     | "occurrences"
@@ -32,6 +33,7 @@ export interface ICryptoSearchContext {
 
 /** Shape of a single cryptographic algorithm returned by the backend API. */
 export interface CryptoAlgorithm {
+  sbom_id: string;
   node_id: string;
   name: string;
   asset_type: string;
