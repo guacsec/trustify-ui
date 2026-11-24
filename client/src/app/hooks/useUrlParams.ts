@@ -1,7 +1,12 @@
+import React from "react";
+import {
+  UNSAFE_DataRouterContext,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import type { DisallowCharacters } from "@app/utils/type-utils";
 import { objectKeys } from "@app/utils/utils";
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 // useUrlParams is a generic hook similar to React.useState which stores its state in the URL search params string.
 // The state is retained on a page reload, when using the browser back/forward buttons, or when bookmarking the page.
@@ -61,6 +66,7 @@ export const useUrlParams = <
   type TPrefixedURLParamKey = TURLParamKey | `${TKeyPrefix}:${TURLParamKey}`;
 
   const navigate = useNavigate();
+  const dataRouter = React.useContext(UNSAFE_DataRouterContext)?.router;
 
   const withPrefix = (key: TURLParamKey): TPrefixedURLParamKey =>
     persistenceKeyPrefix ? `${persistenceKeyPrefix}:${key}` : key;
@@ -76,23 +82,29 @@ export const useUrlParams = <
       : (serializedParams as TSerializedParams<TPrefixedURLParamKey>);
 
   const setParams = (newParams: Partial<TDeserializedParams>) => {
-    // In case setParams is called multiple times synchronously from the same rendered instance,
-    // we use document.location here as the current params so these calls never overwrite each other.
-    // This also retains any unrelated params that might be present and allows newParams to be a partial update.
-    const { pathname, search } = document.location;
-    const existingSearchParams = new URLSearchParams(search);
-    // We prefix the params object here so the serialize function doesn't have to care about the keyPrefix.
-    const newPrefixedSerializedParams = withPrefixes(serialize(newParams));
-    navigate(
-      {
-        pathname,
-        search: trimAndStringifyUrlParams({
-          existingSearchParams,
-          newPrefixedSerializedParams,
-        }),
-      },
-      { replace: true },
-    );
+    if (!isEnabled) return;
+
+    // Data routers commit browser history only after their loaders finish.
+    // Read live router state inside the setter so consecutive writers, even
+    // from different hook instances before a re-render, merge into the pending URL.
+    // Declarative BrowserRouter updates document.location synchronously instead.
+    const routerState = dataRouter?.state;
+    const currentLocation = routerState?.location ?? document.location;
+    const pendingLocation = routerState?.navigation.location;
+    // A navigation to another page must not leak its query into this page.
+    const { search, hash } =
+      pendingLocation?.pathname === currentLocation.pathname
+        ? pendingLocation
+        : currentLocation;
+    const nextSearch = trimAndStringifyUrlParams({
+      existingSearchParams: new URLSearchParams(search),
+      newPrefixedSerializedParams: withPrefixes(serialize(newParams)),
+    });
+    // Empty/default writes must not restart a pending navigation unnecessarily.
+    if (nextSearch === search.replace(/^\?/, "")) return;
+
+    // Omitting pathname keeps this on the current route without duplicating a basename.
+    navigate({ search: nextSearch, hash }, { replace: true });
   };
 
   // We use useLocation here so we are re-rendering when the params change.
@@ -111,9 +123,9 @@ export const useUrlParams = <
   }
 
   React.useEffect(() => {
-    if (allParamsEmpty) setParams(defaultValue);
+    if (isEnabled && allParamsEmpty) setParams(defaultValue);
     // Leaving this rule enabled results in a cascade of unnecessary useCallbacks:
-  }, [allParamsEmpty]);
+  }, [allParamsEmpty, isEnabled]);
 
   return [params, setParams];
 };

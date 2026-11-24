@@ -320,7 +320,7 @@ describe("CryptoList", { timeout: 15_000 }, () => {
   });
 
   it("submits and clears the standalone Keys name search", () => {
-    renderComponent();
+    renderBrowserComponent();
     fireEvent.click(screen.getByRole("tab", { name: "Keys (1)" }));
     const input = screen.getByPlaceholderText("Search by key name");
 
@@ -335,6 +335,11 @@ describe("CryptoList", { timeout: 15_000 }, () => {
       }),
       "related-crypto-material",
     );
+    expect(
+      JSON.parse(
+        new URLSearchParams(window.location.search).get("ck:filters")!,
+      ),
+    ).toEqual({ "": ["rsa"] });
 
     fetchCryptoAlgorithmsSpy.mockClear();
     fireEvent.change(input, { target: { value: "" } });
@@ -344,6 +349,9 @@ describe("CryptoList", { timeout: 15_000 }, () => {
       expect.not.objectContaining({ filters: expect.anything() }),
       "related-crypto-material",
     );
+    expect(
+      new URLSearchParams(window.location.search).get("ck:filters"),
+    ).toBeNull();
   });
 
   /** Verifies that the Keys search is scoped to the name field instead of a full-text search. */
