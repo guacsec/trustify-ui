@@ -105,7 +105,8 @@ vi.mock("@app/components/LoadingWrapper", () => ({
 import { CryptoList } from "./crypto-list";
 
 /** Verifies that the page renders the title, KPI cards, tabs, and table content. */
-describe("CryptoList", () => {
+// Table pagination interactions need extra headroom under coverage on CI runners.
+describe("CryptoList", { timeout: 15_000 }, () => {
   beforeEach(() => {
     mockAlgorithmResponse = mockAlgorithms;
     mockKeyResponse = mockKeys;
