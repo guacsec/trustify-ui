@@ -11,6 +11,7 @@ import {
   useTableControlState,
 } from "@app/hooks/table-controls";
 import { useFetchCryptoAlgorithms } from "@app/queries/crypto";
+import { useWithUiId } from "@app/utils/query-utils";
 
 import { algorithmColumnFilters } from "./algorithm-filters";
 import { CryptoSearchContext } from "./crypto-context";
@@ -95,10 +96,15 @@ export const CryptoSearchProvider: React.FunctionComponent<ICryptoProvider> = ({
     assetType,
   );
 
+  // Node IDs are only unique within an SBOM, not across this global list.
+  const tableDataWithUiId = useWithUiId(algorithms, (item) =>
+    JSON.stringify([item.sbom_id, item.node_id]),
+  );
+
   const tableControls = useTableControlProps({
     ...tableControlState,
-    idProperty: "node_id",
-    currentPageItems: algorithms,
+    idProperty: "_ui_unique_id",
+    currentPageItems: tableDataWithUiId,
     totalItemCount,
     isLoading: isFetching,
     forceNumRenderedColumns: isAlgorithms ? 8 : 5,
