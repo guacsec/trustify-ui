@@ -8,6 +8,7 @@ import type { CryptoAlgorithm } from "@app/pages/crypto-list/crypto-context";
 
 const mockAlgorithms: CryptoAlgorithm[] = [
   {
+    sbom_id: "test-sbom-id",
     node_id: "alg-1",
     name: "AES-256-GCM",
     asset_type: "algorithm",
@@ -18,6 +19,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     sboms_count: 0,
   },
   {
+    sbom_id: "test-sbom-id",
     node_id: "alg-2",
     name: "RSA-2048",
     asset_type: "algorithm",
@@ -28,6 +30,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     sboms_count: 0,
   },
   {
+    sbom_id: "test-sbom-id",
     node_id: "alg-3",
     name: "SHA-256",
     asset_type: "algorithm",
@@ -41,6 +44,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
 
 const mockKeys: CryptoAlgorithm[] = [
   {
+    sbom_id: "test-sbom-id",
     node_id: "key-1",
     name: "private-key-rsa",
     asset_type: "related-crypto-material",
@@ -51,6 +55,7 @@ const mockKeys: CryptoAlgorithm[] = [
     sboms_count: 0,
   },
   {
+    sbom_id: "test-sbom-id",
     node_id: "key-2",
     name: "public-key-ec",
     asset_type: "related-crypto-material",

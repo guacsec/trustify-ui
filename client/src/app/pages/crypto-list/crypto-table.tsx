@@ -112,7 +112,7 @@ export const CryptoTable: React.FC<CryptoTableProps> = ({
           numRenderedColumns={numRenderedColumns}
         >
           {currentPageItems.map((item, rowIndex) => (
-            <Tbody key={item.node_id}>
+            <Tbody key={item._ui_unique_id}>
               <Tr {...getTrProps({ item })}>
                 <TableRowContentWithControls
                   {...tableControls}
