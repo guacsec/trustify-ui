@@ -16,6 +16,7 @@ const mockSummary: CryptoPolicySummary = {
 
 const mockAlgorithms: CryptoAlgorithm[] = [
   {
+    sbom_id: "test-sbom-id",
     node_id: "alg-1",
     name: "AES-256-GCM",
     asset_type: "algorithm",
@@ -26,6 +27,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
     sboms_count: 0,
   },
   {
+    sbom_id: "test-sbom-id",
     node_id: "alg-2",
     name: "RSA-2048",
     asset_type: "algorithm",
@@ -42,6 +44,7 @@ const mockAlgorithms: CryptoAlgorithm[] = [
 
 const mockKeys: CryptoAlgorithm[] = [
   {
+    sbom_id: "test-sbom-id",
     node_id: "key-1",
     name: "my-rsa-key",
     asset_type: "related-crypto-material",
@@ -54,6 +57,7 @@ const mockKeys: CryptoAlgorithm[] = [
 ];
 
 let mockAlgorithmResponse = mockAlgorithms;
+let mockKeyResponse = mockKeys;
 const fetchCryptoAlgorithmsSpy = vi.hoisted(() => vi.fn());
 
 vi.mock("@app/queries/crypto", () => ({
@@ -64,22 +68,22 @@ vi.mock("@app/queries/crypto", () => ({
     refetch: vi.fn(),
   }),
   useFetchCryptoAlgorithms: (
-    params: unknown,
+    params: HubRequestParams,
     _disable: boolean,
     assetType?: string,
   ) => {
     fetchCryptoAlgorithmsSpy(params, assetType);
+    const items =
+      assetType === "related-crypto-material"
+        ? mockKeyResponse
+        : mockAlgorithmResponse;
+    const { page } = params;
+    const offset = page ? (page.pageNumber - 1) * page.itemsPerPage : 0;
     return {
       result: {
-        data:
-          assetType === "related-crypto-material"
-            ? mockKeys
-            : mockAlgorithmResponse,
-        total:
-          assetType === "related-crypto-material"
-            ? mockKeys.length
-            : mockAlgorithmResponse.length,
-        params: {},
+        data: page ? items.slice(offset, offset + page.itemsPerPage) : items,
+        total: items.length,
+        params,
       },
       isFetching: false,
       fetchError: null,
@@ -105,6 +109,7 @@ import { CryptoList } from "./crypto-list";
 describe("CryptoList", { timeout: 15_000 }, () => {
   beforeEach(() => {
     mockAlgorithmResponse = mockAlgorithms;
+    mockKeyResponse = mockKeys;
   });
 
   afterEach(() => {
@@ -512,6 +517,92 @@ describe("CryptoList", { timeout: 15_000 }, () => {
       "algorithm",
     ]);
   });
+
+  it.each([
+    { tab: "Algorithms", assetType: "algorithm", pageSize: 10 },
+    { tab: "Keys", assetType: "related-crypto-material", pageSize: 10 },
+    { tab: "Algorithms", assetType: "algorithm", pageSize: 25 },
+    { tab: "Keys", assetType: "related-crypto-material", pageSize: 25 },
+  ])(
+    "keeps $tab pages at $pageSize rows when node IDs repeat across SBOMs",
+    ({ tab, assetType, pageSize }) => {
+      // Adjacent assets have the same node ID and name, but belong to different SBOMs.
+      const items: CryptoAlgorithm[] = Array.from(
+        { length: pageSize * 2 + 3 },
+        (_, index) => ({
+          ...mockAlgorithms[0]!,
+          sbom_id: `sbom-${index % 2}`,
+          node_id: `asset-${Math.floor(index / 2)}`,
+          name: `Asset ${Math.floor(index / 2)}`,
+          asset_type: assetType,
+        }),
+      );
+      if (assetType === "algorithm") {
+        mockAlgorithmResponse = items;
+      } else {
+        mockKeyResponse = items;
+      }
+      window.history.replaceState(
+        {},
+        "",
+        `/?cr:pageNumber=1&cr:itemsPerPage=${pageSize}&ck:pageNumber=1&ck:itemsPerPage=${pageSize}`,
+      );
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        renderBrowserComponent();
+        fireEvent.click(
+          screen.getByRole("tab", { name: `${tab} (${items.length})` }),
+        );
+        const table = screen.getByRole("grid", { name: "crypto-table" });
+        let pageIndex = 0;
+        const expectPage = () => {
+          const expected = items.slice(
+            pageIndex * pageSize,
+            (pageIndex + 1) * pageSize,
+          );
+          const rows = Array.from(table.querySelectorAll("tbody tr"));
+          expect(rows).toHaveLength(expected.length);
+          expect(
+            rows.map((row) => row.querySelector("td")?.textContent),
+          ).toEqual(expected.map((item) => item.name));
+          expect(rows.map((row) => row.getAttribute("data-item-id"))).toEqual(
+            expected.map((item) =>
+              JSON.stringify([item.sbom_id, item.node_id]),
+            ),
+          );
+          expect(new Set(rows.map((row) => row.id)).size).toBe(rows.length);
+        };
+        expectPage();
+        for (const direction of [
+          "next",
+          "previous",
+          "next",
+          "previous",
+          "next",
+          "next",
+          "previous",
+          "previous",
+        ]) {
+          fireEvent.click(
+            screen.getAllByRole("button", {
+              name: `Go to ${direction} page`,
+            })[0]!,
+          );
+          pageIndex += direction === "next" ? 1 : -1;
+          expectPage();
+        }
+        expect(
+          consoleError.mock.calls.filter(([message]) =>
+            String(message).includes("same key"),
+          ),
+        ).toEqual([]);
+      } finally {
+        consoleError.mockRestore();
+      }
+    },
+  );
 
   /** Verifies that pagination controls are rendered on the Algorithms tab. */
   it("renders pagination controls", () => {
