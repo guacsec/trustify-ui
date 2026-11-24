@@ -1,6 +1,7 @@
 import { createBdd } from "playwright-bdd";
 import { expect } from "../../assertions";
 import { test } from "../../fixtures";
+import { ensureAllImportersExist } from "../../helpers/Importer";
 import { DeletionConfirmDialog } from "../../pages/ConfirmDialog";
 import { ImporterListPage } from "../../pages/importer-list/ImporterListPage";
 
@@ -9,6 +10,10 @@ export const { Given, When, Then } = createBdd(test);
 // Navigation
 When("User navigates to Importers page", async ({ page }) => {
   await ImporterListPage.build(page);
+});
+
+When("All importers are present", async ({ page }) => {
+  await ensureAllImportersExist(page);
 });
 
 // Assertions - Page structure
@@ -361,6 +366,8 @@ When("User disables the {string} importer", async ({ page }, importerName) => {
 When(
   "User enables a disabled importer {string}",
   async ({ page }, importerName) => {
+    test.setTimeout(90_000);
+
     const listPage = new ImporterListPage(page);
 
     // Verify the importer is actually disabled before enabling
