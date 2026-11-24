@@ -92,7 +92,8 @@ const AlgorithmsTable: React.FC<AssetTableProps> = ({
 }) => {
   const tableControlState = useTableControlState({
     tableName: "sbom-crypto-algorithms",
-    persistTo: "urlParams",
+    persistenceKeyPrefix: "sbom-crypto-algorithms",
+    persistTo: { filter: "urlParams" },
     columnNames: {
       name: "Algorithm name",
       primitive: "Primitive",

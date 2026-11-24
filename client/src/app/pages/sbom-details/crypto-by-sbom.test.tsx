@@ -116,7 +116,7 @@ describe("CryptoBySbom", () => {
         assetType === "algorithm" && params.sort?.field === "name",
     );
     expect(calls.length).toBeGreaterThan(0);
-    return calls[calls.length - 1];
+    return calls[calls.length - 1]!;
   };
 
   const submitAlgorithmFilter = async (
@@ -300,11 +300,24 @@ describe("CryptoBySbom", () => {
   });
 
   it.each([
-    ["Primitive", "Search by primitive", "pke", "properties:primitive"],
-    ["Usage", "Search by usage", "keygen", "properties:cryptoFunctions"],
+    ["Search", "Search by algorithm name", "rsa", "", ""],
+    [
+      "Primitive",
+      "Search by primitive",
+      "pke",
+      "properties:primitive",
+      "primitive",
+    ],
+    [
+      "Usage",
+      "Search by usage",
+      "keygen",
+      "properties:cryptoFunctions",
+      "usage",
+    ],
   ])(
     "persists, restores, and clears the %s algorithm search",
-    async (category, placeholder, value, field) => {
+    async (category, placeholder, value, field, categoryKey) => {
       window.history.replaceState(
         {},
         "",
@@ -325,8 +338,12 @@ describe("CryptoBySbom", () => {
       await submitAlgorithmFilter(toolbar, category, placeholder, value);
       expect(getLastAlgorithmCall()).toEqual(expectedCall);
       expect(
-        JSON.parse(new URLSearchParams(window.location.search).get("filters")!),
-      ).toEqual({ [category.toLowerCase()]: [value] });
+        JSON.parse(
+          new URLSearchParams(window.location.search).get(
+            "sbom-crypto-algorithms:filters",
+          )!,
+        ),
+      ).toEqual({ [categoryKey]: [value] });
 
       // Remount at the same URL to simulate reloading or opening a shared link.
       unmount();
@@ -344,9 +361,157 @@ describe("CryptoBySbom", () => {
         "algorithm",
       ]);
       const searchParams = new URLSearchParams(window.location.search);
+      expect(searchParams.get("sbom-crypto-algorithms:filters")).toBeNull();
       expect(searchParams.get("filters")).toBeNull();
       expect(searchParams.get("sd:activeTab")).toBe("cryptography");
       expect(window.location.pathname).toBe("/sboms/test-sbom-id");
+    },
+  );
+
+  it("isolates algorithm filters from unrelated URL parameters", async () => {
+    const unrelatedParams = {
+      "sd:activeTab": "cryptography",
+      filters: JSON.stringify({ primitive: ["hash"] }),
+      "cr:filters": JSON.stringify({ primitive: ["signature"] }),
+    };
+    const initialParams = new URLSearchParams(unrelatedParams);
+    initialParams.append("crypto", "AES");
+    initialParams.append("crypto", "RSA");
+    window.history.replaceState(
+      {},
+      "",
+      "/sboms/test-sbom-id?" + initialParams.toString(),
+    );
+    renderComponent();
+    const toolbar = screen.getByLabelText("Algorithms toolbar");
+
+    expect(getLastAlgorithmCall()).toEqual([
+      "test-sbom-id",
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "algorithm",
+    ]);
+    expect(within(toolbar).queryByText("hash")).toBeNull();
+    expect(within(toolbar).queryByText("signature")).toBeNull();
+
+    await submitAlgorithmFilter(
+      toolbar,
+      "Primitive",
+      "Search by primitive",
+      "pke",
+    );
+    expect(getLastAlgorithmCall()).toEqual([
+      "test-sbom-id",
+      expect.objectContaining({
+        filters: [
+          { field: "properties:primitive", operator: "~", value: "pke" },
+        ],
+      }),
+      "algorithm",
+    ]);
+    const searchParams = new URLSearchParams(window.location.search);
+    expect(
+      JSON.parse(searchParams.get("sbom-crypto-algorithms:filters")!),
+    ).toEqual({ primitive: ["pke"] });
+    expect(Object.fromEntries(searchParams)).toMatchObject(unrelatedParams);
+    expect(searchParams.getAll("crypto")).toEqual(["AES", "RSA"]);
+
+    fireEvent.click(
+      within(toolbar).getByRole("button", { name: "Clear all filters" }),
+    );
+    expect(getLastAlgorithmCall()).toEqual([
+      "test-sbom-id",
+      expect.not.objectContaining({ filters: expect.anything() }),
+      "algorithm",
+    ]);
+    const clearedParams = new URLSearchParams(window.location.search);
+    expect(clearedParams.get("sbom-crypto-algorithms:filters")).toBeNull();
+    expect(Object.fromEntries(clearedParams)).toEqual({
+      ...unrelatedParams,
+      crypto: "RSA",
+    });
+    expect(clearedParams.getAll("crypto")).toEqual(["AES", "RSA"]);
+    expect(window.location.pathname).toBe("/sboms/test-sbom-id");
+  });
+
+  it("keeps sorting and pagination out of the URL", async () => {
+    mockAlgorithmResponse = Array.from({ length: 12 }, (_, index) => ({
+      ...mockAlgorithms[0]!,
+      node_id: "alg-" + index,
+    }));
+    const initialSearch = new URLSearchParams({
+      "sd:activeTab": "cryptography",
+    }).toString();
+    window.history.replaceState({}, "", "/sboms/test-sbom-id?" + initialSearch);
+    const { unmount } = renderComponent();
+    const toolbar = screen.getByLabelText("Algorithms toolbar");
+    expect(window.location.search).toBe("?" + initialSearch);
+
+    fireEvent.click(
+      within(
+        screen.getByRole("columnheader", { name: "Algorithm name" }),
+      ).getByRole("button"),
+    );
+    expect(getLastAlgorithmCall()[1]).toMatchObject({
+      sort: { field: "name", direction: "desc" },
+    });
+    expect(window.location.search).toBe("?" + initialSearch);
+
+    fireEvent.click(
+      within(toolbar).getByRole("button", { name: "Go to next page" }),
+    );
+    expect(getLastAlgorithmCall()[1]).toMatchObject({
+      page: { pageNumber: 2, itemsPerPage: 10 },
+    });
+    expect(window.location.search).toBe("?" + initialSearch);
+
+    await act(async () => {
+      fireEvent.click(
+        within(toolbar).getByRole("button", { name: "11 - 12 of 12" }),
+      );
+    });
+    fireEvent.click(screen.getByRole("menuitem", { name: "20 per page" }));
+    expect(getLastAlgorithmCall()[1]).toMatchObject({
+      page: { pageNumber: 1, itemsPerPage: 20 },
+    });
+    expect(window.location.search).toBe("?" + initialSearch);
+
+    unmount();
+    fetchCryptoBySbomSpy.mockClear();
+    renderComponent();
+    expect(getLastAlgorithmCall()[1]).toMatchObject({
+      sort: { field: "name", direction: "asc" },
+      page: { pageNumber: 1, itemsPerPage: 10 },
+    });
+    expect(window.location.search).toBe("?" + initialSearch);
+  });
+
+  it.each([
+    { description: "unprefixed", prefix: "" },
+    { description: "table-prefixed", prefix: "sbom-crypto-algorithms:" },
+  ])(
+    "ignores $description sort and pagination URL parameters",
+    ({ prefix }) => {
+      const initialSearch = new URLSearchParams({
+        "sd:activeTab": "cryptography",
+        [prefix + "sortColumn"]: "name",
+        [prefix + "sortDirection"]: "desc",
+        [prefix + "pageNumber"]: "2",
+        [prefix + "itemsPerPage"]: "20",
+      }).toString();
+      window.history.replaceState(
+        {},
+        "",
+        "/sboms/test-sbom-id?" + initialSearch,
+      );
+      renderComponent();
+
+      expect(getLastAlgorithmCall()[1]).toMatchObject({
+        sort: { field: "name", direction: "asc" },
+        page: { pageNumber: 1, itemsPerPage: 10 },
+      });
+      expect(
+        Object.fromEntries(new URLSearchParams(window.location.search)),
+      ).toEqual(Object.fromEntries(new URLSearchParams(initialSearch)));
     },
   );
 
