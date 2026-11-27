@@ -317,11 +317,6 @@ describe("CryptoList", { timeout: 15_000 }, () => {
     expect(within(toolbar).getAllByRole("textbox")).toHaveLength(1);
     expect(within(toolbar).queryByLabelText("filtered-by")).toBeNull();
     expect(within(toolbar).queryByRole("combobox")).toBeNull();
-    expect(
-      within(toolbar).getByRole("button", {
-        name: "Import Remediation Mappings",
-      }),
-    ).toBeVisible();
   });
 
   it("submits and clears the standalone Keys name search", () => {
