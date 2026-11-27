@@ -1,14 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-} from "@patternfly/react-core";
+import { Toolbar, ToolbarContent, ToolbarItem } from "@patternfly/react-core";
 
-import { Paths } from "@app/Routes";
 import { FilterToolbar } from "@app/components/FilterToolbar";
 import { SimplePagination } from "@app/components/SimplePagination";
 
@@ -25,7 +18,6 @@ export const CryptoToolbar: React.FC<CryptoToolbarProps> = ({
   showFiltersSideBySide,
 }) => {
   const { tableControls } = React.useContext(CryptoSearchContext);
-  const navigate = useNavigate();
 
   const {
     propHelpers: {
@@ -45,14 +37,6 @@ export const CryptoToolbar: React.FC<CryptoToolbarProps> = ({
             showFiltersSideBySide={showFiltersSideBySide}
           />
         )}
-        <ToolbarItem>
-          <Button
-            variant="secondary"
-            onClick={() => navigate(Paths.cryptographyRemediationUpload)}
-          >
-            Import Remediation Mappings
-          </Button>
-        </ToolbarItem>
         <ToolbarItem {...paginationToolbarItemProps}>
           <SimplePagination
             idPrefix="crypto-table"
